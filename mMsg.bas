@@ -101,9 +101,9 @@ Dim sErrText    As String   ' May be a first part of the sErrDesc
 
     '~~ Display error message by UserForm fErrMsg
     With fMsg
-        .Title = sTitle
-        .TitleFontName = "Tahoma"
-        .TitleFontSize = 9
+        .title = sTitle
+        .titleFontName = "Tahoma"
+        .titlefontsize = 9
         .LabelMessage1 = "Error Message/Description:"
         .Message1Proportional = sErrText
         If sErrPath <> vbNullString Then
@@ -114,7 +114,7 @@ Dim sErrText    As String   ' May be a first part of the sErrDesc
             .LabelMessage3 = "Info:"
             .Message3Proportional = sErrInfo
         End If
-        .Replies = vbOKOnly
+        .replies = vbOKOnly
         .Show
     End With
 
@@ -180,13 +180,13 @@ Dim dMax As Double
     Max = dMax
 End Function
 
-Public Function Msg(ByVal sTitle As String, _
-           Optional ByVal sMsgText As String = vbNullString, _
-           Optional ByVal bFixed As Boolean = False, _
-           Optional ByVal sTitleFontName As String = vbNullString, _
-           Optional ByVal lTitleFontSize As Long = 0, _
-           Optional ByVal siFormWidth As Single = 0, _
-           Optional ByVal vReplies As Variant = vbOKOnly) As Variant
+Public Function Msg(ByVal title As String, _
+           Optional ByVal msgtext As String = vbNullString, _
+           Optional ByVal msgmonospaced As Boolean = False, _
+           Optional ByVal titleFontName As String = vbNullString, _
+           Optional ByVal titlefontsize As Long = 0, _
+           Optional ByVal minimformwidth As Single = 0, _
+           Optional ByVal replies As Variant = vbOKOnly) As Variant
 ' -----------------------------------------------------------------------
 ' Custom message using the UserForm fMsg. The function returns the
 ' clicked reply button's caption or the corresponding vb variable
@@ -201,18 +201,18 @@ Dim siHeight        As Single
     h = GetSystemMetrics32(1) ' Screen Resolution height in points
 
     With fMsg
-        .Title = sTitle
-        .TitleFontName = sTitleFontName
-        .TitleFontSize = lTitleFontSize
+        .title = title
+        .titleFontName = titleFontName
+        .titlefontsize = titlefontsize
 
-        If sMsgText <> vbNullString Then
-            If bFixed = True _
-            Then .Message1Fixed = sMsgText _
-            Else .Message1Proportional = sMsgText
+        If msgtext <> vbNullString Then
+            If msgmonospaced = True _
+            Then .Message1Monospaced = msgtext _
+            Else .Message1Proportional = msgtext
         End If
 
-        .Replies = vReplies
-        If siFormWidth <> 0 Then .Width = Max(.Width, siFormWidth)
+        .replies = replies
+        If minimformwidth <> 0 Then .Width = Max(.Width, minimformwidth)
         .StartUpPosition = 1
         .Width = w * PointsPerPixel * 0.85 'Userform width= Width in Resolution * DPI * 85%
         siHeight = h * PointsPerPixel * 0.2
@@ -250,20 +250,19 @@ Dim dMin As Double
     Min = dMin
 End Function
 
-Public Function Msg3(ByVal sTitle As String, _
-            Optional ByVal sLabel1 As String = vbNullString, _
-            Optional ByVal sText1 As String = vbNullString, _
-            Optional ByVal bFixed1 As Boolean = False, _
-            Optional ByVal sLabel2 As String = vbNullString, _
-            Optional ByVal sText2 As String = vbNullString, _
-            Optional ByVal bFixed2 As Boolean = False, _
-            Optional ByVal sLabel3 As String = vbNullString, _
-            Optional ByVal sText3 As String = vbNullString, _
-            Optional ByVal bFixed3 As Boolean = False, _
-            Optional ByVal sTitleFontName As String = vbNullString, _
-            Optional ByVal lTitleFontSize As Long = 0, _
-            Optional ByVal siFormWidth As Single = 0, _
-            Optional ByVal vReplies As Variant = vbOKOnly) As Variant
+Public Function Msg3(ByVal title As String, _
+            Optional ByVal msg1label As String = vbNullString, _
+            Optional ByVal msg1text As String = vbNullString, _
+            Optional ByVal msg1monospaced As Boolean = False, _
+            Optional ByVal msg2label As String = vbNullString, _
+            Optional ByVal msg2text As String = vbNullString, _
+            Optional ByVal msg2monospaced As Boolean = False, _
+            Optional ByVal msg3label As String = vbNullString, _
+            Optional ByVal msg3text As String = vbNullString, _
+            Optional ByVal msg3monospaced As Boolean = False, _
+            Optional ByVal titlefontsize As Long = 0, _
+            Optional ByVal minformwidth As Single = 0, _
+            Optional ByVal replies As Variant = vbOKOnly) As Variant
 ' ------------------------------------------------------------------
 ' Custom message allowing three sections, each with a label/haeder,
 ' using the UserForm fMsg. The function returns the clicked reply
@@ -279,33 +278,32 @@ Dim siHeight        As Single
     h = GetSystemMetrics32(1) ' Screen Resolution height in points
 
     With fMsg
-        .Title = sTitle
-        .TitleFontName = sTitleFontName
-        .TitleFontSize = lTitleFontSize
+        .title = title
+        .titlefontsize = titlefontsize
 
-        If sText1 <> vbNullString Then
-            If bFixed1 = True _
-            Then .Message1Fixed = sText1 _
-            Else .Message1Proportional = sText1
-            .LabelMessage1 = sLabel1
+        If msg1text <> vbNullString Then
+            If msg1monospaced = True _
+            Then .Message1Monospaced = msg1text _
+            Else .Message1Proportional = msg1text
+            .LabelMessage1 = msg1label
         End If
 
-        If sText2 <> vbNullString Then
-            If bFixed2 = True _
-            Then .Message2Fixed = sText2 _
-            Else .Message2Proportional = sText2
-            .LabelMessage2 = sLabel2
+        If msg2text <> vbNullString Then
+            If msg2monospaced = True _
+            Then .Message2Monospaced = msg2text _
+            Else .Message2Proportional = msg2text
+            .LabelMessage2 = msg2label
         End If
 
-        If sText3 <> vbNullString Then
-            If bFixed3 = True _
-            Then .Message3Fixed = sText3 _
-            Else .Message3Proportional = sText3
-            .LabelMessage3 = sLabel3
+        If msg3text <> vbNullString Then
+            If msg3monospaced = True _
+            Then .Message3Monospaced = msg3text _
+            Else .Message3Proportional = msg3text
+            .LabelMessage3 = msg3label
         End If
 
-        .Replies = vReplies
-        If siFormWidth <> 0 Then .Width = Max(.Width, siFormWidth)
+        .replies = replies
+        If minformwidth <> 0 Then .Width = Max(.Width, minformwidth)
         .StartUpPosition = 1
         .Width = w * PointsPerPixel * 0.85 'Userform width= Width in Resolution * DPI * 85%
         siHeight = h * PointsPerPixel * 0.2
