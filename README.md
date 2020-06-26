@@ -15,8 +15,8 @@ The MsgBox function syntax has these named arguments:
 
 | Part | Description |
 | ---- | ----------- |
-| msgtext | Required. String expression displayed as the message in the dialog box. The maximum length of prompt is approximately 1024 characters, depending on the width of the characters used. If prompt consists of more than one line, you can separate the lines by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line. |
-| replies | Optional. Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 5 reply buttons. If omitted, the default value for buttons is 0 (vbOkOnly). |
+| msgtext | Required.  String expression displayed as the message in the dialog box. The maximum length of prompt is approximately 1024 characters, depending on the width of the characters used. If prompt consists of more than one line, you can separate the lines by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line. |
+| replies | Optional.  Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 5 reply buttons. If omitted, the default value for buttons is 0 (vbOkOnly). |
 | title | Optional. String expression displayed in the title bar of the dialog box. When omitted, the application name is placed in the title bar. |
 
 ## Installation
@@ -24,15 +24,15 @@ The MsgBox function syntax has these named arguments:
 Download: fMsg.frm, fmsg.frx, mMsg.bas
 Import into your project: fMsf.frm and mMsg.bas (fmsg.frx is automatically imported together with fmsg.frm)
 
+Note: For the following examples the above files are imported into the Workbook Msg.xlsm in which also all testing is prepared.
+
 
 
 ## Usage examples
-### Simple message
-- mMsg.Msg sTitle:="any", sMsgText:="any", vReplies:=vbOkOnly
-  displays the following message
-
-### Simple user decision message
-
-### Elaborated Error message
+| Example | Syntax | Displayed message |
+| ------- | ------ | ----------------- |
+| Simple message | `mMsg.msg1 _ msgtitle:="any", _ msgtext:="any"` | |
+| Elaborated user decision dialog | | |
+| Elaborated error message | | |
 
 See the wiki for further details
