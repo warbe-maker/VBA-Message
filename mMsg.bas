@@ -49,72 +49,73 @@ Public Property Let MsgReply(ByVal v As Variant):   vMsgReply = v:          End 
 Public Property Get MsgReply() As Variant:          MsgReply = vMsgReply:   End Property
 
 #If AlternateMsgBox Then
-Public Sub ErrMsg(Optional ByVal lErrNo As Long = 0, _
-                  Optional ByVal sErrSrc As String = vbNullString, _
-                  Optional ByVal sErrDesc As String = vbNullString, _
-                  Optional ByVal sErrLine As String = vbNullString, _
-                  Optional ByVal sTitle As String = vbNullString, _
-                  Optional ByVal sErrPath As String = vbNullString, _
-                  Optional ByVal sErrInfo As String = vbNullString)
+' Elaborated error message using fMsg which supports the display of
+' up to 3 message sections, optionally monospaced (here used for the
+' error path) and each optionally with a label (here used to specify
+' the message sections).
+' Note: The error title is automatically assembled.
 ' -------------------------------------------------------------------
-' Common error message using fMsg which supports the
-' display of an error path in a fixed font textbox.
-' -------------------------------------------------------------------
-Const PROC      As String = "ErrMsg"
-Dim sIndicate   As String
-Dim sErrText    As String   ' May be a first part of the sErrDesc
+Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
+                  Optional ByVal errsource As String = vbNullString, _
+                  Optional ByVal errdescription As String = vbNullString, _
+                  Optional ByVal errline As String = vbNullString, _
+                  Optional ByVal errtitle As String = vbNullString, _
+                  Optional ByVal errpath As String = vbNullString, _
+                  Optional ByVal errinfo As String = vbNullString)
 
-    If lErrNo = 0 _
-    Then MsgBox "Exit statement before error handling missing! Error number is 0!", vbCritical, "Application error in " & ErrSrc(PROC) & "!"
+    Const PROC      As String = "ErrMsg"
+    Dim sIndicate   As String
+    Dim sErrText    As String   ' May be a first part of the errdescription
 
-    '~~ Additional info about the error line in case one had been provided
-    If sErrLine = vbNullString Or sErrLine = "0" Then
+    If errnumber = 0 _
+    Then MsgBox "Apparently there is no exit statement line above the error handling! Error number is 0!", vbCritical, "Application error in " & ErrSrc(PROC) & "!"
+
+    '~~ Error line info in case one had been provided - additionally integrated in the assembled error title
+    If errline = vbNullString Or errline = "0" Then
         sIndicate = vbNullString
     Else
-        sIndicate = " (at line " & sErrLine & ")"
+        sIndicate = " (at line " & errline & ")"
     End If
 
-    If sTitle = vbNullString Then
-        '~~ When no title is provided, one is assembled by the provided info
-        sTitle = sTitle & sIndicate
+    If errtitle = vbNullString Then
+        '~~ When no msgtitle is provided, one is assembled by the provided info
+        errtitle = errtitle & sIndicate
         '~~ Distinguish between VBA and Application error
-        Select Case lErrNo
-            Case Is > 0:    sTitle = "VBA Error " & lErrNo
-            Case Is < 0:    sTitle = "Application Error " & AppErr(lErrNo)
+        Select Case errnumber
+            Case Is > 0:    errtitle = "VBA Error " & errnumber
+            Case Is < 0:    errtitle = "Application Error " & AppErr(errnumber)
         End Select
-        sTitle = sTitle & " in:  " & sErrSrc & sIndicate
+        errtitle = errtitle & " in:  " & errsource & sIndicate
     End If
 
-    If sErrInfo = vbNullString Then
+    If errinfo = vbNullString Then
         '~~ When no error information is provided one may be within the error description
         '~~ which is only possible with an application error raised by Err.Raise
-        If InStr(sErrDesc, "||") <> 0 Then
-            sErrText = Split(sErrDesc, "||")(0)
-            sErrInfo = Split(sErrDesc, "||")(1)
+        If InStr(errdescription, "||") <> 0 Then
+            sErrText = Split(errdescription, "||")(0)
+            errinfo = Split(errdescription, "||")(1)
         Else
-            sErrText = sErrDesc
-            sErrInfo = vbNullString
+            sErrText = errdescription
+            errinfo = vbNullString
         End If
     Else
-        sErrText = sErrDesc
+        sErrText = errdescription
     End If
 
     '~~ Display error message by UserForm fErrMsg
     With fMsg
-        .title = sTitle
-        .titleFontName = "Tahoma"
-        .titlefontsize = 9
-        .LabelMessage1 = "Error Message/Description:"
-        .Message1Proportional = sErrText
-        If sErrPath <> vbNullString Then
-            .LabelMessage2 = "Error path (call stack):"
-            .Message2Proportional = sErrPath
+        .Title = errtitle
+        .msg1Label = "Error Message/Description:"
+        .Msg1TextPrprtional = sErrText
+        If errpath <> vbNullString Then
+            .msg2label = "Error path (call stack):"
+            .Msg2TextPrprtional = errpath
         End If
-        If sErrInfo <> vbNullString Then
-            .LabelMessage3 = "Info:"
-            .Message3Proportional = sErrInfo
+        If errinfo <> vbNullString Then
+            .msg3label = "Info:"
+            .Msg3TextPrprtional = errinfo
         End If
-        .replies = vbOKOnly
+        .Replies = vbOKOnly
         .Show
     End With
 
@@ -122,35 +123,52 @@ End Sub
 
 #Else
 
-Public Sub ErrMsg(ByVal lErrNo As Long, _
-                  ByVal sErrSrc As String, _
-                  ByVal sErrDesc As String, _
-                  ByVal sErrLine As String)
-' ---------------------------------------------
 ' Common error message using MsgBox.
 ' ---------------------------------------------
-Const PROC  As String = "ErrMsg"
-Dim sMsg    As String
-Dim sTitle  As String
+Public Sub ErrMsg(ByVal errnumber As Long, _
+                  ByVal errsource As String, _
+                  ByVal errdescription As String, _
+                  ByVal errline As String, _
+         Optional ByVal errpath As String = vbNullString)
+    
+    Const PROC          As String = "ErrMsg"
+    Dim sMsg            As String
+    Dim sMsgTitle       As String
+    Dim sDescription    As String
+    Dim sInfo           As String
 
-    If lErrNo = 0 _
+    If errnumber = 0 _
     Then MsgBox "Exit statement before error handling missing! Error number is 0!", vbCritical, "Application error in " & ErrSrc(PROC) & "!"
 
     '~~ Prepare Title
-    If lErrNo < 0 Then
-        sTitle = "Application Error " & AppErr(lErrNo)
+    If errnumber < 0 Then
+        sMsgTitle = "Application Error " & AppErr(errnumber)
     Else
-        sTitle = "VB Error " & lErrNo
+        sMsgTitle = "VB Error " & errnumber
     End If
-    sTitle = sTitle & " in " & sErrSource
-    If sErrLine <> 0 Then sTitle = sTitle & " (at line " & sErrLine & ")"
+    sMsgTitle = sMsgTitle & " in " & errsource
+    If errline <> 0 Then sMsgTitle = sMsgTitle & " (at line " & errline & ")"
 
     '~~ Prepare message
-    sMsg = "Error : " & sErrText & vbLf & vbLf & _
-           "In : " & sErrSource
-    If sErrLine <> 0 Then sMsg = sMsg & " (at line " & sErrLine & ")"
-
-    MsgBox sMsg, vbCritical, sTitle
+    If InStr(errdescription, "||") <> 0 Then
+        '~~ Split error description/message and info
+        sDescription = Split(errdescription, "||")(0)
+        sInfo = Split(errdescription, "||")(1)
+    Else
+        sDescription = errdescription
+    End If
+    sMsg = "Description: " & vbLf & sDescription & vbLf & vbLf & _
+           "Source:" & vbLf & errsource
+    If errline <> 0 Then sMsg = sMsg & " (at line " & errline & ")"
+    If errpath <> vbNullString Then
+        sMsg = sMsg & vbLf & vbLf & _
+               "Path:" & vbLf & errpath
+    End If
+    If sInfo <> vbNullString Then
+        sMsg = sMsg & vbLf & vbLf & _
+               "Info:" & vbLf & sInfo
+    End If
+    MsgBox sMsg, vbCritical, sMsgTitle
 
 End Sub
 #End If
@@ -180,39 +198,37 @@ Dim dMax As Double
     Max = dMax
 End Function
 
-Public Function Msg(ByVal title As String, _
+' MsgBox alternative providing up to 5 reply buttons, specified either
+' by MsgBox vbOkOnly (the default), vbYesNo, etc. or a comma delimited
+' string specifying the used button's caption. The function uses the
+' UserForm fMsg and returns the clicked reply button's caption or its
+' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
+' Note: This is a simplified version of the Msg function.
+' --------------------------------------------------------------------
+Public Function Msg1( _
+           Optional ByVal msgtitle As String = vbNullString, _
            Optional ByVal msgtext As String = vbNullString, _
            Optional ByVal msgmonospaced As Boolean = False, _
-           Optional ByVal titleFontName As String = vbNullString, _
-           Optional ByVal titlefontsize As Long = 0, _
-           Optional ByVal minimformwidth As Single = 0, _
-           Optional ByVal replies As Variant = vbOKOnly) As Variant
-' -----------------------------------------------------------------------
-' Custom message using the UserForm fMsg. The function returns the
-' clicked reply button's caption or the corresponding vb variable
-' (vbOk, vbYes, vbNo, etc.) or its caption string.
-' -----------------------------------------------------------------------
-Dim siDisplayHeight As Single
-Dim w               As Long
-Dim h               As Long
-Dim siHeight        As Single
+           Optional ByVal msgminformwidth As Single = 0, _
+           Optional ByVal msgreplies As Variant = vbOKOnly) As Variant
+    Dim w           As Long
+    Dim h           As Long
+    Dim siHeight    As Single
 
     w = GetSystemMetrics32(0) ' Screen Resolution width in points
     h = GetSystemMetrics32(1) ' Screen Resolution height in points
 
     With fMsg
-        .title = title
-        .titleFontName = titleFontName
-        .titlefontsize = titlefontsize
+        .Title = msgtitle
 
         If msgtext <> vbNullString Then
             If msgmonospaced = True _
-            Then .Message1Monospaced = msgtext _
-            Else .Message1Proportional = msgtext
+            Then .Msg1TextMonospaced = msgtext _
+            Else .Msg1TextPrprtional = msgtext
         End If
 
-        .replies = replies
-        If minimformwidth <> 0 Then .Width = Max(.Width, minimformwidth)
+        .Replies = msgreplies
+        If msgminformwidth <> 0 Then .Width = Max(.Width, msgminformwidth)
         .StartUpPosition = 1
         .Width = w * PointsPerPixel * 0.85 'Userform width= Width in Resolution * DPI * 85%
         siHeight = h * PointsPerPixel * 0.2
@@ -221,7 +237,8 @@ Dim siHeight        As Single
         .Show
     End With
 
-    Msg = vMsgReply
+    Msg1 = vMsgReply
+    
 End Function
 
 
@@ -250,60 +267,58 @@ Dim dMin As Double
     Min = dMin
 End Function
 
-Public Function Msg3(ByVal title As String, _
-            Optional ByVal msg1label As String = vbNullString, _
-            Optional ByVal msg1text As String = vbNullString, _
-            Optional ByVal msg1monospaced As Boolean = False, _
-            Optional ByVal msg2label As String = vbNullString, _
-            Optional ByVal msg2text As String = vbNullString, _
-            Optional ByVal msg2monospaced As Boolean = False, _
-            Optional ByVal msg3label As String = vbNullString, _
-            Optional ByVal msg3text As String = vbNullString, _
-            Optional ByVal msg3monospaced As Boolean = False, _
-            Optional ByVal titlefontsize As Long = 0, _
-            Optional ByVal minformwidth As Single = 0, _
-            Optional ByVal replies As Variant = vbOKOnly) As Variant
+' MsgBox alternative providing three message sections, each optionally
+' monospaced and with an optional label/haeder. The function uses the
+' UserForm fMsg and returns the clicked reply button's caption or its
+' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
 ' ------------------------------------------------------------------
-' Custom message allowing three sections, each with a label/haeder,
-' using the UserForm fMsg. The function returns the clicked reply
-' button's caption or the corresponding vb variable (vbOk, vbYes,
-' vbNo, etc.) or its caption string.
-' ------------------------------------------------------------------
-Dim siDisplayHeight As Single
-Dim w               As Long
-Dim h               As Long
-Dim siHeight        As Single
+Public Function Msg(ByVal msgtitle As String, _
+           Optional ByVal msg1Label As String = vbNullString, _
+           Optional ByVal msg1text As String = vbNullString, _
+           Optional ByVal msg1monospaced As Boolean = False, _
+           Optional ByVal msg2label As String = vbNullString, _
+           Optional ByVal msg2text As String = vbNullString, _
+           Optional ByVal msg2monospaced As Boolean = False, _
+           Optional ByVal msg3label As String = vbNullString, _
+           Optional ByVal msg3text As String = vbNullString, _
+           Optional ByVal msg3monospaced As Boolean = False, _
+           Optional ByVal msgtitlefontsize As Long = 0, _
+           Optional ByVal msgminformwidth As Single = 0, _
+           Optional ByVal msgreplies As Variant = vbOKOnly) As Variant
+    
+    Dim w           As Long
+    Dim h           As Long
+    Dim siHeight    As Single
 
     w = GetSystemMetrics32(0) ' Screen Resolution width in points
     h = GetSystemMetrics32(1) ' Screen Resolution height in points
 
     With fMsg
-        .title = title
-        .titlefontsize = titlefontsize
+        .Title = msgtitle
 
         If msg1text <> vbNullString Then
             If msg1monospaced = True _
-            Then .Message1Monospaced = msg1text _
-            Else .Message1Proportional = msg1text
-            .LabelMessage1 = msg1label
+            Then .Msg1TextMonospaced = msg1text _
+            Else .Msg1TextPrprtional = msg1text
+            .msg1Label = msg1Label
         End If
 
         If msg2text <> vbNullString Then
             If msg2monospaced = True _
-            Then .Message2Monospaced = msg2text _
-            Else .Message2Proportional = msg2text
-            .LabelMessage2 = msg2label
+            Then .Msg2TextMonospaced = msg2text _
+            Else .Msg2TextPrprtional = msg2text
+            .msg2label = msg2label
         End If
 
         If msg3text <> vbNullString Then
             If msg3monospaced = True _
-            Then .Message3Monospaced = msg3text _
-            Else .Message3Proportional = msg3text
-            .LabelMessage3 = msg3label
+            Then .Msg3TextMonospaced = msg3text _
+            Else .Msg3TextPrprtional = msg3text
+            .msg3label = msg3label
         End If
 
-        .replies = replies
-        If minformwidth <> 0 Then .Width = Max(.Width, minformwidth)
+        .Replies = msgreplies
+        If msgminformwidth <> 0 Then .Width = Max(.Width, msgminformwidth)
         .StartUpPosition = 1
         .Width = w * PointsPerPixel * 0.85 'Userform width= Width in Resolution * DPI * 85%
         siHeight = h * PointsPerPixel * 0.2
@@ -312,11 +327,11 @@ Dim siHeight        As Single
         .Show
     End With
 
-    Msg3 = vMsgReply
+    Msg = vMsgReply
 
 End Function
 
-Public Sub MakeFormResizable()
+Private Sub MakeFormResizable()
 ' ---------------------------------------------------------------------------
 ' This part is from Leith Ross                                              |
 ' Found this Code on:                                                       |
@@ -336,7 +351,7 @@ Dim RetVal
     RetVal = SetWindowLongPtr(hwnd, GWL_STYLE, lStyle)
 End Sub
 
-Public Function PointsPerPixel() As Double
+Private Function PointsPerPixel() As Double
 ' ----------------------------------------
 ' Return DPI
 ' ----------------------------------------

@@ -32,7 +32,7 @@ Const MARGIN_HORIZONTAL         As Single = 10
 Const MARGIN_VERTICAL           As Single = 10
 Const MARGIN_FORM_TOP           As Single = 5   ' Top position of the first visible control
 Const MARGIN_FORM_BOTTOM        As Single = 50
-Const MARGIN_VERTIVAL_LABEL       As Single = 5
+Const MARGIN_VERTIVAL_LABEL     As Single = 5
 Const REPLY_BUTTON_MIN_WIDTH    As Single = 70
 
 Dim sTitle                      As String
@@ -41,19 +41,19 @@ Dim vReplies                    As Variant
 Dim aReplyButtons               As Variant
 Dim sReplyButtonsReturnValue    As String   ' The provided reply buttons return values a comma delimited string
 Dim lNoOfReplyButtons           As Long
-Dim siFormWidth                 As Single
+Dim siMinFormWidth              As Single
 Dim sTitleFontName              As String
 Dim sTitleFontSize              As String   ' Ignored when sTitleFontName is not provided
 Dim siTopNext                   As Single
-Dim sMsg1Proportional           As String
-Dim sMsg2Proportional           As String
-Dim sMsg3Proportional           As String
-Dim sMsg1Monospaced             As String
-Dim sMsg2Monospaced             As String
-Dim sMsg3Monospaced             As String
-Dim sLabelMessage1              As String
-Dim sLabelMessage2              As String
-Dim sLabelMessage3              As String
+Dim sMsg1TextPrprtional       As String
+Dim sMsg2TextPrprtional       As String
+Dim sMsg3TextPrprtional       As String
+Dim sMsg1TextMonospaced         As String
+Dim sMsg2TextMonospaced         As String
+Dim sMsg3TextMonospaced         As String
+Dim sMsg1Label                  As String
+Dim sMsg2Label                  As String
+Dim sMsg3Label                  As String
 Dim siTitleWidth                As Single
 Dim siMaxMonospacedTextWidth    As Single
 Dim siMaxReplyWidth             As Single
@@ -62,50 +62,46 @@ Dim vReplyButtons               As Variant
 Dim sReplyButtons               As String
 
 Private Sub UserForm_Initialize()
-    siFormWidth = FORM_WIDTH_MIN ' Default
+    siMinFormWidth = FORM_WIDTH_MIN ' Default
 End Sub
 
 Public Property Let ErrSrc(ByVal s As String):                  sErrSrc = s:                                    End Property
 
-Public Property Let FormWidth(ByVal si As Single):              siFormWidth = si:                               End Property
+Public Property Let FormWidth(ByVal si As Single):              siMinFormWidth = si:                            End Property
 
-Public Property Let LabelMessage1(ByVal s As String):           sLabelMessage1 = s:                             End Property
+Public Property Let msg1Label(ByVal s As String):               sMsg1Label = s:                                 End Property
 
-Public Property Let LabelMessage2(ByVal s As String):           sLabelMessage2 = s:                             End Property
+Public Property Let msg2label(ByVal s As String):               sMsg2Label = s:                                 End Property
 
-Public Property Let LabelMessage3(ByVal s As String):           sLabelMessage3 = s:                             End Property
+Public Property Let msg3label(ByVal s As String):               sMsg3Label = s:                                 End Property
 
-Private Property Get LabelMsg1() As MSForms.Label:              Set LabelMsg1 = Me.laMsg1:                      End Property
+Private Property Get Msg1La() As MSForms.Label:                 Set Msg1La = Me.laMsg1:                         End Property
 
-Private Property Get LabelMsg2() As MSForms.Label:              Set LabelMsg2 = Me.laMsg2:                      End Property
+Private Property Get Msg2La() As MSForms.Label:                 Set Msg2La = Me.laMsg2:                         End Property
 
-Private Property Get LabelMsg3() As MSForms.Label:              Set LabelMsg3 = Me.laMsg3:                      End Property
+Private Property Get Msg3La() As MSForms.Label:                 Set Msg3La = Me.laMsg3:                         End Property
 
-Public Property Let Message1Monospaced(ByVal s As String):      sMsg1Monospaced = s:                            End Property
+Public Property Let Msg1TextMonospaced(ByVal s As String):      sMsg1TextMonospaced = s:                        End Property
 
-Public Property Let Message1Proportional(ByVal s As String):    sMsg1Proportional = s:                          End Property
+Public Property Let Msg1TextPrprtional(ByVal s As String):    sMsg1TextPrprtional = s:                      End Property
 
-Public Property Let Message2Monospaced(ByVal s As String):      sMsg2Monospaced = s:                            End Property
+Public Property Let Msg2TextMonospaced(ByVal s As String):      sMsg2TextMonospaced = s:                        End Property
 
-Public Property Let Message2Proportional(ByVal s As String):    sMsg2Proportional = s:                          End Property
+Public Property Let Msg2TextPrprtional(ByVal s As String):    sMsg2TextPrprtional = s:                      End Property
 
-Public Property Let Message3Monospaced(ByVal s As String):      sMsg3Monospaced = s:                            End Property
+Public Property Let Msg3TextMonospaced(ByVal s As String):      sMsg3TextMonospaced = s:                        End Property
 
-Public Property Let Message3Proportional(ByVal s As String):    sMsg3Proportional = s:                          End Property
+Public Property Let Msg3TextPrprtional(ByVal s As String):    sMsg3TextPrprtional = s:                      End Property
 
-Private Property Get msg1monospaced() As MSForms.TextBox:       Set msg1monospaced = Me.tbMsg1Monospaced:       End Property
+Private Property Get Msg1TbMonospaced() As MSForms.TextBox:     Set Msg1TbMonospaced = Me.tbMsg1TextMonospaced: End Property
 
-Private Property Get msg2monospaced() As MSForms.TextBox:       Set msg2monospaced = Me.tbMsg2Monospaced:       End Property
+Private Property Get Msg2TbMonospaced() As MSForms.TextBox:     Set Msg2TbMonospaced = Me.tbMsg2TextMonospaced: End Property
 
-Private Property Get msg3monospaced() As MSForms.TextBox:       Set msg3monospaced = Me.tbMsg3Monospaced:       End Property
+Private Property Get Msg3TbMonospaced() As MSForms.TextBox:     Set Msg3TbMonospaced = Me.tbMsg3TextMonospaced: End Property
 
-Public Property Let replies(ByVal v As Variant):                vReplies = v:                                   End Property
+Public Property Let Replies(ByVal v As Variant):                vReplies = v:                                   End Property
 
-Public Property Let title(ByVal s As String):                   sTitle = s:                                     End Property
-
-Public Property Let titleFontName(ByVal s As String):           sTitleFontName = s:                             End Property
-
-Public Property Let titlefontsize(ByVal l As Long):             sTitleFontSize = l:                             End Property
+Public Property Let Title(ByVal s As String):                   sTitle = s:                                     End Property
 
 Private Property Get TopNext(Optional ByVal ctl As Variant = Nothing) As Single
 Dim tb  As MSForms.TextBox
@@ -124,7 +120,7 @@ Dim cb  As MSForms.CommandButton
                     Case "Label"
                         Select Case ctl.Name
                             Case "la"
-                                siTopNext = Me.laTitleSpaceBottom.Top + Me.laTitleSpaceBottom.Height + MARGIN_VERTICAL
+                                siTopNext = Me.laMsgTitleSpaceBottom.Top + Me.laMsgTitleSpaceBottom.Height + MARGIN_VERTICAL
                             Case Else ' Message label
                                 siTopNext = .Top + .Height
                         End Select
@@ -175,14 +171,14 @@ Dim ctl As MSForms.Control
     
     With Me
         TopPos .laMsg1, MARGIN_VERTIVAL_LABEL
-        TopPos .tbMsg1Monospaced, MARGIN_VERTICAL
-        TopPos .tbMsg1Proportional, MARGIN_VERTICAL
+        TopPos .tbMsg1TextMonospaced, MARGIN_VERTICAL
+        TopPos .tbMsg1TextPrprtional, MARGIN_VERTICAL
         TopPos .laMsg2, MARGIN_VERTIVAL_LABEL
-        TopPos .tbMsg2Monospaced, MARGIN_VERTICAL
-        TopPos .tbMsg2Proportional, MARGIN_VERTICAL
+        TopPos .tbMsg2TextMonospaced, MARGIN_VERTICAL
+        TopPos .tbMsg2TextPrprtional, MARGIN_VERTICAL
         TopPos .laMsg3, MARGIN_VERTIVAL_LABEL
-        TopPos .tbMsg3Monospaced, MARGIN_VERTICAL
-        TopPos .tbMsg3Proportional, MARGIN_VERTICAL
+        TopPos .tbMsg3TextMonospaced, MARGIN_VERTICAL
+        TopPos .tbMsg3TextPrprtional, MARGIN_VERTICAL
         siTopNext = siTopNext + MARGIN_VERTICAL
         
         RepliesPosTop
@@ -283,19 +279,19 @@ End Function
 
 Private Sub MsgParagraphMonospacedSetup( _
             ByVal la As MSForms.Label, _
-            ByVal sLabelText As String, _
+            ByVal latext As String, _
             ByVal tb As MSForms.TextBox, _
-            ByVal sTextBoxText As String)
+            ByVal tbtext As String)
 ' ----------------------------------------
 ' Setup any fixed font message and its
 ' above label when one is specified.
 ' ----------------------------------------
 
-    If sTextBoxText <> vbNullString Then
+    If tbtext <> vbNullString Then
         '~~ Setup above text label/title only when there is a text
-        If sLabelText <> vbNullString Then
+        If latext <> vbNullString Then
             With la
-                .Caption = sLabelText
+                .Caption = latext
                 .Visible = True
                 .Left = FORM_MARGIN_LEFT
             End With
@@ -303,21 +299,21 @@ Private Sub MsgParagraphMonospacedSetup( _
         
         With tb
             .Visible = True
-            MsgParagraphMonospacedWidthSet tb, sTextBoxText  ' sets the global siMaxMonospacedTextWidth variable
+            MsgParagraphMonospacedWidthSet tb, tbtext  ' sets the global siMaxMonospacedTextWidth variable
             .MultiLine = True
             .WordWrap = True
             .AutoSize = True
-            .Value = sTextBoxText
+            .Value = tbtext
             .Left = FORM_MARGIN_LEFT
         End With
         
         With Me
             .Width = mMsg.Max(FORM_WIDTH_MIN, _
-                                 siFormWidth, _
-                                 .laTitle.Width, _
+                                 siMinFormWidth, _
+                                 .laMsgTitle.Width, _
                                  tb.Left + tb.Width + MARGIN_HORIZONTAL)
-            .laTitle.Width = .Width
-            .laTitleSpaceBottom.Width = .Width
+            .laMsgTitle.Width = .Width
+            .laMsgTitleSpaceBottom.Width = .Width
             .Left = FORM_MARGIN_LEFT
         End With
         
@@ -349,7 +345,7 @@ Private Sub MsgParagraphMonospacedWidthSet( _
                 siMaxWidth = Max(siMaxWidth, .Width)
             Next v
         End With
-        tb.Width = Max(siMaxWidth, Me.laTitle.Width) + MARGIN_HORIZONTAL
+        tb.Width = Max(siMaxWidth, Me.laMsgTitle.Width) + MARGIN_HORIZONTAL
     End With
     siMaxMonospacedTextWidth = mMsg.Max(siMaxMonospacedTextWidth, tb.Width)
 
@@ -357,17 +353,17 @@ End Sub
 
 ' Adjust the non-monospaced message paragraph's (tb) width to the form's width
 ' ----------------------------------------------------------------------------
-Private Sub MsgParagraphProportionalSetup( _
+Private Sub MsgParagraphPrprtionalSetup( _
             ByVal la As MSForms.Label, _
-            ByVal sLabelText As String, _
+            ByVal latext As String, _
             ByVal tb As MSForms.TextBox, _
-            ByVal sTextBoxText As String)
+            ByVal tbtext As String)
     
-    If sTextBoxText <> vbNullString Then
+    If tbtext <> vbNullString Then
         '~~ Setup Message Label
-        If sLabelText <> vbNullString Then
+        If latext <> vbNullString Then
             With la
-                .Caption = sLabelText
+                .Caption = latext
                 .Visible = True
                 .Width = Me.Width - (MARGIN_HORIZONTAL * 2)
                 .Left = FORM_MARGIN_LEFT
@@ -381,7 +377,7 @@ Private Sub MsgParagraphProportionalSetup( _
             .WordWrap = True
             .Width = Me.Width - (MARGIN_HORIZONTAL * 2)
             .AutoSize = True
-            .Value = sTextBoxText
+            .Value = tbtext
             .Left = FORM_MARGIN_LEFT
         End With
     End If
@@ -462,23 +458,12 @@ End Function
 
 Private Sub MsgParagraphsSetup()
     With Me
-        If sMsg1Proportional <> vbNullString _
-        Then MsgParagraphProportionalSetup LabelMsg1, sLabelMessage1, .tbMsg2Proportional, sMsg1Proportional
-        
-        If sMsg1Monospaced <> vbNullString _
-        Then MsgParagraphMonospacedSetup LabelMsg1, sLabelMessage1, msg1monospaced, sMsg1Monospaced
-        
-        If sMsg2Proportional <> vbNullString _
-        Then MsgParagraphProportionalSetup LabelMsg2, sLabelMessage2, .tbMsg2Proportional, sMsg2Proportional
-        
-        If sMsg2Monospaced <> vbNullString _
-        Then MsgParagraphMonospacedSetup LabelMsg2, sLabelMessage2, msg2monospaced, sMsg2Monospaced
-        
-        If sMsg3Proportional <> vbNullString _
-        Then MsgParagraphProportionalSetup LabelMsg3, sLabelMessage3, .tbMsg3Proportional, sMsg3Proportional
-        
-        If sMsg3Monospaced <> vbNullString _
-        Then MsgParagraphMonospacedSetup LabelMsg3, sLabelMessage3, msg3monospaced, sMsg3Monospaced
+        If sMsg1TextPrprtional <> vbNullString Then MsgParagraphPrprtionalSetup la:=.laMsg1, latext:=sMsg1Label, tb:=.tbMsg1TextPrprtional, tbtext:=sMsg1TextPrprtional
+        If sMsg1TextMonospaced <> vbNullString Then MsgParagraphMonospacedSetup la:=.laMsg1, latext:=sMsg1Label, tb:=.tbMsg1TextMonospaced, tbtext:=sMsg1TextMonospaced
+        If sMsg2TextPrprtional <> vbNullString Then MsgParagraphPrprtionalSetup la:=.laMsg2, latext:=sMsg2Label, tb:=.tbMsg2TextPrprtional, tbtext:=sMsg2TextPrprtional
+        If sMsg2TextMonospaced <> vbNullString Then MsgParagraphMonospacedSetup la:=.laMsg2, latext:=sMsg2Label, tb:=.tbMsg2TextMonospaced, tbtext:=sMsg2TextMonospaced
+        If sMsg3TextPrprtional <> vbNullString Then MsgParagraphPrprtionalSetup la:=.laMsg3, latext:=sMsg3Label, tb:=.tbMsg3TextPrprtional, tbtext:=sMsg3TextPrprtional
+        If sMsg3TextMonospaced <> vbNullString Then MsgParagraphMonospacedSetup la:=.laMsg3, latext:=sMsg3Label, tb:=.tbMsg3TextMonospaced, tbtext:=sMsg3TextMonospaced
     End With
 End Sub
 
@@ -771,8 +756,8 @@ Private Sub TitleSetup()
     With Me
         If sTitleFontName <> vbNullString And sTitleFontName <> .Font.Name Then
             '~~ A title with a specific font is displayed in a dedicated title label
-            With .laTitle   ' Hidden by default
-                .Top = TopNext(Me.laTitle)
+            With .laMsgTitle   ' Hidden by default
+                .Top = TopNext(Me.laMsgTitle)
                 .Font.Name = sTitleFontName
                 If sTitleFontSize <> 0 Then
                     .Font.Size = sTitleFontSize
@@ -783,8 +768,8 @@ Private Sub TitleSetup()
             
         Else
             .Caption = " " & sTitle
-            .laTitleSpaceBottom.Visible = False
-            With .laTitle
+            .laMsgTitleSpaceBottom.Visible = False
+            With .laMsgTitle
                 '~~ The title label is used to adjust the form width
                 With .Font
                     .Bold = False
@@ -797,7 +782,7 @@ Private Sub TitleSetup()
             siTopNext = MARGIN_FORM_TOP
         End If
         
-        With .laTitle
+        With .laMsgTitle
             '~~ The title label is used to adjust the form width
             With .Font
                 .Bold = False
@@ -810,7 +795,7 @@ Private Sub TitleSetup()
         End With
         
         .Width = siTitleWidth   ' not the finalwidth though
-        .laTitleSpaceBottom.Width = .laTitle.Width
+        .laMsgTitleSpaceBottom.Width = .laMsgTitle.Width
     
     End With
 
