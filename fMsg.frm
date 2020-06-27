@@ -5,7 +5,7 @@ Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} fMsg
    ClientTop       =   390
    ClientWidth     =   12450
    OleObjectBlob   =   "fMsg.frx":0000
-   StartUpPosition =   1  'Fenstermitte
+   StartUpPosition =   2  'Bildschirmmitte
 End
 Attribute VB_Name = "fMsg"
 Attribute VB_GlobalNameSpace = False
@@ -21,7 +21,7 @@ Option Explicit
 '               - 4 reply buttons either specified with replies known
 '                 from the VB MsgBox or any test string.
 '
-' W. Rauschenberger Berlin March 2020
+' lScreenWidth. Rauschenberger Berlin March 2020
 ' --------------------------------------------------------------------------
 Const FORM_WIDTH_MIN            As Single = 200
 Const FORM_WIDTH_MAX            As Long = 80    ' Maximum message form width (percentage of the maximized application window)
@@ -35,6 +35,21 @@ Const MARGIN_FORM_BOTTOM        As Single = 50
 Const MARGIN_VERTIVAL_LABEL     As Single = 5
 Const REPLY_BUTTON_MIN_WIDTH    As Single = 70
 
+' Functions to get the displays DPI
+' Used for getting the metrics of the system devices.
+'
+Const SM_XVIRTUALSCREEN As Long = &H4C&
+Const SM_YVIRTUALSCREEN As Long = &H4D&
+Const SM_CXVIRTUALSCREEN As Long = &H4E&
+Const SM_CYVIRTUALSCREEN As Long = &H4F&
+Const LOGPIXELSX = 88
+Const LOGPIXELSY = 90
+Const TWIPSPERINCH = 1440
+Private Declare PtrSafe Function GetSystemMetrics32 Lib "user32" Alias "GetSystemMetrics" (ByVal nIndex As Long) As Long
+Private Declare PtrSafe Function GetDC Lib "user32" (ByVal hwnd As Long) As Long
+Private Declare PtrSafe Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
+Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hwnd As Long, ByVal hDC As Long) As Long
+
 Dim sTitle                      As String
 Dim sErrSrc                     As String
 Dim vReplies                    As Variant
@@ -45,9 +60,9 @@ Dim siMinFormWidth              As Single
 Dim sTitleFontName              As String
 Dim sTitleFontSize              As String   ' Ignored when sTitleFontName is not provided
 Dim siTopNext                   As Single
-Dim sMsg1TextPrprtional       As String
-Dim sMsg2TextPrprtional       As String
-Dim sMsg3TextPrprtional       As String
+Dim sMsg1TextPrprtional         As String
+Dim sMsg2TextPrprtional         As String
+Dim sMsg3TextPrprtional         As String
 Dim sMsg1TextMonospaced         As String
 Dim sMsg2TextMonospaced         As String
 Dim sMsg3TextMonospaced         As String
@@ -58,75 +73,77 @@ Dim siTitleWidth                As Single
 Dim siMaxMonospacedTextWidth    As Single
 Dim siMaxReplyWidth             As Single
 Dim siMaxReplyHeight            As Single
-Dim vReplyButtons               As Variant
-Dim sReplyButtons               As String
+Dim wVirtualScreenLeft          As Single
+Dim wVirtualScreenTop           As Single
+Dim wVirtualScreenWidth         As Single
+Dim wVirtualScreenHeight        As Single
 
 Private Sub UserForm_Initialize()
     siMinFormWidth = FORM_WIDTH_MIN ' Default
+'    lScreenWidth = GetSystemMetrics32(0) ' Screen Resolution width in points
+'    lScreenHeight = GetSystemMetrics32(1) ' Screen Resolution height in points
 End Sub
 
-Public Property Let ErrSrc(ByVal s As String):                  sErrSrc = s:                                    End Property
+'Public Property Get ScreenWidth() As Long:                  ScreenWidth = lScreenWidth:                     End Property
+'
+'Public Property Get ScreenHeight() As Long:                 ScreenHeight = lScreenHeight:                   End Property
 
-Public Property Let FormWidth(ByVal si As Single):              siMinFormWidth = si:                            End Property
+Public Property Let ErrSrc(ByVal s As String):              sErrSrc = s:                                    End Property
 
-Public Property Let msg1Label(ByVal s As String):               sMsg1Label = s:                                 End Property
+Public Property Let FormWidth(ByVal si As Single):          siMinFormWidth = si:                            End Property
 
-Public Property Let msg2label(ByVal s As String):               sMsg2Label = s:                                 End Property
+Public Property Let Msg1Label(ByVal s As String):           sMsg1Label = s:                                 End Property
 
-Public Property Let msg3label(ByVal s As String):               sMsg3Label = s:                                 End Property
+Public Property Let Msg2label(ByVal s As String):           sMsg2Label = s:                                 End Property
 
-Private Property Get Msg1La() As MSForms.Label:                 Set Msg1La = Me.laMsg1:                         End Property
+Public Property Let Msg3label(ByVal s As String):           sMsg3Label = s:                                 End Property
 
-Private Property Get Msg2La() As MSForms.Label:                 Set Msg2La = Me.laMsg2:                         End Property
+Private Property Get Msg1La() As MSForms.Label:             Set Msg1La = Me.laMsg1:                         End Property
 
-Private Property Get Msg3La() As MSForms.Label:                 Set Msg3La = Me.laMsg3:                         End Property
+Private Property Get Msg2La() As MSForms.Label:             Set Msg2La = Me.laMsg2:                         End Property
 
-Public Property Let Msg1TextMonospaced(ByVal s As String):      sMsg1TextMonospaced = s:                        End Property
+Private Property Get Msg3La() As MSForms.Label:             Set Msg3La = Me.laMsg3:                         End Property
 
-Public Property Let Msg1TextPrprtional(ByVal s As String):    sMsg1TextPrprtional = s:                      End Property
+Public Property Let Msg1TextMonospaced(ByVal s As String):  sMsg1TextMonospaced = s:                        End Property
 
-Public Property Let Msg2TextMonospaced(ByVal s As String):      sMsg2TextMonospaced = s:                        End Property
+Public Property Let Msg1TextPrprtional(ByVal s As String):  sMsg1TextPrprtional = s:                        End Property
 
-Public Property Let Msg2TextPrprtional(ByVal s As String):    sMsg2TextPrprtional = s:                      End Property
+Public Property Let Msg2TextMonospaced(ByVal s As String):  sMsg2TextMonospaced = s:                        End Property
 
-Public Property Let Msg3TextMonospaced(ByVal s As String):      sMsg3TextMonospaced = s:                        End Property
+Public Property Let Msg2TextPrprtional(ByVal s As String):  sMsg2TextPrprtional = s:                        End Property
 
-Public Property Let Msg3TextPrprtional(ByVal s As String):    sMsg3TextPrprtional = s:                      End Property
+Public Property Let Msg3TextMonospaced(ByVal s As String):  sMsg3TextMonospaced = s:                        End Property
 
-Private Property Get Msg1TbMonospaced() As MSForms.TextBox:     Set Msg1TbMonospaced = Me.tbMsg1TextMonospaced: End Property
+Public Property Let Msg3TextPrprtional(ByVal s As String):  sMsg3TextPrprtional = s:                        End Property
 
-Private Property Get Msg2TbMonospaced() As MSForms.TextBox:     Set Msg2TbMonospaced = Me.tbMsg2TextMonospaced: End Property
+Private Property Get Msg1TbMonospaced() As MSForms.TextBox: Set Msg1TbMonospaced = Me.tbMsg1TextMonospaced: End Property
 
-Private Property Get Msg3TbMonospaced() As MSForms.TextBox:     Set Msg3TbMonospaced = Me.tbMsg3TextMonospaced: End Property
+Private Property Get Msg2TbMonospaced() As MSForms.TextBox: Set Msg2TbMonospaced = Me.tbMsg2TextMonospaced: End Property
 
-Public Property Let Replies(ByVal v As Variant):                vReplies = v:                                   End Property
+Private Property Get Msg3TbMonospaced() As MSForms.TextBox: Set Msg3TbMonospaced = Me.tbMsg3TextMonospaced: End Property
 
-Public Property Let Title(ByVal s As String):                   sTitle = s:                                     End Property
+Public Property Let Replies(ByVal v As Variant):            vReplies = v:                                   End Property
 
-Private Property Get TopNext(Optional ByVal ctl As Variant = Nothing) As Single
-Dim tb  As MSForms.TextBox
-Dim la  As MSForms.Label
-Dim cb  As MSForms.CommandButton
+Public Property Let Title(ByVal s As String):               sTitle = s:                                     End Property
 
-    TopNext = siTopNext ' Return the current position for control
+' Set the top position for the control (ctl) and return the top posisition for the next one
+Private Property Get TopNext(ByVal ctl As MSForms.Control) As Single
 
-    If Not ctl Is Nothing Then
-        With ctl
-                ' Set the top position  for this control and increase it for the next
-                .Top = siTopNext
-                Select Case TypeName(ctl)
-                    Case "TextBox", "CommandButton"
-                        siTopNext = .Top + .Height + MARGIN_VERTICAL
-                    Case "Label"
-                        Select Case ctl.Name
-                            Case "la"
-                                siTopNext = Me.laMsgTitleSpaceBottom.Top + Me.laMsgTitleSpaceBottom.Height + MARGIN_VERTICAL
-                            Case Else ' Message label
-                                siTopNext = .Top + .Height
-                        End Select
+    TopNext = siTopNext
+
+    With ctl
+        .Top = siTopNext    ' the top position for this one
+        '~~ Calculate the top position for any displayed which may come next
+        Select Case TypeName(ctl)
+            Case "TextBox", "CommandButton":    siTopNext = .Top + .Height + MARGIN_VERTICAL
+            Case "Label"
+                Select Case ctl.Name
+                    Case "la":                  siTopNext = Me.laMsgTitleSpaceBottom.Top + Me.laMsgTitleSpaceBottom.Height + MARGIN_VERTICAL
+                    Case Else:                  siTopNext = .Top + .Height
                 End Select
-        End With
-    End If
+        End Select
+    End With
+
 End Property
 
 Private Sub cmbReply1_Click():  ReplyClicked 0:    End Sub
@@ -139,46 +156,20 @@ Private Sub cmbReply4_Click():  ReplyClicked 3:    End Sub
 
 Private Sub cmbReply5_Click():  ReplyClicked 4:    End Sub
 
-Private Function ControlsNonTextBoxHeight() As Single
-' -------------------------------------------------------
-' Calculates the required height for all displayed
-' non-TextBox controls.
-' -------------------------------------------------------
-Dim si  As Single
-Dim ctl As MSForms.Control
-Dim tb  As MSForms.TextBox
-    
-    With Me
-        For Each ctl In Me.Controls
-            If TypeName(ctl) <> "Textbox" Then
-                With ctl
-                    If .Visible Then
-                        
-                        si = si + .Height + MARGIN_VERTICAL
-                    End If
-                End With
-            End If
-        Next ctl
-    End With
-    ControlsNonTextBoxHeight = si
-    
-End Function
-
 Private Sub ControlsTopPos()
-Dim ctl As MSForms.Control
 
     siTopNext = MARGIN_FORM_TOP   ' initial top position of first visible element
     
     With Me
-        TopPos .laMsg1, MARGIN_VERTIVAL_LABEL
-        TopPos .tbMsg1TextMonospaced, MARGIN_VERTICAL
-        TopPos .tbMsg1TextPrprtional, MARGIN_VERTICAL
-        TopPos .laMsg2, MARGIN_VERTIVAL_LABEL
-        TopPos .tbMsg2TextMonospaced, MARGIN_VERTICAL
-        TopPos .tbMsg2TextPrprtional, MARGIN_VERTICAL
-        TopPos .laMsg3, MARGIN_VERTIVAL_LABEL
-        TopPos .tbMsg3TextMonospaced, MARGIN_VERTICAL
-        TopPos .tbMsg3TextPrprtional, MARGIN_VERTICAL
+        ControlPosTop .laMsg1, MARGIN_VERTIVAL_LABEL
+        ControlPosTop .tbMsg1TextMonospaced, MARGIN_VERTICAL
+        ControlPosTop .tbMsg1TextPrprtional, MARGIN_VERTICAL
+        ControlPosTop .laMsg2, MARGIN_VERTIVAL_LABEL
+        ControlPosTop .tbMsg2TextMonospaced, MARGIN_VERTICAL
+        ControlPosTop .tbMsg2TextPrprtional, MARGIN_VERTICAL
+        ControlPosTop .laMsg3, MARGIN_VERTIVAL_LABEL
+        ControlPosTop .tbMsg3TextMonospaced, MARGIN_VERTICAL
+        ControlPosTop .tbMsg3TextPrprtional, MARGIN_VERTICAL
         siTopNext = siTopNext + MARGIN_VERTICAL
         
         RepliesPosTop
@@ -193,15 +184,12 @@ Private Sub FormHeightFinal()
 Dim siHeightMax         As Single
 Dim siHeightUsed        As Single
 Dim siHeightExceeding   As Single
-Dim siScreenHeight      As Single
+'Dim siScreenHeight      As Single
 Dim s                   As String
 Dim siWidth             As Single
 
-'    Application.WindowState = xlMaximized
-'    Application.ScreenUpdating = True
-    siScreenHeight = Application.Height
-    siHeightMax = siScreenHeight * (FORM_HEIGHT_MAX / 100)
-'    Application.WindowState = xlNormal
+'    siScreenHeight = Application.Height
+    siHeightMax = wVirtualScreenHeight * (FORM_HEIGHT_MAX / 100)
     
     With Me
         siHeightUsed = .cmbReply1.Top + .cmbReply1.Height + MARGIN_FORM_BOTTOM
@@ -232,7 +220,6 @@ Dim siWidth             As Single
                 .Value = s
                 .SelStart = 0
             End With
-            .Top = (siScreenHeight - siHeightMax) / 2
         End If
     End With
     
@@ -244,22 +231,10 @@ End Sub
 Private Sub FormWidthFinal()
 Dim siMaxWidth  As Single
 
-    Application.WindowState = xlMaximized
-    siMaxWidth = Application.Width * (FORM_WIDTH_MAX / 100)
-    Application.WindowState = xlNormal
-    
-    With Me
-        If .Width > siMaxWidth Then
-            .Width = siMaxWidth
-        Else
-            .Width = Max( _
-                         siTitleWidth, _
-                         ((siMaxReplyWidth + MARGIN_VERTICAL) * lNoOfReplyButtons) + (MARGIN_VERTICAL * 2), _
-                         siMaxMonospacedTextWidth, _
-                         FORM_WIDTH_MIN)
-
-        End If
-    End With
+    siMaxWidth = wVirtualScreenWidth * (FORM_WIDTH_MAX / 100)
+    If Me.Width > siMaxWidth Then
+        Me.Width = siMaxWidth
+    End If
     
 End Sub
 
@@ -270,7 +245,7 @@ Dim v   As Variant
 Dim si  As Single
 Dim tb  As MSForms.TextBox
 
-    For Each v In MsgParagraphsDisplayed
+    For Each v In MsgSectionsDisplayed
         Set tb = v
         If tb.Height > si Then Set MsgParagraphMaxHeight = tb
     Next v
@@ -384,9 +359,9 @@ Private Sub MsgParagraphPrprtionalSetup( _
 
 End Sub
 
-' Collection of all displayed message paragraphs.
+' Returns a collection of all displayed message sections.
 ' -----------------------------------------------------
-Private Function MsgParagraphsDisplayed() As Collection
+Private Function MsgSectionsDisplayed() As Collection
 Dim cll As New Collection
 Dim ctl As MSForms.Control
     
@@ -397,66 +372,48 @@ Dim ctl As MSForms.Control
             End If
         Next ctl
     End With
-    Set MsgParagraphsDisplayed = cll
+    Set MsgSectionsDisplayed = cll
 
 End Function
 
 ' Adjust the largest displayed message paragraph's height
 ' so that it fits into the final form height.
 ' -------------------------------------------------------
-Private Sub MsgParagraphsHeightFinal()
-Dim v                       As Variant
-Dim siHeightInitial         As Single
+Private Sub MsgSectionsHeightFinal()
 Dim siHeightCurrentRequired As Single
 Dim siHeightExceeding       As Single
-Dim cllMsgParagraphs        As Collection
-Dim tb                      As MSForms.TextBox
+Dim cllMsgSections        As Collection
 Dim s                       As String
-Dim siWidth                 As String
 
     With Me
         siHeightCurrentRequired = .cmbReply1.Top + .cmbReply1.Height + MARGIN_FORM_BOTTOM
     End With
-    If siHeightCurrentRequired > Me.Height Then
-        Set cllMsgParagraphs = MsgParagraphsDisplayed
-        siHeightExceeding = siHeightCurrentRequired > Me.Height
-        '~~ All displayed controls together take more height than the available form's height
-        '~~ The displayed message paragraphs are reduced in their height to fit the available space
-        With MsgParagraphMaxHeight ' The message paragraph with the maximum height
-            .SetFocus
-            s = .Value
-            siWidth = .Width
-            Select Case .ScrollBars
-                Case fmScrollBarsHorizontal
-                    .Height = .Height - siHeightExceeding - 15
-                Case fmScrollBarsVertical
-                    .ScrollBars = fmScrollBarsBoth
-                    .Height = .Height - siHeightExceeding - 15
-                Case fmScrollBarsBoth
-                    .Height = .Height - siHeightExceeding - 15
-                Case fmScrollBarsNone
-                    .ScrollBars = fmScrollBarsVertical
-                    .Height = .Height - siHeightExceeding
-            End Select
-        End With
-    End If
+    If siHeightCurrentRequired <= Me.Height Then Exit Sub
+    
+    Set cllMsgSections = MsgSectionsDisplayed
+    siHeightExceeding = siHeightCurrentRequired > Me.Height
+    '~~ All displayed controls together take more height than the available form's height
+    '~~ The displayed message sections are reduced in their height to fit the available space
+    With MsgParagraphMaxHeight ' The message paragraph with the maximum height
+        .SetFocus
+        s = .Value
+        Select Case .ScrollBars
+            Case fmScrollBarsHorizontal
+                .Height = .Height - siHeightExceeding - 15
+            Case fmScrollBarsVertical
+                .ScrollBars = fmScrollBarsBoth
+                .Height = .Height - siHeightExceeding - 15
+            Case fmScrollBarsBoth
+                .Height = .Height - siHeightExceeding - 15
+            Case fmScrollBarsNone
+                .ScrollBars = fmScrollBarsVertical
+                .Height = .Height - siHeightExceeding
+        End Select
+    End With
 
 End Sub
 
-Private Function MsgParagraphsHeightInitial() As Single
-Dim si  As Single
-Dim tb  As MSForms.TextBox
-Dim v   As Variant
-
-    For Each v In MsgParagraphsDisplayed
-        Set tb = v
-        si = si + tb.Height + MARGIN_VERTICAL
-    Next v
-    MsgParagraphsHeightInitial = si
-
-End Function
-
-Private Sub MsgParagraphsSetup()
+Private Sub MsgSectionsSetup()
     With Me
         If sMsg1TextPrprtional <> vbNullString Then MsgParagraphPrprtionalSetup la:=.laMsg1, latext:=sMsg1Label, tb:=.tbMsg1TextPrprtional, tbtext:=sMsg1TextPrprtional
         If sMsg1TextMonospaced <> vbNullString Then MsgParagraphMonospacedSetup la:=.laMsg1, latext:=sMsg1Label, tb:=.tbMsg1TextMonospaced, tbtext:=sMsg1TextMonospaced
@@ -471,14 +428,14 @@ End Sub
 ' is re-adjusted. Any message paragraph using a proportinal font will result in
 ' a new height, any monospaced font paragraph in a vertival scroll bar.
 ' -----------------------------------------------------------------------------
-Private Sub MsgParagraphsWidthFinal()
+Private Sub MsgSectionsWidthFinal()
 Dim siMax   As Single
 Dim v       As Variant
 Dim tb     As MSForms.TextBox
 Dim s      As String
  
     siMax = Me.Width - (FORM_MARGIN_LEFT + MARGIN_HORIZONTAL)
-    For Each v In MsgParagraphsDisplayed
+    For Each v In MsgSectionsDisplayed
         Set tb = v
         With tb
             If .Width > siMax Then
@@ -801,15 +758,12 @@ Private Sub TitleSetup()
 
 End Sub
 
-Private Sub FormPositionOnScreen()
-    With Me
-        .Top = 125 '< change 125 to what u want
-        .Left = 25 '< change 25 to what u want
-    End With
+Public Sub FormFinalPositionOnScreen()
+    AdjustStartupPosition Me
 End Sub
 
-Private Sub TopPos(ByVal ctl As MSForms.Control, _
-                   ByVal siMargin As Single)
+Private Sub ControlPosTop(ByVal ctl As MSForms.Control, _
+                          ByVal siMargin As Single)
     With ctl
         If .Visible Then
             .Top = siTopNext
@@ -817,32 +771,94 @@ Private Sub TopPos(ByVal ctl As MSForms.Control, _
         End If
     End With
 End Sub
+ 
+' Get coordinates of top-left corner and size of entire screen (stretched over
+' all monitors) and convert to Points.
+' ----------------------------------------------------------------------------
+Private Sub GetScreenMetrics()
+    
+    wVirtualScreenLeft = GetSystemMetrics32(SM_XVIRTUALSCREEN)
+    wVirtualScreenTop = GetSystemMetrics32(SM_YVIRTUALSCREEN)
+    wVirtualScreenWidth = GetSystemMetrics32(SM_CXVIRTUALSCREEN)
+    wVirtualScreenHeight = GetSystemMetrics32(SM_CYVIRTUALSCREEN)
+    '
+    ConvertPixelsToPoints wVirtualScreenLeft, wVirtualScreenTop
+    ConvertPixelsToPoints wVirtualScreenWidth, wVirtualScreenHeight
+
+End Sub
+
+Public Sub AdjustStartupPosition(ByRef pUserForm As Object, _
+                                 Optional ByRef pOwner As Object)
+    On Error Resume Next
+    
+    GetScreenMetrics
+    
+    Select Case pUserForm.StartupPosition
+        Case Manual, WindowsDefault ' Do nothing
+        
+        Case CenterOwner            ' Position centered on top of the 'Owner'. Usually this is Application.
+            If Not pOwner Is Nothing Then Set pOwner = Application
+            With pUserForm
+                .StartupPosition = 0
+                .Left = pOwner.Left + ((pOwner.Width - .Width) / 2)
+                .Top = pOwner.Top + ((pOwner.Height - .Height) / 2)
+            End With
+            
+        Case CenterScreen           ' Assign the Left and Top properties after switching to Manual positioning.
+            With pUserForm
+                .StartupPosition = Manual
+                .Left = (wVirtualScreenWidth - .Width) / 2
+                .Top = (wVirtualScreenHeight - .Height) / 2
+            End With
+    End Select
+ 
+    ' Avoid falling off screen. Misplacement can be caused by multiple screens when the primary display
+    ' is not the left-most screen (which causes "pOwner.Left" to be negative). First make sure the bottom
+    ' right fits, then check if the top-left is still on the screen (which gets priority).
+    '
+    With pUserForm
+        If ((.Left + .Width) > (wVirtualScreenLeft + wVirtualScreenWidth)) _
+        Then .Left = ((wVirtualScreenLeft + wVirtualScreenWidth) - .Width)
+        If ((.Top + .Height) > (wVirtualScreenTop + wVirtualScreenHeight)) _
+        Then .Top = ((wVirtualScreenTop + wVirtualScreenHeight) - .Height)
+        If (.Left < wVirtualScreenLeft) Then .Left = wVirtualScreenLeft
+        If (.Top < wVirtualScreenTop) Then .Top = wVirtualScreenTop
+    End With
+End Sub
+ 
+' Returns pixels (device dependent) to points (used by Excel).
+' --------------------------------------------------------------------
+Private Sub ConvertPixelsToPoints(ByRef x As Single, ByRef y As Single)
+On Error Resume Next
+    Dim hDC            As Long
+    Dim RetVal         As Long
+    Dim PixelsPerInchX As Long
+    Dim PixelsPerInchY As Long
+ 
+    hDC = GetDC(0)
+    PixelsPerInchX = GetDeviceCaps(hDC, LOGPIXELSX)
+    PixelsPerInchY = GetDeviceCaps(hDC, LOGPIXELSY)
+    RetVal = ReleaseDC(0, hDC)
+    x = x * TWIPSPERINCH / 20 / PixelsPerInchX
+    y = y * TWIPSPERINCH / 20 / PixelsPerInchY
+End Sub
 
 Private Sub UserForm_Activate()
     
+    GetScreenMetrics            ' provides the screen's width and height
     With Me
-        
         TitleSetup
-        
-        MsgParagraphsSetup          ' provided message paragraphs text and visibility
-        
-        RepliesSetup vReplies  ' provided reply buttons text and visibility
-        
-        FormWidthFinal         ' considers title width, monospaced message paragraphs width and maximum form width
-                
-        MsgParagraphsWidthFinal
-        
-        RepliesPosLeft
-                
-        ControlsTopPos
-        
-        FormHeightFinal
-    
-        MsgParagraphsHeightFinal
-        
-        ControlsTopPos
-            
+        MsgSectionsSetup        ' provided message sections text and visibility
+        RepliesSetup vReplies   ' provided reply buttons text and visibility
+        FormWidthFinal          ' considers title width, monospaced message sections width and maximum form width
+        MsgSectionsWidthFinal   ' may end up with a horizontal scroll bar when monospaced
+        RepliesPosLeft          ' adjust displayed reply buttons left position
+        ControlsTopPos          ' adjust all displayed controls' top position
+        FormHeightFinal         ' may end up with a horizontal scroll bar
+        MsgSectionsHeightFinal  ' may end up with a horizontal scroll bar for a monospaced message section
+        ControlsTopPos          ' adjusts all controls' top position
     End With
+    AdjustStartupPosition Me
 
 End Sub
 

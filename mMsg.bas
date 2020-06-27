@@ -18,32 +18,26 @@ Option Explicit
 ' - ErrMsg              Displays a common error message either by means of the
 '                       VB MsgBox or by means of the common method Msg.
 '
-' W. Rauschenberger Berlin June 2020
+' lScreenWidth. Rauschenberger Berlin June 2020
 ' -------------------------------------------------------------------------------
-Public Declare PtrSafe Function GetSystemMetrics32 Lib "user32" Alias "GetSystemMetrics" (ByVal nIndex As Long) As Long
-' Functions to get the displays DPI
-Private Declare PtrSafe Function GetDC Lib "user32" (ByVal hwnd As Long) As Long
-Private Declare PtrSafe Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
-Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hwnd As Long, ByVal hDC As Long) As Long
-Private Const LOGPIXELSX = 88               ' Pixels/inch in X
-Private Const POINTS_PER_INCH As Long = 72  ' A point is defined as 1/72 inches
-Private Declare PtrSafe Function GetForegroundWindow _
-  Lib "User32.dll" () As Long
 
-Private Declare PtrSafe Function GetWindowLongPtr _
-  Lib "User32.dll" Alias "GetWindowLongA" _
-() '    (ByVal hwnd As LongPtr, _
-     ByVal nIndex As Long) _
-  As LongPtr
-
-Private Declare PtrSafe Function SetWindowLongPtr _
-  Lib "User32.dll" Alias "SetWindowLongA" _
-() '    (ByVal hwnd As LongPtr, _
-     ByVal nIndex As LongPtr, _
-     ByVal dwNewLong As LongPtr) _
-  As LongPtr
-
+' Declarations for the function MakeFormResizable (yet unused)
+'Private Declare PtrSafe Function GetForegroundWindow Lib "User32.dll" () As Long
+'
+'Private Declare PtrSafe Function GetWindowLongPtr Lib "User32.dll" Alias "GetWindowLongA" () As LongPtr
+'    (ByVal hwnd As LongPtr, ByVal nIndex As Long)
+'
+'Private Declare PtrSafe Function SetWindowLongPtr Lib "User32.dll" Alias "SetWindowLongA" () As LongPtr
+'   (ByVal hwnd As LongPtr, ByVal nIndex As LongPtr, ByVal dwNewLong As LongPtr)
+'
 Private vMsgReply As Variant
+
+Public Enum StartupPosition
+    Manual = 0
+    CenterOwner = 1
+    CenterScreen = 2
+    WindowsDefault = 3
+End Enum
 
 Public Property Let MsgReply(ByVal v As Variant):   vMsgReply = v:          End Property
 Public Property Get MsgReply() As Variant:          MsgReply = vMsgReply:   End Property
@@ -105,17 +99,18 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
     '~~ Display error message by UserForm fErrMsg
     With fMsg
         .Title = errtitle
-        .msg1Label = "Error Message/Description:"
+        .Msg1Label = "Error Message/Description:"
         .Msg1TextPrprtional = sErrText
         If errpath <> vbNullString Then
-            .msg2label = "Error path (call stack):"
+            .Msg2label = "Error path (call stack):"
             .Msg2TextPrprtional = errpath
         End If
         If errinfo <> vbNullString Then
-            .msg3label = "Info:"
+            .Msg3label = "Info:"
             .Msg3TextPrprtional = errinfo
         End If
         .Replies = vbOKOnly
+        .FormFinalPositionOnScreen
         .Show
     End With
 
@@ -211,12 +206,8 @@ Public Function Msg1( _
            Optional ByVal msgmonospaced As Boolean = False, _
            Optional ByVal msgminformwidth As Single = 0, _
            Optional ByVal msgreplies As Variant = vbOKOnly) As Variant
-    Dim w           As Long
-    Dim h           As Long
-    Dim siHeight    As Single
-
-    w = GetSystemMetrics32(0) ' Screen Resolution width in points
-    h = GetSystemMetrics32(1) ' Screen Resolution height in points
+    
+'    Dim siHeight    As Single
 
     With fMsg
         .Title = msgtitle
@@ -228,11 +219,12 @@ Public Function Msg1( _
         End If
 
         .Replies = msgreplies
-        If msgminformwidth <> 0 Then .Width = Max(.Width, msgminformwidth)
-        .StartUpPosition = 1
-        .Width = w * PointsPerPixel * 0.85 'Userform width= Width in Resolution * DPI * 85%
-        siHeight = h * PointsPerPixel * 0.2
-        .Height = Min(.Height, siHeight)
+'        .FormFinalPositionOnScreen
+'        If msgminformwidth <> 0 Then .Width = Max(.Width, msgminformwidth)
+'        .StartUpPosition = 1
+'        .Width = .ScreenWidth * .PointsPerPixel * 0.85 'Userform width= Width in Resolution * DPI * 85%
+'        siHeight = .ScreenHeight * .PointsPerPixel * 0.2
+'        .Height = Min(.Height, siHeight)
 
         .Show
     End With
@@ -273,25 +265,20 @@ End Function
 ' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
 ' ------------------------------------------------------------------
 Public Function Msg(ByVal msgtitle As String, _
-           Optional ByVal msg1Label As String = vbNullString, _
+           Optional ByVal Msg1Label As String = vbNullString, _
            Optional ByVal msg1text As String = vbNullString, _
            Optional ByVal msg1monospaced As Boolean = False, _
-           Optional ByVal msg2label As String = vbNullString, _
+           Optional ByVal Msg2label As String = vbNullString, _
            Optional ByVal msg2text As String = vbNullString, _
            Optional ByVal msg2monospaced As Boolean = False, _
-           Optional ByVal msg3label As String = vbNullString, _
+           Optional ByVal Msg3label As String = vbNullString, _
            Optional ByVal msg3text As String = vbNullString, _
            Optional ByVal msg3monospaced As Boolean = False, _
            Optional ByVal msgtitlefontsize As Long = 0, _
            Optional ByVal msgminformwidth As Single = 0, _
            Optional ByVal msgreplies As Variant = vbOKOnly) As Variant
     
-    Dim w           As Long
-    Dim h           As Long
-    Dim siHeight    As Single
-
-    w = GetSystemMetrics32(0) ' Screen Resolution width in points
-    h = GetSystemMetrics32(1) ' Screen Resolution height in points
+'    Dim siHeight        As Single
 
     With fMsg
         .Title = msgtitle
@@ -300,29 +287,30 @@ Public Function Msg(ByVal msgtitle As String, _
             If msg1monospaced = True _
             Then .Msg1TextMonospaced = msg1text _
             Else .Msg1TextPrprtional = msg1text
-            .msg1Label = msg1Label
+            .Msg1Label = Msg1Label
         End If
 
         If msg2text <> vbNullString Then
             If msg2monospaced = True _
             Then .Msg2TextMonospaced = msg2text _
             Else .Msg2TextPrprtional = msg2text
-            .msg2label = msg2label
+            .Msg2label = Msg2label
         End If
 
         If msg3text <> vbNullString Then
             If msg3monospaced = True _
             Then .Msg3TextMonospaced = msg3text _
             Else .Msg3TextPrprtional = msg3text
-            .msg3label = msg3label
+            .Msg3label = Msg3label
         End If
 
         .Replies = msgreplies
-        If msgminformwidth <> 0 Then .Width = Max(.Width, msgminformwidth)
-        .StartUpPosition = 1
-        .Width = w * PointsPerPixel * 0.85 'Userform width= Width in Resolution * DPI * 85%
-        siHeight = h * PointsPerPixel * 0.2
-        .Height = Min(.Height, siHeight)
+'        .FormFinalPositionOnScreen
+'        If msgminformwidth <> 0 Then .Width = Max(.Width, msgminformwidth)
+'        .StartUpPosition = 1
+'        .Width = .ScreenWidth * .PointsPerPixel * 0.85 'Userform width= Width in Resolution * DPI * 85%
+'        siHeight = .ScreenHeight * .PointsPerPixel * 0.2
+'        .Height = Min(.Height, siHeight)
 
         .Show
     End With
@@ -331,37 +319,24 @@ Public Function Msg(ByVal msgtitle As String, _
 
 End Function
 
-Private Sub MakeFormResizable()
-' ---------------------------------------------------------------------------
-' This part is from Leith Ross                                              |
-' Found this Code on:                                                       |
-' https://www.mrexcel.com/forum/excel-questions/485489-resize-userform.html |
-'                                                                           |
-' All credits belong to him                                                 |
-' ---------------------------------------------------------------------------
-Const WS_THICKFRAME = &H40000
-Const GWL_STYLE As Long = (-16)
-Dim lStyle As LongPtr
-Dim hwnd As LongPtr
-Dim RetVal
-
-    hwnd = GetForegroundWindow
-
-    lStyle = GetWindowLongPtr(hwnd, GWL_STYLE Or WS_THICKFRAME)
-    RetVal = SetWindowLongPtr(hwnd, GWL_STYLE, lStyle)
-End Sub
-
-Private Function PointsPerPixel() As Double
-' ----------------------------------------
-' Return DPI
-' ----------------------------------------
-Dim hDC             As Long
-Dim lDotsPerInch    As Long
-    hDC = GetDC(0)
-    lDotsPerInch = GetDeviceCaps(hDC, LOGPIXELSX)
-    PointsPerPixel = POINTS_PER_INCH / lDotsPerInch
-    ReleaseDC 0, hDC
-End Function
+'' This part is from Leith Ross                                              |
+'' Found this Code on:                                                       |
+'' https://www.mrexcel.com/forum/excel-questions/485489-resize-userform.html |
+''                                                                           |
+'' All credits belong to him                                                 |
+'' ---------------------------------------------------------------------------
+'Private Sub MakeFormResizable()
+'Const WS_THICKFRAME = &H40000
+'Const GWL_STYLE As Long = (-16)
+'Dim lStyle As LongPtr
+'Dim hwnd As LongPtr
+'Dim RetVal
+'
+'    hwnd = GetForegroundWindow
+'
+'    lStyle = GetWindowLongPtr(hwnd, GWL_STYLE Or WS_THICKFRAME)
+'    RetVal = SetWindowLongPtr(hwnd, GWL_STYLE, lStyle)
+'End Sub
 
 Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "mMsg" & "." & sProc
