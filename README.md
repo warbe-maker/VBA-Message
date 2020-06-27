@@ -10,7 +10,7 @@ Displays a message in a dialog box, waits for the user to click a button, and re
 
 
 ## Syntax
-**msg**(msgtitle, msgtext [,replies])
+`msg(msgtitle, msgtext [,replies])`
 The MsgBox function syntax has these named arguments:
 
 | Part | Description |
