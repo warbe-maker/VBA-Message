@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} fMsg 
-   ClientHeight    =   5475
+   ClientHeight    =   6300
    ClientLeft      =   45
    ClientTop       =   390
    ClientWidth     =   12450
@@ -19,15 +19,16 @@ Option Explicit
 '                 proportional or a fixed font
 '               - each of the 3 messages with an optional label
 '               - 4 reply buttons either specified with replies known
-'                 from the VB MsgBox or any test string.
+'                 from the VB MsgSectionBox or any test string.
 '
 ' lScreenWidth. Rauschenberger Berlin March 2020
 ' --------------------------------------------------------------------------
+Const FONT_NAME_MONOSPACED      As String = "Courier New"   ' Default monospaced font
 Const FORM_WIDTH_MIN            As Single = 200
-Const FORM_WIDTH_MAX            As Long = 80    ' Maximum message form width (percentage of the maximized application window)
-Const FORM_HEIGHT_MAX           As Long = 80    ' Maximum message form height (percentage of the maximized application window)
+Const FORM_WIDTH_MAX_POW        As Long = 80    ' Maximum form width as a percentage of the screen size
+Const FORM_HEIGHT_MAX_POW       As Long = 90    ' Maximum form height as a percentage of the screen size
 Const FORM_MARGIN_LEFT          As Single = 5
-Const FORM_MARGIN_RIGHT         As Single = 10
+Const FORM_MARGIN_RIGHT         As Single = 15
 Const MARGIN_HORIZONTAL         As Single = 10
 Const MARGIN_VERTICAL           As Single = 10
 Const MARGIN_FORM_TOP           As Single = 5   ' Top position of the first visible control
@@ -54,83 +55,135 @@ Dim sTitle                      As String
 Dim sErrSrc                     As String
 Dim vReplies                    As Variant
 Dim aReplyButtons               As Variant
-Dim sReplyButtonsReturnValue    As String   ' The provided reply buttons return values a comma delimited string
-Dim lNoOfReplyButtons           As Long
-Dim siMinFormWidth              As Single
 Dim sTitleFontName              As String
 Dim sTitleFontSize              As String   ' Ignored when sTitleFontName is not provided
 Dim siTopNext                   As Single
-Dim sMsg1TextPrprtional         As String
-Dim sMsg2TextPrprtional         As String
-Dim sMsg3TextPrprtional         As String
-Dim sMsg1TextMonospaced         As String
-Dim sMsg2TextMonospaced         As String
-Dim sMsg3TextMonospaced         As String
-Dim sMsg1Label                  As String
-Dim sMsg2Label                  As String
-Dim sMsg3Label                  As String
+Dim sMsgSection1Label           As String
+Dim sMsgSection1Text            As String
+Dim bMsgSection1Monospaced      As Boolean
+Dim sMsgSection2Label           As String
+Dim sMsgSection2Text            As String
+Dim bMsgSection2Monospaced      As Boolean
+Dim sMsgSection3Label           As String
+Dim sMsgSection3Text            As String
+Dim bMsgSection3Monospaced      As Boolean
 Dim siTitleWidth                As Single
-Dim siMaxMonospacedTextWidth    As Single
-Dim siMaxReplyWidth             As Single
-Dim siMaxReplyHeight            As Single
 Dim wVirtualScreenLeft          As Single
 Dim wVirtualScreenTop           As Single
 Dim wVirtualScreenWidth         As Single
 Dim wVirtualScreenHeight        As Single
+Dim lMaximumFormHeightPoW       As Long       ' % of the screen height
+Dim lMaximumFormWidthPoW        As Long       ' % of the screen width
+Dim siMaximumFormHeight         As Single     ' above converted to excel userform height
+Dim siMaximumFormWidth          As Single     ' above converted to excel userform width
+Dim siMinimumFormHeight         As Single
+Dim siMinimumFormWidth          As Single
+Dim sFontNameMonospaced         As String
+Dim cllMsgSections              As New Collection
+Dim cllMsgSectionsVisible       As New Collection
+Dim cllReplyButtons             As New Collection
+Dim cllReplyButtonsVisible      As New Collection
+Dim cllReplyButtonsValue        As New Collection
+Dim cllMsgLabels                As New Collection
+Dim siMaxMonospacedTextWidth    As Single
+Dim siMaxMsgWidth               As Single
+Dim siMaxReplyWidth             As Single
+Dim siMaxReplyHeight            As Single
+
 
 Private Sub UserForm_Initialize()
-    siMinFormWidth = FORM_WIDTH_MIN ' Default
-'    lScreenWidth = GetSystemMetrics32(0) ' Screen Resolution width in points
-'    lScreenHeight = GetSystemMetrics32(1) ' Screen Resolution height in points
+    lMaximumFormWidthPoW = FORM_WIDTH_MAX_POW
+    lMaximumFormHeightPoW = FORM_HEIGHT_MAX_POW
+    siMinimumFormWidth = FORM_WIDTH_MIN         ' Default UserForm width
+    GetScreenMetrics            ' provides the screen's width and height
+    siMaximumFormWidth = wVirtualScreenWidth * (lMaximumFormWidthPoW / 100)      ' Default maximum form width
+    siMaximumFormHeight = wVirtualScreenHeight * (lMaximumFormWidthPoW / 100)   ' Default maximum form height
+    sFontNameMonospaced = FONT_NAME_MONOSPACED                          ' Default monospaced font
+    bMsgSection1Monospaced = False
+    bMsgSection2Monospaced = False
+    bMsgSection3Monospaced = False
+    
+    With Me
+        cllMsgSections.Add .tbMsgSection1
+        cllMsgSections.Add .tbMsgSection2
+        cllMsgSections.Add .tbMsgSection3
+        
+        cllMsgLabels.Add .laMsgSection1
+        cllMsgLabels.Add .laMsgSection2
+        cllMsgLabels.Add .laMsgSection3
+        
+        cllReplyButtons.Add .cmbReply1
+        cllReplyButtons.Add .cmbReply2
+        cllReplyButtons.Add .cmbReply3
+        cllReplyButtons.Add .cmbReply4
+        cllReplyButtons.Add .cmbReply5
+    End With
 End Sub
 
-'Public Property Get ScreenWidth() As Long:                  ScreenWidth = lScreenWidth:                     End Property
-'
-'Public Property Get ScreenHeight() As Long:                 ScreenHeight = lScreenHeight:                   End Property
+Public Property Let MaxFormWidthPercentageOfScreenSize(ByVal l As Long):            lMaximumFormWidthPoW = l:                   End Property
+Public Property Get MaxFormWidthPercentageOfScreenSize() As Long:                   MaxFormWidthPercentageOfScreenSize = lMaximumFormWidthPoW: End Property
 
-Public Property Let ErrSrc(ByVal s As String):              sErrSrc = s:                                    End Property
+Public Property Let MaxFormHeightPercentageOfScreenSize(ByVal l As Long):            lMaximumFormHeightPoW = l:                   End Property
+Public Property Get MaxFormHeightPercentageOfScreenSize() As Long:                   MaxFormHeightPercentageOfScreenSize = lMaximumFormHeightPoW: End Property
 
-Public Property Let FormWidth(ByVal si As Single):          siMinFormWidth = si:                            End Property
+Public Property Get MaximumFormWidth() As Single:                                   MaximumFormWidth = siMaximumFormWidth:      End Property
+Public Property Let MaximumFormWidth(ByVal si As Single)
+    '~~ The maximum specified form size is limited to 99% of the screen size!
+    siMaximumFormWidth = wVirtualScreenWidth * (Min(si, 99) / 100)   ' maximum form height based on screen size
+    '~~ The maximum form width must never not become less than the minimum width
+    If siMaximumFormWidth < siMinimumFormWidth Then
+       siMaximumFormWidth = siMinimumFormWidth
+    End If
+End Property
 
-Public Property Let Msg1Label(ByVal s As String):           sMsg1Label = s:                                 End Property
+Public Property Get MaximumFormHeight() As Single:                                  MaximumFormHeight = siMaximumFormHeight:    End Property
+Public Property Let MaximumFormHeight(ByVal si As Single)
+    '~~ The maximum form height is limited to 99% of the screen size!
+    siMaximumFormHeight = wVirtualScreenHeight * (Min(si, 99) / 100)
+    '~~ The maximum form width must never not become less than the minimum width
+    If siMaximumFormHeight < siMinimumFormHeight Then
+       siMaximumFormHeight = siMinimumFormHeight
+    End If
+End Property
 
-Public Property Let Msg2label(ByVal s As String):           sMsg2Label = s:                                 End Property
+Public Property Get MinimumFormWidth() As Single:                               MinimumFormWidth = siMinimumFormWidth:          End Property
+Public Property Let MinimumFormWidth(ByVal si As Single)
+    siMinimumFormWidth = si
+    '~~ The maximum form width must never not become less than the minimum width
+    If siMaximumFormWidth < siMinimumFormWidth Then
+       siMaximumFormWidth = siMinimumFormWidth
+    End If
+End Property
 
-Public Property Let Msg3label(ByVal s As String):           sMsg3Label = s:                                 End Property
+Private Property Get ReplyButton(Optional i As Long) As MsForms.CommandButton:  Set ReplyButton = cllReplyButtons(i):           End Property
+Private Property Get ReplyButtonValue(Optional i As Long):                      ReplyButtonValue = cllReplyButtonsValue(i):     End Property
+Private Property Let ReplyButtonValue(Optional i As Long, ByVal v As Variant):  cllReplyButtonsValue.Add v:                     End Property
 
-Private Property Get Msg1La() As MSForms.Label:             Set Msg1La = Me.laMsg1:                         End Property
+Private Property Get MsgSectionLabel(Optional i As Long) As MsForms.Label:      Set MsgSectionLabel = cllMsgLabels(i):          End Property
+Private Property Get MsgSection(Optional i As Long) As MsForms.TextBox:         Set MsgSection = cllMsgSections(i):             End Property
 
-Private Property Get Msg2La() As MSForms.Label:             Set Msg2La = Me.laMsg2:                         End Property
+Public Property Let ErrSrc(ByVal s As String):                                  sErrSrc = s:                                    End Property
 
-Private Property Get Msg3La() As MSForms.Label:             Set Msg3La = Me.laMsg3:                         End Property
+Public Property Let MsgSection1Label(ByVal s As String):                        sMsgSection1Label = s:                          End Property
+Public Property Let MsgSection1Text(ByVal s As String):                         sMsgSection1Text = s:                           End Property
+Public Property Let MsgSection1Monospaced(ByVal b As Boolean):                  bMsgSection1Monospaced = b:                     End Property
 
-Public Property Let Msg1TextMonospaced(ByVal s As String):  sMsg1TextMonospaced = s:                        End Property
+Public Property Let MsgSection2Label(ByVal s As String):                        sMsgSection2Label = s:                          End Property
+Public Property Let MsgSection2Text(ByVal s As String):                         sMsgSection2Text = s:                           End Property
+Public Property Let MsgSection2Monospaced(ByVal b As Boolean):                  bMsgSection2Monospaced = b:                     End Property
 
-Public Property Let Msg1TextPrprtional(ByVal s As String):  sMsg1TextPrprtional = s:                        End Property
+Public Property Let MsgSection3Label(ByVal s As String):                        sMsgSection3Label = s:                          End Property
+Public Property Let MsgSection3Text(ByVal s As String):                         sMsgSection3Text = s:                           End Property
+Public Property Let MsgSection3Monospaced(ByVal b As Boolean):                  bMsgSection3Monospaced = b:                     End Property
 
-Public Property Let Msg2TextMonospaced(ByVal s As String):  sMsg2TextMonospaced = s:                        End Property
+Public Property Let Replies(ByVal v As Variant):                                vReplies = v:                                   End Property
 
-Public Property Let Msg2TextPrprtional(ByVal s As String):  sMsg2TextPrprtional = s:                        End Property
-
-Public Property Let Msg3TextMonospaced(ByVal s As String):  sMsg3TextMonospaced = s:                        End Property
-
-Public Property Let Msg3TextPrprtional(ByVal s As String):  sMsg3TextPrprtional = s:                        End Property
-
-Private Property Get Msg1TbMonospaced() As MSForms.TextBox: Set Msg1TbMonospaced = Me.tbMsg1TextMonospaced: End Property
-
-Private Property Get Msg2TbMonospaced() As MSForms.TextBox: Set Msg2TbMonospaced = Me.tbMsg2TextMonospaced: End Property
-
-Private Property Get Msg3TbMonospaced() As MSForms.TextBox: Set Msg3TbMonospaced = Me.tbMsg3TextMonospaced: End Property
-
-Public Property Let Replies(ByVal v As Variant):            vReplies = v:                                   End Property
-
-Public Property Let Title(ByVal s As String):               sTitle = s:                                     End Property
+Public Property Let Title(ByVal s As String):                                   sTitle = s:                                     End Property
 
 ' Set the top position for the control (ctl) and return the top posisition for the next one
-Private Property Get TopNext(ByVal ctl As MSForms.Control) As Single
+Private Property Get TopNext(ByVal ctl As MsForms.Control) As Single
 
     TopNext = siTopNext
-
     With ctl
         .Top = siTopNext    ' the top position for this one
         '~~ Calculate the top position for any displayed which may come next
@@ -146,34 +199,31 @@ Private Property Get TopNext(ByVal ctl As MSForms.Control) As Single
 
 End Property
 
-Private Sub cmbReply1_Click():  ReplyClicked 0:    End Sub
+Private Sub cmbReply1_Click():  ReplyClicked 1:    End Sub
 
-Private Sub cmbReply2_Click():  ReplyClicked 1:    End Sub
+Private Sub cmbReply2_Click():  ReplyClicked 2:    End Sub
 
-Private Sub cmbReply3_Click():  ReplyClicked 2:    End Sub
+Private Sub cmbReply3_Click():  ReplyClicked 3:    End Sub
 
-Private Sub cmbReply4_Click():  ReplyClicked 3:    End Sub
+Private Sub cmbReply4_Click():  ReplyClicked 4:    End Sub
 
-Private Sub cmbReply5_Click():  ReplyClicked 4:    End Sub
+Private Sub cmbReply5_Click():  ReplyClicked 5:    End Sub
 
 Private Sub ControlsTopPos()
 
     siTopNext = MARGIN_FORM_TOP   ' initial top position of first visible element
     
     With Me
-        ControlPosTop .laMsg1, MARGIN_VERTIVAL_LABEL
-        ControlPosTop .tbMsg1TextMonospaced, MARGIN_VERTICAL
-        ControlPosTop .tbMsg1TextPrprtional, MARGIN_VERTICAL
-        ControlPosTop .laMsg2, MARGIN_VERTIVAL_LABEL
-        ControlPosTop .tbMsg2TextMonospaced, MARGIN_VERTICAL
-        ControlPosTop .tbMsg2TextPrprtional, MARGIN_VERTICAL
-        ControlPosTop .laMsg3, MARGIN_VERTIVAL_LABEL
-        ControlPosTop .tbMsg3TextMonospaced, MARGIN_VERTICAL
-        ControlPosTop .tbMsg3TextPrprtional, MARGIN_VERTICAL
+        ControlPosTop MsgSectionLabel(1), MARGIN_VERTIVAL_LABEL
+        ControlPosTop MsgSection(1), MARGIN_VERTICAL
+        ControlPosTop MsgSectionLabel(2), MARGIN_VERTIVAL_LABEL
+        ControlPosTop MsgSection(2), MARGIN_VERTICAL
+        ControlPosTop MsgSectionLabel(3), MARGIN_VERTIVAL_LABEL
+        ControlPosTop MsgSection(3), MARGIN_VERTICAL
         siTopNext = siTopNext + MARGIN_VERTICAL
         
         RepliesPosTop
-        .Height = .cmbReply1.Top + .cmbReply1.Height + MARGIN_FORM_BOTTOM
+        .Height = ReplyButton(1).Top + ReplyButton(1).Height + MARGIN_FORM_BOTTOM
     End With
 
 End Sub
@@ -181,90 +231,74 @@ End Sub
 ' Final form height adjustment considering only the maximum height specified
 ' --------------------------------------------------------------------------
 Private Sub FormHeightFinal()
-Dim siHeightMax         As Single
-Dim siHeightUsed        As Single
 Dim siHeightExceeding   As Single
-'Dim siScreenHeight      As Single
 Dim s                   As String
 Dim siWidth             As Single
-
-'    siScreenHeight = Application.Height
-    siHeightMax = wVirtualScreenHeight * (FORM_HEIGHT_MAX / 100)
     
     With Me
-        siHeightUsed = .cmbReply1.Top + .cmbReply1.Height + MARGIN_FORM_BOTTOM
-        If siHeightUsed > siHeightMax Then
-            '~~ Reduce the height of the largest displayed message paragraph by the amount of exceeding height
-            siHeightExceeding = siHeightUsed - siHeightMax
-            With MsgParagraphMaxHeight
-                siWidth = .Width
-                s = .Value
-                .SetFocus
-                .AutoSize = False
-                .Value = vbNullString
-                Select Case .ScrollBars
-                    Case fmScrollBarsHorizontal
-                        .ScrollBars = fmScrollBarsVertical
-                        .Width = siWidth + 15
-                        .Height = .Height - siHeightExceeding - 15
-                    Case fmScrollBarsVertical
-                        .ScrollBars = fmScrollBarsVertical
-                    Case fmScrollBarsBoth
-                        .Height = .Height - siHeightExceeding - 15
-                        .Width = siWidth - 15
-                    Case fmScrollBarsNone
-                        .ScrollBars = fmScrollBarsVertical
-                        .Width = siWidth + 15
-                        .Height = .Height - siHeightExceeding
-                End Select
-                .Value = s
-                .SelStart = 0
-            End With
-        End If
+        '~~ Reduce the height of the largest displayed message paragraph by the amount of exceeding height
+        siHeightExceeding = .Height - siMaximumFormHeight
+        .Height = siMaximumFormHeight
+        With MsgSectionMaxHeight
+            siWidth = .Width
+            s = .Value
+            .SetFocus
+            .AutoSize = False
+            .Value = vbNullString
+            Select Case .ScrollBars
+                Case fmScrollBarsHorizontal
+                    .ScrollBars = fmScrollBarsVertical
+                    .Width = siWidth + 15
+                    .Height = .Height - siHeightExceeding - 15
+                Case fmScrollBarsVertical
+                    .ScrollBars = fmScrollBarsVertical
+                Case fmScrollBarsBoth
+                    .Height = .Height - siHeightExceeding - 15
+                    .Width = siWidth - 15
+                Case fmScrollBarsNone
+                    .ScrollBars = fmScrollBarsVertical
+                    .Width = siWidth + 15
+                    .Height = .Height - siHeightExceeding
+            End Select
+            .Value = s
+            .SelStart = 0
+        End With
     End With
     
 End Sub
 
-' Final form width adjustment considering: title width, maximum fixed message text width,
-' width and number of displayed reply buttons, specified minimum message window width
-' ---------------------------------------------------------------------------------------
-Private Sub FormWidthFinal()
-Dim siMaxWidth  As Single
-
-    siMaxWidth = wVirtualScreenWidth * (FORM_WIDTH_MAX / 100)
-    If Me.Width > siMaxWidth Then
-        Me.Width = siMaxWidth
-    End If
-    
-End Sub
-
-' Return the displayed textbox with the largest height
+' Returns the visible textbox with the largest height.
 ' ----------------------------------------------------------
-Private Function MsgParagraphMaxHeight() As MSForms.TextBox
+Private Function MsgSectionMaxHeight() As MsForms.TextBox
 Dim v   As Variant
 Dim si  As Single
-Dim tb  As MSForms.TextBox
+Dim tb  As MsForms.TextBox
 
-    For Each v In MsgSectionsDisplayed
+    For Each v In MsgSectionsVisible
         Set tb = v
-        If tb.Height > si Then Set MsgParagraphMaxHeight = tb
+        If tb.Height > si Then
+            si = tb.Height
+            Set MsgSectionMaxHeight = tb
+        End If
     Next v
     
 End Function
 
-Private Sub MsgParagraphMonospacedSetup( _
-            ByVal la As MSForms.Label, _
+' Setup a message section with its label when one is specified.
+' -------------------------------------------------------------
+Private Sub MsgSectionSetup( _
+            ByVal section As Long, _
             ByVal latext As String, _
-            ByVal tb As MSForms.TextBox, _
-            ByVal tbtext As String)
-' ----------------------------------------
-' Setup any fixed font message and its
-' above label when one is specified.
-' ----------------------------------------
-
+            ByVal tbtext As String, _
+            ByVal monospaced As Boolean)
+    
+    Dim la  As MsForms.Label
+    Dim tb  As MsForms.TextBox
+    
     If tbtext <> vbNullString Then
         '~~ Setup above text label/title only when there is a text
         If latext <> vbNullString Then
+            Set la = MsgSectionLabel(section)
             With la
                 .Caption = latext
                 .Visible = True
@@ -272,117 +306,104 @@ Private Sub MsgParagraphMonospacedSetup( _
             End With
         End If
         
+        Set tb = MsgSection(section)
         With tb
+            If monospaced Then
+                .Font.Name = sFontNameMonospaced
+                MsgSectionMonospacedWidthSet tb, tbtext  ' sets the global siMaxMonospacedTextWidth variable
+                .Width = siMaxMonospacedTextWidth
+            Else
+                .Width = Me.Width - (FORM_MARGIN_LEFT + FORM_MARGIN_RIGHT)
+            End If
             .Visible = True
-            MsgParagraphMonospacedWidthSet tb, tbtext  ' sets the global siMaxMonospacedTextWidth variable
             .MultiLine = True
             .WordWrap = True
-            .AutoSize = True
-            .Value = tbtext
             .Left = FORM_MARGIN_LEFT
+            If monospaced Then
+                .IntegralHeight = True
+                DoEvents
+                .Width = siMaxMonospacedTextWidth
+            End If
+            .AutoSize = True
+            .Value = Replace(tbtext, vbLf, vbCrLf)
+            .SelStart = 0
+            siMaxMsgWidth = Max(siMaxMsgWidth, .Width)
         End With
         
-        With Me
-            .Width = mMsg.Max(FORM_WIDTH_MIN, _
-                                 siMinFormWidth, _
-                                 .laMsgTitle.Width, _
-                                 tb.Left + tb.Width + MARGIN_HORIZONTAL)
-            .laMsgTitle.Width = .Width
-            .laMsgTitleSpaceBottom.Width = .Width
-            .Left = FORM_MARGIN_LEFT
-        End With
+        AdjustFormWidth tb
         
     End If
 End Sub
 
+Private Sub AdjustFormWidth(ByVal ctl As MsForms.Control)
+    With Me
+        Debug.Print "Width = " & .Width
+        .Width = mMsg.Max(.Width, _
+                          siMinimumFormWidth, _
+                         ctl.Left + ctl.Width + FORM_MARGIN_RIGHT _
+                         )
+        Debug.Print "Width = " & .Width
+    End With
+
+End Sub
 ' Setup the width of a the monospaced textbox (tb) with text (sText)
 ' whereby the fixed font textbox's width is determined by the longest
 ' text line's length - determined by means of an autosized width-template.
 ' ------------------------------------------------------------------------
-Private Sub MsgParagraphMonospacedWidthSet( _
-            ByVal tb As MSForms.TextBox, _
+Private Sub MsgSectionMonospacedWidthSet( _
+            ByVal tb As MsForms.TextBox, _
             ByVal sText As String)
-    Dim sSplit      As String
-    Dim v           As Variant
-    Dim siMaxWidth  As Single
-
+            
+    Dim sSplit          As String
+    Dim v               As Variant
+    Dim siMaximumFormWidth As Single
+    
     '~~ Determine the used line break character
     If InStr(sText, vbLf) <> 0 Then sSplit = vbLf
     If InStr(sText, vbCrLf) <> 0 Then sSplit = vbCrLf
     
     '~~ Find the width which fits the largest text line
-    With Me
-        With .tbMsgMonospacedWidthTemplate
-            .MultiLine = False
-            .WordWrap = False
-            For Each v In Split(sText, sSplit)
-                .Value = v
-                siMaxWidth = Max(siMaxWidth, .Width)
-            Next v
-        End With
-        tb.Width = Max(siMaxWidth, Me.laMsgTitle.Width) + MARGIN_HORIZONTAL
+    With tb
+        .MultiLine = False
+        .WordWrap = False
+        For Each v In Split(sText, sSplit)
+            .Value = v
+            siMaximumFormWidth = Max(siMaximumFormWidth, .Width)
+        Next v
+        .Width = Max(siMaximumFormWidth, Me.laMsgTitle.Width) + FORM_MARGIN_RIGHT
+        siMaxMonospacedTextWidth = mMsg.Max(siMaxMonospacedTextWidth, .Width)
     End With
-    siMaxMonospacedTextWidth = mMsg.Max(siMaxMonospacedTextWidth, tb.Width)
-
 End Sub
 
-' Adjust the non-monospaced message paragraph's (tb) width to the form's width
-' ----------------------------------------------------------------------------
-Private Sub MsgParagraphPrprtionalSetup( _
-            ByVal la As MSForms.Label, _
-            ByVal latext As String, _
-            ByVal tb As MSForms.TextBox, _
-            ByVal tbtext As String)
-    
-    If tbtext <> vbNullString Then
-        '~~ Setup Message Label
-        If latext <> vbNullString Then
-            With la
-                .Caption = latext
-                .Visible = True
-                .Width = Me.Width - (MARGIN_HORIZONTAL * 2)
-                .Left = FORM_MARGIN_LEFT
-            End With
-        End If
-        
-        '~~ Setup Message Textbox
-        With tb
-            .Visible = True
-            .MultiLine = True
-            .WordWrap = True
-            .Width = Me.Width - (MARGIN_HORIZONTAL * 2)
-            .AutoSize = True
-            .Value = tbtext
-            .Left = FORM_MARGIN_LEFT
-        End With
-    End If
+Private Function MsgSectionIsMonospaced(ByVal tb As MsForms.TextBox) As Boolean
+    MsgSectionIsMonospaced = tb.Font.Name = sFontNameMonospaced
+End Function
 
-End Sub
-
-' Returns a collection of all displayed message sections.
+' Returns a collection of the visible message sections.
 ' -----------------------------------------------------
-Private Function MsgSectionsDisplayed() As Collection
-Dim cll As New Collection
-Dim ctl As MSForms.Control
+Private Function MsgSectionsVisible() As Collection
     
-    With Me
-        For Each ctl In Me.Controls
-            If TypeName(ctl) = "TextBox" And ctl.Visible = True Then
-                cll.Add ctl
-            End If
-        Next ctl
-    End With
-    Set MsgSectionsDisplayed = cll
+    Dim v   As Variant
+    Dim tb  As MsForms.TextBox
+    Dim cll As New Collection
+    
+    For Each v In cllMsgSections
+        Set tb = v
+        If tb.Visible = True Then
+            cll.Add tb
+        End If
+    Next v
+    Set MsgSectionsVisible = cll
 
 End Function
 
-' Adjust the largest displayed message paragraph's height
-' so that it fits into the final form height.
-' -------------------------------------------------------
+' Executed only in case the form width had to be reduced in order to meet its specified maximum height.
+' The message section with the largest height will be reduced to fit an will receive a vertical scroll bar.
+' ---------------------------------------------------------------------------------------------------------
 Private Sub MsgSectionsHeightFinal()
 Dim siHeightCurrentRequired As Single
 Dim siHeightExceeding       As Single
-Dim cllMsgSections        As Collection
+Dim cllMsgSections          As Collection
 Dim s                       As String
 
     With Me
@@ -390,88 +411,72 @@ Dim s                       As String
     End With
     If siHeightCurrentRequired <= Me.Height Then Exit Sub
     
-    Set cllMsgSections = MsgSectionsDisplayed
+    Set cllMsgSections = MsgSectionsVisible
     siHeightExceeding = siHeightCurrentRequired > Me.Height
     '~~ All displayed controls together take more height than the available form's height
     '~~ The displayed message sections are reduced in their height to fit the available space
-    With MsgParagraphMaxHeight ' The message paragraph with the maximum height
+    With MsgSectionMaxHeight ' The message paragraph with the maximum height
         .SetFocus
         s = .Value
         Select Case .ScrollBars
             Case fmScrollBarsHorizontal
-                .Height = .Height - siHeightExceeding - 15
-            Case fmScrollBarsVertical
-                .ScrollBars = fmScrollBarsBoth
-                .Height = .Height - siHeightExceeding - 15
-            Case fmScrollBarsBoth
-                .Height = .Height - siHeightExceeding - 15
-            Case fmScrollBarsNone
-                .ScrollBars = fmScrollBarsVertical
-                .Height = .Height - siHeightExceeding
+            Case fmScrollBarsVertical:  .ScrollBars = fmScrollBarsBoth
+            Case fmScrollBarsNone:      .ScrollBars = fmScrollBarsVertical
+            Case fmScrollBarsBoth       ' nothing required
         End Select
+        .Height = .Height - siHeightExceeding - 15 ' 15 is the height required by the scroll bar
     End With
 
 End Sub
 
 Private Sub MsgSectionsSetup()
     With Me
-        If sMsg1TextPrprtional <> vbNullString Then MsgParagraphPrprtionalSetup la:=.laMsg1, latext:=sMsg1Label, tb:=.tbMsg1TextPrprtional, tbtext:=sMsg1TextPrprtional
-        If sMsg1TextMonospaced <> vbNullString Then MsgParagraphMonospacedSetup la:=.laMsg1, latext:=sMsg1Label, tb:=.tbMsg1TextMonospaced, tbtext:=sMsg1TextMonospaced
-        If sMsg2TextPrprtional <> vbNullString Then MsgParagraphPrprtionalSetup la:=.laMsg2, latext:=sMsg2Label, tb:=.tbMsg2TextPrprtional, tbtext:=sMsg2TextPrprtional
-        If sMsg2TextMonospaced <> vbNullString Then MsgParagraphMonospacedSetup la:=.laMsg2, latext:=sMsg2Label, tb:=.tbMsg2TextMonospaced, tbtext:=sMsg2TextMonospaced
-        If sMsg3TextPrprtional <> vbNullString Then MsgParagraphPrprtionalSetup la:=.laMsg3, latext:=sMsg3Label, tb:=.tbMsg3TextPrprtional, tbtext:=sMsg3TextPrprtional
-        If sMsg3TextMonospaced <> vbNullString Then MsgParagraphMonospacedSetup la:=.laMsg3, latext:=sMsg3Label, tb:=.tbMsg3TextMonospaced, tbtext:=sMsg3TextMonospaced
+        If sMsgSection1Text <> vbNullString Then MsgSectionSetup section:=1, latext:=sMsgSection1Label, tbtext:=sMsgSection1Text, monospaced:=bMsgSection1Monospaced
+        If sMsgSection2Text <> vbNullString Then MsgSectionSetup section:=2, latext:=sMsgSection2Label, tbtext:=sMsgSection2Text, monospaced:=bMsgSection2Monospaced
+        If sMsgSection3Text <> vbNullString Then MsgSectionSetup section:=3, latext:=sMsgSection3Label, tbtext:=sMsgSection3Text, monospaced:=bMsgSection3Monospaced
     End With
 End Sub
 
-' After final adjustment of the form's width all the message paragraph's width
-' is re-adjusted. Any message paragraph using a proportinal font will result in
-' a new height, any monospaced font paragraph in a vertival scroll bar.
-' -----------------------------------------------------------------------------
+' After final adjustment of the form's width the visible the message paragraph's width is re-adjusted.
+' Proportional message sections will result in a new height,
+' mmonospaced message sections will receive a horizontal sccroll bar.
+' ----------------------------------------------------------------------------------------------------
 Private Sub MsgSectionsWidthFinal()
-Dim siMax   As Single
-Dim v       As Variant
-Dim tb     As MSForms.TextBox
-Dim s      As String
+
+    Dim siMax   As Single
+    Dim v       As Variant
+    Dim tb      As MsForms.TextBox
+    Dim s       As String
  
-    siMax = Me.Width - (FORM_MARGIN_LEFT + MARGIN_HORIZONTAL)
-    For Each v In MsgSectionsDisplayed
+    siMax = Me.Width - (FORM_MARGIN_LEFT + FORM_MARGIN_RIGHT)
+    
+    For Each v In MsgSectionsVisible
         Set tb = v
         With tb
-            If .Width > siMax Then
-                s = .Value
-                Select Case .Font.Name
-                    Case "Courier New", "Lucida Sans Typewriter"
-                        '~~ Manage a vertical scroll-bar instead of a new width
-                        .WordWrap = False
-                        .AutoSize = False
-                        .Value = vbNullString
-                        .SetFocus
-                        .Value = s
-                        Select Case .ScrollBars
-                            Case fmScrollBarsVertical
-                                .ScrollBars = fmScrollBarsBoth
-                                .Width = siMax - 15
-                            Case fmScrollBarsHorizontal
-                                .Width = siMax
-                            Case fmScrollBarsBoth
-                                .Width = siMax - 15
-                                .Height = .Height - 15
-                            Case fmScrollBarsNone
-                                .ScrollBars = fmScrollBarsHorizontal
-                                .Width = siMax
-                        End Select
-                        DoEvents
-                        .SelStart = 0
-                    Case Else
-                        '~~ Manage an adjusted width
-                        .WordWrap = True
-                        .AutoSize = True
-                        .Value = vbNullString
-                        .Width = siMax
-                        DoEvents
-                        .Value = s
+            s = .Value
+            If .Width > siMax And MsgSectionIsMonospaced(tb) Then
+                '~~ Provide a horizontal scroll-bar
+                .WordWrap = False
+                .AutoSize = False
+                .Value = vbNullString
+                .SetFocus
+                .Value = s
+                Select Case .ScrollBars
+                    Case fmScrollBarsVertical:                      .ScrollBars = fmScrollBarsBoth
+                    Case fmScrollBarsNone:                          .ScrollBars = fmScrollBarsHorizontal
+                    Case fmScrollBarsHorizontal, fmScrollBarsBoth   ' do nothing
                 End Select
+                .Width = Me.Width - FORM_MARGIN_LEFT - FORM_MARGIN_RIGHT / 2 - 15
+                DoEvents
+                .SelStart = 0
+            Else
+                '~~ Adjust the textbox width
+                .WordWrap = True
+                .AutoSize = True
+                .Value = vbNullString
+                .Width = siMax
+                DoEvents
+                .Value = s
             End If
         End With
     Next v
@@ -481,76 +486,52 @@ End Sub
 ' Setup for each reply button its left position.
 ' ----------------------------------------------
 Private Sub RepliesPosLeft()
-
-    With Me
-        Select Case lNoOfReplyButtons
-            Case 1
-                With .cmbReply1
-                    .Width = siMaxReplyWidth
-                    .Left = (Me.Width / 2) - (siMaxReplyWidth / 2) ' center
-                End With
-            Case 2
-                With .cmbReply1
-                    .Width = siMaxReplyWidth
-                    .Left = (Me.Width / 2) - (MARGIN_VERTICAL / 2) - siMaxReplyWidth ' left from center
-                End With
-                With .cmbReply2
-                    .Width = siMaxReplyWidth
-                    .Left = Me.cmbReply1.Left + siMaxReplyWidth + MARGIN_VERTICAL ' right from center
-                End With
-            Case 3
-                With .cmbReply2
-                    .Width = siMaxReplyWidth
-                    .Left = (Me.Width / 2) - (siMaxReplyWidth / 2) ' center
-                End With
-                With .cmbReply1
-                    .Width = siMaxReplyWidth
-                    .Left = Me.cmbReply2.Left - siMaxReplyWidth - MARGIN_VERTICAL ' left from center
-                End With
-                With .cmbReply3
-                    .Width = siMaxReplyWidth
-                    .Left = Me.cmbReply2.Left + siMaxReplyWidth + MARGIN_VERTICAL ' Right from center
-                End With
-            Case 4
-                With .cmbReply2                     ' position 2nd button left from center
-                    .Width = siMaxReplyWidth
-                    .Left = (Me.Width / 2) - (MARGIN_VERTICAL / 2) - siMaxReplyWidth
-                End With
-                With .cmbReply1                 ' position left from button 2
-                    .Width = siMaxReplyWidth
-                    .Left = Me.cmbReply2.Left - MARGIN_VERTICAL - siMaxReplyWidth
-                End With
-                With .cmbReply3
-                    .Width = siMaxReplyWidth        ' position 3rd button right from 2nd
-                    .Left = Me.cmbReply2.Left + siMaxReplyWidth + MARGIN_VERTICAL
-                End With
-                With .cmbReply4
-                    .Width = siMaxReplyWidth        ' position 4th button right from 3rd
-                    .Left = Me.cmbReply3.Left + siMaxReplyWidth + MARGIN_VERTICAL
-                End With
-            Case 5
-                With .cmbReply3                                     ' position 3rd reply button in the center
-                    .Width = siMaxReplyWidth
-                    .Left = (Me.Width / 2) - (siMaxReplyWidth / 2)
-                End With
-                With .cmbReply2                                     ' position 2nd to left from 3rd
-                    .Width = siMaxReplyWidth
-                    .Left = Me.cmbReply3.Left - siMaxReplyWidth - MARGIN_VERTICAL
-                End With
-                With .cmbReply1                                     ' position 1st to left from 2nd
-                    .Width = siMaxReplyWidth
-                    .Left = Me.cmbReply2.Left - siMaxReplyWidth - MARGIN_VERTICAL
-                End With
-                With .cmbReply4                                     ' position 4th right from 3rd
-                    .Width = siMaxReplyWidth
-                    .Left = Me.cmbReply3.Left + siMaxReplyWidth + MARGIN_VERTICAL
-                End With
-                With .cmbReply5                                     ' position 5th right from 4th
-                    .Width = siMaxReplyWidth
-                    .Left = Me.cmbReply4.Left + siMaxReplyWidth + MARGIN_VERTICAL
-                End With
-        End Select
-    End With
+    
+    Dim v           As Variant
+    Dim lVisible    As Long
+    Dim siWidth     As Single
+    Dim siHeight    As Single
+    Dim siByReplies As Single   ' Width required for the visible reply buttons
+    
+    For Each v In cllReplyButtons
+        If v.Visible = False Then Exit For
+        lVisible = lVisible + 1
+        With ReplyButton(lVisible)
+            siWidth = Max(siWidth, .Width, REPLY_BUTTON_MIN_WIDTH)
+            siHeight = Max(siHeight, .Height)
+        End With
+    Next v
+    
+    siByReplies = FORM_MARGIN_LEFT + ((siWidth + MARGIN_HORIZONTAL) * lVisible)
+    Me.Width = Max(Me.Width, Me.MinimumFormWidth, siByReplies)
+    
+    For Each v In cllReplyButtons
+        v.Width = siWidth
+        v.Height = siHeight
+    Next v
+    
+    Select Case lVisible
+        Case 1
+            ReplyButton(1).Left = (Me.Width / 2) - (siWidth / 2) ' center
+        Case 2
+            ReplyButton(1).Left = (Me.Width / 2) - (MARGIN_HORIZONTAL / 2) - siWidth    ' left from center
+            ReplyButton(2).Left = ReplyButton(1).Left + siWidth + MARGIN_HORIZONTAL     ' right from center
+        Case 3
+            ReplyButton(2).Left = (Me.Width / 2) - (siWidth / 2)                        ' center button 2
+            ReplyButton(1).Left = ReplyButton(2).Left - siWidth - MARGIN_HORIZONTAL     ' pos button 1 left from 2
+            ReplyButton(3).Left = ReplyButton(2).Left + siWidth + MARGIN_HORIZONTAL     ' pos button 3 right from 2
+        Case 4
+            ReplyButton(2).Left = (Me.Width / 2) - (MARGIN_HORIZONTAL / 2) - siWidth    ' pos button 2 left from center
+            ReplyButton(3).Left = (Me.Width / 2) + (MARGIN_HORIZONTAL / 2)              ' pos button 3 right from center
+            ReplyButton(1).Left = ReplyButton(2).Left - MARGIN_HORIZONTAL - siWidth     ' pos button 1 left from 2
+            ReplyButton(4).Left = ReplyButton(3).Left + siWidth + MARGIN_HORIZONTAL     ' pos button 4 right from 3
+        Case 5
+            ReplyButton(3).Left = (Me.Width / 2) - (siWidth / 2)                        ' center button 3
+            ReplyButton(2).Left = ReplyButton(3).Left - siWidth - MARGIN_HORIZONTAL     ' pos button 2 left from 3
+            ReplyButton(1).Left = ReplyButton(2).Left - siWidth - MARGIN_HORIZONTAL     ' pos button 1 left from 2
+            ReplyButton(4).Left = ReplyButton(3).Left + siWidth + MARGIN_HORIZONTAL     ' pos button 4 right from 3
+            ReplyButton(5).Left = ReplyButton(4).Left + siWidth + MARGIN_HORIZONTAL     ' pos button 5 right from 4
+    End Select
 
 End Sub
 
@@ -587,172 +568,137 @@ End Sub
 ' Setup and position the displayed reply buttons.
 ' Return the max reply button width.
 ' ------------------------------------------------------
-Private Sub RepliesSetup(ByVal vReplies As Variant)
-Dim v   As Variant
+Private Sub ReplyButtonsSetup(ByVal vReplies As Variant)
+    
+    Dim v   As Variant
+    Dim lButton As Long
+
+    Set cllReplyButtonsValue = Nothing
+    Set cllReplyButtonsValue = New Collection
 
     With Me
         '~~ Setup button caption
         If IsNumeric(vReplies) Then
             Select Case vReplies
                 Case vbOKOnly
-                    lNoOfReplyButtons = 1
-                    ReplySetup .cmbReply1, "Ok"
-                    siMaxReplyWidth = Max(siMaxReplyWidth, .cmbReply1.Width, REPLY_BUTTON_MIN_WIDTH)
-                    sReplyButtonsReturnValue = vbOK
+                    ReplyButtonSetup 1, "Ok", vbOK
                 Case vbOKCancel
-                    lNoOfReplyButtons = 2
-                    ReplySetup .cmbReply1, "Ok"
-                    ReplySetup .cmbReply2, "Cancel"
-                    siMaxReplyWidth = Max(siMaxReplyWidth, .cmbReply2.Width, REPLY_BUTTON_MIN_WIDTH)
-                    sReplyButtonsReturnValue = vbOK & "," & vbCancel
+                    ReplyButtonSetup 1, "Ok", vbOK
+                    ReplyButtonSetup 2, "Cancel", vbCancel
                 Case vbYesNo
-                    lNoOfReplyButtons = 2
-                    ReplySetup .cmbReply1, "Yes"
-                    ReplySetup .cmbReply2, "No"
-                    siMaxReplyWidth = Max(siMaxReplyWidth, .cmbReply2.Width, REPLY_BUTTON_MIN_WIDTH)
-                    sReplyButtonsReturnValue = vbYes & "," & vbNo
+                    ReplyButtonSetup 1, "Yes", vbYes
+                    ReplyButtonSetup 2, "No", vbNo
                 Case vbRetryCancel
-                    lNoOfReplyButtons = 2
-                    ReplySetup .cmbReply1, "Retry"
-                    ReplySetup .cmbReply2, "Cancel"
-                    siMaxReplyWidth = Max(siMaxReplyWidth, .cmbReply2.Width, REPLY_BUTTON_MIN_WIDTH)
-                    sReplyButtonsReturnValue = vbRetry & "," & vbCancel
+                    ReplyButtonSetup 1, "Retry", vbRetry
+                    ReplyButtonSetup 2, "Cancel", vbCancel
                 Case vbYesNoCancel
-                    lNoOfReplyButtons = 3
-                    ReplySetup .cmbReply1, "Yes"
-                    ReplySetup .cmbReply2, "No"
-                    ReplySetup .cmbReply3, "Cancel"
-                    siMaxReplyWidth = Max(siMaxReplyWidth, .cmbReply3.Width, REPLY_BUTTON_MIN_WIDTH)
-                    sReplyButtonsReturnValue = vbYes & "," & vbNo & "," & vbCancel
+                    ReplyButtonSetup 1, "Yes", vbYes
+                    ReplyButtonSetup 2, "No", vbNo
+                    ReplyButtonSetup 3, "Cancel", vbCancel
                 Case vbAbortRetryIgnore
-                    lNoOfReplyButtons = 3
-                    ReplySetup .cmbReply1, "Abort"
-                    ReplySetup .cmbReply2, "Retry"
-                    ReplySetup .cmbReply3, "Ignore"
-                    siMaxReplyWidth = Max(siMaxReplyWidth, .cmbReply3.Width, REPLY_BUTTON_MIN_WIDTH)
-                    sReplyButtonsReturnValue = vbAbort & "," & vbRetry & "," & vbIgnore
+                    ReplyButtonSetup 1, "Abort", vbAbort
+                    ReplyButtonSetup 2, "Retry", vbRetry
+                    ReplyButtonSetup 3, "Ignore", vbIgnore
             End Select
         Else
-            lNoOfReplyButtons = 0
-            sReplyButtonsReturnValue = vbNullString
             aReplyButtons = Split(vReplies, ",")
             For Each v In aReplyButtons
                 If v <> vbNullString Then
-                    lNoOfReplyButtons = lNoOfReplyButtons + 1
-                    sReplyButtonsReturnValue = sReplyButtonsReturnValue & v & ","
+                    lButton = lButton + 1
+                    ReplyButtonSetup lButton, v, v
                 End If
             Next v
-            Select Case lNoOfReplyButtons
-                Case 1
-                    ReplySetup .cmbReply1, aReplyButtons(0)
-                    siMaxReplyWidth = Max(siMaxReplyWidth, .cmbReply1.Width, REPLY_BUTTON_MIN_WIDTH)
-                Case 2
-                    ReplySetup .cmbReply1, aReplyButtons(0)
-                    ReplySetup .cmbReply2, aReplyButtons(1)
-                    siMaxReplyWidth = Max(siMaxReplyWidth, .cmbReply1.Width, .cmbReply2.Width, REPLY_BUTTON_MIN_WIDTH)
-                Case 3
-                    ReplySetup .cmbReply1, aReplyButtons(0)
-                    ReplySetup .cmbReply2, aReplyButtons(1)
-                    ReplySetup .cmbReply3, aReplyButtons(2)
-                    siMaxReplyWidth = Max(siMaxReplyWidth, .cmbReply1.Width, .cmbReply2.Width, .cmbReply3.Width, REPLY_BUTTON_MIN_WIDTH)
-                Case 4
-                    ReplySetup .cmbReply1, aReplyButtons(0)
-                    ReplySetup .cmbReply2, aReplyButtons(1)
-                    ReplySetup .cmbReply3, aReplyButtons(2)
-                    ReplySetup .cmbReply4, aReplyButtons(3)
-                    siMaxReplyWidth = Max(siMaxReplyWidth, .cmbReply1.Width, .cmbReply2.Width, .cmbReply3.Width, .cmbReply4.Width, REPLY_BUTTON_MIN_WIDTH)
-                Case 5
-                    ReplySetup .cmbReply1, aReplyButtons(0)
-                    ReplySetup .cmbReply2, aReplyButtons(1)
-                    ReplySetup .cmbReply3, aReplyButtons(2)
-                    ReplySetup .cmbReply4, aReplyButtons(3)
-                    ReplySetup .cmbReply5, aReplyButtons(4)
-                    siMaxReplyWidth = Max(siMaxReplyWidth, .cmbReply1.Width, .cmbReply2.Width, .cmbReply3.Width, .cmbReply4.Width, .cmbReply5.Width, REPLY_BUTTON_MIN_WIDTH)
-            End Select
         End If
     End With
 
 End Sub
 
-' Return the value of the clicked reply button (lIndex).
+' Return the value of the clicked reply button (button).
 ' ------------------------------------------------------
-Private Sub ReplyClicked(ByVal lIndex As Long)
+Private Sub ReplyClicked(ByVal button As Long)
 Dim s As String
     
-    s = Split(sReplyButtonsReturnValue, ",")(lIndex)
+    s = ReplyButtonValue(button)
     If IsNumeric(s) Then
         mMsg.MsgReply = CLng(s)
     Else
         mMsg.MsgReply = s
     End If
+#If Test = 0 Then ' allows assertions during testing
     Unload Me
+#Else
+    Me.Hide
+#End If
     
 End Sub
 
-' Setup Command Button's visibility and text.
+' Setup a reply button's visibility and caption.
 ' -----------------------------------------------
-Private Sub ReplySetup(ByVal cmb As MSForms.CommandButton, _
-                             ByVal s As String)
+Private Sub ReplyButtonSetup(ByVal button As Long, _
+                             ByVal s As String, _
+                             ByVal v As Variant)
+    
+    Dim cmb As MsForms.CommandButton
+    
     If s <> vbNullString Then
+        Set cmb = ReplyButton(button)
         With cmb
             .Visible = True
             .Caption = s
             siMaxReplyHeight = mMsg.Max(siMaxReplyHeight, .Height)
+            siMaxReplyWidth = Max(siMaxReplyWidth, .Width, REPLY_BUTTON_MIN_WIDTH)
         End With
+        ReplyButtonValue(button) = v
     End If
+    
 End Sub
 
+' An extra title label mimics the title bar in order to determine the required form's width.
+' When a specific font name and/or size is specified, the extra title label is actively used
+' and the UserForm's title bar is not displayed - which means that there is no X to cancel.
+' ------------------------------------------------------------------------------------------
 Private Sub TitleSetup()
-' ----------------------------------------------------------------
-' When a font name other than the system's font name is provided
-' an extra title label mimics the title bar.
-' In any case the title label is used to determine the form width
-' by autosize of the label.
-' ----------------------------------------------------------------
     
     With Me
         If sTitleFontName <> vbNullString And sTitleFontName <> .Font.Name Then
             '~~ A title with a specific font is displayed in a dedicated title label
             With .laMsgTitle   ' Hidden by default
+                .Visible = True
                 .Top = TopNext(Me.laMsgTitle)
                 .Font.Name = sTitleFontName
                 If sTitleFontSize <> 0 Then
                     .Font.Size = sTitleFontSize
                 End If
-                .Visible = True
-                siTopNext = .Top + .Height + MARGIN_FORM_TOP
             End With
-            
+            .laMsgTitleSpaceBottom.Visible = True
         Else
-            .Caption = " " & sTitle
-            .laMsgTitleSpaceBottom.Visible = False
             With .laMsgTitle
-                '~~ The title label is used to adjust the form width
+                '~~ The title label is only used to adjust the form width
                 With .Font
                     .Bold = False
                     .Name = Me.Font.Name
-                    .Size = 8.6
+                    .Size = 8.65    ' Value which comes to a length close to the length required
                 End With
                 .Visible = False
                 siTitleWidth = .Width + MARGIN_HORIZONTAL
             End With
             siTopNext = MARGIN_FORM_TOP
+            .Caption = " " & sTitle    ' some left margin
+            .laMsgTitleSpaceBottom.Visible = False
         End If
         
         With .laMsgTitle
             '~~ The title label is used to adjust the form width
-            With .Font
-                .Bold = False
-                .Size = 8.6
-            End With
+            .WordWrap = False
             .AutoSize = True
             .Caption = " " & sTitle    ' some left margin
             .AutoSize = False
             siTitleWidth = .Width + MARGIN_HORIZONTAL
         End With
         
-        .Width = siTitleWidth   ' not the finalwidth though
         .laMsgTitleSpaceBottom.Width = .laMsgTitle.Width
+    
+        AdjustFormWidth .laMsgTitleSpaceBottom
     
     End With
 
@@ -762,7 +708,7 @@ Public Sub FormFinalPositionOnScreen()
     AdjustStartupPosition Me
 End Sub
 
-Private Sub ControlPosTop(ByVal ctl As MSForms.Control, _
+Private Sub ControlPosTop(ByVal ctl As MsForms.Control, _
                           ByVal siMargin As Single)
     With ctl
         If .Visible Then
@@ -845,20 +791,40 @@ End Sub
 
 Private Sub UserForm_Activate()
     
-    GetScreenMetrics            ' provides the screen's width and height
     With Me
+        .Width = siMinimumFormWidth
         TitleSetup
-        MsgSectionsSetup        ' provided message sections text and visibility
-        RepliesSetup vReplies   ' provided reply buttons text and visibility
-        FormWidthFinal          ' considers title width, monospaced message sections width and maximum form width
-        MsgSectionsWidthFinal   ' may end up with a horizontal scroll bar when monospaced
-        RepliesPosLeft          ' adjust displayed reply buttons left position
-        ControlsTopPos          ' adjust all displayed controls' top position
-        FormHeightFinal         ' may end up with a horizontal scroll bar
-        MsgSectionsHeightFinal  ' may end up with a horizontal scroll bar for a monospaced message section
+        MsgSectionsSetup                ' Message sections text and visibility
+        ReplyButtonsSetup vReplies      ' Reply buttons text, size and visibility
+        
+        If .Width > siMaximumFormWidth Then .Width = siMaximumFormWidth
+        DoEvents
+        
+        '~~ An ajusted form width or any message section may have changed the available width
+        '~~ The final width adjustment may enlarge the width or shrink it wereas in the latter
+        '~~ case for a monospaced section a horizontal scroll bar is provided.
+        
+        .Width = Max(siMinimumFormWidth, _
+                     FORM_MARGIN_LEFT + siMaxMsgWidth + FORM_MARGIN_RIGHT, _
+                     FORM_MARGIN_LEFT + ((siMaxReplyWidth + MARGIN_HORIZONTAL) * cllReplyButtonsVisible.Count)) + FORM_MARGIN_RIGHT
+        
+        RepliesPosLeft                  ' adjust displayed reply buttons left position
+        
+        MsgSectionsWidthFinal
+        
+        If .Height > siMaximumFormHeight Then
+            '~~ Reduce height to maximum specified and adjust height of message section(s) accordingly
+            FormHeightFinal
+            DoEvents
+            MsgSectionsHeightFinal  ' may end up with a horizontal scroll bar for a monospaced message section
+        End If
+        
         ControlsTopPos          ' adjusts all controls' top position
+    
     End With
+    
     AdjustStartupPosition Me
 
 End Sub
+
 

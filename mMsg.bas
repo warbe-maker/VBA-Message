@@ -99,15 +99,17 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
     '~~ Display error message by UserForm fErrMsg
     With fMsg
         .Title = errtitle
-        .Msg1Label = "Error Message/Description:"
-        .Msg1TextPrprtional = sErrText
+        .MsgSection1Label = "Error Message/Description:"
+        .MsgSection1Text = sErrText
+        .MsgSection1Monospaced = False
         If errpath <> vbNullString Then
-            .Msg2label = "Error path (call stack):"
-            .Msg2TextPrprtional = errpath
+            .MsgSection2Label = "Error path (call stack):"
+            .MsgSection2Text = errpath
+            .MsgSection2Monospaced = True
         End If
         If errinfo <> vbNullString Then
-            .Msg3label = "Info:"
-            .Msg3TextPrprtional = errinfo
+            .MsgSection3Label = "Info:"
+            .MsgSection3Text = errinfo
         End If
         .Replies = vbOKOnly
         .FormFinalPositionOnScreen
@@ -211,21 +213,9 @@ Public Function Msg1( _
 
     With fMsg
         .Title = msgtitle
-
-        If msgtext <> vbNullString Then
-            If msgmonospaced = True _
-            Then .Msg1TextMonospaced = msgtext _
-            Else .Msg1TextPrprtional = msgtext
-        End If
-
+        .MsgSection1Text = msgtext
+        .MsgSection1Monospaced = msgmonospaced
         .Replies = msgreplies
-'        .FormFinalPositionOnScreen
-'        If msgminformwidth <> 0 Then .Width = Max(.Width, msgminformwidth)
-'        .StartUpPosition = 1
-'        .Width = .ScreenWidth * .PointsPerPixel * 0.85 'Userform width= Width in Resolution * DPI * 85%
-'        siHeight = .ScreenHeight * .PointsPerPixel * 0.2
-'        .Height = Min(.Height, siHeight)
-
         .Show
     End With
 
@@ -265,13 +255,13 @@ End Function
 ' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
 ' ------------------------------------------------------------------
 Public Function Msg(ByVal msgtitle As String, _
-           Optional ByVal Msg1Label As String = vbNullString, _
+           Optional ByVal msg1label As String = vbNullString, _
            Optional ByVal msg1text As String = vbNullString, _
            Optional ByVal msg1monospaced As Boolean = False, _
-           Optional ByVal Msg2label As String = vbNullString, _
+           Optional ByVal msg2label As String = vbNullString, _
            Optional ByVal msg2text As String = vbNullString, _
            Optional ByVal msg2monospaced As Boolean = False, _
-           Optional ByVal Msg3label As String = vbNullString, _
+           Optional ByVal msg3label As String = vbNullString, _
            Optional ByVal msg3text As String = vbNullString, _
            Optional ByVal msg3monospaced As Boolean = False, _
            Optional ByVal msgtitlefontsize As Long = 0, _
@@ -282,36 +272,21 @@ Public Function Msg(ByVal msgtitle As String, _
 
     With fMsg
         .Title = msgtitle
-
-        If msg1text <> vbNullString Then
-            If msg1monospaced = True _
-            Then .Msg1TextMonospaced = msg1text _
-            Else .Msg1TextPrprtional = msg1text
-            .Msg1Label = Msg1Label
-        End If
-
-        If msg2text <> vbNullString Then
-            If msg2monospaced = True _
-            Then .Msg2TextMonospaced = msg2text _
-            Else .Msg2TextPrprtional = msg2text
-            .Msg2label = Msg2label
-        End If
-
-        If msg3text <> vbNullString Then
-            If msg3monospaced = True _
-            Then .Msg3TextMonospaced = msg3text _
-            Else .Msg3TextPrprtional = msg3text
-            .Msg3label = Msg3label
-        End If
+        
+        .MsgSection1Label = msg1label
+        .MsgSection1Text = msg1text
+        .MsgSection1Monospaced = msg1monospaced
+        
+        .MsgSection2Label = msg2label
+        .MsgSection2Text = msg2text
+        .MsgSection2Monospaced = msg2monospaced
+        
+        .MsgSection3Label = msg3label
+        .MsgSection3Text = msg3text
+        .MsgSection3Monospaced = msg3monospaced
 
         .Replies = msgreplies
-'        .FormFinalPositionOnScreen
-'        If msgminformwidth <> 0 Then .Width = Max(.Width, msgminformwidth)
-'        .StartUpPosition = 1
-'        .Width = .ScreenWidth * .PointsPerPixel * 0.85 'Userform width= Width in Resolution * DPI * 85%
-'        siHeight = .ScreenHeight * .PointsPerPixel * 0.2
-'        .Height = Min(.Height, siHeight)
-
+        .FormFinalPositionOnScreen
         .Show
     End With
 
