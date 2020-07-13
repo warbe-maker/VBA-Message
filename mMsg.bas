@@ -204,7 +204,7 @@ End Function
 ' --------------------------------------------------------------------
 Public Function Msg1( _
            Optional ByVal msgtitle As String = vbNullString, _
-           Optional ByVal msgtext As String = vbNullString, _
+           Optional ByVal MsgSectionText As String = vbNullString, _
            Optional ByVal msgmonospaced As Boolean = False, _
            Optional ByVal msgminformwidth As Single = 0, _
            Optional ByVal msgreplies As Variant = vbOKOnly) As Variant
@@ -213,7 +213,7 @@ Public Function Msg1( _
 
     With fMsg
         .Title = msgtitle
-        .MsgSection1Text = msgtext
+        .MsgSection1Text = MsgSectionText
         .MsgSection1Monospaced = msgmonospaced
         .Replies = msgreplies
         .Show
