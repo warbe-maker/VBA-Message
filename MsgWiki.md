@@ -1,47 +1,60 @@
 # VB MsgBox Alternative
-## Possible message layouts
-The alternative message box allows the display of a wide range of information, e.g. even the content of text files which should be illustrated below. The main deficiencies  eliminated are:
+The alternative VB MsgBox is not a 100% equivalent but comes with the main limitations eliminated
+* limited window width, resulting in a truncated title
+* limited message text space
+* limited reply button options (number caption text)
+* no monospaced text
+Things not implemented yet are
+* specifying the default button
+* display of an image like a ?, !, etc.
 
-- The very limited window width, resulting in a truncated title
-- The very limited message text space
-- The very limited reply buttons in number and the possible caption text as well
-- The inability to display monospaced text
-
+## Examples illustrating the major enhancements 
 ### Simple message pretty analogous to Msgbox
 image
 
-### "Pimped" Error message
+### A "pimped" Error message
 image
 
-### New kinds of reply buttons
+### A complex decision requesting dialog 
 image
 
-## Specification of a re-engineered message box
+## Specification
+### Basics
+* Up to 3 message sections
+  * optionally monospaced (not word wrapped!)
+  * optionally with a label
+* Up to 5 reply buttons. 
+either exactly like the VB MsgBox and additionally with any multiline caption text. 
+The replied value corresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
+* The message window width considers
+  * the title width (avoiding truncation)
+  * the longest monospaced text line - if any
+  * the number and width of the displayed reply buttons
+  * the specified minimum window width
+  * the specified maximum message window width (as a % of the screen width)
+* The message window height considers
+  * the space required for the message sections and the reply buttons
+  * the specified maximum message window height (as a % if the screen height)
 
-- Up to 3 message paragraphs
-  optionally monospaced and optionally labelled
-- Up to 5 reply buttons either exactly like Msgbox offers them but additionally with any multiline caption text whereby the replied value korresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
-- Flexible window width considering
-  - The title width
-  - The longest monospaced text line - if any
-  - The number and width of the displayed reply buttons
-  - A specified minimum window width
-- Flexible window height
-  - Adjusted up to the screen height
-  - Message paragraphs which had to be limited in their height show a vertical scroll bar
+### Handling of an exceeded width or height limits
+* when the specified maximum width is exceeded either by a monospaced message section (proportional spaced sections are word wrapped and thus cannot exceed the maximum width) or by the number and width of the reply buttons, a horizontal scroll bar is displayed.
+* when the specified maximum height is exceeded, the highest message section's height is reduced to fit and a vertical scroll bar is displayed.
 
 ## Installation
+See ReadMe
 
 ## Usage
 
 ## Examples
 
 ## Parameters
+There are much more parameters available than the ones obviously required for any kind of message. The additional parameters allow the implementation of VB project specific message procedures.
+### Basic
 
 | Parameter | applicable for | meaning |
 | ------- | -------- | ---------- |
-| sTitle | msg, msg3 | The text displayed in the handle bar |
-| sMsgText | msg | The one and only text displayed |
+| msgtitle | msg, msg3 | The text displayed in the handle bar |
+| msgtext | msg | The one and only text displayed |
 | vReplies | msg, msg3 | The number and content of the reply buttons (see Table below), defaults to __vbOkOnly__ |
 | sText1, sText2, sText3 | msg3 | Message paragraphs |
 | sLabel1, sLabel2, sLabel3 | msg3 | Label corresponding to the message paragraphs |
