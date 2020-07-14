@@ -51,14 +51,21 @@ See ReadMe
 There are much more parameters available than the ones obviously required for any kind of message. The additional parameters allow the implementation of VB project specific message procedures.
 ### Basic
 
-| Parameter | applicable for | meaning |
+| Parameter | applicable for (procedure in mMsg module) | meaning |
 | ------- | -------- | ---------- |
-| msgtitle | msg, msg3 | The text displayed in the handle bar |
-| msgtext | msg | The one and only text displayed |
-| vReplies | msg, msg3 | The number and content of the reply buttons (see Table below), defaults to __vbOkOnly__ |
-| sText1, sText2, sText3 | msg3 | Message paragraphs |
-| sLabel1, sLabel2, sLabel3 | msg3 | Label corresponding to the message paragraphs |
-| bMonospace1, bMonospace2, bMonospace3 | msg3 | True = Message paragraph monospaced |
+| msgtitle | msg, box | The text displayed in the handle bar |
+| msgtext | box | The one and only text displayed |
+| msg1label | msg| label for the first message section |
+| msg1text | msg | text for the first message section |
+| msg1monospaced | msg | optional, defaults to False |
+| msg2label | msg| label for the first message section |
+| msg2text | msg | text for the first message section |
+| msg2monospaced | msg| optional, defaults to False |
+| msg3label | msg| label for the first message section |
+| msg3text | msg | text for the first message section |
+| msg3monospaced | msg | optional, defaults to False || vReplies | msg, msg3 | The number and content of the reply buttons (see Table below), defaults to __vbOkOnly__ |
+| replies | msg, box | specifies the to be displayed reply buttons, optional, defaults to vbOkOnly |
+
 
 #### Parameter vReplies
 | Value | Meaning |
