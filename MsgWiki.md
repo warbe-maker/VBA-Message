@@ -1,23 +1,24 @@
-# VB MsgBox Alternative
+## VB MsgBox Alternative
 Addresses the following limitations and flexibility flaws:
-* Limited window width, resulting in title truncation
-* Limited space for the message
-* Limited reply button options  (number and caption text)
-* No monospaced font option
+* Limited width
+* Title truncation
+* Limited message space
+* Inflexible reply button options (limited in number and caption text)
+* No monospace font option
 
-## Examples
+## Alternative message setup and designs
 The following examples should illustrate the effect
 ### Simple message pretty analogous to Msgbox
 image
 
 ### A "pimped" Error message
+The error message below is displayed with my error handler module which will be a future repo.
 image
 
-### An more complex decision requesting message
+### An enhanced decision requesting message
 image
 
-## Specification
-
+## Specification of the alternative MsgBox
 * Up to 3 message sections  
   * optionally monospaced. 
   * optionally with a label
@@ -63,8 +64,8 @@ Example: A parameter vReplies:="Yes,No,Cancel" results in the same reply buttons
 The Excel Workbook Msg xlsm is for development and testing. The module mTest provides all means for a proper regression test. The implemented tests are available via the test Worksheet Test/wsMsgTest. The test procedures in the mTest module are designed for a compact and complete test of all functions, options and boundaries and in that not necessarily usefully usage examples. For usage examples the procedures in the mExamples module may preferably consulted.
 Performing a regression test should be obligatory for anyone contributing by code modifications for any purpose or reason. See Contributing.
 
-# UserForm
-## Design
+## Design and implementation
+### UserForm
 The Userform uses a hierachy of frames, each dedicated to a specific operation
 * MessageSections:  
  .Top = T_MARGIN.  
