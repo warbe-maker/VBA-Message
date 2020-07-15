@@ -1,33 +1,36 @@
 # VB MsgBox Alternative
-## Possible message layouts
-The alternative message box allows the display of a wide range of information, e.g. even the content of text files which should be illustrated below. The main deficiencies  eliminated are:
+Addresses the following limitations and flexibility flaws:
+* Limited window width, resulting in title truncation
+* Limited space for the message
+* Limited reply button options  (number and caption text)
+* No monospaced font option
 
-- The very limited window width, resulting in a truncated title
-- The very limited message text space
-- The very limited reply buttons in number and the possible caption text as well
-- The inability to display monospaced text
-
+## Examples
+The following examples should illustrate the effect
 ### Simple message pretty analogous to Msgbox
 image
 
-### "Pimped" Error message
+### A "pimped" Error message
 image
 
-### New kinds of reply buttons
+### An more complex decision requesting message
 image
 
-## Specification of a re-engineered message box
+## Specification
 
-- Up to 3 message paragraphs
-  optionally monospaced and optionally labelled
-- Up to 5 reply buttons either exactly like Msgbox offers them but additionally with any multiline caption text whereby the replied value korresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
-- Flexible window width considering
-  - The title width
-  - The longest monospaced text line - if any
-  - The number and width of the displayed reply buttons
-  - A specified minimum window width
-- Flexible window height
-  - Adjusted up to the screen height
+* Up to 3 message sections  
+  * optionally monospaced. 
+  * optionally with a label
+* Up to 5 reply buttons either exactly like Msgbox offers them but additionally with any multiline caption text whereby the replied value korresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
+* Flexible message window width by considering the following facts and parameters
+  * title width
+  * the longest monospaced text line - if any
+  * the number and width of the displayed reply buttons
+  * minimum window width in pt
+  * maximum window width (specified as percentage of the screen width)
+* Flexible message window height by considering the following facts an parameters
+  * maximum window height (specified as percentage of the screen height)
+  * adjusted up to the screen height
   - Message paragraphs which had to be limited in their height show a vertical scroll bar
 
 ## Installation
