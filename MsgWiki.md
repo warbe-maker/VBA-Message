@@ -49,6 +49,7 @@ See ReadMe
 
 ## Parameters
 There are much more parameters available than the ones obviously required for any kind of message. The additional parameters allow the implementation of VB project specific message procedures.
+
 ### Basic
 
 | Parameter | applicable for (procedure in mMsg module) | meaning |
@@ -67,13 +68,15 @@ There are much more parameters available than the ones obviously required for an
 | replies | msg, box | specifies the to be displayed reply buttons, optional, defaults to vbOkOnly |
 
 
-#### Parameter vReplies
-| Value | Meaning |
-| ------------- | ------- |
-| vbOkOnly, vbYesNo, etc. analogous MsgBox | MsgBox alike reply buttons (up to 3) |
-| Any comma delimited text string (up to 5 strings) which may include line breaks for multiline reply button text | Will be displayed in as many buttons |
-
-Example: A parameter vReplies:="Yes,No,Cancel" results in the same reply buttons as a parameter vReplies:=vbYesNoCancel
+#### Parameter replies
+| Value | Result |
+| ----- | -------------------- |
+| vbOkOnly, vbYesNo, etc. analogous MsgBox | Up to 3 VB MsgBox alike reply buttons |
+| Up to five comma delimited text strings | Each string is displayed as a reply button |
+| | Example: | 
+| | replies:="Yes,No,Cancel". |
+| | is the eequivalent of. |
+| | replies:=vbYesNoCancel |
 
 ## Development and Test
 
