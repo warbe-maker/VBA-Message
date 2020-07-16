@@ -4,7 +4,7 @@
 Addresses the following limitations and flexibility flaws:
 * Limited width
 * Title truncation
-* Limited message space
+
 
 
 
