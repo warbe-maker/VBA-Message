@@ -1,3 +1,5 @@
+
+
 ## VB MsgBox Alternative
 Addresses the following limitations and flexibility flaws:
 * Limited width
@@ -7,11 +9,26 @@ Addresses the following limitations and flexibility flaws:
 * No monospace font option
 
 ## Alternative message setup and designs
+
 The following examples should illustrate the effect
+
+# VB MsgBox Alternative
+The alternative VB MsgBox is not a 100% equivalent but comes with the main limitations eliminated
+* limited window width, resulting in a truncated title
+* limited message text space
+* limited reply button options (number caption text)
+* no monospaced text
+Things not implemented yet are
+* specifying the default button
+* display of an image like a ?, !, etc.
+
+## Examples illustrating the major enhancements 
+
 ### Simple message pretty analogous to Msgbox
 image
 
 ### A "pimped" Error message
+
 The error message below is displayed with my error handler module which will be a future repo.
 image
 
@@ -34,30 +51,73 @@ image
   * adjusted up to the screen height
   - Message paragraphs which had to be limited in their height show a vertical scroll bar
 
+image
+
+### A complex decision requesting dialog 
+image
+
+## Specification
+### Basics
+* Up to 3 message sections
+  * optionally monospaced (not word wrapped!)
+  * optionally with a label
+* Up to 5 reply buttons. 
+either exactly like the VB MsgBox and additionally with any multiline caption text. 
+The replied value corresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
+* The message window width considers
+  * the title width (avoiding truncation)
+  * the longest monospaced text line - if any
+  * the number and width of the displayed reply buttons
+  * the specified minimum window width
+  * the specified maximum message window width (as a % of the screen width)
+* The message window height considers
+  * the space required for the message sections and the reply buttons
+  * the specified maximum message window height (as a % if the screen height)
+
+### Handling of an exceeded width or height limits
+* when the specified maximum width is exceeded either by a monospaced message section (proportional spaced sections are word wrapped and thus cannot exceed the maximum width) or by the number and width of the reply buttons, a horizontal scroll bar is displayed.
+* when the specified maximum height is exceeded, the highest message section's height is reduced to fit and a vertical scroll bar is displayed.
+
+
+
+
 ## Installation
+See ReadMe
 
 ## Usage
 
 ## Examples
 
 ## Parameters
+There are much more parameters available than the ones obviously required for any kind of message. The additional parameters allow the implementation of VB project specific message procedures.
 
-| Parameter | applicable for | meaning |
+### Basic
+
+| Parameter | applicable for (procedure in mMsg module) | meaning |
 | ------- | -------- | ---------- |
-| sTitle | msg, msg3 | The text displayed in the handle bar |
-| sMsgText | msg | The one and only text displayed |
-| vReplies | msg, msg3 | The number and content of the reply buttons (see Table below), defaults to __vbOkOnly__ |
-| sText1, sText2, sText3 | msg3 | Message paragraphs |
-| sLabel1, sLabel2, sLabel3 | msg3 | Label corresponding to the message paragraphs |
-| bMonospace1, bMonospace2, bMonospace3 | msg3 | True = Message paragraph monospaced |
+| msgtitle | msg, box | The text displayed in the handle bar |
+| msgtext | box | The one and only text displayed |
+| msg1label | msg| label for the first message section |
+| msg1text | msg | text for the first message section |
+| msg1monospaced | msg | optional, defaults to False |
+| msg2label | msg| label for the first message section |
+| msg2text | msg | text for the first message section |
+| msg2monospaced | msg| optional, defaults to False |
+| msg3label | msg| label for the first message section |
+| msg3text | msg | text for the first message section |
+| msg3monospaced | msg | optional, defaults to False || vReplies | msg, msg3 | The number and content of the reply buttons (see Table below), defaults to __vbOkOnly__ |
+| replies | msg, box | specifies the to be displayed reply buttons, optional, defaults to vbOkOnly |
 
-#### Parameter vReplies
-| Value | Meaning |
-| ------------- | ------- |
-| vbOkOnly, vbYesNo, etc. analogous MsgBox | MsgBox alike reply buttons (up to 3) |
-| Any comma delimited text string (up to 5 strings) which may include line breaks for multiline reply button text | Will be displayed in as many buttons |
 
-Example: A parameter vReplies:="Yes,No,Cancel" results in the same reply buttons as a parameter vReplies:=vbYesNoCancel
+#### Parameter replies
+| Value | Result |
+| ----- | -------------------- |
+| vbOkOnly, vbYesNo, etc. analogous MsgBox | Up to 3 VB MsgBox alike reply buttons |
+| Up to five comma delimited text strings | Each string is displayed as a reply button |
+| | Example: | 
+| | replies:="Yes,No,Cancel". |
+| | is the eequivalent of. |
+| | replies:=vbYesNoCancel |
 
 ## Development and Test
 
