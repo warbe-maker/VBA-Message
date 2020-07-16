@@ -6,11 +6,13 @@ Addresses the following limitations and flexibility flaws:
 * Title truncation
 * Limited message space
 * Inflexible reply button options (limited in number and caption text)
-* No monospace font option
 
-## Alternative message setup and designs
 
-The following examples should illustrate the effect
+
+
+
+
+
 
 # VB MsgBox Alternative
 The alternative VB MsgBox is not a 100% equivalent but comes with the main limitations eliminated
