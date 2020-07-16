@@ -16,7 +16,9 @@
 
 
 ## VB MsgBox Alternative
-The alternative VB MsgBox is not a 100% equivalent but comes with the main limitations eliminated
+Not a 100% equ
+
+uivalent but with the following limitations and flexibility flaws eliminated
 * limited window width, resulting in a truncated title
 * limited message text space
 * limited reply button options (number caption text)
