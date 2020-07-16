@@ -1,8 +1,8 @@
 
 
 ## VB MsgBox Alternative
-Addresses the following limitations and flexibility flaws:
-* Limited width
+
+
 
 
 
