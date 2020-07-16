@@ -1,3 +1,17 @@
+
+
+## VB MsgBox Alternative
+Addresses the following limitations and flexibility flaws:
+* Limited width
+* Title truncation
+* Limited message space
+* Inflexible reply button options (limited in number and caption text)
+* No monospace font option
+
+## Alternative message setup and designs
+
+The following examples should illustrate the effect
+
 # VB MsgBox Alternative
 The alternative VB MsgBox is not a 100% equivalent but comes with the main limitations eliminated
 * limited window width, resulting in a truncated title
@@ -9,10 +23,34 @@ Things not implemented yet are
 * display of an image like a ?, !, etc.
 
 ## Examples illustrating the major enhancements 
+
 ### Simple message pretty analogous to Msgbox
 image
 
 ### A "pimped" Error message
+
+The error message below is displayed with my error handler module which will be a future repo.
+image
+
+### An enhanced decision requesting message
+image
+
+## Specification of the alternative MsgBox
+* Up to 3 message sections  
+  * optionally monospaced. 
+  * optionally with a label
+* Up to 5 reply buttons either exactly like Msgbox offers them but additionally with any multiline caption text whereby the replied value korresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
+* Flexible message window width by considering the following facts and parameters
+  * title width
+  * the longest monospaced text line - if any
+  * the number and width of the displayed reply buttons
+  * minimum window width in pt
+  * maximum window width (specified as percentage of the screen width)
+* Flexible message window height by considering the following facts an parameters
+  * maximum window height (specified as percentage of the screen height)
+  * adjusted up to the screen height
+  - Message paragraphs which had to be limited in their height show a vertical scroll bar
+
 image
 
 ### A complex decision requesting dialog 
@@ -39,6 +77,9 @@ The replied value corresponds with the button content. I e. it is either vbOk, v
 ### Handling of an exceeded width or height limits
 * when the specified maximum width is exceeded either by a monospaced message section (proportional spaced sections are word wrapped and thus cannot exceed the maximum width) or by the number and width of the reply buttons, a horizontal scroll bar is displayed.
 * when the specified maximum height is exceeded, the highest message section's height is reduced to fit and a vertical scroll bar is displayed.
+
+
+
 
 ## Installation
 See ReadMe
@@ -83,8 +124,8 @@ There are much more parameters available than the ones obviously required for an
 The Excel Workbook Msg xlsm is for development and testing. The module mTest provides all means for a proper regression test. The implemented tests are available via the test Worksheet Test/wsMsgTest. The test procedures in the mTest module are designed for a compact and complete test of all functions, options and boundaries and in that not necessarily usefully usage examples. For usage examples the procedures in the mExamples module may preferably consulted.
 Performing a regression test should be obligatory for anyone contributing by code modifications for any purpose or reason. See Contributing.
 
-# UserForm
-## Design
+## Design and implementation
+### UserForm
 The Userform uses a hierachy of frames, each dedicated to a specific operation
 * MessageSections:  
  .Top = T_MARGIN.  
