@@ -5,7 +5,7 @@ Addresses the following limitations and flexibility flaws:
 * Limited width
 * Title truncation
 * Limited message space
-* Inflexible reply button options (limited in number and caption text)
+
 
 
 
