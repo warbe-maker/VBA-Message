@@ -1,35 +1,17 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## VB MsgBox Alternative
-Not a 100% equ
-
-uivalent but with the following limitations and flexibility flaws eliminated
+Not a 100% equivalent implementation but with the following limitations and flexibility flaws eliminated
 * limited window width, resulting in a truncated title
 * limited message text space
 * limited reply button options (number caption text)
-* no monospaced text
-Things not implemented yet are
+* no mono-spaced text
+
+Things not (again) implemented yet are
 * specifying the default button
 * display of an image like a ?, !, etc.
 
 ## Examples illustrating the major enhancements 
 
-### Simple message pretty analogous to Msgbox
+### Simple message pretty analogous to MsgBox
 image
 
 ### A "pimped" Error message
@@ -42,12 +24,12 @@ image
 
 ## Specification of the alternative MsgBox
 * Up to 3 message sections  
-  * optionally monospaced. 
+  * optionally mono-spaced. 
   * optionally with a label
-* Up to 5 reply buttons either exactly like Msgbox offers them but additionally with any multiline caption text whereby the replied value korresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
+* Up to 5 reply buttons either exactly like MsgBox offers them but additionally with any multi-line caption text whereby the replied value corresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
 * Flexible message window width by considering the following facts and parameters
   * title width
-  * the longest monospaced text line - if any
+  * the longest mono-spaced text line - if any
   * the number and width of the displayed reply buttons
   * minimum window width in pt
   * maximum window width (specified as percentage of the screen width)
@@ -64,14 +46,14 @@ image
 ## Specification
 ### Basics
 * Up to 3 message sections
-  * optionally monospaced (not word wrapped!)
+  * optionally mono-spaced (not word wrapped!)
   * optionally with a label
 * Up to 5 reply buttons. 
-either exactly like the VB MsgBox and additionally with any multiline caption text. 
+either exactly like the VB MsgBox and additionally with any multi-line caption text. 
 The replied value corresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
 * The message window width considers
   * the title width (avoiding truncation)
-  * the longest monospaced text line - if any
+  * the longest mono-spaced text line - if any
   * the number and width of the displayed reply buttons
   * the specified minimum window width
   * the specified maximum message window width (as a % of the screen width)
@@ -80,7 +62,7 @@ The replied value corresponds with the button content. I e. it is either vbOk, v
   * the specified maximum message window height (as a % if the screen height)
 
 ### Handling of an exceeded width or height limits
-* when the specified maximum width is exceeded either by a monospaced message section (proportional spaced sections are word wrapped and thus cannot exceed the maximum width) or by the number and width of the reply buttons, a horizontal scroll bar is displayed.
+* when the specified maximum width is exceeded either by a mono-spaced message section (proportional spaced sections are word wrapped and thus cannot exceed the maximum width) or by the number and width of the reply buttons, a horizontal scroll bar is displayed.
 * when the specified maximum height is exceeded, the highest message section's height is reduced to fit and a vertical scroll bar is displayed.
 
 
@@ -131,11 +113,10 @@ Performing a regression test should be obligatory for anyone contributing by cod
 
 ## Design and implementation
 ### UserForm
-The Userform uses a hierachy of frames, each dedicated to a specific operation
-* MessageSections:  
- .Top = T_MARGIN.  
-Collection of MessageSection (cllMsgSections).
-  * MessageSection. (. = 1-3)  
+The UserForm uses a hierarchy of frames, each dedicated to a specific operation. On the UserForm level these are the *MessageArea* and the *RepliesArea* frames, both used for the assignment of the Top property.  
+* *MessageArea*
+  * ImageFrame
+  * MessageSection1 to ...3  
 Property Get MessageSection(Optional ByVal section As Long) As MsForms.Frame
     * SectionLabel. 
 Property Get MsgLabel(Optional ByVal section As Long) As MsForns.Label

@@ -99,17 +99,16 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
     '~~ Display error message by UserForm fErrMsg
     With fMsg
         .Title = errtitle
-        .MsgSection1Label = "Error Message/Description:"
-        .MsgSection1Text = sErrText
-        .MsgSection1Monospaced = False
+        .SectionsLabel(1) = "Error Message/Description:"
+        .SectionsText(1) = sErrText
         If errpath <> vbNullString Then
-            .MsgSection2Label = "Error path (call stack):"
-            .MsgSection2Text = errpath
-            .MsgSection2Monospaced = True
+            .SectionsLabel(2) = "Error path (call stack):"
+            .SectionsText(2) = errpath
+            .SectionsMonospaced(2) = True
         End If
         If errinfo <> vbNullString Then
-            .MsgSection3Label = "Info:"
-            .MsgSection3Text = errinfo
+            .SectionsLabel(3) = "Info:"
+            .SectionsText(3) = errinfo
         End If
         .Replies = vbOKOnly
         .FormFinalPositionOnScreen
@@ -202,7 +201,7 @@ End Function
 ' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
 ' Note: This is a simplified version of the Msg function.
 ' --------------------------------------------------------------------
-Public Function Msg1( _
+Public Function Box( _
            Optional ByVal msgtitle As String = vbNullString, _
            Optional ByVal MsgSectionText As String = vbNullString, _
            Optional ByVal msgmonospaced As Boolean = False, _
@@ -213,13 +212,13 @@ Public Function Msg1( _
 
     With fMsg
         .Title = msgtitle
-        .MsgSection1Text = MsgSectionText
-        .MsgSection1Monospaced = msgmonospaced
+        .SectionsText(1) = MsgSectionText
+        .SectionsMonospaced(1) = msgmonospaced
         .Replies = msgreplies
         .Show
     End With
 
-    Msg1 = vMsgReply
+    Box = vMsgReply
     
 End Function
 
@@ -273,17 +272,17 @@ Public Function Msg(ByVal msgtitle As String, _
     With fMsg
         .Title = msgtitle
         
-        .MsgSection1Label = msg1label
-        .MsgSection1Text = msg1text
-        .MsgSection1Monospaced = msg1monospaced
+        .SectionsLabel(1) = msg1label
+        .SectionsText(1) = msg1text
+        .SectionsMonospaced(1) = msg1monospaced
         
-        .MsgSection2Label = msg2label
-        .MsgSection2Text = msg2text
-        .MsgSection2Monospaced = msg2monospaced
+        .SectionsLabel(2) = msg2label
+        .SectionsText(2) = msg2text
+        .SectionsMonospaced(2) = msg2monospaced
         
-        .MsgSection3Label = msg3label
-        .MsgSection3Text = msg3text
-        .MsgSection3Monospaced = msg3monospaced
+        .SectionsLabel(3) = msg3label
+        .SectionsText(3) = msg3text
+        .SectionsMonospaced(3) = msg3monospaced
 
         .Replies = msgreplies
         .FormFinalPositionOnScreen

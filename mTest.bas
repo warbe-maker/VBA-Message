@@ -116,8 +116,8 @@ Public Function WidthDeterminedByMinimumWidth( _
 repeat:
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
     sMsg1Label = "Test description:":       sMsg1Text = wsMsgTest.TestDescription(lTest)
-    sMsg2Label = "Expected test result:":   sMsg2Text = "The width of all message sections is ajusted to the current specified minimum form width (" & fMsg.MinimumFormWidth & " pt)."
-    sMsg3Label = "Please alos note:":       sMsg3Text = "The message form height is ajusted to the need " & _
+    sMsg2Label = "Expected test result:":   sMsg2Text = "The width of all message sections is adjusted to the current specified minimum form width (" & fMsg.MinimumFormWidth & " pt)."
+    sMsg3Label = "Please also note:":       sMsg3Text = "The message form height is ajusted to the need " & _
                                                         "up to the specified maximum heigth which is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "% and not exceeded."
 
     WidthDeterminedByMinimumWidth = _
