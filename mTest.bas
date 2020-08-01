@@ -105,7 +105,7 @@ Public Function WidthDeterminedByMinimumWidth( _
     
     ' Initializations for this test
     With fMsg
-        .DisplayElementsWithFrame = WITH_BORDERS
+        .FrameBordersVisible = WITH_BORDERS
         .MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest)
     End With
     
@@ -159,7 +159,7 @@ Public Function WidthDeterminedByTitle( _
     '~~ Initial test values obtained from the Test Worksheet
     lIncrDecr = wsMsgTest.MinFormWidthIncrDecr(lTest)
     With fMsg
-        .DisplayElementsWithFrame = WITH_BORDERS
+        .FrameBordersVisible = WITH_BORDERS
         .MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest)
     End With
     
@@ -205,7 +205,7 @@ Public Function WidthDeterminedByMonospacedMessageSection( _
     ' Initializations for this test
     With fMsg
         .MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest)
-        .DisplayElementsWithFrame = WITH_BORDERS
+        .FrameBordersVisible = WITH_BORDERS
     End With
     
     vReply4 = "Repeat with" & vbLf & "maximum width" & vbLf & "+ " & lIncrDecr
@@ -264,7 +264,7 @@ Public Function WidthDeterminedByReplyButtons( _
     
     ' Initializations for this test
     With fMsg
-        .DisplayElementsWithFrame = WITH_BORDERS
+        .FrameBordersVisible = WITH_BORDERS
     End With
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
@@ -336,7 +336,7 @@ Public Function MonospacedSectionWidthExceedsMaximumFormWidth( _
     
     ' Initializations for this test
     With fMsg
-        .DisplayElementsWithFrame = WITH_BORDERS
+        .FrameBordersVisible = WITH_BORDERS
         .MaxFormWidthPrcntgOfScreenSize = 50
     End With
     
@@ -376,7 +376,7 @@ Public Function MonospacedMessageSectionExceedMaximumFormHeight() As Variant
     
     ' Initializations for this test
     With fMsg
-        .DisplayElementsWithFrame = WITH_BORDERS
+        .FrameBordersVisible = WITH_BORDERS
         .MaxFormWidthPrcntgOfScreenSize = 80
         .MaxFormHeightPrcntgOfScreenSize = 50
     End With

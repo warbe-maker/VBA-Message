@@ -109,7 +109,7 @@ Dim cllReplyButtonsVisible2     As New Collection
 Dim cllReplyButtonsValue1       As New Collection
 Dim cllReplyButtonsValue2       As New Collection
 Dim cllReplyRows                As New Collection
-Dim cllMsgFrames                As New Collection
+Dim cllMsgSectionTextFrames                As New Collection
 Dim bWithFrames                 As Boolean          ' for test purpose only, defaults to False
 Dim dctSectionsLabel            As New Dictionary
 Dim dctSectionsText             As New Dictionary
@@ -135,6 +135,11 @@ Private Sub UserForm_Initialize()
     
     For Each ctl In Me.Controls
         If TypeName(ctl) = "Frame" And ctl.Parent Is Me Then
+            With ctl
+                .Visible = False
+                .Height = 0
+                .width = 0
+            End With
             cllAreas.Add ctl
         End If
     Next ctl
@@ -142,6 +147,11 @@ Private Sub UserForm_Initialize()
     '~~ Message Section Frames (grouping the label and the message text)
     For Each ctl In Me.Controls
         If TypeName(ctl) = "Frame" And ctl.Parent Is Me.frFormSectionMessage Then
+            With ctl
+                .Visible = False
+                .Height = 0
+                .width = 0
+            End With
             cllMsgSections.Add ctl
         End If
     Next ctl
@@ -151,6 +161,11 @@ Private Sub UserForm_Initialize()
         Set fr = v
         For Each ctl In Me.Controls
             If TypeName(ctl) = "Label" And ctl.Parent Is fr Then
+                With ctl
+                    .Visible = False
+                    .Height = 0
+                    .width = 0
+                End With
                 cllMsgSectionsLabel.Add ctl
             End If
         Next ctl
@@ -161,16 +176,26 @@ Private Sub UserForm_Initialize()
         Set fr = v
         For Each ctl In Me.Controls
             If TypeName(ctl) = "Frame" And ctl.Parent Is fr Then
-                cllMsgFrames.Add ctl
+                With ctl
+                    .Visible = False
+                    .Height = 0
+                    .width = 0
+                End With
+                cllMsgSectionTextFrames.Add ctl
             End If
         Next ctl
     Next v
     
     '~~ Message text (in the text frames)
-    For Each v In cllMsgFrames
+    For Each v In cllMsgSectionTextFrames
         Set fr = v
         For Each ctl In Me.Controls
             If TypeName(ctl) = "TextBox" And ctl.Parent Is fr Then
+                With ctl
+                    .Visible = False
+                    .Height = 0
+                    .width = 0
+                End With
                 cllMsgSectionsText.Add ctl
             End If
         Next ctl
@@ -179,23 +204,41 @@ Private Sub UserForm_Initialize()
     '~~ Reply rows
     For Each ctl In Me.Controls
         If TypeName(ctl) = "Frame" And ctl.Parent Is RepliesArea Then
+            With ctl
+                .Visible = False
+                .Height = 0
+                .width = 0
+            End With
             cllReplyRows.Add ctl
         End If
     Next ctl
     
     For Each ctl In Me.Controls
         If TypeName(ctl) = "CommandButton" And ctl.Parent Is Me.frRepliesRow1 Then
+            With ctl
+                .Visible = False
+                .Height = 0
+                .width = 0
+            End With
             cllReplyButtons1.Add ctl
         End If
     Next ctl
     
     For Each ctl In Me.Controls
         If TypeName(ctl) = "CommandButton" And ctl.Parent Is Me.frRepliesRow2 Then
+            With ctl
+                .Visible = False
+                .Height = 0
+                .width = 0
+            End With
             cllReplyButtons2.Add ctl
         End If
     Next ctl
     
+    Me.width = siMinimumFormWidth
+    Me.Height = V_MARGIN * 4
     bWithFrames = False
+    TopPos
     
 End Sub
 
@@ -209,7 +252,7 @@ End Property
 ' This property is for testing purpose only. It default to False
 ' and may be used to see the width and height of the elements.
 ' --------------------------------------------------------------
-Public Property Let DisplayElementsWithFrame(ByVal withframes As Boolean)
+Public Property Let FrameBordersVisible(ByVal withframes As Boolean)
     
     Dim ctl As MSForms.Control
     
@@ -279,42 +322,43 @@ Private Property Let FormWidth(ByVal w As Single)
 End Property
 
 ' UserForm design elements
-Private Property Get Areas() As Collection:                                                 Set Areas = cllAreas:                               End Property
-Private Property Get MsgArea() As MSForms.Frame:                                            Set MsgArea = cllAreas(1):                          End Property
-Private Property Get RepliesArea() As MSForms.Frame:                                        Set RepliesArea = cllAreas(2):                      End Property
-Private Property Get ReplyRows() As Collection:                                             Set ReplyRows = cllReplyRows:                       End Property
-Private Property Get RepliesRow(Optional ByVal row As Long) As MSForms.Frame:               Set RepliesRow = cllReplyRows(row):                 End Property
-Private Property Get MsgFrames() As Collection:                                             Set MsgFrames = cllMsgFrames:                       End Property
-Private Property Get MsgFrame(Optional ByVal section As Long) As MSForms.Frame:             Set MsgFrame = cllMsgFrames(section):               End Property
-Private Property Get MsgSections() As Collection:                                           Set MsgSections = cllMsgSections:                   End Property
-Private Property Get MsgSectionLabel(Optional section As Long) As MSForms.Label:            Set MsgSectionLabel = cllMsgSectionsLabel(section): End Property
-Private Property Get MsgSection(Optional i As Long) As MSForms.Frame:                       Set MsgSection = cllMsgSections(i):                 End Property
-Private Property Get MsgSectionText(Optional i As Long) As MSForms.TextBox:                 Set MsgSectionText = cllMsgSectionsText(i):         End Property
+Private Property Get Areas() As Collection:                                                 Set Areas = cllAreas:                                       End Property
+Private Property Get MsgArea() As MSForms.Frame:                                            Set MsgArea = cllAreas(1):                                  End Property
+Private Property Get RepliesArea() As MSForms.Frame:                                        Set RepliesArea = cllAreas(2):                              End Property
+Private Property Get ReplyRows() As Collection:                                             Set ReplyRows = cllReplyRows:                               End Property
+Private Property Get RepliesRow(Optional ByVal row As Long) As MSForms.Frame:               Set RepliesRow = cllReplyRows(row):                         End Property
+Private Property Get MsgFrames() As Collection:                                             Set MsgFrames = cllMsgSectionTextFrames:                    End Property
+Private Property Get MsgFrame(Optional ByVal section As Long) As MSForms.Frame:             Set MsgFrame = cllMsgSectionTextFrames(section):            End Property
+Private Property Get MsgSections() As Collection:                                           Set MsgSections = cllMsgSections:                           End Property
+Private Property Get MsgSectionLabel(Optional section As Long) As MSForms.Label:            Set MsgSectionLabel = cllMsgSectionsLabel(section):         End Property
+Private Property Get MsgSection(Optional i As Long) As MSForms.Frame:                       Set MsgSection = cllMsgSections(i):                         End Property
+Private Property Get MsgSectionTextFrame(Optional ByVal section As Long):                   Set MsgSectionTextFrame = cllMsgSectionTextFrames(section): End Property
+Private Property Get MsgSectionText(Optional i As Long) As MSForms.TextBox:                 Set MsgSectionText = cllMsgSectionsText(i):                 End Property
 
 ' Message section propertis (label, text, monospaced)
-Public Property Let SectionsLabel(Optional ByVal section As Long, ByVal s As String):       dctSectionsLabel.Add section, s:                    End Property
+Public Property Let SectionsLabel(Optional ByVal section As Long, ByVal s As String):       dctSectionsLabel.Add section, s:                            End Property
 Public Property Get SectionsLabel(Optional ByVal section As Long) As String
     If dctSectionsLabel.Exists(section) _
     Then SectionsLabel = dctSectionsLabel(section) _
     Else SectionsLabel = vbNullString
 End Property
 
-Public Property Let SectionsText(Optional ByVal section As Long, ByVal s As String):        dctSectionsText.Add section, s:                     End Property
+Public Property Let SectionsText(Optional ByVal section As Long, ByVal s As String):        dctSectionsText.Add section, s:                             End Property
 Public Property Get SectionsText(Optional ByVal section As Long) As String
     If dctSectionsText.Exists(section) _
     Then SectionsText = dctSectionsText(section) _
     Else SectionsText = vbNullString
 End Property
 
-Public Property Let SectionsMonospaced(Optional ByVal section As Long, ByVal b As Boolean): dctSectionsMonospaced.Add section, b:               End Property
+Public Property Let SectionsMonospaced(Optional ByVal section As Long, ByVal b As Boolean): dctSectionsMonospaced.Add section, b:                       End Property
 Public Property Get SectionsMonospaced(Optional ByVal section As Long) As Boolean
     If dctSectionsMonospaced.Exists(section) _
     Then SectionsMonospaced = dctSectionsMonospaced(section) _
     Else SectionsMonospaced = False
 End Property
-Public Property Let ErrSrc(ByVal s As String):                                              sErrSrc = s:                                        End Property
-Public Property Let Replies(ByVal v As Variant):                                            vReplies = v:                                       End Property
-Public Property Let Title(ByVal s As String):                                               sTitle = s:                                         End Property
+Public Property Let ErrSrc(ByVal s As String):                                              sErrSrc = s:                                                End Property
+Public Property Let Replies(ByVal v As Variant):                                            vReplies = v:                                               End Property
+Public Property Let Title(ByVal s As String):                                               sTitle = s:                                                 End Property
 
 ' Set the top position for the control (ctl) and return the top posisition for the next one
 Private Property Get TopNext(ByVal ctl As MSForms.Control) As Single
@@ -394,7 +438,7 @@ Dim v   As Variant
 Dim si  As Single
 Dim tb  As MSForms.TextBox
 
-    For Each v In MsgSectionsVisible
+    For Each v In MsgSectionsTextVisible
         Set tb = v
         If tb.Height > si Then
             si = tb.Height
@@ -434,16 +478,20 @@ Private Sub MsgSectionSetup( _
     laMsgSectionLabel.width = frMsgSection.width
     frMsgSectionTextFrame.width = frMsgSection.width
     tbMsgSectionText.width = frMsgSection.width
-    
-    With frArea
-        .Visible = True
-        .left = 0
-        .width = Me.width - R_MARGIN
-    End With
-    frMsgSection.width = frArea.width
-    
+        
     If sMsgText <> vbNullString Then
-        frMsgSection.Visible = True
+        With frArea
+            .Visible = True
+            .left = 0
+            .width = Me.width - R_MARGIN
+            .Height = Max(.Height + (V_MARGIN * 4), V_MARGIN * 4) ' V_MARGIN is the initial height
+        End With
+        With frMsgSection
+            .width = frArea.width
+            .Height = V_MARGIN * 4 ' initial height
+            .Visible = True
+        End With
+        TopPos
         '~~ Setup above text label/title only when there is a text
         If sMsgLabel <> vbNullString Then
             Set laMsgSectionLabel = MsgSectionLabel(section)
@@ -473,22 +521,36 @@ Private Sub MsgSectionSetup( _
     frMsgSection.Height = frMsgSectionTextFrame.Top + frMsgSectionTextFrame.Height
     frArea.Height = frMsgSection.Top + frMsgSection.Height + V_MARGIN
     Me.Height = Max(Me.Height, siTopNext + (V_MARGIN * 4))
-    TopPosMsgSections
+    
+    TopPos
 
 End Sub
 
 Private Sub MsgSectionSetupProportional(ByVal section As Long, _
                                         ByVal text As String)
     
-    Dim tbMsgText   As MSForms.TextBox
+    Dim frMsgSection    As MSForms.Frame
+    Dim tbMsgText       As MSForms.TextBox
+    Dim frMsgText       As MSForms.Frame
+    
+    Set frMsgSection = MsgSection(section)
+    Set frMsgText = MsgSectionTextFrame(section)
     Set tbMsgText = MsgSectionText(section)
     
     '~~ Setup the textbox
+    With frMsgText
+        .Visible = True
+        .Height = V_MARGIN * 4 ' initial height
+    End With
+    frMsgSection.Height = frMsgText.Top + frMsgText.Height + V_MARGIN
+    TopPos
+    
     With tbMsgText
+        .Visible = True
         .MultiLine = True
         .AutoSize = True
         .WordWrap = True
-        .width = Me.width - L_MARGIN
+        .width = MsgArea.width
         .value = text
         .SelStart = 0
     End With
@@ -503,7 +565,7 @@ Private Sub MsgSectionSetupProportional(ByVal section As Long, _
         .Height = tbMsgText.Height
     End With
                                        
-    TopPosMsgSections
+    TopPos
     
 End Sub
                                        
@@ -623,7 +685,7 @@ End Function
 
 ' Returns a collection of the visible message sections.
 ' -----------------------------------------------------
-Private Function MsgSectionsVisible() As Collection
+Private Function MsgSectionsTextVisible() As Collection
     
     Dim v   As Variant
     Dim tb  As MSForms.TextBox
@@ -635,7 +697,7 @@ Private Function MsgSectionsVisible() As Collection
             cll.Add tb
         End If
     Next v
-    Set MsgSectionsVisible = cll
+    Set MsgSectionsTextVisible = cll
 
 End Function
 
@@ -1012,6 +1074,12 @@ Public Sub FormFinalPositionOnScreen()
     AdjustStartupPosition Me
 End Sub
 
+' Re-positioning of displayed frames, usually after a width expansion of the UserForm
+' -----------------------------------------------------------------------------------
+Private Sub TopPos()
+    TopPosMsgSections
+    TopPosAreas
+End Sub
 ' Position the control (ctl) at the current next top position (siTopNext)
 ' and increase the next top position.
 ' -----------------------------------------------------------------------
@@ -1030,17 +1098,36 @@ Private Sub TopPosMsgSections()
             End If
         End With
     Next v
-
+    
+    With MsgArea
+        If .Visible And siTopNext > 0 Then
+            .Height = siTopNext + V_MARGIN
+        End If
+    End With
+    
+    Me.Height = Max(Me.Height, MsgArea.Top + MsgArea.Height + (V_MARGIN * 4))
+    
 End Sub
  
 Private Sub TopPosAreas()
 
-    Dim fr1 As MSForms.Frame, fr2 As MSForms.Frame
-    Set fr1 = MsgArea
-    Set fr2 = RepliesArea
-    fr1.Top = T_MARGIN
-    fr2.Top = fr1.Top + fr1.Height + V_MARGIN
-    Me.Height = fr2.Top + fr2.Height + (V_MARGIN * 3)
+    siTopNext = T_MARGIN
+    
+    With MsgArea
+        If .Visible Then
+            .Top = siTopNext
+            siTopNext = .Top + .Height + V_MARGIN
+        End If
+    End With
+    
+    With RepliesArea
+        If .Visible Then
+            .Top = siTopNext
+            siTopNext = .Top + .Height + V_MARGIN
+        End If
+    End With
+    
+    Me.Height = siTopNext - V_MARGIN + (V_MARGIN * 4)
     
 End Sub
 
