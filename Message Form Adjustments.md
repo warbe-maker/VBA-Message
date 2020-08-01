@@ -1,4 +1,5 @@
-## Message/UserForm Design notes
+## Design and implementation of the Message/UserForm
+### Message/UserForm design
 The message form is organized in a hierarchy of frames as follows.
 
     +----Message Area (Frame)----------------+
@@ -18,6 +19,7 @@ The message form is organized in a hierarchy of frames as follows.
   * The number of available message sections and reply CommandButtons is exclusively specified through the UserForm's design - the code can handle any number of it without change.  
   As an example: In case the last (third) message section is duplicated, four instead of just three sections are available - regardless of being used.
 
+### Message/UserForm implementation
 
     Private Sub CollectControls()
         Collect into:=cllAreas, ctltype:="Frame",  fromparent:=Me

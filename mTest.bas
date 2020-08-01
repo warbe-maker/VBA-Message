@@ -107,6 +107,7 @@ Public Function WidthDeterminedByMinimumWidth( _
     With fMsg
         .FrameBordersVisible = WITH_BORDERS
         .MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest)
+        .FrameCaptions = False
     End With
     
     vReply4 = "Repeat with" & vbLf & "minimum width" & vbLf & "+ " & lIncrDecr
