@@ -2,6 +2,7 @@
 ### General
 - The implementation of the message form is strictly design driven. I.e. the number of available **Message Sections**, the number of **Reply Rows**, and the number of **Reply (Command) Buttons** is only a matter of the design and does not require any code change.
 - The implementation does not make use of any of the control's object name but relies on the hierarchical order of the frames (see below).
+
 ### Message/UserForm design
 The message form is organized in a hierarchy of frames as follows.
 
@@ -19,14 +20,15 @@ The message form is organized in a hierarchy of frames as follows.
     | +------------------------------------+ |
     +----------------------------------------+
  
-
-### Message/UserForm implementation
+The controls (frames, textboxes, and command buttons) are collected with the message form's initialization and used throughout the implementation.
 
 ```vbscript
-' Return the controls of ctltype with a fromparent as collection into
+' Returns controls of type (ctltype) with a parent (ofparent) 
+' - which may be the UserForm or a collection of "parent frames" -
+' as collection (into).
 ' -------------------------------------------------------------------
 Private Sub Collect(ByRef into As Collection, _
-                    ByVal fromparent As Object, _
+                    ByVal fromparent As Variant, _
                     ByVal ctltype As String)
 
     Dim ctl As MsForms.Control    
@@ -34,7 +36,7 @@ Private Sub Collect(ByRef into As Collection, _
     Set into = Nothing: Set into = New Collection
     Select Case TypeName(fromparent)
         Case "Frame", "UserForm"
-            For each ctl in Me
+            For each ctl in Me.Controls
                 If TypeName(ctl) = ctltype And ctl.Parent Is fromparent _
                 Then into.Add ctl
             Next ctl
