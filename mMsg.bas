@@ -111,7 +111,6 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
             .SectionsText(3) = errinfo
         End If
         .Replies = vbOKOnly
-        .FormFinalPositionOnScreen
         .Show
     End With
 
@@ -285,7 +284,6 @@ Public Function Msg(ByVal msgtitle As String, _
         .SectionsMonospaced(3) = msg3monospaced
 
         .Replies = msgreplies
-        .FormFinalPositionOnScreen
         .Show
     End With
 

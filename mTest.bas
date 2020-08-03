@@ -29,7 +29,6 @@ Option Compare Text
 Const C_PREV        As String = "Previous"
 Const C_STOP        As String = "Stop"
 Const C_NEXT        As String = "Next"
-Const WITH_BORDERS  As Boolean = True      ' for test purpose only! Defaults to False
 
 Dim lMinFormWidth   As Long
 Dim lTest           As Long
@@ -105,9 +104,9 @@ Public Function WidthDeterminedByMinimumWidth( _
     
     ' Initializations for this test
     With fMsg
-        .FrameBordersVisible = WITH_BORDERS
+'        .FramesWithBorder = True
+'        .FramesWithCaption = True
         .MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest)
-        .FrameCaptions = False
     End With
     
     vReply4 = "Repeat with" & vbLf & "minimum width" & vbLf & "+ " & lIncrDecr
@@ -160,7 +159,6 @@ Public Function WidthDeterminedByTitle( _
     '~~ Initial test values obtained from the Test Worksheet
     lIncrDecr = wsMsgTest.MinFormWidthIncrDecr(lTest)
     With fMsg
-        .FrameBordersVisible = WITH_BORDERS
         .MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest)
     End With
     
@@ -204,10 +202,7 @@ Public Function WidthDeterminedByMonospacedMessageSection( _
     lIncrDecr = wsMsgTest.MaxFormWidthIncrDecr(lTest)
     
     ' Initializations for this test
-    With fMsg
-        .MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest)
-        .FrameBordersVisible = WITH_BORDERS
-    End With
+    fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest)
     
     vReply4 = "Repeat with" & vbLf & "maximum width" & vbLf & "+ " & lIncrDecr
     vReply5 = "Repeat with" & vbLf & "maximum width" & vbLf & "- " & lIncrDecr
@@ -225,6 +220,10 @@ Public Function WidthDeterminedByMonospacedMessageSection( _
                                                             "  based on the screen size which for this test is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
     
 repeat:
+    With fMsg
+        .FramesWithCaption = True  ' defaults to false, set to true for test purpose only
+        .FramesWithBorder = True  ' defaults to false, set to true for test purpose only
+    End With
     WidthDeterminedByMonospacedMessageSection = _
     mMsg.Msg( _
              msgtitle:=sMsgTitle, _
@@ -265,7 +264,7 @@ Public Function WidthDeterminedByReplyButtons( _
     
     ' Initializations for this test
     With fMsg
-        .FrameBordersVisible = WITH_BORDERS
+        .FramesWithBorder = True
     End With
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
@@ -337,7 +336,7 @@ Public Function MonospacedSectionWidthExceedsMaximumFormWidth( _
     
     ' Initializations for this test
     With fMsg
-        .FrameBordersVisible = WITH_BORDERS
+        .FramesWithBorder = True
         .MaxFormWidthPrcntgOfScreenSize = 50
     End With
     
@@ -377,7 +376,7 @@ Public Function MonospacedMessageSectionExceedMaximumFormHeight() As Variant
     
     ' Initializations for this test
     With fMsg
-        .FrameBordersVisible = WITH_BORDERS
+        .FramesWithBorder = True
         .MaxFormWidthPrcntgOfScreenSize = 80
         .MaxFormHeightPrcntgOfScreenSize = 50
     End With
