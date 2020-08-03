@@ -1,4 +1,7 @@
 ## Design and implementation of the Message/UserForm
+### General
+- The implementation of the message form is strictly design driven. I.e. the number of available **Message Sections**, the number of **Reply Rows**, and the number of **Reply (Command) Buttons** is only a matter of the design and does not require any code change.
+- The implementation does not make use of any of the control's object name but relies on the hierarchical order of the frames (see below).
 ### Message/UserForm design
 The message form is organized in a hierarchy of frames as follows.
 
@@ -15,57 +18,37 @@ The message form is organized in a hierarchy of frames as follows.
     | | Replies (CommandButtons)           | |
     | +------------------------------------+ |
     +----------------------------------------+
-  * The controls are not addressed through their object name but via collections build at the UserForm's initialization by using the parent property.
-  * The number of available message sections and reply CommandButtons is exclusively specified through the UserForm's design - the code can handle any number of it without change.  
-  As an example: In case the last (third) message section is duplicated, four instead of just three sections are available - regardless of being used.
+ 
 
 ### Message/UserForm implementation
 
-    Private Sub CollectControls()
-        Collect into:=cllAreas, ctltype:="Frame",  fromparent:=Me
+```vbscript
+' Return the controls of ctltype with a fromparent as collection into
+' -------------------------------------------------------------------
+Private Sub Collect(ByRef into As Collection, _
+                    ByVal fromparent As Object, _
+                    ByVal ctltype As String)
 
-        ' Collect Message Sections
-        Collect into:=cllMsgSections, ctltype:="Frame", fromparent:=cllAreas(1)
-        ' Collect Message Section Labels
-        Collect into:=cllMsgSectionLabels, fromparent:=cllMsgSections, ctltype:="Label"
-        ' Collect Message Section Text Frames
-        Collect into:=cllMsgSectionTextFrame, ctltype:="Frame", fromparent:=cllMsgSections
-        ' Collect Message Section TextBoxes
-        Collect into:=cllMsgSectionText, ctltype:="TextBox", fromparent:=cllMsgSectionsTextFrame
-
-        ' Collect Reply Rows
-        Collect into:=cllReplyRows, ctltype:="Frame", fromparent:=cllAreas(2)
-        ' Collect for each Reply Row the Replies
-        For each v in cllReplyRows        
-            Collect into:=cllRepliesRow,  ctltype:="CommandButton", fromparent:=v
-             cllRepliesRows.Add cllRepliesRow       
-        Next v
-
-    End Sub
-
-    Private Sub Collect(ByRef into As Collection, _
-               ByVal fromparent As Object, _
-               ByVal ctltype As String)
-
-        Dim ctl As MsForms.Control    
-         
-        Set into = Nothing: Set into = New Collection
-        Select Case TypeName(fromparent)
-            Case "Frame", "UserForm"
+    Dim ctl As MsForms.Control    
+     
+    Set into = Nothing: Set into = New Collection
+    Select Case TypeName(fromparent)
+        Case "Frame", "UserForm"
+            For each ctl in Me
+                If TypeName(ctl) = ctltype And ctl.Parent Is fromparent _
+                Then into.Add ctl
+            Next ctl
+        Case "Collection"
+            For each v in fromparent
                 For each ctl in Me
-                    If TypeName(ctl) = ctltype And ctl.Parent Is fromparent _
+                    If TypeName(ctl) = ctltype And ctl.Parent Is v _
                     Then into.Add ctl
-                Next ctl
-            Case "Collection"
-                For each v in fromparent
-                    For each ctl in Me
-                        If TypeName(ctl) = ctltype And ctl.Parent Is v _
-                        Then into.Add ctl
-                   Next ctl
-                Next v
-        End Select
+               Next ctl
+            Next v
+    End Select
 
-    End Sub
+End Sub
+```
 
 ## Width Adjustment
 The message form is initialized with the specified minimum message form width. Width expansion may be  triggered by the setup (in the outlined sequence) of the following width determining elements:
