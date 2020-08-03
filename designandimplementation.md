@@ -23,34 +23,58 @@ The message form is organized in a hierarchy of frames as follows.
 The controls (frames, textboxes, and command buttons) are collected with the message form's initialization and used throughout the implementation.
 
 ```vbscript
-' Returns controls of type (ctltype) with a parent (ofparent) 
-' - which may be the UserForm or a collection of "parent frames" -
-' as collection (into).
-' -------------------------------------------------------------------
+' Returns all controls of type (ctltype) which do have a parent (fromparent)
+' as collection (into) by assigning the an initial height (ctlheight) and width (ctlwidth).
+' -----------------------------------------------------------------------------------------
 Private Sub Collect(ByRef into As Collection, _
                     ByVal fromparent As Variant, _
-                    ByVal ctltype As String)
+                    ByVal ctltype As String, _
+                    ByVal ctlheight As Single, _
+                    ByVal ctlwidth As Single)
 
-    Dim ctl As MsForms.Control    
+    Dim ctl As MSForms.Control
+    Dim v   As Variant
      
+    On Error GoTo on_error
+    
     Set into = Nothing: Set into = New Collection
     Select Case TypeName(fromparent)
-        Case "Frame", "UserForm"
-            For each ctl in Me.Controls
-                If TypeName(ctl) = ctltype And ctl.Parent Is fromparent _
-                Then into.Add ctl
-            Next ctl
         Case "Collection"
-            For each v in fromparent
-                For each ctl in Me
-                    If TypeName(ctl) = ctltype And ctl.Parent Is v _
-                    Then into.Add ctl
+            '~~ Parent is each frame in the collection
+            For Each v In fromparent
+                For Each ctl In Me.Controls
+                    If TypeName(ctl) = ctltype And ctl.Parent Is v Then
+                        With ctl
+                            Debug.Print "Parent: " & ctl.Parent.Name & ", Type: " & TypeName(ctl) & ", Ctl: " & ctl.Name
+                            .Visible = False
+                            .Height = ctlheight
+                            .width = ctlwidth
+                        End With
+                        into.Add ctl
+                    End If
                Next ctl
             Next v
+        Case Else
+            For Each ctl In Me.Controls
+                If TypeName(ctl) = ctltype And ctl.Parent Is fromparent Then
+                    With ctl
+                        Debug.Print "Parent: " & ctl.Parent.Name & ", Type: " & TypeName(ctl) & ", Ctl: " & ctl.Name
+                        .Visible = False
+                        .Height = ctlheight
+                        .width = ctlwidth
+                    End With
+                    into.Add ctl
+                End If
+            Next ctl
     End Select
-
+exit_proc:
+    Exit Sub
+    
+on_error:
+    Debug.Print Err.Description: Stop: Resume Next
 End Sub
 ```
+
 
 ## Width Adjustment
 The message form is initialized with the specified minimum message form width. Width expansion may be  triggered by the setup (in the outlined sequence) of the following width determining elements:

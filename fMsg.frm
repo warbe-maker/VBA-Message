@@ -1248,9 +1248,9 @@ Private Sub DisplayFramesWithCaption(ByVal b As Boolean)
 
 End Sub
 
-' Collect controls of type ctltype with a parent fromparent
-' by assigning an initial height and width
-' --------------------------------------------------
+' Returns all controls of type (ctltype) which do have a parent (fromparent)
+' as collection (into) by assigning the an initial height (ctlheight) and width (ctlwidth).
+' -----------------------------------------------------------------------------------------
 Private Sub Collect(ByRef into As Collection, _
                     ByVal fromparent As Variant, _
                     ByVal ctltype As String, _
