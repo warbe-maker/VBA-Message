@@ -68,7 +68,7 @@ Public Sub Regression()
         Case C_PREV:    GoTo 2
     End Select
 
-3:  Select Case mTest.WidthDeterminedByMonospacedMessageSection()
+3:  Select Case mTest.WidthDeterminedByMonoSpacedMessageSection()
         Case C_STOP:    Exit Sub
         Case C_PREV:    GoTo 3
     End Select
@@ -78,7 +78,7 @@ Public Sub Regression()
         Case C_PREV:    GoTo 3
     End Select
 
-5:  Select Case mTest.MonospacedSectionWidthExceedsMaximumFormWidth()
+5:  Select Case mTest.MonoSpacedSectionWidthExceedsMaxFormWidth()
         Case C_STOP:    Exit Sub
         Case C_PREV:    GoTo 4
     End Select
@@ -188,11 +188,11 @@ End Function
 ' Test 3
 ' The optional parameters are used in conjunction with the Regression test only
 ' -----------------------------------------------------------------------------
-Public Function WidthDeterminedByMonospacedMessageSection( _
+Public Function WidthDeterminedByMonoSpacedMessageSection( _
                  Optional ByVal vReply1 As Variant = vbNullString, _
                  Optional ByVal vReply3 As Variant = vbNullString) As Variant
     
-    Const PROC      As String = "WidthDeterminedByMonospacedMessageSection"
+    Const PROC      As String = "WidthDeterminedByMonoSpacedMessageSection"
     Dim lIncrDecr   As Long
     
     lTest = 3
@@ -224,7 +224,7 @@ repeat:
         .FramesWithCaption = True  ' defaults to false, set to true for test purpose only
         .FramesWithBorder = True  ' defaults to false, set to true for test purpose only
     End With
-    WidthDeterminedByMonospacedMessageSection = _
+    WidthDeterminedByMonoSpacedMessageSection = _
     mMsg.Msg( _
              msgtitle:=sMsgTitle, _
              msg1label:=sMsg1Label, _
@@ -236,7 +236,7 @@ repeat:
              msg3monospaced:=True, _
              msgreplies:=vReplies _
             )
-    Select Case WidthDeterminedByMonospacedMessageSection
+    Select Case WidthDeterminedByMonoSpacedMessageSection
         Case vReply5
             fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest) - lIncrDecr
             vReplies = vReply1 & "," & vReply2 & "," & vReply3 & "," & vReply4
@@ -269,7 +269,7 @@ Public Function WidthDeterminedByReplyButtons( _
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
     sMsg1Label = "Test description:"
-    sMsg1Text = "The width used by the reply buttons determines the width of the message form - unless they does not exceed the specified maximum form width which for this test is " & fMsg.MaximumFormWidth & " (which is the specified " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size)."
+    sMsg1Text = "The width used by the reply buttons determines the width of the message form - unless they does not exceed the specified maximum form width which for this test is " & fMsg.MaxFormWidth & " (which is the specified " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size)."
     sMsg2Label = "Expected test result:"
     sMsg2Text = "The message form width is adjusted to the space required by the number of reply buttons and all message sections are adjusted to this (enlarged) width."
     sMsg3Label = "Please also note:"
@@ -325,11 +325,11 @@ End Function
 ' Test 5
 ' The optional parameters are used in conjunction with the Regression test only
 ' -----------------------------------------------------------------------------
-Public Function MonospacedSectionWidthExceedsMaximumFormWidth( _
+Public Function MonoSpacedSectionWidthExceedsMaxFormWidth( _
                  Optional ByVal vReply1 As Variant = vbNullString, _
                  Optional ByVal vReply3 As Variant = vbNullString) As Variant
 
-    Const PROC  As String = "MonospacedSectionWidthExceedsMaximumFormWidth"
+    Const PROC  As String = "MonoSpacedSectionWidthExceedsMaxFormWidth"
     Unload fMsg                     ' Ensures a message starts from scratch
     lTest = 5
     vReply2 = C_STOP
@@ -342,17 +342,17 @@ Public Function MonospacedSectionWidthExceedsMaximumFormWidth( _
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
     sMsg1Label = "Test description:"
-    sMsg1Text = "The width used by the 3rd ""monospaced"" message section exceeds the maximum form width which for this test is " & fMsg.MaximumFormWidth & " pt (the equivalent of " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size)."
+    sMsg1Text = "The width used by the 3rd ""monospaced"" message section exceeds the maximum form width which for this test is " & fMsg.MaxFormWidth & " pt (the equivalent of " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size)."
     sMsg2Label = "Expected test result:"
     sMsg2Text = "The monospaced message section comes with a horizontal scroll bar."
     sMsg3Label = "Please note the following:"
-    sMsg3Text = "- This monspaced message section exceeds the specified maximum form width which for this test is " & fMsg.MaximumFormWidth & " pt," & vbLf & _
+    sMsg3Text = "- This monspaced message section exceeds the specified maximum form width which for this test is " & fMsg.MaxFormWidth & " pt," & vbLf & _
                 "  the equivalent of " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size." & vbLf & _
-                "- The message form height is adjusted to the required height, limited to " & fMsg.MaximumFormHeight & " pt," & vbLf & _
+                "- The message form height is adjusted to the required height, limited to " & fMsg.MaxFormHeight & " pt," & vbLf & _
                 "  the equivalent of " & fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen size, for this test and not reached or exceeded."
     vReplies = vReply1 & "," & vReply2 & "," & vReply3
     
-    MonospacedSectionWidthExceedsMaximumFormWidth = _
+    MonoSpacedSectionWidthExceedsMaxFormWidth = _
     mMsg.Msg( _
              msgtitle:=sMsgTitle, _
              msg1label:=sMsg1Label, _
@@ -369,9 +369,9 @@ End Function
 ' Test 6
 ' The optional parameters are used in conjunction with the Regression test only
 ' -----------------------------------------------------------------------------
-Public Function MonospacedMessageSectionExceedMaximumFormHeight() As Variant
+Public Function MonoSpacedMessageSectionExceedMaxFormHeight() As Variant
 
-    Const PROC  As String = "MonospacedMessageSectionExceedMaximumFormHeight"
+    Const PROC  As String = "MonoSpacedMessageSectionExceedMaxFormHeight"
     Unload fMsg                     ' Ensures a message starts from scratch
     
     ' Initializations for this test
@@ -383,7 +383,7 @@ Public Function MonospacedMessageSectionExceedMaximumFormHeight() As Variant
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
     sMsg1Label = "Test description:"
-    sMsg1Text = "The width used by the monospaced message section exxceeds the maximum form width for this test (" & fMsg.MaximumFormWidth & ") which is the specified " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size."
+    sMsg1Text = "The width used by the monospaced message section exxceeds the maximum form width for this test (" & fMsg.MaxFormWidth & ") which is the specified " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size."
     sMsg2Label = "Expected test result:"
     sMsg2Text = repeat(20, "This monospaced message comes with a horizontal scroll bar." & vbLf, True)
     sMsg3Label = "Please note the following:"
@@ -391,7 +391,7 @@ Public Function MonospacedMessageSectionExceedMaximumFormHeight() As Variant
                 "which for this test is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
     vReplies = vReply1 & "," & vReply2 & "," & vReply3
     
-    MonospacedMessageSectionExceedMaximumFormHeight = _
+    MonoSpacedMessageSectionExceedMaxFormHeight = _
     mMsg.Msg( _
              msgtitle:=sMsgTitle, _
              msg1label:=sMsg1Label, _

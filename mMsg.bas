@@ -104,7 +104,7 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
         If errpath <> vbNullString Then
             .SectionsLabel(2) = "Error path (call stack):"
             .SectionsText(2) = errpath
-            .SectionsMonospaced(2) = True
+            .SectionsMonoSpaced(2) = True
         End If
         If errinfo <> vbNullString Then
             .SectionsLabel(3) = "Info:"
@@ -212,7 +212,7 @@ Public Function Box( _
     With fMsg
         .Title = msgtitle
         .SectionsText(1) = MsgSectionText
-        .SectionsMonospaced(1) = msgmonospaced
+        .SectionsMonoSpaced(1) = msgmonospaced
         .Replies = msgreplies
         .Show
     End With
@@ -273,15 +273,15 @@ Public Function Msg(ByVal msgtitle As String, _
         
         .SectionsLabel(1) = msg1label
         .SectionsText(1) = msg1text
-        .SectionsMonospaced(1) = msg1monospaced
+        .SectionsMonoSpaced(1) = msg1monospaced
         
         .SectionsLabel(2) = msg2label
         .SectionsText(2) = msg2text
-        .SectionsMonospaced(2) = msg2monospaced
+        .SectionsMonoSpaced(2) = msg2monospaced
         
         .SectionsLabel(3) = msg3label
         .SectionsText(3) = msg3text
-        .SectionsMonospaced(3) = msg3monospaced
+        .SectionsMonoSpaced(3) = msg3monospaced
 
         .Replies = msgreplies
         .Show
