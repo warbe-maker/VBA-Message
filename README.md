@@ -4,9 +4,9 @@ Displays a message in a dialog box, waits for the user to click a button, and re
 
 | Function | Description |
 | -------- | ----------- |
-| **msg1** | Pretty MsgBox alike, displays a single message with any number of line breaks, with up to 5 free reply buttons. |
-| **msg** | Still pretty MsgBox alike, displays up to 3 message junks, each optionally monospaced and with an optional label and up to 5 free reply buttons. |
-| **errmsg** | Makes use of the advantages of **msg** in displaying a well designed error message. |
+| _Box_ | Pretty MsgBox alike, displays a single message with any number of line breaks, with up to 5 free reply buttons. |
+| _Msg_ | Still pretty MsgBox alike, displays up to 3 message junks, each optionally monospaced and with an optional label and up to 5 free reply buttons. |
+| _ErrMsg_ | Makes use of the advantages of **msg** in displaying a well designed error message. |
 
 
 ## Syntax
