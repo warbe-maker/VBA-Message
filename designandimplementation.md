@@ -8,11 +8,11 @@ Things not (again/yet) implemented:
 * specifying the default button
 * display of an alert image like a ?, !, etc.
 
-## Examples
-The examples below not only  illustrate the major enhancements but are also examples of the three "flavors" of this MsgBox alternative. These 3 make use of the UseForm fMsg. Any other kind of "application specific" message may be implemented by making use of the public properties of the fMsg UserForm
+### Examples, Demo Messages
+The examples below not only  illustrate the major enhancements but are also examples of the three "flavors" this MsgBox alternative comes. The examples demonstrate the use of the UseForm _fMsg_. Beside these three, let's call them common usages, any kind of "application specific" message may be implemented by making use of the public properties of the _fMsg_ UserForm (see ...)
 
 ### Simple message
-The simple message implemented by the _Box_ function provides:
+The simple message implemented by the _Box_ function in module _mMsg_ is mainly for the compatibility with MsgBox and provides:
 * A _Message Area_ with one _Message Text Section_
 * A _Replies Area_ with up to 7 _Reply Buttons_ ordered all in one row or  underneath  in up to 7 rows with any Multiline caption text.
 
@@ -22,15 +22,14 @@ image
 
 ### Error message
 
-The error message below (my standard one) uses:
+The error message below (my standard one) is provided by the _ErrMsg_ function in the _mMsg_ Module and uses:
 * The _Message Area_ with (all) 3 _Message Text Sections_ and each with the optional _Message Label_ and one with the _Monospaced_ font option
 * The _Re-plies Area_ with one fixed *Ok* button.
 
 image
 
 
-### Decision requesting message
-The below example uses most of the advantages 
+### Common message
 
 image
 
@@ -46,7 +45,7 @@ They first 3 may be used exactly like MsgBox offers them or for all of them with
   * the number and width of the displayed reply buttons
   * minimum window width in pt
   * maximum window width (specified as percentage of the screen width)
-* Flexible message window height by considering the following facts an parameters
+* Flexible message window height by considering the following facts and parameters
   * maximum window height (specified as percentage of the screen height)
   * adjusted up to the screen height
   - Message paragraphs which had to be limited in their height show a vertical scroll bar
@@ -58,25 +57,26 @@ image
 
 ## Specification
 ### Basics
-* Up to 3 message sections
-  * optionally mono-spaced (not word wrapped!)
-  * optionally with a label
-* Up to 5 reply buttons. 
-either exactly like the VB MsgBox and additionally with any multi-line caption text. 
-The replied value corresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
+* Up to 3 _Message Sections_
+  * optionally _Mono-spaced_ (not word wrapped!)
+  * optionally with a _Message Section Label_
+* Up to 7 _Reply Buttons_. 
+either 3 exactly like the VB MsgBox, all with any multi-line caption text. 
+Note: The replied value corresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
 * The message window width considers
   * the title width (avoiding truncation)
   * the longest mono-spaced text line - if any
-  * the number and width of the displayed reply buttons
+  * the number and width of the displayed _Reply Buttons_ displayed in the widest row
   * the specified minimum window width
-  * the specified maximum message window width (as a % of the screen width)
+  * the specified maximum _Message Form_ width (as a % of the screen width)
 * The message window height considers
-  * the space required for the message sections and the reply buttons
-  * the specified maximum message window height (as a % if the screen height)
+  * the space required for the _Message Sections_ and the _Reply Buttons_
+  * the specified maximum _Message Form_ height (as a % if the screen height)
 
 ### Handling of an exceeded width or height limits
-* when the specified maximum width is exceeded either by a mono-spaced message section (proportional spaced sections are word wrapped and thus cannot exceed the maximum width) or by the number and width of the reply buttons, a horizontal scroll bar is displayed.
-* when the specified maximum height is exceeded, the highest message section's height is reduced to fit and a vertical scroll bar is displayed.
+* When the specified maximum width is exceeded by a mono-spaced message section (proportional spaced sections are word wrapped and thus cannot exceed the maximum width) the section gets a horizontal scroll bar.
+* When a Replies Row exceeds the maximum _Message Form_ width the Replies Area gets a horizontal scroll bar.
+* When the specified maximum height is exceeded, the height of the _Message Area_  ist reduced to fit and gets a vertical scroll bar.
 
 
 
@@ -334,5 +334,3 @@ Note: This top repositioning may be done just once when all elements had initial
         ReposTopPosReplyRows
         ReposTopAreas
     End Sub
-
-
