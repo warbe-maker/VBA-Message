@@ -1,30 +1,35 @@
 ## VB MsgBox Alternative (the idea)
-Not a 100% equivalent implementation but without the following limitations and flexibility flaws
-* limited _Message Form_ size (truncated title and limited message text space)
-* limited reply button options (max 3 with predefined caption text
-* no mono-spaced text option
+Not a 100% equivalent compares it as follows
 
-Things not (again/yet) implemented:
-* specifying the default button
-* display of an alert image like a ?, !, etc.
+| MsgBox | This Alternative |
+| ------ | ---- |
+| Limited message width | The maximum _Message Form_ width is specified as a percentage of the screen width |
+| Limited message height |The maximum _Message Form_ height is specified as a percentage of the screen height |
+| A message which exceeds the (hard to tell) size limit is truncated | A message which exceeds the specified (default is 80%) maximum _Message Form_ size is displayed with a vertical and/or a vertical scroll bar
+| The message is displayed with a proportional font | A message can optionally be displayed with a mono-spaced font |
+| To display a well designed message is time consuming and no satisfactory result can be expected | There are up to 3 _Message Sections_ each with an optional _Message Text Label_ and each with a _Monospaced_ option |
+| The maximum reply options (reply command buttons) is 3 | Up to 7 _Reply Buttons_ are available for being used  and they may be displayed in up to 7 _Reply Rows_ (one in a row). In an extreme approach, the whole text required to make a decision can be put on the reply buttons directly, and all may be placed underneath |
+| The content (caption) of the reply buttons is a limited amount of terms (Yes, No, Ignore, Cancel) | The caption of the _Reply Buttons_ may be those known from MsgBox but in addition any Multiline text is possible |
+| Specifying the default button | (yet) not implemented |
+| Display of an alert image like a ?, !, etc. | (yet) not implemented |
 
-### Examples, Demo Messages
-The examples below not only  illustrate the major enhancements but are also examples of the three "flavors" this MsgBox alternative comes. The examples demonstrate the use of the UseForm _fMsg_. Beside these three, let's call them common usages, any kind of "application specific" message may be implemented by making use of the public properties of the _fMsg_ UserForm (see ...)
+### Examples, Demonstrations
+The examples below not only  illustrate the major enhancements but also the 3 implemented functions in the module _mMsg_ which do use the UserForm _fMsg_.
+
+Beside these three "common" functions, any "application specific" message may be implemented analogously by making use of the public properties of the _fMsg_ UserForm (see ...)
 
 ### Simple message
-The simple message implemented by the _Box_ function in module _mMsg_ is mainly for the compatibility with MsgBox and provides:
-* A _Message Area_ with one _Message Text Section_
-* A _Replies Area_ with up to 7 _Reply Buttons_ ordered all in one row or  underneath  in up to 7 rows with any Multiline caption text.
-
-Despite the _replies_ parameter all others are pretty MsgBox alike.
+The simple message implemented by the _Box_ function in module _mMsg_ is mainly for the compatibility with MsgBox and makes use of:
+* One _Message Section_ (without a label)
+* n of the 7 _Reply Buttons_ ordered in up to 7 rows with any Multiline caption text. A _replies_ parameter as it is used with the MsgBox (e.g  vbOkOnly) would display equally and thus is fully compatible. Apart from the _replies_ parameter all others are MsgBox alike.
 
 image
 
 ### Error message
 
-The error message below (my standard one) is provided by the _ErrMsg_ function in the _mMsg_ Module and uses:
-* The _Message Area_ with (all) 3 _Message Text Sections_ and each with the optional _Message Label_ and one with the _Monospaced_ font option
-* The _Re-plies Area_ with one fixed *Ok* button.
+The error message below (my standard one) is provided by the _ErrMsg_ function in the _mMsg_ Module and makes use of:
+* The _Message Area_ with (all) 3 _Message Text Sections_ and each with the optional _Message Label_ and the Error source section  with the _Monospaced_ font option in order to have a property indented "call stack"
+* The _Re-plies Area_ with one fixed *Ok* button - common for VB error messages.
 
 image
 
