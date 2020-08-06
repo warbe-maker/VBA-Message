@@ -1,4 +1,10 @@
-## VB MsgBox Alternative (the idea)
+## Contents
+- [The idea of an alternative MsgBox](#the-idea-of-an-alternative-msgbox)
+- [Examples, Demonstrations](examples-demonstrations)
+  - [Simple message](#simple-message)
+
+
+## The idea of an alternative MsgBox
 Not a 100% equivalent compares it as follows
 
 | MsgBox | This Alternative |
@@ -16,16 +22,19 @@ Not a 100% equivalent compares it as follows
 ### Examples, Demonstrations
 The examples below not only  illustrate the major enhancements but also the 3 implemented functions in the module _mMsg_ which do use the UserForm _fMsg_.
 
-Beside these three "common" functions, any "application specific" message may be implemented analogously by making use of the public properties of the _fMsg_ UserForm (see ...)
+Beside these three "common" functions, any "application specific" message may be implemented analogously by making use of the
 
-### Simple message
+[Public Properties of the _fMsg_ UserForm](#public -properties-of-the-fmsg-userform)
+
+
+#### Simple message
 The simple message implemented by the _Box_ function in module _mMsg_ is mainly for the compatibility with MsgBox and makes use of:
 * One _Message Section_ (without a label)
 * n of the 7 _Reply Buttons_ ordered in up to 7 rows with any Multiline caption text. A _replies_ parameter as it is used with the MsgBox (e.g  vbOkOnly) would display equally and thus is fully compatible. Apart from the _replies_ parameter all others are MsgBox alike.
 
 image
 
-### Error message
+#### Error message
 
 The error message below (my standard one) is provided by the _ErrMsg_ function in the _mMsg_ Module and makes use of:
 * The _Message Area_ with (all) 3 _Message Text Sections_ and each with the optional _Message Label_ and the Error source section  with the _Monospaced_ font option in order to have a property indented "call stack"
@@ -34,33 +43,7 @@ The error message below (my standard one) is provided by the _ErrMsg_ function i
 image
 
 
-### Common message
-
-image
-
 ## Specification of the alternative MsgBox
-* A _Message Area_ with up to 3 _Message Sections_  
-  * optionally _Mono-spaced_. 
-  * optionally with a _Message Section Label_
-* Up to 7 reply buttons in up to 7 _Reply Rows_. 
-They first 3 may be used exactly like MsgBox offers them or for all of them with   any multi-line caption text (the replied value corresponds with the button content. I e. it is either vbOk, vbYe, vbNo, vbCancel, etc. or the button's caption text
-* Flexible message window width by considering the following facts and parameters
-  * title width
-  * the longest mono-spaced text line - if any
-  * the number and width of the displayed reply buttons
-  * minimum window width in pt
-  * maximum window width (specified as percentage of the screen width)
-* Flexible message window height by considering the following facts and parameters
-  * maximum window height (specified as percentage of the screen height)
-  * adjusted up to the screen height
-  - Message paragraphs which had to be limited in their height show a vertical scroll bar
-
-image
-
-### A complex decision requesting dialog 
-image
-
-## Specification
 ### Basics
 * Up to 3 _Message Sections_
   * optionally _Mono-spaced_ (not word wrapped!)
@@ -84,8 +67,6 @@ Note: The replied value corresponds with the button content. I e. it is either v
 * When the specified maximum height is exceeded, the height of the _Message Area_  ist reduced to fit and gets a vertical scroll bar.
 
 
-
-
 ## Installation
 See ReadMe
 
@@ -93,7 +74,7 @@ See ReadMe
 
 ## Examples
 
-## Parameters
+## Function Parameters
 There are much more parameters available than the ones obviously required for any kind of message. The additional parameters allow the implementation of VB project specific message procedures.
 
 ### Basic
@@ -123,6 +104,9 @@ There are much more parameters available than the ones obviously required for an
 | | replies:="Yes,No,Cancel". |
 | | is the eequivalent of. |
 | | replies:=vbYesNoCancel |
+
+
+### Public Properties of the _fMsg_ UserForm
 
 ## Development and Test
 
