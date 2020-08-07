@@ -19,7 +19,7 @@ Not a 100% equivalent compares it as follows
 | ------ | ---- |
 | Limited message width | The maximum _Message Form_ width is specified as a percentage of the screen width |
 | Limited message height |The maximum _Message Form_ height is specified as a percentage of the screen height |
-| A message which exceeds the (hard to tell) size limit is truncated | A message which exceeds the specified (default is 80%) maximum _Message Form_ size is displayed with a vertical and/or a vertical scroll bar
+| A message which exceeds the (hard to tell) size limit is truncated | A message which exceeds the specified (default is 80%) maximum _Message Form_ size is displayed with a vertical and/or a horizontal scroll bar
 | The message is displayed with a proportional font | A message can optionally be displayed with a mono-spaced font |
 | To display a well designed message is time consuming and no satisfactory result can be expected | There are up to 3 _Message Sections_ each with an optional _Message Text Label_ and each with a _Monospaced_ option |
 | The maximum reply options (reply command buttons) is 3 | Up to 7 _Reply Buttons_ are available for being used  and they may be displayed in up to 7 _Reply Rows_ (one in a row). In an extreme approach, the whole text required to make a decision can be put on the reply buttons directly, and all may be placed underneath |
@@ -38,7 +38,7 @@ Beside these three "common" functions, any "application specific" message may be
 #### Simple message
 The simple message implemented by the _Box_ function in module _mMsg_ is mainly for the compatibility with MsgBox and makes use of:
 * One _Message Section_ (without a label)
-* n of the 7 _Reply Buttons_ ordered in up to 7 rows with any Multiline caption text. A _replies_ parameter as it is used with the MsgBox (e.g  vbOkOnly) would display equally and thus is fully compatible. Apart from the _replies_ parameter all others are MsgBox alike.
+* n of the 7 _Reply Buttons_ ordered in up to 7 rows with any multiline caption text. A _replies_ parameter as it is used with the MsgBox (e.g  vbOkOnly) would display equally and thus is fully compatible. Apart from the _replies_ parameter all others are MsgBox alike.
 
 image
 
@@ -76,47 +76,51 @@ Note: The replied value corresponds with the button content. I e. it is either v
 
 ### Exceptions
 * When the specified maximum width is exceeded by a mono-spaced message section (proportional spaced sections are word wrapped and thus cannot exceed the maximum width) the section gets a horizontal scroll bar.
-* When a Replies Row exceeds the maximum _Message Form_ width the Replies Area gets a horizontal scroll bar.
-* When the specified maximum height is exceeded, the height of the _Message Area_  ist reduced to fit and gets a vertical scroll bar.
+* When a _Replies Row_ exceeds the maximum _Message Form_ width the _Replies Area_ gets a horizontal scroll bar.
+* When the specified maximum height is exceeded, the height of the _Message Area_  is reduced to fit and gets a vertical scroll bar.
 
 
 ### Parameters    
-The three function, _Box_, _ErrMsg_, _Msg_, provide the _Message Form_ with the values to be displayed and hand over the clicked _Reply Button_ to the caller.
+The three functions, _Box_, _ErrMsg_, _Msg_, provide the _Message Form_ with the values to be displayed and receive the value of the clicked _Reply Button_.
 
 
 | Parameter | applicable for (procedure in mMsg module) | meaning |
 | ------- | -------- | ---------- |
-| msgtitle | msg, box | The text displayed in the handle bar |
-| msgtext | box | The one and only text displayed |
-| msg1label | msg| label for the first message section |
-| msg1text | msg | text for the first message section |
-| msg1monospaced | msg | optional, defaults to False |
-| msg2label | msg| label for the first message section |
-| msg2text | msg | text for the first message section |
-| msg2monospaced | msg| optional, defaults to False |
-| msg3label | msg| label for the first message section |
-| msg3text | msg | text for the first message section |
-| msg3monospaced | msg | optional, defaults to False || vReplies | msg, msg3 | The number and content of the reply buttons (see Table below), defaults to __vbOkOnly__ |
-| replies | msg, box | specifies the to be displayed reply buttons, optional, defaults to vbOkOnly (see details below) |
+| _msgtitle_ |_Box_, _Msg_, _ErrMsg_ | The text displayed in the handle bar |
+| _msgtext_ | _Box_ | The one and only text displayed |
+| _msg1label_ | _Msg_, _ErrMsg_ | label for the first message section |
+| _msg1text_ | _Msg_, _ErrMsg_ | text for the first message section |
+| _msg1monospaced_ | _Msg_ | optional, defaults to False |
+| _msg2label_ | _Msg_ | label for the first message section |
+| _msg2text_ | _Msg_, _ErrMsg_  | text for the first message section |
+| _msg2monospaced_ | _Msg_ | optional, defaults to False |
+| _msg3label_ | _Msg_, _ErrMsg_ | label for the first message section |
+| _msg3text_ | _Msg_, _ErrMsg_ | text for the first message section |
+| _msg3monospaced_ | _Msg_, _ErrMsg_ | optional, defaults to False || vReplies | _Msg_, _ErrMsg _  | The number and content of the reply buttons (see Table below), defaults to __vbOkOnly__ |
+| _replies_ | _Box_, _Msg_, _ErrMsg_ | specifies the to be displayed _Reply Button_ captions, is optional and defaults to vbOkOnly (see details below) |
 
 
 #### _replies_ Parameter
 | Value | Result |
 | ----- | -------------------- |
 | vbOkOnly, vbYesNo, etc. analogous MsgBox | Up to 3 VB MsgBox alike reply buttons |
-| Up to five comma delimited text strings | Each string is displayed as a reply button |
-| | Example: | 
-| | replies:="Yes,No,Cancel". |
-| | is the eequivalent of. |
-| | replies:=vbYesNoCancel |
+| strig,string,string,... | Each string is displayed as a reply button |
+| string,string,vbLf,string,string | the first two strings are for the _Reply Buttons_ 1 and 2 in the first row, the last two for the second row |
+| Example: | replies:="Yes,No,Cancel"  is the equivalent of  replies:=vbYesNoCancel |
 
 
 ### Public Properties of the _fMsg_ UserForm
+The three public functions in the _mMsg_ module, _Box_, _Msg_, and _ErrMsg_ use the following public properties of the _Message Form_ _fMsg_
 
-## Development and Test
+| Property | Meaning |
+| -------- | ------- |
+|  |  |
+|  |  |
+|  |  |
+|  |  |
 
-The Excel Workbook Msg xlsm is for development and testing. The module mTest provides all means for a proper regression test. The implemented tests are available via the test Worksheet Test/wsMsgTest. The test procedures in the mTest module are designed for a compact and complete test of all functions, options and boundaries and in that not necessarily usefully usage examples. For usage examples the procedures in the mExamples module may preferably consulted.
-Performing a regression test should be obligatory for anyone contributing by code modifications for any purpose or reason. See Contributing.
+
+
 
 ## Design and implementation of the _Message Form_
 The message form is organized in a hierarchy of frames with the following scheme.
@@ -281,29 +285,18 @@ are setup at last and adjusted to the (by then) final message form width.
     End Sub
 
 ## Height Adjustment
-### Height Increment
-Height size increment is done along with
-- the setup of a message section by the subsequent repositioning of all below displayed elements' top position
-- the setup of the reply buttons (reply button rows respectively).
+The height is incremented along with the setup of a message section and the setup of a _Reply Buttons Row_ at first without considering  the specified maximum message form height.
 
-These height increments are done without considering  the specified maximum message form height.
-
-### Height Decrement
-When all elements are setup and the message form exceeds the maximum specified height the form height the message area and/or the reply area are adjusted. When the areas' height relation is 50/50 to 65/35 both areas will get a vertical scroll bar and the height is decremented by the corresponding relation. Otherwise only the taller area is reduced by the exceeding amount and gets a vertical scroll bar. The width of the scrollbar is the height before the reduction 
-
-    '   
-    Private Function MsgAreaHeight() As Single
-    
-    End Function
+When all elements are setup and the _Message Form_ exceeds the maximum specified height the height of the _Message Area_ and/or the _Reply Area_ is reduced to fit and a vertical scroll bar is applied. In detail: When the areas' height relation is 50/50 to 65/35 both areas will get a vertical scroll bar and their height is decremented by the corresponding relation. Otherwise only the taller area is reduced by the exceeding amount and gets a vertical scroll bar. The width of the scrollbar is the height before the reduction.
 
 
-## Vertical Repositioning
+### Vertical Repositioning
 Adjusting the top position of displayed elements is due initially when an element had need setup and subsequently whenever an element's height changed because of a width adjustment. Together with the adjustment of the top position of the bottommost element the new height of the message form is set.
 
-Note: This top repositioning may be done just once when all elements had initially been  setup. However, for testing it is more appropriate to be performed immediately after setup of each individual element.
+Note: This top repositioning may be done just once when all elements had initially been setup. For testing however it may be appropriate to  perform it when one element had been setup.
 
-    Private Sub RepositionTop()
-        ReposTopMsgSections
-        ReposTopPosReplyRows
-        ReposTopAreas
-    End Sub
+
+## Development and Test
+
+The Excel Workbook Msg xlsm is for development and testing. The module mTest provides all means for a proper regression test. The implemented tests are available via the test Worksheet Test/wsMsgTest. The test procedures in the mTest module are designed for a compact and complete test of all functions, options and boundaries and in that not necessarily usefully usage examples. For usage examples the procedures in the mExamples module may preferably consulted.
+Performing a regression test should be obligatory for anyone contributing by code modifications for any purpose or reason. See Contributing.
