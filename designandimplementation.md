@@ -1,10 +1,18 @@
 ## Contents
-- [The idea of an alternative MsgBox](#the-idea-of-an-alternative-msgbox)
+- [Why an alternative MsgBox](#why-an-alternative-msgbox)
 - [Examples, Demonstrations](examples-demonstrations)
   - [Simple message](#simple-message)
+  - [Error message](#error-message)
+  - [Common" message](#common-message)
+- [Specification](#specification)
+  - [Basics](#basics)
+  - [Exceptions](#exceptions)
+  - [Parameters](#parameters)
+    - [_replies_ Parameter](#replies-parameter)
+  - [Design and implementation of the _Message Form_](#design-and-implementation-of-the-message-form)
+    
 
-
-## The idea of an alternative MsgBox
+## Why an alternative MsgBox
 Not a 100% equivalent compares it as follows
 
 | MsgBox | This Alternative |
@@ -37,13 +45,18 @@ image
 #### Error message
 
 The error message below (my standard one) is provided by the _ErrMsg_ function in the _mMsg_ Module and makes use of:
-* The _Message Area_ with (all) 3 _Message Text Sections_ and each with the optional _Message Label_ and the Error source section  with the _Monospaced_ font option in order to have a property indented "call stack"
+* Three _Message Sections_ each with a _Message Section Label_ 
+* A _Monospaced_ font option for the error source which displays a proper indented "call stack"
 * The _Re-plies Area_ with one fixed *Ok* button - common for VB error messages.
 
 image
 
+#### "Common" message
 
-## Specification of the alternative MsgBox
+image
+
+
+## Specification
 ### Basics
 * Up to 3 _Message Sections_
   * optionally _Mono-spaced_ (not word wrapped!)
@@ -61,23 +74,15 @@ Note: The replied value corresponds with the button content. I e. it is either v
   * the space required for the _Message Sections_ and the _Reply Buttons_
   * the specified maximum _Message Form_ height (as a % if the screen height)
 
-### Handling of an exceeded width or height limits
+### Exceptions
 * When the specified maximum width is exceeded by a mono-spaced message section (proportional spaced sections are word wrapped and thus cannot exceed the maximum width) the section gets a horizontal scroll bar.
 * When a Replies Row exceeds the maximum _Message Form_ width the Replies Area gets a horizontal scroll bar.
 * When the specified maximum height is exceeded, the height of the _Message Area_  ist reduced to fit and gets a vertical scroll bar.
 
 
-## Installation
-See ReadMe
+### Parameters    
+The three function, _Box_, _ErrMsg_, _Msg_, provide the _Message Form_ with the values to be displayed and hand over the clicked _Reply Button_ to the caller.
 
-## Usage
-
-## Examples
-
-## Function Parameters
-There are much more parameters available than the ones obviously required for any kind of message. The additional parameters allow the implementation of VB project specific message procedures.
-
-### Basic
 
 | Parameter | applicable for (procedure in mMsg module) | meaning |
 | ------- | -------- | ---------- |
@@ -92,10 +97,10 @@ There are much more parameters available than the ones obviously required for an
 | msg3label | msg| label for the first message section |
 | msg3text | msg | text for the first message section |
 | msg3monospaced | msg | optional, defaults to False || vReplies | msg, msg3 | The number and content of the reply buttons (see Table below), defaults to __vbOkOnly__ |
-| replies | msg, box | specifies the to be displayed reply buttons, optional, defaults to vbOkOnly |
+| replies | msg, box | specifies the to be displayed reply buttons, optional, defaults to vbOkOnly (see details below) |
 
 
-#### Parameter replies
+#### _replies_ Parameter
 | Value | Result |
 | ----- | -------------------- |
 | vbOkOnly, vbYesNo, etc. analogous MsgBox | Up to 3 VB MsgBox alike reply buttons |
@@ -113,81 +118,8 @@ There are much more parameters available than the ones obviously required for an
 The Excel Workbook Msg xlsm is for development and testing. The module mTest provides all means for a proper regression test. The implemented tests are available via the test Worksheet Test/wsMsgTest. The test procedures in the mTest module are designed for a compact and complete test of all functions, options and boundaries and in that not necessarily usefully usage examples. For usage examples the procedures in the mExamples module may preferably consulted.
 Performing a regression test should be obligatory for anyone contributing by code modifications for any purpose or reason. See Contributing.
 
-## Design and implementation
-### UserForm
-The UserForm uses a hierarchy of frames, each dedicated to a specific operation. On the UserForm level these are the *MessageArea* and the *RepliesArea* frames, both used for the assignment of the Top property.  
-* *MessageArea*
-  * ImageFrame
-  * MessageSection1 to ...3  
-Property Get MessageSection(Optional ByVal section As Long) As MsForms.Frame
-    * SectionLabel. 
-Property Get MsgLabel(Optional ByVal section As Long) As MsForns.Label
-    * SectionFrame. 
-Property Get MsgFrame(Optional ByVal section As Long) As MsForns.Frame
-      * SectionText. 
-Property Get MsgText(Optional ByVal section As Long) As MsForns.TextBox
-* RepliesSection:  
-Bottom frame. 
-.Top = MessageSections.Top + MessageSections.Height + V_MARGIN. 
-Collection of RepliesRow (cllReplyRows). 
-Property Get RepliesRow(Optional ByVal row As Long) As MsForms.Frame
-  * RepliesRow. (. = 1 - 6)
-    * RepliesFrame. (. = 1 - 6)
-Collection of ReplyButton.
-      * ReplyButton. (. = 1-6)
-
-The UserForm is prepared for 6 reply button which may appear as follows
-* Row 1: 1 to 6 buttons
-* Row 2: 0 to 3 buttons
-* Row 3: 0 to 2 buttons
-* Row 4 to 6: 0 to 1 button
-
-The order depends on the specified maximum message form width and the width of the largest button - wich defines the width for all the other buttons. When the specified maximum height is exceeded by the reply buttons the all used rows surrounding frame is reduced to fit the form and a vertical scroll bar is applied. The visible height will be at least one and a half button row. When the form will still exceed ist's maximum width, the greatest message section will be processed the same way.
-
-Private Property Get ReplyButton(Optional ByVal row As Long, Optional ByVal button As Long) As MsForms.CommandButton
-
-## Implementation
-The hierarchy of elements (message section labels 1 to n, message section text frames 1to n),  message section textboxes 1to n, and reply rows commandbuttons 1 to n) is obtained without the use of any control names. The number of message sections and reply buttons is not limited by the design since missing elements are created dynamically.
-
-## Public Properties
-### Commonly used properties
-
-| Property | R/W | Purpose |
-| -------------- | ------- | ------------- |
-|
-
-
-### Special properties
-Additional special properties are available for the modification of the message appearance and last but not least for the implementation of dedicated message functions for specific needs in a VB project. As an example, some of them are used by the test procedures.
-
-| Property | R/W | Purpose |
-| -------------- | ------- | ------------- |
-|
-
-### Constants
-The following constants are initialization values or directly used for the layout and appearance of a displayed message. Some of the initial values may be modified through the special properties.
-
-| Constant | Specifies | Default |
-| --------------- | --------------- | ------------ |
-| MIN_FORM_WIDTH | minimum width of the message window  | 300 pt |
-| MIN_REPLY_HEIGHT | 30 pt |
-| MIN_REPLY_WIDTH | minimum width of a reply buttons  | 50 pt |
-| MAX_FORM_HEIGHT_POW | maximum message width as percentage of the screen height | 80 % |
-| MAX_FORM_WIDTH | maximum percentage space used of the screen height | 80 % |
-| T_MARGIN | top margin | 5 or |
-| B_MARGIN | bottom margin | 40 pt |
-| L_MARGIN | left margin | 0 PT |
-| R_MARGIN | right margin | 5 or |
-    
-
-
-## Design and implementation of the Message/UserForm
-### General
-- The implementation of the message form is strictly design driven. I.e. the number of available **Message Sections**, the number of **Reply Rows**, and the number of **Reply (Command) Buttons** is only a matter of the design and does not require any code change.
-- The implementation does not make use of any of the control's object name but relies on the hierarchical order of the frames (see below).
-
-### Message/UserForm design
-The message form is organized in a hierarchy of frames as follows.
+## Design and implementation of the _Message Form_
+The message form is organized in a hierarchy of frames with the following scheme.
 
     +----Message Area (Frame)----------------+
     | +---Message Section (Frame)----------+ |
@@ -257,6 +189,58 @@ on_error:
     Debug.Print Err.Description: Stop: Resume Next
 End Sub
 ```
+
+The UserForm is prepared for 6 reply button which may appear as follows
+* Row 1: 1 to 6 buttons
+* Row 2: 0 to 3 buttons
+* Row 3: 0 to 2 buttons
+* Row 4 to 6: 0 to 1 button
+
+The order depends on the specified maximum message form width and the width of the largest button - wich defines the width for all the other buttons. When the specified maximum height is exceeded by the reply buttons the all used rows surrounding frame is reduced to fit the form and a vertical scroll bar is applied. The visible height will be at least one and a half button row. When the form will still exceed ist's maximum width, the greatest message section will be processed the same way.
+
+Private Property Get ReplyButton(Optional ByVal row As Long, Optional ByVal button As Long) As MsForms.CommandButton
+
+## Implementation
+The hierarchy of elements (message section labels 1 to n, message section text frames 1to n),  message section textboxes 1to n, and reply rows commandbuttons 1 to n) is obtained without the use of any control names. The number of message sections and reply buttons is not limited by the design since missing elements are created dynamically.
+
+## Public Properties
+### Commonly used properties
+
+| Property | R/W | Purpose |
+| -------------- | ------- | ------------- |
+|
+
+
+### Special properties
+Additional special properties are available for the modification of the message appearance and last but not least for the implementation of dedicated message functions for specific needs in a VB project. As an example, some of them are used by the test procedures.
+
+| Property | R/W | Purpose |
+| -------------- | ------- | ------------- |
+|
+
+### Constants
+The following constants are initialization values or directly used for the layout and appearance of a displayed message. Some of the initial values may be modified through the special properties.
+
+| Constant | Specifies | Default |
+| --------------- | --------------- | ------------ |
+| MIN_FORM_WIDTH | minimum width of the message window  | 300 pt |
+| MIN_REPLY_HEIGHT | 30 pt |
+| MIN_REPLY_WIDTH | minimum width of a reply buttons  | 50 pt |
+| MAX_FORM_HEIGHT_POW | maximum message width as percentage of the screen height | 80 % |
+| MAX_FORM_WIDTH | maximum percentage space used of the screen height | 80 % |
+| T_MARGIN | top margin | 5 or |
+| B_MARGIN | bottom margin | 40 pt |
+| L_MARGIN | left margin | 0 PT |
+| R_MARGIN | right margin | 5 or |
+    
+
+
+## Design and implementation of the Message/UserForm
+### General
+- The implementation of the message form is strictly design driven. I.e. the number of available **Message Sections**, the number of **Reply Rows**, and the number of **Reply (Command) Buttons** is only a matter of the design and does not require any code change.
+- The implementation does not make use of any of the control's object name but relies on the hierarchical order of the frames (see below).
+
+### Message/UserForm design
 
 
 ## Width Adjustment
