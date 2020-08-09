@@ -1,7 +1,8 @@
 # Implementation of the _Message Form_
 ## General
 - The implementation of the message form is strictly design driven. I.e. the number of available **Message Sections**, the number of **Reply Rows**, and the number of **Reply (Command) Buttons** is only a matter of the design and does not require any code change.
-- The implementation does not make use of any of the control's object name but relies on the hierarchical order of the frames (see below).
+- The implementation relies on the hierarchical order of the frames (see below). The control's object name is used only where I couldn't find a way to avoid it.
+- The implementation does not use any Class Modules - though they may have resulted in a more elegant code - in order to keep the number of to be installed component as small as possible.
 
 The controls (frames, text boxes, and command buttons) are collected with the message form's initialization and used throughout the implementation.
 
@@ -112,6 +113,5 @@ When all elements are setup and the message form exceeds the maximum specified h
 Adjusting the top position of displayed elements is due initially when an element had need setup and subsequently whenever an element's height changed because of a width adjustment. Together with the adjustment of the top position of the bottommost element the new height of the message form is set.
 
 Note: This top repositioning may be done just once when all elements had initially been  setup. However, for testing it is more appropriate to be performed immediately after setup of each individual element.
-
 
 
