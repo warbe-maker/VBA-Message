@@ -140,12 +140,12 @@ The UserForm is prepared for 6 reply button which may appear as follows
 * Row 3: 0 to 2 buttons
 * Row 4 to 6: 0 to 1 button
 
-The order depends on the specified maximum message form width and the width of the largest button - wich defines the width for all the other buttons. When the specified maximum height is exceeded by the reply buttons the all used rows surrounding frame is reduced to fit the form and a vertical scroll bar is applied. The visible height will be at least one and a half button row. When the form will still exceed ist's maximum width, the greatest message section will be processed the same way.
+The order depends on the specified maximum message form width and the width of the largest button - wich defines the width for all the other buttons. When the specified maximum height is exceeded by the reply buttons the all used rows surrounding frame is reduced to fit the form and a vertical scroll bar is applied. The visible height will be at least one and a half button row. When the form will still exceed it's maximum width, the greatest message section will be processed the same way.
 
 Private Property Get ReplyButton(Optional ByVal row As Long, Optional ByVal button As Long) As MsForms.CommandButton
 
 ## Implementation
-The hierarchy of elements (message section labels 1 to n, message section text frames 1to n),  message section textboxes 1to n, and reply rows commandbuttons 1 to n) is obtained without the use of any control names. The number of message sections and reply buttons is not limited by the design since missing elements are created dynamically.
+The hierarchy of elements (message section labels 1 to n, message section text frames 1 to n),  message section text boxes 1 to n, and reply rows command buttons 1 to n) is obtained without the use of any control names. The number of message sections and reply buttons is not limited by the design since missing elements are created dynamically.
 
 ## Public Properties
 ### Commonly used properties
