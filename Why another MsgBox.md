@@ -1,11 +1,11 @@
 # Why another MsgBox?
 
-The idea dates back when I implemented my general error handling and was looking for a well designed and more appealing error message, not only displaying the description of the error but also the source to the error as a kind of call stack and optionally some additional information.
-Another feel for the need occurred when I tried to implement a more complex "decision message" with more choices than just Yes, No, Cancel, etc.. The idea was to have reply buttons with a more meaningful caption text which allows a shorter message text above.
+The idea dates back when I implemented my general error handling and was looking for a well designed and more appealing error message, not only displaying the description of the error but also the source if the error as a kind of call stack, preferably with a mono-spaced font and optionally some additional information.
+Another feel for the need occurred when I tried to implement a more complex "decision message" with more choices than just Yes, No, Cancel, etc.. The idea was to have reply buttons with the most meaningful caption text possible in order to save wording in the above message text.
 
-The result is now not a 100% MsgBox equivalent but it compares as follows:
+The result is now not 100% MsgBox equivalent because some features are excluded. The compare is as follows:
 
-| The VB MsgBox | This Alternative "_Message Form_" |
+| The VB MsgBox | The Alternative "_Message Form_" |
 | ------ | ---- |
 | Limited message width | The maximum _Message Form_ width is specified as a percentage of the screen width |
 | Limited message height |The maximum _Message Form_ height is specified as a percentage of the screen height |
@@ -17,8 +17,14 @@ The result is now not a 100% MsgBox equivalent but it compares as follows:
 | Specifying the default button | (yet) not implemented |
 | Display of an alert image like a ?, !, etc. | (yet) not implemented |
 
-These implementation comprises of:
-- a Standard Module _mMsg_ with the functions _Box_, _ErrMsg_, and _Msg_. _Box_ is mainly for the backwards compatibility with the _MsgBox_, _ErrMsg_ became my standard error message, and _Msg_ allows full use of all design fetures. Beside these three functions any "application specific" message may be implemented analogously by making use of the public properties of the _Message Form_ (see [Implementation](#Implementation.md))
+The implementation comprises of:
+- a Standard Module _mMsg_ with the functions
+  - _Box_ is mainly for the backwards compatibility with the _MsgBox_
+  - _ErrMsg_ became my standard error message
+  - _Msg_ allows full use of all design fetures
+- UserForm _fMsg_
+
+Beside these three functions any "application specific" message may be implemented analogously by making use of the public properties of the _Message Form_ (see [Implementation](#Implementation.md))
 
 ### Examples, Demonstrations
 The examples below not only illustrate the major enhancements but also the 3 implemented functions in the module _mMsg_ which do use the UserForm _fMsg_.
