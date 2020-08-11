@@ -29,7 +29,6 @@ Private Sub Collect(ByRef into As Collection, _
                 For Each ctl In Me.Controls
                     If TypeName(ctl) = ctltype And ctl.Parent Is v Then
                         With ctl
-                            Debug.Print "Parent: " & ctl.Parent.Name & ", Type: " & TypeName(ctl) & ", Ctl: " & ctl.Name
                             .Visible = False
                             .Height = ctlheight
                             .width = ctlwidth
@@ -42,7 +41,6 @@ Private Sub Collect(ByRef into As Collection, _
             For Each ctl In Me.Controls
                 If TypeName(ctl) = ctltype And ctl.Parent Is fromparent Then
                     With ctl
-                        Debug.Print "Parent: " & ctl.Parent.Name & ", Type: " & TypeName(ctl) & ", Ctl: " & ctl.Name
                         .Visible = False
                         .Height = ctlheight
                         .width = ctlwidth
@@ -58,8 +56,9 @@ on_error:
     Debug.Print Err.Description: Stop: Resume Next
 End Sub
 ```
+
 ## Width Adjustment
-The message form is initialized with the specified minimum message form width. Width expansion may be  triggered by the setup (in the outlined sequence) of the following width determining elements:
+The _Message Form_ is initialized with the specified minimum message form width (see [Default Value Constants](#default-value-constants) which may be modified via the public property _MaxFormWidthPrcntgOfSceenSize_ (see [Public Properties of the _Message Form_](#public-properties-of-the-message-form)). A width expansion may be triggered by the setup (in the outlined sequence) of the following the width determining elements:
   1. **Title**  
 When the **Title** exceeds the specified  maximum message form width some text will be truncated. However, with a default maximum message form width of 80 % of the screen width that will happen pretty unlikely.
   2. **Mono-spaced message section** followed by **Replies Rows**  
@@ -91,27 +90,43 @@ Private Sub MsgSectionAdjustHeightToAvailableWidth( _
     End With
     
 End Sub
+```
 
 ## Height Adjustment
 ### Height Increment
-Height size increment is done along with
-- the setup of a message section by the subsequent repositioning of all below displayed elements' top position
-- the setup of the reply buttons (reply button rows respectively).
+The height of the _Message Form_ is incremented along with the setup of the _Message Sections_ and the setup of the _Reply Buttons_ and the _Reply Button Rows_ respectively.
 
-These height increments are done without considering  the specified maximum message form height.
+These height increments are at first done without considering any specified maximum _Message Form_ height.
 
 ### Height Decrement
-When all elements are setup and the message form exceeds the maximum specified height the form height the message area and/or the reply area are adjusted. When the areas' height relation is 50/50 to 65/35 both areas will get a vertical scroll bar and the height is decremented by the corresponding relation. Otherwise only the taller area is reduced by the exceeding amount and gets a vertical scroll bar. The width of the scrollbar is the height before the reduction 
+When all elements are setup and the message form exceeds the specified maximum height (see [Default Value Constants](#default-value-constants) which may be modified via the [Public Property of the _Message Form_](#public-properties-of-the-message-form) _MaxFormHeightPrcntgOfSceenSize_, the height of the _Message Area_ frame and/or the _Reply Area_ frame is reduced to fit and provided with a vertical scroll bar. In detail: When the areas' height relation is 50/50 to 65/35 both areas will get a vertical scroll bar and the height is decremented by the related value. Otherwise only the taller area is reduced by the exceeding amount (the width of the scrollbar is the height before the reduction). 
 
-    '   
-    Private Function MsgAreaHeight() As Single
+```vbscript  
+Private Function MsgAreaHeight() As Single
     
-    End Function
+End Function
+```
 
-
-## Vertical Repositioning
+## Vertical Repositioninghbj.  
 Adjusting the top position of displayed elements is due initially when an element had need setup and subsequently whenever an element's height changed because of a width adjustment. Together with the adjustment of the top position of the bottommost element the new height of the message form is set.
 
 Note: This top repositioning may be done just once when all elements had initially been  setup. However, for testing it is more appropriate to be performed immediately after setup of each individual element.
 
+## Default Value Constants
+| Constant | Meaning |
+| -------- | ------- |
+|          |         |
+|          |         |
+|          |         |
+
+
+## Public Properties of the _Message Form_
+### Common
+| Property | R/W | Meaning |
+| -------- | --- | ------- |
+|          |     |         |
+|          |     |         |
+|          |     |         |
+
+### For test only
 
