@@ -1,4 +1,4 @@
-# Implementation of the _Message Form_
+# Implementation of the _Message Form_ (_fMsg_ UserForm)
 ## General
 - The implementation of the message form is strictly design driven. I.e. the number of available **Message Sections**, the number of **Reply Rows**, and the number of **Reply (Command) Buttons** is only a matter of the design and does not require any code change.
 - The implementation relies on the hierarchical order of the frames (see below). The control's object name is used only where I couldn't find a way to avoid it.
@@ -56,8 +56,7 @@ on_error:
     Debug.Print Err.Description: Stop: Resume Next
 End Sub
 ```
-
-## Width Adjustment
+## Width Adjustments
 The _Message Form_ is initialized with the specified minimum message form width (see [Default Value Constants](#default-value-constants) which may be modified via the public property _MaxFormWidthPrcntgOfSceenSize_ (see [Public Properties of the _Message Form_](#public-properties-of-the-message-form)). A width expansion may be triggered by the setup (in the outlined sequence) of the following the width determining elements:
   1. **Title**  
 When the **Title** exceeds the specified  maximum message form width some text will be truncated. However, with a default maximum message form width of 80 % of the screen width that will happen pretty unlikely.
@@ -92,13 +91,13 @@ Private Sub MsgSectionAdjustHeightToAvailableWidth( _
 End Sub
 ```
 
-## Height Adjustment
-### Height Increment
+## Height Adjustments
+### Height Increments
 The height of the _Message Form_ is incremented along with the setup of the _Message Sections_ and the setup of the _Reply Buttons_ and the _Reply Button Rows_ respectively.
 
 These height increments are at first done without considering any specified maximum _Message Form_ height.
 
-### Height Decrement
+### Height Decrements
 When all elements are setup and the message form exceeds the specified maximum height (see [Default Value Constants](#default-value-constants) which may be modified via the [Public Property of the _Message Form_](#public-properties-of-the-message-form) _MaxFormHeightPrcntgOfSceenSize_, the height of the _Message Area_ frame and/or the _Reply Area_ frame is reduced to fit and provided with a vertical scroll bar. In detail: When the areas' height relation is 50/50 to 65/35 both areas will get a vertical scroll bar and the height is decremented by the related value. Otherwise only the taller area is reduced by the exceeding amount (the width of the scrollbar is the height before the reduction). 
 
 ```vbscript  
@@ -107,12 +106,12 @@ Private Function MsgAreaHeight() As Single
 End Function
 ```
 
-## Vertical Repositioninghbj.  
-Adjusting the top position of displayed elements is due initially when an element had need setup and subsequently whenever an element's height changed because of a width adjustment. Together with the adjustment of the top position of the bottommost element the new height of the message form is set.
+## Vertical Re-positioning  
+Adjusting the top position of displayed elements is due initially when an element had need setup and subsequently whenever an element's height changed because of a width adjustment. Together with the adjustment of the top position of the bottom-most element the new height of the message form is set.
 
-Note: This top repositioning may be done just once when all elements had initially been  setup. However, for testing it is more appropriate to be performed immediately after setup of each individual element.
+Note: This top re-positioning may be done just once when all elements had initially been  setup. However, for testing it is more appropriate to be performed immediately after setup of each individual element.
 
-## Default Value Constants
+## _Message Form_ Constants as Default Values
 | Constant | Meaning |
 | -------- | ------- |
 |          |         |
@@ -120,7 +119,7 @@ Note: This top repositioning may be done just once when all elements had initial
 |          |         |
 
 
-## Public Properties of the _Message Form_
+## Public _Message Form_ Properties
 ### Common
 | Property | R/W | Meaning |
 | -------- | --- | ------- |
@@ -129,4 +128,8 @@ Note: This top repositioning may be done just once when all elements had initial
 |          |     |         |
 
 ### For test only
-
+| Property | R/W | Meaning |
+| -------- | --- | ------- |
+|          |     |         |
+|          |     |         |
+|          |     |         |
