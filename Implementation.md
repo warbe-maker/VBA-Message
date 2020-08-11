@@ -123,13 +123,21 @@ Note: This top re-positioning may be done just once when all elements had initia
 ### Common
 | Property | R/W | Meaning |
 | -------- | --- | ------- |
-|          |     |         |
-|          |     |         |
-|          |     |         |
+| MaxFormHeight | R |         |
+| MaxFormHeightPrcntgOfScreenSize | R/W |         |
+| MaxFormWidth  |     |         |
+| MaxFormWidthPrcntgOfScreenSize  | R/W |         |
+| MinFormWidthPrcntgOfScreenSize  |     |         |
+| MinimumFormWidth                |     |         |
+| Replies         |     |         |
+| SectionsLabel   |     |         |
+| SectionsMonoSpaced         |     |         |
+| SectionsText         |     |         |
+| Title         |     |         |
+| ErrSrc         |     |         |
 
-### For test only
+### Public Properties for test only
 | Property | R/W | Meaning |
 | -------- | --- | ------- |
-|          |     |         |
-|          |     |         |
-|          |     |         |
+| FramesWithCaption | W | Defaults to False. Frames are displayed with their "test" caption |
+| FramesWithBorder  | W |  Defaults to False. Frames are displayed with a visible border |
