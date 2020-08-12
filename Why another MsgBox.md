@@ -50,7 +50,7 @@ image
 The error message below (my standard one) is displayed with
 
 ```vbscript
-mMsg.ErrMsg title:=..., errdesc:=..., errsrc:="...."
+mMsg.ErrMsg errtitle:=..., errnumber:=.., errdescription:=..., errline:=.., errpath:="....", errinfo:="..."
 ```
 and makes use of:
 * Three _Message Sections_ each with a _Message Section Label_ 
