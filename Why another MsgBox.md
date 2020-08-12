@@ -41,15 +41,20 @@ Mainly for the compatibility with MsgBox it is displayed with
 ```
 mMsg.Box title:=..., prompt:=...,buttons:=vbYesNo
 ```
-The _buttons_ parameter however is much more flexible as it is handed over to the public _Message Form_ property _Replies_ (see [Implementation](#implementation.md)
+The _buttons_ parameter however is much more flexible as it is handed over to the public _Message Form_ property _Replies_ (see [Implementation](#implementation.md)).
+
 image
 
 #### Error message
 
-The error message below (my standard one) is provided by the _ErrMsg_ function in the _mMsg_ Module and makes use of:
+The error message below (my standard one) is displayed with
+
+```vbscript
+mMsg.ErrMsg title:=..., errdesc:=..., errsrc:="...."
+```
+and makes use of:
 * Three _Message Sections_ each with a _Message Section Label_ 
-* A _Monospaced_ font option for the error source which displays a proper indented "call stack"
-* The _Re-plies Area_ with one fixed *Ok* button - common for VB error messages.
+* A _Monospaced_ font option for the _errsource_ which displays a proper indented "path to the error"
 
 image
 
