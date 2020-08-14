@@ -1,10 +1,10 @@
 # Implementation of the _Message Form_ (_fMsg_ UserForm)
 ## General
-- The implementation of the message form is strictly design driven. I.e. the number of available **Message Sections**, the number of **Reply Rows**, and the number of **Reply (Command) Buttons** is only a matter of the design and does not require any code change.
-- The implementation relies on the hierarchical order of the frames (see below). The control's object name is used only where I couldn't find a way to avoid it.
-- The implementation does not use any Class Modules - though they may have resulted in a more elegant code - in order to keep the number of to be installed component as small as possible.
+- The implementation of the _Message Form_ is mostly design driven. I.e. the number of available _Message Sections_, the number of _Reply Rows_, and the number of _Reply Buttons_ is primarily a matter of the design and requires only moderate code change.
+- The implementation relies on the hierarchical order of the frames (see below). The control's object name is used only where unavoidable.
+- The intention of not using Class Modules is to keep the number of to-be-installed modules at minimum - though they may have resulted in a more elegant implementation.
 
-The controls (frames, text boxes, and command buttons) are collected with the message form's initialization and used throughout the implementation.
+The controls (frames, text boxes, and command buttons) are collected at the _Message Form's_ initialization and these collections are used throughout the implementation.
 
 ```vbscript
 ' Returns all controls of type (ctltype) which do have a parent (fromparent)
@@ -111,7 +111,7 @@ Adjusting the top position of displayed elements is due initially when an elemen
 
 Note: This top re-positioning may be done just once when all elements had initially been  setup. However, for testing it is more appropriate to be performed immediately after setup of each individual element.
 
-## _Message Form_ Constants as Default Values
+## Default Value Constants 
 | Constant | Meaning |
 | -------- | ------- |
 |          |         |
