@@ -1,6 +1,6 @@
-# Implementation of the _Message Form_ (_fMsg_ UserForm)
+# Implementation
 ## General
-- The implementation of the _Message Form_ is mostly design driven. I.e. the number of available _Message Sections_, the number of _Reply Rows_, and the number of _Reply Buttons_ is primarily a matter of the design and requires only moderate code change.
+- The implementation of the _Message Form_ (the UserForm _fMsg) is mostly design driven. I.e. the number of available _Message Sections_, the number of _Reply Rows_, and the number of _Reply Buttons_ is primarily a matter of the design and requires only moderate code change.
 - The implementation relies on the hierarchical order of the frames (see below). The control's object name is used only where unavoidable.
 - The intention of not using Class Modules is to keep the number of to-be-installed modules at minimum - though they may have resulted in a more elegant implementation.
 
