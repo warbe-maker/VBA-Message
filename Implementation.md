@@ -3,7 +3,7 @@
 - The implementation of the _Message Form_ (the UserForm _fMsg) is mostly design driven. I.e. the number of available _Message Sections_, the number of _Reply Rows_, and the number of _Reply Buttons_ is primarily a matter of the design and requires only moderate code change.
 - The implementation relies on the hierarchical order of the frames (see below). The control's object name is used only where unavoidable as is for the click events of the _Reply Buttons_.
 ```vbscipt
-Private Sub cmbReply11_Click():  ReplyClicked 1, 1:  End Sub
+Private Sub cmbReply11_Click():  ReplyClicked 1, 1:   End Sub
 Private Sub cmbReply12_Click():  ReplyClicked 1, 2:   End Sub
 Private Sub cmbReply13_Click():  ReplyClicked 1, 3:   End Sub
 Private Sub cmbReply14_Click():  ReplyClicked 1, 4:   End Sub

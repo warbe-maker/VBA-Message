@@ -58,4 +58,14 @@ The message form is organized in a hierarchy of frames as follows.
     | +----------------------------------------+ |
     +--------------------------------------------+
  
-The controls (frames, text boxes, and command buttons) are collected with the message form's initialization and used throughout the implementation. I.e. the whole approach is merely design driven.
+The controls (frames, text boxes, and command buttons) are collected with the message form's initialization and used throughout the [Implementation](#implementation.md). I.e. the whole approach is merely design driven.
+
+The design allows the following orders og the _Reply Buttons_:
+
+| Scheme |      |
+| - | - |
+| 1 2 3 4 5 6 7 | 1 - 7 in one row |
+| 1 2 3 4<br> &nbsp; 5 6 7 | All in two rows|
+| 1 2 3<br>4 5 6<br>&nbsp;&nbsp;&nbsp;7 | All in 3 rows|
+| 1 2<br>3 4<br>5 6<br>&nbsp;7 | All in 4 rows |
+| 1<br>2<br>3<br>4<br>5<br>6<br>7 | 1 - 7 underneath |
