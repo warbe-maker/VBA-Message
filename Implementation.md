@@ -1,10 +1,32 @@
 # Implementation
 ## General
 - The implementation of the _Message Form_ (the UserForm _fMsg) is mostly design driven. I.e. the number of available _Message Sections_, the number of _Reply Rows_, and the number of _Reply Buttons_ is primarily a matter of the design and requires only moderate code change.
-- The implementation relies on the hierarchical order of the frames (see below). The control's object name is used only where unavoidable.
-- The intention of not using Class Modules is to keep the number of to-be-installed modules at minimum - though they may have resulted in a more elegant implementation.
+- The implementation relies on the hierarchical order of the frames (see below). The control's object name is used only where unavoidable as is for the click events of the _Reply Buttons_.
+```vbscipt
+Private Sub cmbReply11_Click():  ReplyClicked 1, 1:  End Sub
+Private Sub cmbReply12_Click():  ReplyClicked 1, 2:   End Sub
+Private Sub cmbReply13_Click():  ReplyClicked 1, 3:   End Sub
+Private Sub cmbReply14_Click():  ReplyClicked 1, 4:   End Sub
+Private Sub cmbReply15_Click():  ReplyClicked 1, 5:   End Sub
+Private Sub cmbReply16_Click():  ReplyClicked 1, 6:   End Sub
+Private Sub cmbReply17_Click():  ReplyClicked 1, 7:   End Sub
+Private Sub cmbReply21_Click():  ReplyClicked 2, 1:   End Sub
+Private Sub cmbReply22_Click():  ReplyClicked 2, 2:   End Sub
+Private Sub cmbReply23_Click():  ReplyClicked 2, 3:   End Sub
+Private Sub cmbReply24_Click():  ReplyClicked 2, 4:   End Sub
+Private Sub cmbReply31_Click():  ReplyClicked 3, 1:   End Sub
+Private Sub cmbReply32_Click():  ReplyClicked 3, 2:   End Sub
+Private Sub cmbReply33_Click():  ReplyClicked 3, 3:   End Sub
+Private Sub cmbReply41_Click():  ReplyClicked 4, 1:   End Sub
+Private Sub cmbReply42_Click():  ReplyClicked 4, 2:   End Sub
+Private Sub cmbReply51_Click():  ReplyClicked 5, 1:   End Sub
+Private Sub cmbReply61_Click():  ReplyClicked 6, 1:   End Sub
+Private Sub cmbReply71_Click():  ReplyClicked 7, 1:   End Sub
+```
 
-The controls (frames, text boxes, and command buttons) are collected at the _Message Form's_ initialization and these collections are used throughout the implementation.
+- In order to keep the number of to-be-installed modules at minimum the implementation intentionally refraines from Class Modules. Type declarations may have been used instead however but aren't.
+
+- The controls (frames, text boxes, and command buttons) are collected at the _Message Form's_ initialization and these collections are used throughout the implementation.
 
 ```vbscript
 ' Returns all controls of type (ctltype) which do have a parent (fromparent)
@@ -112,11 +134,14 @@ Adjusting the top position of displayed elements is due initially when an elemen
 Note: This top re-positioning may be done just once when all elements had initially been  setup. However, for testing it is more appropriate to be performed immediately after setup of each individual element.
 
 ## Default Value Constants 
+
 | Constant | Meaning |
 | -------- | ------- |
-|          |         |
-|          |         |
-|          |         |
+| MONOSPACED_FONT_NAME | Default Font Name for mono-spaced message section text |
+| MONOSPACED_FONT_SIZE | Default Font Size for mono-spaced message section text|
+| FORM_WIDTH_MIN | Minimum _Message Form_ wird in pt|            | FORM_WIDTH_MAX_POW | Maximum _Message Form_ width as % of the screen size |
+| FORM_HEIGHT_MAX_POW | |
+| MIN_WIDTH_REPLY_BUTTON | Minimum width of a _Reply Button_ |
 
 
 ## Public _Message Form_ Properties
