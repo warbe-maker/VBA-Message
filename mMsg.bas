@@ -72,7 +72,7 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
     End If
 
     If errtitle = vbNullString Then
-        '~~ When no msgtitle is provided, one is assembled by the provided info
+        '~~ When no title is provided, one is assembled by the provided info
         errtitle = errtitle & sIndicate
         '~~ Distinguish between VBA and Application error
         Select Case errnumber
@@ -98,19 +98,19 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
 
     '~~ Display error message by UserForm fErrMsg
     With fMsg
-        .Title = errtitle
-        .SectionsLabel(1) = "Error Message/Description:"
-        .SectionsText(1) = sErrText
+        .title = errtitle
+        .SectionLabel(1) = "Error Message/Description:"
+        .SectionText(1) = sErrText
         If errpath <> vbNullString Then
-            .SectionsLabel(2) = "Error path (call stack):"
-            .SectionsText(2) = errpath
-            .SectionsMonoSpaced(2) = True
+            .SectionLabel(2) = "Error path (call stack):"
+            .SectionText(2) = errpath
+            .SectionMonoSpaced(2) = True
         End If
         If errinfo <> vbNullString Then
-            .SectionsLabel(3) = "Info:"
-            .SectionsText(3) = errinfo
+            .SectionLabel(3) = "Info:"
+            .SectionText(3) = errinfo
         End If
-        .Replies = vbOKOnly
+        .buttons = vbOKOnly
         .Show
     End With
 
@@ -201,19 +201,19 @@ End Function
 ' Note: This is a simplified version of the Msg function.
 ' --------------------------------------------------------------------
 Public Function Box( _
-           Optional ByVal msgtitle As String = vbNullString, _
+           Optional ByVal title As String = vbNullString, _
            Optional ByVal MsgSectionText As String = vbNullString, _
            Optional ByVal msgmonospaced As Boolean = False, _
-           Optional ByVal msgminformwidth As Single = 0, _
-           Optional ByVal msgreplies As Variant = vbOKOnly) As Variant
+           Optional ByVal minformwidth As Single = 0, _
+           Optional ByVal buttons As Variant = vbOKOnly) As Variant
     
 '    Dim siHeight    As Single
 
     With fMsg
-        .Title = msgtitle
-        .SectionsText(1) = MsgSectionText
-        .SectionsMonoSpaced(1) = msgmonospaced
-        .Replies = msgreplies
+        .title = title
+        .SectionText(1) = MsgSectionText
+        .SectionMonoSpaced(1) = msgmonospaced
+        .buttons = buttons
         .Show
     End With
 
@@ -252,38 +252,35 @@ End Function
 ' UserForm fMsg and returns the clicked reply button's caption or its
 ' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
 ' ------------------------------------------------------------------
-Public Function Msg(ByVal msgtitle As String, _
-           Optional ByVal msg1label As String = vbNullString, _
-           Optional ByVal msg1text As String = vbNullString, _
-           Optional ByVal msg1monospaced As Boolean = False, _
-           Optional ByVal msg2label As String = vbNullString, _
-           Optional ByVal msg2text As String = vbNullString, _
-           Optional ByVal msg2monospaced As Boolean = False, _
-           Optional ByVal msg3label As String = vbNullString, _
-           Optional ByVal msg3text As String = vbNullString, _
-           Optional ByVal msg3monospaced As Boolean = False, _
-           Optional ByVal msgtitlefontsize As Long = 0, _
-           Optional ByVal msgminformwidth As Single = 0, _
-           Optional ByVal msgreplies As Variant = vbOKOnly) As Variant
+Public Function Msg(ByVal title As String, _
+           Optional ByVal section1label As String = vbNullString, _
+           Optional ByVal section1text As String = vbNullString, _
+           Optional ByVal section1monospaced As Boolean = False, _
+           Optional ByVal section2label As String = vbNullString, _
+           Optional ByVal section2text As String = vbNullString, _
+           Optional ByVal section2monospaced As Boolean = False, _
+           Optional ByVal section3label As String = vbNullString, _
+           Optional ByVal section3text As String = vbNullString, _
+           Optional ByVal section3monospaced As Boolean = False, _
+           Optional ByVal monospacedfontsize As Long = 0, _
+           Optional ByVal buttons As Variant = vbOKOnly) As Variant
     
-'    Dim siHeight        As Single
-
     With fMsg
-        .Title = msgtitle
+        .title = title
         
-        .SectionsLabel(1) = msg1label
-        .SectionsText(1) = msg1text
-        .SectionsMonoSpaced(1) = msg1monospaced
+        .SectionLabel(1) = section1label
+        .SectionText(1) = section1text
+        .SectionMonoSpaced(1) = section1monospaced
         
-        .SectionsLabel(2) = msg2label
-        .SectionsText(2) = msg2text
-        .SectionsMonoSpaced(2) = msg2monospaced
+        .SectionLabel(2) = section2label
+        .SectionText(2) = section2text
+        .SectionMonoSpaced(2) = section2monospaced
         
-        .SectionsLabel(3) = msg3label
-        .SectionsText(3) = msg3text
-        .SectionsMonoSpaced(3) = msg3monospaced
+        .SectionLabel(3) = section3label
+        .SectionText(3) = section3text
+        .SectionMonoSpaced(3) = section3monospaced
 
-        .Replies = msgreplies
+        .buttons = buttons
         .Show
     End With
 

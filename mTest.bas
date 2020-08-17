@@ -41,13 +41,15 @@ Dim sMsgText        As String
 Dim sMsg1Text       As String
 Dim sMsg2Text       As String
 Dim sMsg3Text       As String
-Dim vReplies        As Variant
-Dim vReply          As Variant
-Dim vReply1         As Variant
-Dim vReply2         As Variant
-Dim vReply3         As Variant
-Dim vReply4         As Variant
-Dim vReply5         As Variant
+Dim vButtons        As Variant
+Dim vButton          As Variant
+Dim vButton1         As Variant
+Dim vButton2         As Variant
+Dim vButton3         As Variant
+Dim vButton4         As Variant
+Dim vButton5         As Variant
+Dim vButton6         As Variant
+Dim vButton7         As Variant
 Dim vReplied        As Variant
 Dim siUsedPoSW      As Long     ' The test specific used % of the screen width (default to 80%)
 
@@ -89,17 +91,17 @@ End Sub
 ' The optional parameters are used in conjunction with the Regression test only
 ' -----------------------------------------------------------------------------
 Public Function WidthDeterminedByMinimumWidth( _
-                 Optional ByVal vReply1 As Variant = vbNullString, _
-                 Optional ByVal vReply3 As Variant = vbNullString) As Variant
+                 Optional ByVal vButton1 As Variant = vbNullString, _
+                 Optional ByVal vButton3 As Variant = vbNullString) As Variant
     
     Const PROC      As String = "WidthDeterminedByMinimumWidth"
-    Dim lIncrDecr   As Long
+    Dim lIncrDecrWidth   As Long
     
-    vReply2 = C_STOP
+    vButton2 = C_STOP
     lTest = 1
     
     '~~ Initial test values obtained from the Test Worksheet
-    lIncrDecr = wsMsgTest.MinFormWidthIncrDecr(lTest)
+    lIncrDecrWidth = wsMsgTest.MinFormWidthIncrDecr(lTest)
     
     
     ' Initializations for this test
@@ -109,9 +111,9 @@ Public Function WidthDeterminedByMinimumWidth( _
         .MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest)
     End With
     
-    vReply4 = "Repeat with" & vbLf & "minimum width" & vbLf & "+ " & lIncrDecr
-    vReply5 = "Repeat with" & vbLf & "minimum width" & vbLf & "- " & lIncrDecr
-    vReplies = vReply1 & "," & vReply2 & "," & vReply3 & "," & vReply4
+    vButton4 = "Repeat with" & vbLf & "minimum width" & vbLf & "+ " & lIncrDecrWidth
+    vButton5 = "Repeat with" & vbLf & "minimum width" & vbLf & "- " & lIncrDecrWidth
+    vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton4
     
 repeat:
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
@@ -122,20 +124,20 @@ repeat:
 
     WidthDeterminedByMinimumWidth = _
     mMsg.Msg( _
-             msgtitle:=sMsgTitle, _
-             msg1label:=sMsg1Label, msg1text:=sMsg1Text, _
-             msg2label:=sMsg2Label, msg2text:=sMsg2Text, _
-             msg3label:=sMsg3Label, msg3text:=sMsg3Text, _
-             msgreplies:=vReplies _
+             title:=sMsgTitle, _
+             section1label:=sMsg1Label, section1text:=sMsg1Text, _
+             section2label:=sMsg2Label, section2text:=sMsg2Text, _
+             section3label:=sMsg3Label, section3text:=sMsg3Text, _
+             buttons:=vButtons _
             )
     Select Case WidthDeterminedByMinimumWidth
-        Case vReply5
-            fMsg.MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest) - lIncrDecr
-            vReplies = vReply1 & "," & vReply2 & "," & vReply3 & "," & vReply4
+        Case vButton5
+            fMsg.MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest) - lIncrDecrWidth
+            vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton4
             GoTo repeat
-        Case vReply4
-            fMsg.MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest) + lIncrDecr
-            vReplies = vReply1 & "," & vReply2 & "," & vReply3 & "," & vReply5
+        Case vButton4
+            fMsg.MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest) + lIncrDecrWidth
+            vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton5
             GoTo repeat
         Case Else ' Stop and Next are passed on to the caller
     End Select
@@ -146,18 +148,18 @@ End Function
 ' The optional parameters are used in conjunction with the Regression test only
 ' -----------------------------------------------------------------------------
 Public Function WidthDeterminedByTitle( _
-                 Optional ByVal vReply1 As Variant = vbNullString, _
-                 Optional ByVal vReply3 As Variant = vbNullString) As Variant
+                 Optional ByVal vButton1 As Variant = vbNullString, _
+                 Optional ByVal vButton3 As Variant = vbNullString) As Variant
     
     Const PROC  As String = "WidthDeterminedByTitle"
-    Dim lIncrDecr           As Long
+    Dim lIncrDecrWidth           As Long
     
-    vReply2 = C_STOP
+    vButton2 = C_STOP
     Unload fMsg                     ' Ensures a message starts from scratch
     lTest = 2
     
     '~~ Initial test values obtained from the Test Worksheet
-    lIncrDecr = wsMsgTest.MinFormWidthIncrDecr(lTest)
+    lIncrDecrWidth = wsMsgTest.MinFormWidthIncrDecr(lTest)
     With fMsg
         .MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest)
     End With
@@ -170,18 +172,18 @@ Public Function WidthDeterminedByTitle( _
                                                         "The message form height is ajusted to the need up to the specified " & _
                                                         "maximum heigth based on the screen size which for this test is " & _
                                                         fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
-    vReplies = vReply1 & "," & vReply2 & "," & vReply3
+    vButtons = vButton1 & "," & vButton2 & "," & vButton3
     
     WidthDeterminedByTitle = _
     mMsg.Msg( _
-             msgtitle:=sMsgTitle, _
-             msg1label:=sMsg1Label, _
-             msg1text:=sMsg1Text, _
-             msg2label:=sMsg2Label, _
-             msg2text:=sMsg2Text, _
-             msg3label:=sMsg3Label, _
-             msg3text:=sMsg3Text, _
-             msgreplies:=vReplies _
+             title:=sMsgTitle, _
+             section1label:=sMsg1Label, _
+             section1text:=sMsg1Text, _
+             section2label:=sMsg2Label, _
+             section2text:=sMsg2Text, _
+             section3label:=sMsg3Label, _
+             section3text:=sMsg3Text, _
+             buttons:=vButtons _
             )
 End Function
 
@@ -189,31 +191,35 @@ End Function
 ' The optional parameters are used in conjunction with the Regression test only
 ' -----------------------------------------------------------------------------
 Public Function WidthDeterminedByMonoSpacedMessageSection( _
-                 Optional ByVal vReply1 As Variant = vbNullString, _
-                 Optional ByVal vReply3 As Variant = vbNullString) As Variant
+                 Optional ByVal vButton1 As Variant = vbNullString, _
+                 Optional ByVal vButton3 As Variant = vbNullString) As Variant
     
-    Const PROC      As String = "WidthDeterminedByMonoSpacedMessageSection"
-    Dim lIncrDecr   As Long
+    Const PROC          As String = "WidthDeterminedByMonoSpacedMessageSection"
+    Dim lIncrDecrHeight As Long
+    Dim lIncrDecrWidth  As Long
     
     lTest = 3
-    vReply2 = C_STOP
+    vButton2 = C_STOP
 
     '~~ Initial test values obtained from the Test Worksheet
-    lIncrDecr = wsMsgTest.MaxFormWidthIncrDecr(lTest)
+    lIncrDecrWidth = wsMsgTest.MaxFormWidthIncrDecr(lTest)
+    lIncrDecrHeight = wsMsgTest.MaxFormHeightIncrDecr(lTest)
     
     ' Initializations for this test
     fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest)
     
-    vReply4 = "Repeat with" & vbLf & "maximum width" & vbLf & "+ " & lIncrDecr
-    vReply5 = "Repeat with" & vbLf & "maximum width" & vbLf & "- " & lIncrDecr
-    vReplies = vReply1 & "," & vReply2 & "," & vReply3 & "," & vReply5
+    vButton4 = "Repeat with" & vbLf & "maximum width" & vbLf & "+ " & lIncrDecrWidth
+    vButton5 = "Repeat with" & vbLf & "maximum width" & vbLf & "- " & lIncrDecrWidth
+    vButton6 = "Repeat with" & vbLf & "maximum height" & vbLf & "+ " & lIncrDecrHeight
+    vButton7 = "Repeat with" & vbLf & "maximum height" & vbLf & "- " & lIncrDecrHeight
+    vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton5
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
     sMsg1Label = "Test description:":           sMsg1Text = wsMsgTest.TestDescription(lTest)
     sMsg2Label = "Expected test result:":       sMsg2Text = "Initally, the message form width is adjusted to the longest line in the " & _
                                                             "monospaced message section and all other message sections are adjusted " & _
                                                             "to this (enlarged) width." & vbLf & _
-                                                            "When the maximum form width is reduced by " & lIncrDecr & " % the monospaced message section is displayed with a horizontal scroll bar."
+                                                            "When the maximum form width is reduced by " & lIncrDecrWidth & " % the monospaced message section is displayed with a horizontal scroll bar."
     sMsg3Label = "Please note the following:":  sMsg3Text = "- In contrast to the message sections above, this section uses the ""monospaced"" option which ensures" & vbLf & _
                                                             "  the message text is not ""wrapped around""." & vbLf & _
                                                             "- The message form height is ajusted to the need up to the specified maximum heigth" & vbLf & _
@@ -226,24 +232,24 @@ repeat:
     End With
     WidthDeterminedByMonoSpacedMessageSection = _
     mMsg.Msg( _
-             msgtitle:=sMsgTitle, _
-             msg1label:=sMsg1Label, _
-             msg1text:=sMsg1Text, _
-             msg2label:=sMsg2Label, _
-             msg2text:=sMsg2Text, _
-             msg3label:=sMsg3Label, _
-             msg3text:=sMsg3Text, _
-             msg3monospaced:=True, _
-             msgreplies:=vReplies _
+             title:=sMsgTitle, _
+             section1label:=sMsg1Label, _
+             section1text:=sMsg1Text, _
+             section2label:=sMsg2Label, _
+             section2text:=sMsg2Text, _
+             section3label:=sMsg3Label, _
+             section3text:=sMsg3Text, _
+             section3monospaced:=True, _
+             buttons:=vButtons _
             )
     Select Case WidthDeterminedByMonoSpacedMessageSection
-        Case vReply5
-            fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest) - lIncrDecr
-            vReplies = vReply1 & "," & vReply2 & "," & vReply3 & "," & vReply4
+        Case vButton5
+            fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest) - lIncrDecrWidth
+            vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton4
             GoTo repeat
-        Case vReply4
-            fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest) + lIncrDecr
-            vReplies = vReply1 & "," & vReply2 & "," & vReply3 & "," & vReply5
+        Case vButton4
+            fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest) + lIncrDecrWidth
+            vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton5
             GoTo repeat
         Case Else ' Stop and Next are passed on to the caller
     End Select
@@ -254,13 +260,13 @@ End Function
 ' The optional parameters are used in conjunction with the Regression test only
 ' -----------------------------------------------------------------------------
 Public Function WidthDeterminedByReplyButtons( _
-                 Optional ByVal vReply1 As Variant = vbNullString, _
-                 Optional ByVal vReply3 As Variant = vbNullString) As Variant
+                 Optional ByVal vButton1 As Variant = vbNullString, _
+                 Optional ByVal vButton3 As Variant = vbNullString) As Variant
     
     Const PROC  As String = "WidthDeterminedByReplyButtons1"
     Unload fMsg                     ' Ensures a message starts from scratch
     lTest = 4
-    vReply2 = C_STOP
+    vButton2 = C_STOP
     
     ' Initializations for this test
     With fMsg
@@ -275,46 +281,46 @@ Public Function WidthDeterminedByReplyButtons( _
     sMsg3Label = "Please also note:"
     sMsg3Text = "The message form height is adjusted to the required height limited only by the specified maximum heigth " & _
                 "which is a percentage of the screen size (for this test = " & fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
-    vReply4 = "Repeat with" & vbLf & "5 buttons"
-    vReply5 = "Repeat with" & vbLf & "4 buttons"
+    vButton4 = "Repeat with" & vbLf & "5 buttons"
+    vButton5 = "Repeat with" & vbLf & "4 buttons"
     
-    If vReply1 = vbNullString And vReply3 = vbNullString Then
+    If vButton1 = vbNullString And vButton3 = vbNullString Then
         '~~ Test is performed "standalone"
-        vReplies = "Dummy," & vReply2 & ",Dummy," & vReply4
+        vButtons = "Dummy," & vButton2 & ",Dummy," & vButton4
     Else
-        vReplies = vReply1 & "," & vReply2 & "," & vReply3 & "," & vReply4
+        vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton4
     End If
     
 repeat:
     WidthDeterminedByReplyButtons = _
     mMsg.Msg( _
-             msgtitle:=sMsgTitle, _
-             msg1label:=sMsg1Label, _
-             msg1text:=sMsg1Text, _
-             msg2label:=sMsg2Label, _
-             msg2text:=sMsg2Text, _
-             msg3label:=sMsg3Label, _
-             msg3text:=sMsg3Text, _
-             msgreplies:=vReplies _
+             title:=sMsgTitle, _
+             section1label:=sMsg1Label, _
+             section1text:=sMsg1Text, _
+             section2label:=sMsg2Label, _
+             section2text:=sMsg2Text, _
+             section3label:=sMsg3Label, _
+             section3text:=sMsg3Text, _
+             buttons:=vButtons _
             )
     
     Select Case WidthDeterminedByReplyButtons
-        Case vReply4
-            If vReply1 = vbNullString And vReply3 = vbNullString Then
+        Case vButton4
+            If vButton1 = vbNullString And vButton3 = vbNullString Then
                 '~~ Test is performed "standalone"
-                vReplies = "Dummy," & vReply2 & ",Dummy,Dummy," & vReply5
+                vButtons = "Dummy," & vButton2 & ",Dummy,Dummy," & vButton5
             Else
                 '~~ Test is performed within Regression
-                vReplies = vReply1 & "," & vReply2 & "," & vReply3 & "," & vReply5
+                vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton5
             End If
             GoTo repeat
-        Case vReply5
-            If vReply1 = vbNullString And vReply3 = vbNullString Then
+        Case vButton5
+            If vButton1 = vbNullString And vButton3 = vbNullString Then
                 '~~ Test is performed "standalone"
-                vReplies = "Dummy," & vReply2 & ",Dummy," & vReply4
+                vButtons = "Dummy," & vButton2 & ",Dummy," & vButton4
             Else
                 '~~ Test is performed within Regression
-                vReplies = vReply1 & "," & vReply2 & "," & vReply3 & ",Dummy," & vReply4
+                vButtons = vButton1 & "," & vButton2 & "," & vButton3 & ",Dummy," & vButton4
             End If
             GoTo repeat
         Case Else ' passed on to caller
@@ -326,13 +332,13 @@ End Function
 ' The optional parameters are used in conjunction with the Regression test only
 ' -----------------------------------------------------------------------------
 Public Function MonoSpacedSectionWidthExceedsMaxFormWidth( _
-                 Optional ByVal vReply1 As Variant = vbNullString, _
-                 Optional ByVal vReply3 As Variant = vbNullString) As Variant
+                 Optional ByVal vButton1 As Variant = vbNullString, _
+                 Optional ByVal vButton3 As Variant = vbNullString) As Variant
 
     Const PROC  As String = "MonoSpacedSectionWidthExceedsMaxFormWidth"
     Unload fMsg                     ' Ensures a message starts from scratch
     lTest = 5
-    vReply2 = C_STOP
+    vButton2 = C_STOP
     
     ' Initializations for this test
     With fMsg
@@ -350,19 +356,19 @@ Public Function MonoSpacedSectionWidthExceedsMaxFormWidth( _
                 "  the equivalent of " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size." & vbLf & _
                 "- The message form height is adjusted to the required height, limited to " & fMsg.MaxFormHeight & " pt," & vbLf & _
                 "  the equivalent of " & fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen size, for this test and not reached or exceeded."
-    vReplies = vReply1 & "," & vReply2 & "," & vReply3
+    vButtons = vButton1 & "," & vButton2 & "," & vButton3
     
     MonoSpacedSectionWidthExceedsMaxFormWidth = _
     mMsg.Msg( _
-             msgtitle:=sMsgTitle, _
-             msg1label:=sMsg1Label, _
-             msg1text:=sMsg1Text, _
-             msg2label:=sMsg2Label, _
-             msg2text:=sMsg2Text, _
-             msg3label:=sMsg3Label, _
-             msg3text:=sMsg3Text, _
-             msg3monospaced:=True, _
-             msgreplies:=vReplies _
+             title:=sMsgTitle, _
+             section1label:=sMsg1Label, _
+             section1text:=sMsg1Text, _
+             section2label:=sMsg2Label, _
+             section2text:=sMsg2Text, _
+             section3label:=sMsg3Label, _
+             section3text:=sMsg3Text, _
+             section3monospaced:=True, _
+             buttons:=vButtons _
             )
 End Function
 
@@ -389,19 +395,19 @@ Public Function MonoSpacedMessageSectionExceedMaxFormHeight() As Variant
     sMsg3Label = "Please note the following:"
     sMsg3Text = "The message form height is adjusted to the required height limited by the specified percentage of the screen height, " & _
                 "which for this test is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
-    vReplies = vReply1 & "," & vReply2 & "," & vReply3
+    vButtons = vButton1 & "," & vButton2 & "," & vButton3
     
     MonoSpacedMessageSectionExceedMaxFormHeight = _
     mMsg.Msg( _
-             msgtitle:=sMsgTitle, _
-             msg1label:=sMsg1Label, _
-             msg1text:=sMsg1Text, _
-             msg2label:=sMsg2Label, _
-             msg2text:=sMsg2Text, _
-             msg2monospaced:=True, _
-             msg3label:=sMsg3Label, _
-             msg3text:=sMsg3Text, _
-             msgreplies:=vReplies _
+             title:=sMsgTitle, _
+             section1label:=sMsg1Label, _
+             section1text:=sMsg1Text, _
+             section2label:=sMsg2Label, _
+             section2text:=sMsg2Text, _
+             section2monospaced:=True, _
+             section3label:=sMsg3Label, _
+             section3text:=sMsg3Text, _
+             buttons:=vButtons _
             )
 End Function
 
