@@ -1,6 +1,9 @@
 # MsgBox Alternative
 
-Displays a message in a dialog box, waits for the user to click a button, and returns a variant indicating which button the user clicked. This MsgBox alternative comes in three flavors
+Displays a message in a dialog box, waits for the user to click a button, and returns a variant indicating which button the user clicked.
+
+## Interfaces
+All interfaces use the UserForm _fMsg_ (_Message Form_) which may be used to create any application specific message interfaces.
 
 | Function | Description |
 | -------- | ----------- |
@@ -21,18 +24,13 @@ The MsgBox function syntax has these named arguments:
 
 ## Installation
 
-Download: fMsg.frm, fmsg.frx, mMsg.bas
-Import into your project: fMsf.frm and mMsg.bas (fmsg.frx is automatically imported together with fmsg.frm)
+- Download
+  - fMsg.frm
+  - fmsg.frx
+  - mMsg.bas
+- Import
+  - fMsf.frm
+  - mMsg.bas
 
-Note: For the following examples the above files are imported into the Workbook Msg.xlsm in which also all testing is prepared.
 
 
-
-## Usage examples
-| Example | Syntax | Displayed message |
-| ------- | ------ | ----------------- |
-| Simple message | `mMsg.msg1 _ msgtitle:="any", _ msgtext:="any"` | |
-| Elaborated user decision dialog | | |
-| Elaborated error message | | |
-
-See the wiki for further details
