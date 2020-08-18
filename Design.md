@@ -1,6 +1,10 @@
 ## Design of the Message/UserForm
 
-The design of the _Message Form_ allows 3 message sections and 7 _Reply Buttons_. The _Reply Buttons_ may all be ordered in _Replies Row 1_ or all 7 underneath, each in one of the 7 rows - or any kind of meaningful order in between.
+### General
+
+The design of the _Message Form_ allows 3 message sections and 7 reply _Buttons_. The reply _Buttons_ may all be ordered in _Replies Row_ 1 or 1 in each of the 7 rows, and any other desired approach between these two.
+
+### Organization/Design of the controls
 
 The message form is organized in a hierarchy of frames as follows.
 
@@ -58,14 +62,4 @@ The message form is organized in a hierarchy of frames as follows.
     | +----------------------------------------+ |
     +--------------------------------------------+
  
-The controls (frames, text boxes, and command buttons) are collected with the message form's initialization and used throughout the [Implementation](#implementation.md). I.e. the whole approach is merely design driven.
-
-The design allows the following orders og the _Reply Buttons_:
-
-| Scheme |      |
-| - | - |
-| 1 2 3 4 5 6 7 | 1 - 7 in one row |
-| 1 2 3 4<br> &nbsp; 5 6 7 | All in two rows|
-| 1 2 3<br>4 5 6<br>&nbsp;&nbsp;&nbsp;7 | All in 3 rows|
-| 1 2<br>3 4<br>5 6<br>&nbsp;7 | All in 4 rows |
-| 1<br>2<br>3<br>4<br>5<br>6<br>7 | 1 - 7 underneath |
+The [Implementation](#Implementation.md) is merely design driven and avoids using any control's name. This is achieved by collection of the controls (frames, text boxes, and command buttons) by the design rather than by controls name. As a consequence, additional message sections and additional reply buttons are primarily a matter of design change.
