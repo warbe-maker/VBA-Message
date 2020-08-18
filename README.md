@@ -1,6 +1,7 @@
 # MsgBox Alternative
 
 Displays a message in a dialog box, waits for the user to click a button, and returns a variant indicating which button the user clicked.
+See also [Why another Msg box?](#why-another-msgbox.md)
 
 ## Interfaces
 All interfaces use the UserForm _fMsg_ (_Message Form_) which may be used to create any application specific message interfaces.
@@ -31,6 +32,5 @@ The MsgBox function syntax has these named arguments:
 - Import
   - fMsf.frm
   - mMsg.bas
-
 
 
