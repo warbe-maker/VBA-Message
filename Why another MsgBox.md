@@ -1,4 +1,4 @@
-# Why another MsgBox?
+## Why another MsgBox?
 
 The shortest and possibly already convincing answer may be the [Examples,  Demonstrations](#examples-demonstrations).
 
@@ -11,7 +11,7 @@ This was the birth of three message sections, each with an optional label.
 Another feel for the need occurred when I tried to implement a more complex "decision message" with more choices than just Yes, No, Cancel, etc.. 
 This was the birth of the idea to have reply buttons not only fully compatible with the MsgBox but some more and all with any meaningful caption text of any length (to replace a lengthy message above explaining when to click which button.
 
-### Comparison of the MsgBox with this alternative
+### Comparison
 
 | The VB MsgBox | The Alternative "_Message Form_" |
 | ------ | ---- |
