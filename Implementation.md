@@ -1,7 +1,7 @@
 # Implementation
 ## General
-- The implementation of the _Message Form_ (the UserForm _fMsg) is mostly design driven. I.e. the number of available _Message Sections_, the number of _Reply Rows_, and the number of _Reply Buttons_ is primarily a matter of the design and requires only moderate code change.
-- The implementation relies on the hierarchical order of the frames (see below). The control's object name is used only where unavoidable as is for the click events of the _Reply Buttons_.
+- The implementation of the _Message Form_ (the UserForm _fMsg) is mostly design driven. I.e. the number of available _Message Sections_, the number of _Reply Rows_, and the number of reply _Buttons_ in _Buttons Rows_ is primarily a matter of the design and requires only moderate code change.
+As a consequence the implementation relies on the order of the frames and controls therein. Controls object names  are used only where unavoidable as is for the click events of the reply _Buttons_ (at least I havenˋt found a way to avoid this).
 ```vbscipt
 Private Sub cmbReply11_Click():  ReplyClicked 1, 1:   End Sub
 Private Sub cmbReply12_Click():  ReplyClicked 1, 2:   End Sub
@@ -24,7 +24,7 @@ Private Sub cmbReply61_Click():  ReplyClicked 6, 1:   End Sub
 Private Sub cmbReply71_Click():  ReplyClicked 7, 1:   End Sub
 ```
 
-- In order to keep the number of to-be-installed modules at minimum the implementation intentionally refraines from Class Modules. Type declarations may have been used instead however but aren't.
+- In order to keep the number of to-be-installed modules at minimum the implementation is without Class Modules by intention. Possibly Type declarations may have been an laternative for a more elegant implementation but aren't used.
 
 - The controls (frames, text boxes, and command buttons) are collected at the _Message Form's_ initialization and these collections are used throughout the implementation.
 
