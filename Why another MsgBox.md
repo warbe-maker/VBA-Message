@@ -26,14 +26,12 @@ This was the birth of the idea to have reply buttons not only fully compatible w
 
 
 ### Examples, Demonstrations
-The examples below not only illustrate the major enhancements but also the 3 implemented functions in the module _mMsg_ which do use the UserForm _fMsg_: _Box_, _Msg_, _ErrMsg_
-
 #### Simple message
 Mainly for the compatibility with MsgBox it is displayed with
 ```vbscript
-mMsg.Box title:=..., prompt:=...,buttons:=vbYesNo
+mMsg.Box title:=..., prompt:=...,buttons:=vbOkOnly
 ```
-or alternatively
+or alternatively when the clicked reply matters:
 ```vbscript
 Select Case mMsg.Box(title:=..., prompt:=...,buttons:=vbYesNo)
    Case vbYes
@@ -60,3 +58,11 @@ image
 #### Common decision message
 
 image
+
+### Summary
+The above examples not only illustrate the benefit of the _Alternative MsgBox_ but also demonstrate the use of the 3 functions in the module _mMsg_ which are the interface to the UserForm (_fMsg_):
+- _Box_
+- _Msg_
+- _ErrMsg_
+
+Considering the public properties in the [Implementation, Public Properties](<Implementation.md>) of the UserForm and the mechanism to receive the return value of the clicked reply button some can go ahead without the installation of the _mMsg_ module and implement his/her own application specific message function using those already implemented as examples only.
