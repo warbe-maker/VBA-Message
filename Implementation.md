@@ -144,7 +144,7 @@ Note: This top re-positioning may be done just once when all elements had initia
 | MIN_WIDTH_REPLY_BUTTON | Minimum width of a _Reply Button_ |
 
 
-## Public _Message Form_ Properties
+## Public Properties
 ### Common
 | Property | R/W | Meaning |
 | -------- | --- | ------- |
