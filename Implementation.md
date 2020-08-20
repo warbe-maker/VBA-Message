@@ -145,20 +145,22 @@ Note: This top re-positioning may be done just once when all elements had initia
 
 
 ## Common Public Properties
-| Property | R/W | Meaning |
+| Property | R/W | Meaning, Usage | Comment |
+| ---------- | --- | ------- | ----- |
+| Title      | W |         |
+| Label      | W | `fMsg.Label(section) = "...."` | section = 1,2,or 3 |
+| Text       | W | `fMsg.Text(section) = "...."` | section = 1,2,or 3)  |
+| MonoSpaced | W | `fMsg.MonoSpaced(section) = True` | section = 1,2,3<br>defaults to False when not provided for a section |        |
+| Buttons    | W |         | |
+
+
+## Public Size Properties
+ 
+| Property | R/W | Default |
 | -------- | --- | ------- |
-| MaxFormHeight | R |         |
-| MaxFormHeightPrcntgOfScreenSize | R/W |         |
-| MaxFormWidth  |     |         |
-| MaxFormWidthPrcntgOfScreenSize  | R/W |         |
-| MinFormWidthPrcntgOfScreenSize  |     |         |
-| MinimumFormWidth                |     |         |
-| Replies         |     |         |
-| SectionsLabel   |     |         |
-| SectionsMonoSpaced         |     |         |
-| SectionsText         |     |         |
-| Title         |     |         |
-| ErrSrc         |     |         |
+| MaxFormHeightPrcntgOfScreenSize | R/W |  90 % |
+| MaxFormWidthPrcntgOfScreenSize  | R/W |  80 % |
+| MinimumFormWidth                |     |  300 pt | 
 
 ## Public Properties for test only
 | Property | R/W | Meaning |

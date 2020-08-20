@@ -65,4 +65,4 @@ The above examples not only illustrate the benefit of the _Alternative MsgBox_ b
 - _Msg_
 - _ErrMsg_
 
-Considering the public properties in the [Implementation, Public Properties](<Implementation.md>) of the UserForm and the mechanism to receive the return value of the clicked reply button some can go ahead without the installation of the _mMsg_ module and implement his/her own application specific message function using those already implemented as examples only.
+Considering the [Common Public Properties](<Implementation.md#common-public-properties>) of the UserForm and the mechanism to receive the return value of the clicked reply button some can go ahead without the installation of the _mMsg_ module and implement his/her own application specific message function using those already implemented as examples only.
