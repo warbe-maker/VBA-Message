@@ -144,8 +144,7 @@ Note: This top re-positioning may be done just once when all elements had initia
 | MIN_WIDTH_REPLY_BUTTON | Minimum width of a _Reply Button_ |
 
 
-## Public Properties
-### Common
+## Common Public Properties
 | Property | R/W | Meaning |
 | -------- | --- | ------- |
 | MaxFormHeight | R |         |
@@ -161,7 +160,7 @@ Note: This top re-positioning may be done just once when all elements had initia
 | Title         |     |         |
 | ErrSrc         |     |         |
 
-### Public Properties for test only
+## Public Properties for test only
 | Property | R/W | Meaning |
 | -------- | --- | ------- |
 | FramesWithCaption | W | Defaults to False. Frames are displayed with their "test" caption |
