@@ -1,7 +1,9 @@
 # MsgBox Alternative
 
 Displays a message in a dialog box, waits for the user to click a button, and returns a variant indicating which button the user clicked.
-See also [Why another Msg box?](#Why%20another%20MsgBox.md)
+When the "Why" is not or no longer a question [Skip the section](#interfaces)
+
+{{Why%20another%20MsgBox.md}}
 
 ## Interfaces
 All interfaces use the UserForm _fMsg_ (_Message Form_) which may be used to create any application specific message interfaces.
