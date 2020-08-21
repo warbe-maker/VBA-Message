@@ -4,27 +4,60 @@ Displays a message in a dialog box, waits for the user to click a button, and re
 Not sure whether it is worth it? See [Why another MsgBox](<Why%20another%20MsgBox.md>)
 
 ## Interfaces
-Below are the 3 functions/interfaces using the UserForm _fMsg_:
+The alternative comes with 3 functions (interfaces) which use the  UserForm _fMsg_ for the message display and do receive the return value of the clicked reply _button_.
 
-| Function | Description |
-| -------- | ----------- |
-| _Box_ | Pretty MsgBox alike, displays a single message with any number of line breaks, with up to 7 reply _buttons_ ordered in up to 7 rows. |
-| _Msg_ | Displays<br>up to 3 message sections, each with an optional label and optionally monospaced<br>up to 7 buttons in up to 7 rows |
-| _ErrMsg_ | Makes use of the advantages of **msg** in displaying a well designed error message. |
+### _Msg_
+#### Syntax
+```
+ - msg(title _<br>[[, label1][, text1][, monospaced1]]
+ _
+[[, label2][, text2][, monospaced2]] _
+[[, label3][, text3][, monospaced3]] _
+[,buttons])
+```
+#### Description
 
 
-## Syntax
-`msg(title, label1, text1, monospaced 1 label2, text2, monosoaced2, label3, text3, monospaced3 [,buttons])`
+### _Box_
+#### Syntax
 
-The MsgBox function syntax has these named arguments:
+```
+Box(title, prompt[,buttons])
+```
+#### Description
+Pretty MsgBox alike, displays a single message with any number of line breaks, with up to 7 reply _buttons_ ordered in up to 7 rows.
 
-| Named argument | Description |
-| ---- | ----------- |
-| title | Required  String |
-| label1 | Optional. String expression displayed as label above text1 |
-| text1 | Optional.  String expression displayed as message section in the dialog box. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. consists of more than one line, you can separate the lines by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line. |
-| buttons | Optional.  Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 5 reply buttons. If omitted, the default value for buttons is 0 (vbOkOnly). |
-| title | Optional. String expression displayed in the title bar of the dialog box. When omitted, the application name is placed in the title bar. |
+
+### _Msg_
+#### Syntax
+```
+Msg(title _
+[[, label1][, text1][, monospaced1]] _
+[[, label2][, text2][, monospaced2]] _
+[[, label3][, text3][, monospaced3]] _
+[,buttons])
+```
+#### Description
+Displays up to 3 message sections, each with an optional label and optionally monospaced and up to 7 buttons in up to 7 rows.
+
+### _ErrMsg_
+#### Syntax
+```
+ErrMsg(errornumber _
+, errordescription[,errorpath[,errorline]
+```
+#### Description
+Uses the UserForm _fMsg_ to display a well designed error message.
+
+### Named arguments
+
+| Part | Function | Description |
+| ---- | ----------- | --- |
+| title | Box<br>Msg | Optional. String expression displayed in the title bar of the dialog box. When omitted, the application name is placed in the title bar. |
+| label1<br>label2<br>label3 | Msg | Optional. String expression displayed as label above the corresponding text_ |
+| text1<br>text2<br>text3 | Msg | Optional.  String expression displayed as message section. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. consists of more than one line, you can separate the lines by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line. |
+| monospaced1<br>monospaced2<br>monospaced3 | Msg | Optional. Defaults to False. When True,  the corresponding text_ is displayed with a mono-spaced font |
+| buttons | Box<br>Msg | Optional.  Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 5 reply buttons. If omitted, the default value for buttons is 0 (vbOkOnly). |
 
 ## Installation
 
@@ -42,36 +75,44 @@ The MsgBox function syntax has these named arguments:
 
 Mainly for the compatibility with MsgBox it is displayed with
 
-mMsg.Box title:=..., prompt:=...,buttons:=vbOkOnly
+```mMsg.Box title:=..., prompt:=...,buttons:=vbOkOnly
+```
 or alternatively when the clicked reply matters:
 
-Select Case mMsg.Box(title:=..., prompt:=...,buttons:=vbYesNo)
+```
+Select Case mMsg.Box(title:=..., prompt:=...,buttons:=...)
    Case vbYes
    Case vbNo
 End Select
-Disregarding the buttons which is much more flexible all the rest behaves exactly like the VB MsgBox.
+```
+Disregarding the buttons argument - which is much more flexible - the arguments are identical with those of the VB MsgBox.
 
 image
 
-Error message
+### Error message
 The error message below (my standard one) is displayed with
 
+```
 mMsg.ErrMsg errtitle:=..., errnumber:=.., errdescription:=..., errline:=.., errpath:="....", errinfo:="..."
-and makes use of:
+```
+and makes use of all 3 _Message Sections_ each with a _Message Section Label_,
+a _Monospaced_ font is used for the  _errorsource_ to be displayed properly indented.
 
-Three Message Sections each with a Message Section Label
-A Monospaced font option for the errsource which displays a proper indented "path to the error"
 image
 
-Common decision message
+### Common decision message
+
+```
+Select Case mMsg.Box(title:=..., prompt:=...,buttons:=...)
+   Case ...
+   Case ...
+End Select
+```
 
 image
 
 
 ### Summary
-The examples above illustrate the use of the 3 functions in the module _mMsg_ which are in fact just interfaces to the UserForm (_fMsg_):
-- _Box_
-- _Msg_
-- _ErrMsg_
+The examples above illustrate the use of the 3 functions (interfaces) in the module _mMsg_ using the UserForm _fMsg_: _Box_, _Msg_, _ErrMsg_
 
 Considering the [Common Public Properties](<Implementation.md#common-public-properties>) of the UserForm and the mechanism to receive the return value of the clicked reply button some can go ahead without the installation of the _mMsg_ module and implement his/her own application specific message function using those already implemented as examples only.
