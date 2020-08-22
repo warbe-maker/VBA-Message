@@ -1,6 +1,12 @@
 ## Design of the Message/UserForm
 
-The design of the _Message Form_ allows 3 message sections and 7 _Reply Buttons_. The _Reply Buttons_ may all be ordered in _Replies Row 1_ or all 7 underneath, each in one of the 7 rows - or any kind of meaningful order in between.
+### General
+
+The design of the _Message Form_ consists of
+- 3 message sections, no matter which one is used
+- 7 rows each with 7 reply _Buttons_ allowing any display from all in one to one in each row.
+
+### Design of the controls
 
 The message form is organized in a hierarchy of frames as follows.
 
@@ -34,38 +40,19 @@ The message form is organized in a hierarchy of frames as follows.
     | | Reply Row 1 Button 6 (CommandButtons)  | |
     | | Reply Row 1 Button 7 (CommandButtons)  | |
     | +----------------------------------------+ |
-    | +-- Replies Row 2 (Frame) ---------------+ |
-    | | Reply Row 2 Button 1 (CommandButtons)  | |
-    | | Reply Row 2 Button 2 (CommandButtons)  | |
-    | | Reply Row 2 Button 3 (CommandButtons)  | |
-    | +----------------------------------------+ |
-    | +-- Replies Row 3 (Frame) ---------------+ |
-    | | Reply Row 3 Button 1 (CommandButtons)  | |
-    | | Reply Row 3 Button 2 (CommandButtons)  | |
-    | | Reply Row 3 Button 3 (CommandButtons)  | |
-    | +----------------------------------------+ |
-    | +-- Replies Row 4 (Frame) ---------------+ |
-    | | Reply Row 4 Button 1 (CommandButtons)  | |
-    | +----------------------------------------+ |
-    | +-- Replies Row 5 (Frame) ---------------+ |
-    | | Reply Row 5 Button 1 (CommandButtons)  | |
-    | +----------------------------------------+ |
-    | +-- Replies Row 6 (Frame) ---------------+ |
-    | | Reply Row 6 Button 1 (CommandButtons)  | |
+    |                      .                     |
+    |                      .                     |
+    |                      .                     |
     | +----------------------------------------+ |
     | +-- Replies Row 7 (Frame) ---------------+ |
     | | Reply Row 7 Button 1 (CommandButtons)  | |
+    | | Reply Row 3 Button 2 (CommandButtons)  | |
+    | | Reply Row 3 Button 3 (CommandButtons)  | |
+    | | Reply Row 1 Button 4 (CommandButtons)  | |
+    | | Reply Row 1 Button 5 (CommandButtons)  | |
+    | | Reply Row 1 Button 6 (CommandButtons)  | |
+    | | Reply Row 1 Button 7 (CommandButtons)  | |
     | +----------------------------------------+ |
     +--------------------------------------------+
  
-The controls (frames, text boxes, and command buttons) are collected with the message form's initialization and used throughout the [Implementation](#implementation.md). I.e. the whole approach is merely design driven.
-
-The design allows the following orders og the _Reply Buttons_:
-
-| Scheme |      |
-| - | - |
-| 1 2 3 4 5 6 7 | 1 - 7 in one row |
-| 1 2 3 4<br> &nbsp; 5 6 7 | All in two rows|
-| 1 2 3<br>4 5 6<br>&nbsp;&nbsp;&nbsp;7 | All in 3 rows|
-| 1 2<br>3 4<br>5 6<br>&nbsp;7 | All in 4 rows |
-| 1<br>2<br>3<br>4<br>5<br>6<br>7 | 1 - 7 underneath |
+The [Implementation](#Implementation.md) is merely design driven. Not using control's name is achieved by storing  all controls (frames, text boxes, and command buttons) in collections by relying on the design rather than on control names. As a consequence, additional message sections and additional reply buttons are primarily a matter of a design change and require a minimum code change.

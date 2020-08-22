@@ -1,7 +1,7 @@
 # Implementation
 ## General
-- The implementation of the _Message Form_ (the UserForm _fMsg) is mostly design driven. I.e. the number of available _Message Sections_, the number of _Reply Rows_, and the number of _Reply Buttons_ is primarily a matter of the design and requires only moderate code change.
-- The implementation relies on the hierarchical order of the frames (see below). The control's object name is used only where unavoidable as is for the click events of the _Reply Buttons_.
+- The implementation of the _Message Form_ (the UserForm _fMsg) is mostly design driven. I.e. the number of available _Message Sections_, the number of _Reply Rows_, and the number of reply _Buttons_ in _Buttons Rows_ is primarily a matter of the design and requires only moderate code change.
+As a consequence the implementation relies on the order of the frames and controls therein. Controls object names  are used only where unavoidable as is for the click events of the reply _Buttons_ (at least I havenˋt found a way to avoid this).
 ```vbscipt
 Private Sub cmbReply11_Click():  ReplyClicked 1, 1:   End Sub
 Private Sub cmbReply12_Click():  ReplyClicked 1, 2:   End Sub
@@ -24,7 +24,7 @@ Private Sub cmbReply61_Click():  ReplyClicked 6, 1:   End Sub
 Private Sub cmbReply71_Click():  ReplyClicked 7, 1:   End Sub
 ```
 
-- In order to keep the number of to-be-installed modules at minimum the implementation intentionally refraines from Class Modules. Type declarations may have been used instead however but aren't.
+- In order to keep the number of to-be-installed modules at minimum the implementation is without Class Modules by intention. Possibly Type declarations may have been an laternative for a more elegant implementation but aren't used.
 
 - The controls (frames, text boxes, and command buttons) are collected at the _Message Form's_ initialization and these collections are used throughout the implementation.
 
@@ -144,24 +144,25 @@ Note: This top re-positioning may be done just once when all elements had initia
 | MIN_WIDTH_REPLY_BUTTON | Minimum width of a _Reply Button_ |
 
 
-## Public _Message Form_ Properties
-### Common
-| Property | R/W | Meaning |
-| -------- | --- | ------- |
-| MaxFormHeight | R |         |
-| MaxFormHeightPrcntgOfScreenSize | R/W |         |
-| MaxFormWidth  |     |         |
-| MaxFormWidthPrcntgOfScreenSize  | R/W |         |
-| MinFormWidthPrcntgOfScreenSize  |     |         |
-| MinimumFormWidth                |     |         |
-| Replies         |     |         |
-| SectionsLabel   |     |         |
-| SectionsMonoSpaced         |     |         |
-| SectionsText         |     |         |
-| Title         |     |         |
-| ErrSrc         |     |         |
+## Common Public Properties
+| Property | R/W | Meaning, Usage | Comment |
+| ---------- | --- | ------- | ----- |
+| Title      | W |         |
+| Label      | W | `fMsg.Label(section) = "...."` | section = 1,2,or 3 |
+| Text       | W | `fMsg.Text(section) = "...."` | section = 1,2,or 3)  |
+| MonoSpaced | W | `fMsg.MonoSpaced(section) = True` | section = 1,2,3<br>defaults to False when not provided for a section |        |
+| Buttons    | W |         | |
 
-### Public Properties for test only
+
+## Public Size Properties
+ 
+| Property | R/W | Default |
+| -------- | --- | ------- |
+| MaxFormHeightPrcntgOfScreenSize | R/W |  90 % |
+| MaxFormWidthPrcntgOfScreenSize  | R/W |  80 % |
+| MinimumFormWidth                |     |  300 pt | 
+
+## Public Properties for test only
 | Property | R/W | Meaning |
 | -------- | --- | ------- |
 | FramesWithCaption | W | Defaults to False. Frames are displayed with their "test" caption |
