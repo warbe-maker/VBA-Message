@@ -109,12 +109,13 @@ Dim dctApplButtons              As New Dictionary   ' Dictionary of the total nu
 Dim cllApplRowButtons           As Collection       ' Collection of the applied buttons of a certain row
 Dim cllApplButtonsValue         As New Collection   ' Collection of the applied/setup buttons reply value
 Dim bWithFrames                 As Boolean          ' for test purpose only, defaults to False
-Dim dctSectionsLabel            As New Dictionary   ' User provided through Property SectionLabel
-Dim dctSectionsText             As New Dictionary   ' User provided through Property SectionText
-Dim dctSectionsMonoSpaced       As New Dictionary   ' User provided through Property Sections
+Dim dctSectionsLabel            As New Dictionary   ' User provided Section Labels text through Property SectionLabel
+Dim dctSectionsText             As New Dictionary   ' User provided Section texts through Property SectionText
+Dim dctSectionsMonoSpaced       As New Dictionary   ' User provided Section Monospaced option through Property SectionMonospaced
 Dim siButtonsWidth              As Single
 Dim siButtonsHeight             As Single
 Dim sNextRow                    As String
+Dim dctSections                 As New Dictionary
 
 Private Sub UserForm_Initialize()
     
@@ -239,32 +240,68 @@ Private Property Get DsgnButtonRows() As Collection:                            
 Private Property Let DsgnButtons(ByVal cll As Collection):                              cllDsgnButtons.Add cll:                                        End Property
 Private Property Get DsgnRowsSetup() As Long:                                           DsgnRowsSetup = cllApplButtonsValue.Count:                    End Property
 
-Public Property Get SectionLabel(Optional ByVal section As Long) As String
-    If dctSectionsLabel.Exists(section) _
-    Then SectionLabel = dctSectionsLabel(section) _
-    Else SectionLabel = vbNullString
+' Message section properties:
+' Message Section Label
+Public Property Let SectionLabel(Optional ByVal section As Long, ByVal s As String)
+    
+    With dctSectionsLabel
+        If .Exists(section) Then .Remove section
+        .Add section, s
+    End With
+    
+'    With dctSections
+'        If .Exists(section) Then
+'            MessageSection = .Item(section)
+'            MessageSection.sLabel = s
+'            .Remove section
+'            .Add section, tSection
+'        Else
+'            tSection.sLabel = s
+'            .Add section, tSection
+'        End If
+'    End With
+    
 End Property
 
-' Message section properties (label, text, monospaced)
-Public Property Let SectionLabel(Optional ByVal section As Long, ByVal s As String):   dctSectionsLabel.Add section, s:                                End Property
+Public Property Get SectionLabel(Optional ByVal section As Long) As String
+    With dctSectionsLabel
+        If .Exists(section) _
+        Then SectionLabel = dctSectionsLabel(section) _
+        Else SectionLabel = vbNullString
+    End With
+End Property
 
+' Message Section Mono-spaced
 Public Property Get SectionMonoSpaced(Optional ByVal section As Long) As Boolean
-    If dctSectionsMonoSpaced.Exists(section) _
-    Then SectionMonoSpaced = dctSectionsMonoSpaced(section) _
-    Else SectionMonoSpaced = False
+    With dctSectionsMonoSpaced
+        If .Exists(section) _
+        Then SectionMonoSpaced = .Item(section) _
+        Else SectionMonoSpaced = False
+    End With
 End Property
 
 Public Property Let SectionMonoSpaced(Optional ByVal section As Long, ByVal b As Boolean)
-    dctSectionsMonoSpaced.Add section, b
+    With dctSectionsMonoSpaced
+        If .Exists(section) Then .Remove section
+        .Add section, b
+    End With
 End Property
 
 Public Property Get SectionText(Optional ByVal section As Long) As String
-    If dctSectionsText.Exists(section) _
-    Then SectionText = dctSectionsText(section) _
-    Else SectionText = vbNullString
+    With dctSectionsText
+        If .Exists(section) _
+        Then SectionText = .Item(section) _
+        Else SectionText = vbNullString
+    End With
 End Property
 
-Public Property Let SectionText(Optional ByVal section As Long, ByVal s As String):    dctSectionsText.Add section, s:                             End Property
+Public Property Let SectionText(Optional ByVal section As Long, ByVal s As String)
+    With dctSectionsText
+        If .Exists(section) Then .Remove section
+        .Add section, s
+    End With
+End Property
+
 Public Property Let title(ByVal s As String):                                               sTitle = s:                                                 End Property
 
 Public Sub AdjustStartupPosition(ByRef pUserForm As Object, _
@@ -530,7 +567,7 @@ Private Sub MsgSectionSetup(ByVal section As Long)
     Dim frText      As MSForms.Frame
     Dim sLabel      As String
     Dim sText       As String
-    Dim bMonoSpaced As Boolean
+    Dim bMonospaced As Boolean
 
     Set frArea = DsgnMsgArea
     Set frSection = DsgnSection(section)
@@ -540,7 +577,7 @@ Private Sub MsgSectionSetup(ByVal section As Long)
     
     sLabel = SectionLabel(section)
     sText = SectionText(section)
-    bMonoSpaced = SectionMonoSpaced(section)
+    bMonospaced = SectionMonoSpaced(section)
     
     frSection.width = frArea.width
     la.width = frSection.width
@@ -566,7 +603,7 @@ Private Sub MsgSectionSetup(ByVal section As Long)
             frText.Top = 0
         End If
         
-        If bMonoSpaced Then
+        If bMonospaced Then
             MsgSectionSetupMonoSpaced section, sText  ' returns the maximum width required for monospaced section
         Else ' proportional spaced
             MsgSectionSetupPropSpaced section, sText

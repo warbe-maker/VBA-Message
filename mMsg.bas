@@ -30,6 +30,12 @@ Option Explicit
 'Private Declare PtrSafe Function SetWindowLongPtr Lib "User32.dll" Alias "SetWindowLongA" () As LongPtr
 '   (ByVal hwnd As LongPtr, ByVal nIndex As LongPtr, ByVal dwNewLong As LongPtr)
 '
+Public Type MessageSection
+    sLabel As String
+    sText As String
+    bMonospaced As Boolean
+End Type
+
 Private vMsgReply As Variant
 
 Public Enum StartupPosition
