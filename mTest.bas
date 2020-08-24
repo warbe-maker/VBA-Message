@@ -101,23 +101,24 @@ Public Function WidthDeterminedByMinimumWidth( _
     lTest = 1
     
     '~~ Initial test values obtained from the Test Worksheet
-    lIncrDecrWidth = wsMsgTest.MinFormWidthIncrDecr(lTest)
+    lIncrDecrWidth = wsMsg.MinFormWidthIncrDecr(lTest)
     
     
     ' Initializations for this test
-    With fMsg
-'        .FramesWithBorder = True
-'        .FramesWithCaption = True
-        .MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest)
-    End With
+    fMsg.MinimumFormWidth = wsMsg.InitMinFormWidth(lTest)
     
     vButton4 = "Repeat with" & vbLf & "minimum width" & vbLf & "+ " & lIncrDecrWidth
     vButton5 = "Repeat with" & vbLf & "minimum width" & vbLf & "- " & lIncrDecrWidth
     vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton4
     
 repeat:
+    With fMsg
+'        .FramesWithBorder = True
+'        .FramesWithCaption = True
+    End With
+    
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
-    sMsg1Label = "Test description:":       sMsg1Text = wsMsgTest.TestDescription(lTest)
+    sMsg1Label = "Test description:":       sMsg1Text = wsMsg.TestDescription(lTest)
     sMsg2Label = "Expected test result:":   sMsg2Text = "The width of all message sections is adjusted to the current specified minimum form width (" & fMsg.MinimumFormWidth & " pt)."
     sMsg3Label = "Please also note:":       sMsg3Text = "The message form height is ajusted to the need " & _
                                                         "up to the specified maximum heigth which is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "% and not exceeded."
@@ -132,11 +133,11 @@ repeat:
             )
     Select Case WidthDeterminedByMinimumWidth
         Case vButton5
-            fMsg.MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest) - lIncrDecrWidth
+            fMsg.MinimumFormWidth = wsMsg.InitMinFormWidth(lTest) - lIncrDecrWidth
             vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton4
             GoTo repeat
         Case vButton4
-            fMsg.MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest) + lIncrDecrWidth
+            fMsg.MinimumFormWidth = wsMsg.InitMinFormWidth(lTest) + lIncrDecrWidth
             vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton5
             GoTo repeat
         Case Else ' Stop and Next are passed on to the caller
@@ -159,13 +160,13 @@ Public Function WidthDeterminedByTitle( _
     lTest = 2
     
     '~~ Initial test values obtained from the Test Worksheet
-    lIncrDecrWidth = wsMsgTest.MinFormWidthIncrDecr(lTest)
+    lIncrDecrWidth = wsMsg.MinFormWidthIncrDecr(lTest)
     With fMsg
-        .MinimumFormWidth = wsMsgTest.InitMinFormWidth(lTest)
+        .MinimumFormWidth = wsMsg.InitMinFormWidth(lTest)
     End With
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC) & "  (This title uses more space than the minimum specified message form width and thus the width is determined by the title)"
-    sMsg1Label = "Test description:":       sMsg1Text = wsMsgTest.TestDescription(lTest)
+    sMsg1Label = "Test description:":       sMsg1Text = wsMsg.TestDescription(lTest)
     sMsg2Label = "Expected test result:":   sMsg2Text = "The message form width is adjusted to the title's lenght."
     sMsg3Label = "Please note:":            sMsg3Text = "The two message sections in this test do use a proportional font " & _
                                                         "and thus are adjusted to form width determined by other factors." & vbLf & _
@@ -202,11 +203,11 @@ Public Function WidthDeterminedByMonoSpacedMessageSection( _
     vButton2 = C_STOP
 
     '~~ Initial test values obtained from the Test Worksheet
-    lIncrDecrWidth = wsMsgTest.MaxFormWidthIncrDecr(lTest)
-    lIncrDecrHeight = wsMsgTest.MaxFormHeightIncrDecr(lTest)
+    lIncrDecrWidth = wsMsg.MaxFormWidthIncrDecr(lTest)
+    lIncrDecrHeight = wsMsg.MaxFormHeightIncrDecr(lTest)
     
     ' Initializations for this test
-    fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest)
+    fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsg.InitMaxFormWidth(lTest)
     
     vButton4 = "Repeat with" & vbLf & "maximum width" & vbLf & "+ " & lIncrDecrWidth
     vButton5 = "Repeat with" & vbLf & "maximum width" & vbLf & "- " & lIncrDecrWidth
@@ -215,7 +216,7 @@ Public Function WidthDeterminedByMonoSpacedMessageSection( _
     vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton5
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
-    sMsg1Label = "Test description:":           sMsg1Text = wsMsgTest.TestDescription(lTest)
+    sMsg1Label = "Test description:":           sMsg1Text = wsMsg.TestDescription(lTest)
     sMsg2Label = "Expected test result:":       sMsg2Text = "Initally, the message form width is adjusted to the longest line in the " & _
                                                             "monospaced message section and all other message sections are adjusted " & _
                                                             "to this (enlarged) width." & vbLf & _
@@ -244,11 +245,11 @@ repeat:
             )
     Select Case WidthDeterminedByMonoSpacedMessageSection
         Case vButton5
-            fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest) - lIncrDecrWidth
+            fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsg.InitMaxFormWidth(lTest) - lIncrDecrWidth
             vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton4
             GoTo repeat
         Case vButton4
-            fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsgTest.InitMaxFormWidth(lTest) + lIncrDecrWidth
+            fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsg.InitMaxFormWidth(lTest) + lIncrDecrWidth
             vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton5
             GoTo repeat
         Case Else ' Stop and Next are passed on to the caller
