@@ -79,13 +79,17 @@ on_error:
 End Sub
 ```
 ## Width Adjustments
-The _Message Form_ is initialized with the specified minimum message form width (see [Default Value Constants](#default-value-constants) which may be modified via the public property _MaxFormWidthPrcntgOfSceenSize_ (see [Public Properties of the _Message Form_](#public-properties-of-the-message-form)). A width expansion may be triggered by the setup (in the outlined sequence) of the following the width determining elements:
+### Width Increments
+The _Message Form_ is initialized with the specified minimum message form width (see [Default Value Constants](#default-value-constants) which may be modified via the public property _MaxFormWidthPrcntgOfSceenSize_ (see [Public Properties of the _Message Form_](#public-properties-of-the-message-form)). A width increment may be triggered by the setup (in the outlined sequence) of the following the width determining elements:
   1. **Title**  
 When the **Title** exceeds the specified  maximum message form width some text will be truncated. However, with a default maximum message form width of 80 % of the screen width that will happen pretty unlikely.
   2. **Mono-spaced message section** followed by **Replies Rows**  
 When either of the two exceeds the maximum message form width it will get a horizontal scroll bar.
   3. **Proportional spaced message sections**  
 are setup at last and adjusted to the (by then) final message form width.
+
+### Width Decrements
+When the _Message Area's_ plus the _Button Area's_ height take more than the available maximum specified _Message Form_ height vertical scroll bars come into play. However, the space required for the scroll bar requires an reduction of the _Proportional Spaced_ Message sections and/or the _Button Rows_. In the first case this additionally - increases the _Message Section's_ height, in the second case the Button Rows may require a horizontal scroll bar.
 
 ```vbscript
 ' Re-adjust width of message section text and
@@ -128,9 +132,6 @@ When all elements are setup and the message form exceeds the specified maximum h
 |The _Buttons Area_ takes 60% or more if the total areas height|The _Message Area_ gets a vertical scrollbar |
 | Otherwise | Both areas get a vertical scroll bar|
  
-
-## Width decrease
-When the _Message Area's_ plus the _Button Area's_ height take more than the available maximum specified _Message Form_ height vertical scroll bars come into play. However, the space required for the scroll bar requires an reduction of the _Proportional Spaced_ Message sections and/or the _Button Rows_. In the first case this additionally - increases the _Message Section's_ height, in the second case the Button Rows may require a horizontal scroll bar.
 
 ## Vertical Re-positioning  
 Adjusting the top position of displayed elements is due when all elements are setup. Subsequent re-positioning is due when the [width is decreased](#width-decrease) in order to make space for a vertical scroll bar. Together with the adjustment of the top position of the bottom-most element the new height of the message form is set - limited by the specified maximum form height.
