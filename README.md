@@ -56,7 +56,7 @@ Uses the UserForm _fMsg_ to display a well designed error message.
 | title | Box<br>Msg | Optional. String expression displayed in the title bar of the dialog box. When omitted, the application name is placed in the title bar. |
 | label1<br>label2<br>label3 | Msg | Optional. String expression displayed as label above the corresponding text_ |
 | text1<br>text2<br>text3 | Msg | Optional.  String expression displayed as message section. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. consists of more than one line, you can separate the lines by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line. |
-| monospaced1<br>monospaced2<br>monospaced3 | Msg | Optional. Defaults to False. When True,  the corresponding text_ is displayed with a mono-spaced font |
+| monospaced1<br>monospaced2<br>monospaced3 | Msg | Optional. Defaults to False. When True,  the corresponding text is displayed with a mono-spaced font see [Proportional- versus Mono-spaced](#proportional-versus-mono-spaced) |
 | buttons | Box<br>Msg | Optional.  Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 5 reply buttons. If omitted, the default value for buttons is 0 (vbOkOnly). |
 
 ## Installation
@@ -112,7 +112,12 @@ End Select
 image
 
 
-### Summary
+### Examples Summary
 The examples above illustrate the use of the 3 functions (interfaces) in the module _mMsg_ using the UserForm _fMsg_: _Box_, _Msg_, _ErrMsg_
 
 Considering the [Common Public Properties](<Implementation.md#common-public-properties>) of the UserForm and the mechanism to receive the return value of the clicked reply button some can go ahead without the installation of the _mMsg_ module and implement his/her own application specific message function using those already implemented as examples only.
+
+## Proportional- versus Mono-Spaced
+The result of the two differs significantly
+- _Monospaced_ = True <br> The width of the _Message Form_ is determined by the longest text line (up to the maximum form width specified)  because the text is ++not++  "wrapped"
+- _Monospaced_ = False (default) <br> The width of a proportional-spaced text is determined by the form width because it is "wrapped". For a message which is exclusively displayed proportioal-spaced it is pretty likely that the specified _Minimum Form Width_ ist used - unless the length of the title determines a wider form width.
