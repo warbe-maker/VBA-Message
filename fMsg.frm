@@ -343,6 +343,9 @@ Public Sub AdjustStartupPosition(ByRef pUserForm As Object, _
     End With
 End Sub
 
+' The reply button click event is the only code using
+' control's name - which unfortunately this cannot be avioded.
+' ------------------------------------------------------------
 Private Sub cmb11_Click():  ButtonClicked Me.cmb11:   End Sub
 Private Sub cmb12_Click():  ButtonClicked Me.cmb12:   End Sub
 Private Sub cmb13_Click():  ButtonClicked Me.cmb13:   End Sub
@@ -612,7 +615,7 @@ Private Sub MsgSectionSetup(ByVal section As Long)
         
     End If
     
-    DoEvents
+'    DoEvents
     
 End Sub
 
@@ -668,7 +671,7 @@ Private Sub MsgSectionSetupMonoSpaced( _
                         .Scroll xAction:=fmScrollActionNoChange, yAction:=fmScrollActionEnd
                 End Select
             End With
-            DoEvents
+'            DoEvents
         End If
         
     End With
@@ -684,18 +687,26 @@ End Sub
 Private Sub MsgSectionSetupPropSpaced(ByVal section As Long, _
                                         ByVal text As String)
     
+    Dim frArea      As MSForms.Frame
     Dim frSection   As MSForms.Frame
     Dim frText      As MSForms.Frame
+    Dim tbText      As MSForms.TextBox
     
+    Set frArea = DsgnMsgArea
     Set frSection = DsgnSection(section)
     Set frText = DsgnSectionTextFrame(section)
+    Set tbText = DsgnSectionText(section)
     
-    With DsgnSectionText(section)
+    frArea.width = Me.width - H_SPACE_FRAMES
+    frSection.width = frArea.width - H_SPACE_FRAMES
+    frText.width = frSection.width - H_SPACE_FRAMES
+    
+    With tbText
         .Visible = True
         .MultiLine = True
         .AutoSize = True
         .WordWrap = True
-        .width = Me.width - (H_SPACE_FRAMES * 4)
+        .width = frText.width - H_SPACE_FRAMES
         .value = text
         .SelStart = 0
         frText.width = .width + H_SPACE_FRAMES
@@ -1056,6 +1067,8 @@ Private Sub UserForm_Activate()
     
     Dim siTitleWidth    As Single
 
+    Application.ScreenUpdating = False
+    
     DisplayFramesWithCaption bFramesWithCaption
     
     With Me
@@ -1105,7 +1118,7 @@ Private Sub VerticalPositioning()
     VerticalPositioningMsgArea
     VerticalPositioningButtonsArea
     VerticalPositioningAreas
-    DoEvents
+'    DoEvents
 End Sub
 
 Private Sub VerticalPositioningAreas()
@@ -1159,7 +1172,7 @@ Private Sub VerticalPositioningMsgArea()
     Next lSection
     Me.Height = Max(Me.Height, frArea.Top + frArea.Height + (V_SPACE_AREAS * 4))
     
-    DoEvents
+'    DoEvents
 
 exit_proc:
     Exit Sub
