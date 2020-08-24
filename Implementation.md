@@ -1,32 +1,11 @@
 # Implementation
 ## General
-- The implementation of the _Message Form_ (the UserForm _fMsg) is mostly design driven. I.e. the number of available _Message Sections_, the number of _Button Rows_, and the number of reply _Buttons_ in _Buttons Rows_ is primarily a matter of the design and requires only moderate code change.
+- The implementation of the _Message Form_ (the UserForm _fMsg_) is mostly design driven. I.e. the number of available _Message Sections_, the number of reply _Buttons_, and the number of reply  _Buttons Rows_ is primarily a matter of the design and it's change requires only moderate code change.
 As a consequence the implementation relies on the hierarchical order of the frames and controls therein. Controls object names  are used only where unavoidable as is for the click events of the reply _Buttons_ (at least I havenˋt found a way to avoid this).
-```vbscipt
-Private Sub cmbReply11_Click():  ReplyClicked 1, 1:   End Sub
-Private Sub cmbReply12_Click():  ReplyClicked 1, 2:   End Sub
-Private Sub cmbReply13_Click():  ReplyClicked 1, 3:   End Sub
-Private Sub cmbReply14_Click():  ReplyClicked 1, 4:   End Sub
-Private Sub cmbReply15_Click():  ReplyClicked 1, 5:   End Sub
-Private Sub cmbReply16_Click():  ReplyClicked 1, 6:   End Sub
-Private Sub cmbReply17_Click():  ReplyClicked 1, 7:   End Sub
-Private Sub cmbReply21_Click():  ReplyClicked 2, 1:   End Sub
-Private Sub cmbReply22_Click():  ReplyClicked 2, 2:   End Sub
-Private Sub cmbReply23_Click():  ReplyClicked 2, 3:   End Sub
-Private Sub cmbReply24_Click():  ReplyClicked 2, 4:   End Sub
-Private Sub cmbReply31_Click():  ReplyClicked 3, 1:   End Sub
-Private Sub cmbReply32_Click():  ReplyClicked 3, 2:   End Sub
-Private Sub cmbReply33_Click():  ReplyClicked 3, 3:   End Sub
-Private Sub cmbReply41_Click():  ReplyClicked 4, 1:   End Sub
-Private Sub cmbReply42_Click():  ReplyClicked 4, 2:   End Sub
-Private Sub cmbReply51_Click():  ReplyClicked 5, 1:   End Sub
-Private Sub cmbReply61_Click():  ReplyClicked 6, 1:   End Sub
-Private Sub cmbReply71_Click():  ReplyClicked 7, 1:   End Sub
-```
 
-- In order to keep the number of to-be-installed modules at minimum the implementation is without Class Modules by intention. Possibly Type declarations may have been an laternative for a more elegant implementation but aren't used.
+- In order to keep the number of the to-be-installed modules at minimum (_mMsg_ and _fMsg_) the implementation does not make use of any Class Module - though they would have allowed a more elegant code.
 
-- The controls (frames, text boxes, and command buttons) are collected at the _Message Form's_ initialization and these collections are used throughout the implementation.
+- All controls (frames, text boxes, and command buttons) are collected at the _Message Form's_ initialization and these collections are used throughout the implementation.
 
 ```vbscript
 ' Returns all controls of type (ctltype) which do have a parent (fromparent)
@@ -95,7 +74,7 @@ When the _Message Area's_ plus the _Button Area's_ height take more than the ava
 ' Re-adjust width of message section text and
 ' adjust frames height accordingly
 ' ---------------------------------------------
-Private Sub MsgSectionAdjustHeightToAvailableWidth( _
+Private Sub MsgSectionDecrementWidth( _
             ByVal section As Long, _
             ByVal newwidth As Single)
 
