@@ -1,7 +1,7 @@
 # Implementation
 ## General
-- The implementation of the _Message Form_ (the UserForm _fMsg) is mostly design driven. I.e. the number of available _Message Sections_, the number of _Reply Rows_, and the number of reply _Buttons_ in _Buttons Rows_ is primarily a matter of the design and requires only moderate code change.
-As a consequence the implementation relies on the order of the frames and controls therein. Controls object names  are used only where unavoidable as is for the click events of the reply _Buttons_ (at least I havenˋt found a way to avoid this).
+- The implementation of the _Message Form_ (the UserForm _fMsg) is mostly design driven. I.e. the number of available _Message Sections_, the number of _Button Rows_, and the number of reply _Buttons_ in _Buttons Rows_ is primarily a matter of the design and requires only moderate code change.
+As a consequence the implementation relies on the hierarchical order of the frames and controls therein. Controls object names  are used only where unavoidable as is for the click events of the reply _Buttons_ (at least I havenˋt found a way to avoid this).
 ```vbscipt
 Private Sub cmbReply11_Click():  ReplyClicked 1, 1:   End Sub
 Private Sub cmbReply12_Click():  ReplyClicked 1, 2:   End Sub
@@ -120,18 +120,22 @@ The height of the _Message Form_ is incremented along with the setup of the _Mes
 These height increments are at first done without considering any specified maximum _Message Form_ height.
 
 ### Height Decrements
-When all elements are setup and the message form exceeds the specified maximum height (see [Default Value Constants](#default-value-constants) which may be modified via the [Public Property of the _Message Form_](#public-properties-of-the-message-form) _MaxFormHeightPrcntgOfSceenSize_, the height of the _Message Area_ frame and/or the _Reply Area_ frame is reduced to fit and provided with a vertical scroll bar. In detail: When the areas' height relation is 50/50 to 65/35 both areas will get a vertical scroll bar and the height is decremented by the related value. Otherwise only the taller area is reduced by the exceeding amount (the width of the scrollbar is the height before the reduction). 
+When all elements are setup and the message form exceeds the specified maximum height (see [Default Value Constants](#default-value-constants) which may be modified via the [Public Property of the _Message Form_](#public-properties-of-the-message-form) _MaxFormHeightPrcntgOfSceenSize_, the height of the _Message Area_ frame and/or the _Buttons Area_ frame is reduced to fit and provided with a vertical scroll bar.
 
-```vbscript  
-Private Function MsgAreaHeight() As Single
-    
-End Function
-```
+|Case|Action|
+|----|------|
+| The _Message Area_ takes 60% or more of the total areas height | The _Message Area_ gets a vertical scrollbar|
+|The _Buttons Area_ takes 60% or more if the total areas height|The _Message Area_ gets a vertical scrollbar |
+| Otherwise | Both areas get a vertical scroll bar|
+ 
+
+## Width decrease
+When the _Message Area's_ plus the _Button Area's_ height take more than the available maximum specified _Message Form_ height vertical scroll bars come into play. However, the space required for the scroll bar requires an reduction of the _Proportional Spaced_ Message sections and/or the _Button Rows_. In the first case this additionally - increases the _Message Section's_ height, in the second case the Button Rows may require a horizontal scroll bar.
 
 ## Vertical Re-positioning  
-Adjusting the top position of displayed elements is due initially when an element had need setup and subsequently whenever an element's height changed because of a width adjustment. Together with the adjustment of the top position of the bottom-most element the new height of the message form is set.
+Adjusting the top position of displayed elements is due when all elements are setup. Subsequent re-positioning is due when the [width is decreased](#width-decrease) in order to make space for a vertical scroll bar. Together with the adjustment of the top position of the bottom-most element the new height of the message form is set - limited by the specified maximum form height.
 
-Note: This top re-positioning may be done just once when all elements had initially been  setup. However, for testing it is more appropriate to be performed immediately after setup of each individual element.
+Note: This re-positioning may be done at any time for testing in order to display the current setup state.
 
 ## Default Value Constants 
 
