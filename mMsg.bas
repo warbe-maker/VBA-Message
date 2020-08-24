@@ -45,9 +45,6 @@ Public Enum StartupPosition
     WindowsDefault = 3
 End Enum
 
-Public Property Let MsgReply(ByVal v As Variant):   vMsgReply = v:          End Property
-Public Property Get MsgReply() As Variant:          MsgReply = vMsgReply:   End Property
-
 #If AlternateMsgBox Then
 ' Elaborated error message using fMsg which supports the display of
 ' up to 3 message sections, optionally monospaced (here used for the
@@ -104,7 +101,7 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
 
     '~~ Display error message by UserForm fErrMsg
     With fMsg
-        .title = errtitle
+        .AppTitle = errtitle
         .SectionLabel(1) = "Error Message/Description:"
         .SectionText(1) = sErrText
         If errpath <> vbNullString Then
@@ -116,7 +113,7 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
             .SectionLabel(3) = "Info:"
             .SectionText(3) = errinfo
         End If
-        .buttons = vbOKOnly
+        .ApplButtons = vbOKOnly
         .Show
     End With
 
@@ -216,14 +213,15 @@ Public Function Box( _
 '    Dim siHeight    As Single
 
     With fMsg
-        .title = title
+        .AppTitle = title
         .SectionText(1) = MsgSectionText
         .SectionMonoSpaced(1) = msgmonospaced
-        .buttons = buttons
+        .ApplButtons = buttons
         .Show
+        Box = .ReplyValue
     End With
+    Unload fMsg
 
-    Box = vMsgReply
     
 End Function
 
@@ -272,7 +270,7 @@ Public Function Msg(ByVal title As String, _
            Optional ByVal buttons As Variant = vbOKOnly) As Variant
     
     With fMsg
-        .title = title
+        .AppTitle = title
         
         .SectionLabel(1) = section1label
         .SectionText(1) = section1text
@@ -286,11 +284,12 @@ Public Function Msg(ByVal title As String, _
         .SectionText(3) = section3text
         .SectionMonoSpaced(3) = section3monospaced
 
-        .buttons = buttons
+        .ApplButtons = buttons
         .Show
+        Msg = .ReplyValue
     End With
+    Unload fMsg
 
-    Msg = vMsgReply
 
 End Function
 

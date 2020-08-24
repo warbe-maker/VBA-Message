@@ -42,14 +42,14 @@ Dim sMsg1Text       As String
 Dim sMsg2Text       As String
 Dim sMsg3Text       As String
 Dim vButtons        As Variant
-Dim vButton          As Variant
-Dim vButton1         As Variant
-Dim vButton2         As Variant
-Dim vButton3         As Variant
-Dim vButton4         As Variant
-Dim vButton5         As Variant
-Dim vButton6         As Variant
-Dim vButton7         As Variant
+Dim vButton         As Variant
+Dim vButton1        As Variant
+Dim vButton2        As Variant
+Dim vButton3        As Variant
+Dim vButton4        As Variant
+Dim vButton5        As Variant
+Dim vButton6        As Variant
+Dim vButton7        As Variant
 Dim vReplied        As Variant
 Dim siUsedPoSW      As Long     ' The test specific used % of the screen width (default to 80%)
 
