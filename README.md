@@ -2,22 +2,22 @@
 
 Displays a message in a dialog box, waits for the user to click a button, and returns a variant indicating which button the user clicked.
 
-### Why another MsgBox?
-The alternative addresses some of the MsgBox deficiencies.
+### Why alternative MsgBox?
+The alternative implementation addresses nany of the MsgBox deficiencies.
 
-| VB MsgBox | Alternative "_Message Form_" |
+| VB MsgBox | Alternative |
 | ------ | ---- |
-| The message width and height is limited and cannot be altered | The maximum _Message Form_ width and height is specified as a percentage of the screen size. The width defaults to 80% the height defaults to  90% |
-| When a message exceeds the (hard to tell) size limit it is truncated | When the maximum _Message Form_ size is exceeded a vertical and/or a horizontal scroll bar is applied
-| The message is displayed with a proportional font | A message may optionally be displayed with a mono-spaced font |
-| Composing a fair designed message is time consuming and it is difficult to come up with a good result | With up to 3 _Message Sections_ each with an optional _Message Text Label_ and a _Monospaced_ option a good design is effortless |
-| The maximum reply _Buttons_) is 3 | Up to 7 reply _Buttons_ may be displayed in any order in up to 7 reply _Button Rows_   |
-| The content (caption) of the reply buttons is a limited number of - native English! - terms (Ok, Yes, No, Ignore, Cancel) | The caption of the reply _Buttons_ may be those known from MsgBox and additionally any multi-line text |
+| The message width and height is limited and cannot be altered | The maximum width and height is specified as a percentage of the screen size which defaults 80% width and  90% height (hardly ever used)|
+| When a message exceeds the (hard to tell) size limit it is truncated | When the maximum size is exceeded a vertical and/or a horizontal scroll bar is applied
+| The message is displayed with a proportional font | A message may (or part of it) may be displayed mono-spaced |
+| Composing a fair designed message is time consuming and it is difficult to come up with a good result | With up to 3 _Message Sections_ each with an optional _Message Text Label_ and a _Monospaced_ option an appealing design is effortless |
+| The maximum reply _Buttons_) is 3 | Up to 7 reply _Buttons_ may be displayed in up to 7 reply _Button Rows_ in any order |
+| The caption) of the reply _Buttons_ is based on a value (vbYesNo, vbOkOnly, etc. and result in untranslated native English! - terms (Ok, Yes, No, Ignore, Cancel) | The caption of the reply _Buttons_ may specified by those values known from the VB MsgBox but additionally any multi-line text may be specified |
 | Specifying the default button | (yet) not implemented |
 | Display of an alert image like a ?, !, etc. | (yet) not implemented |
 
 ## Interfaces
-The alternative comes with 3 functions (interfaces) which use the  UserForm _fMsg_ for the message display and do receive the return value of the clicked reply _button_.
+The alternative implementation  comes in three flavors (in module _mMsg_). Three  functions are interfaces to the UserForm _fMsg_ and return the clicked reply _Buttons_ value to the caller.
 
 ### _Msg_
 #### Syntax
@@ -130,7 +130,7 @@ The examples above illustrate the use of the 3 functions (interfaces) in the mod
 
 Considering the [Common Public Properties](<Implementation.md#common-public-properties>) of the UserForm and the mechanism to receive the return value of the clicked reply button some can go ahead without the installation of the _mMsg_ module and implement his/her own application specific message function using those already implemented as examples only.
 
-## Proportional- versus Mono-Spaced
+## Proportional versus Mono-Spaced
 The result of the two differs significantly
 - _Monospaced_ = True <br> The width of the _Message Form_ is determined by the longest text line (up to the maximum form width specified)  because the text is ++not++  "wrapped"
 - _Monospaced_ = False (default) <br> The width of a proportional-spaced text is determined by the form width because it is "wrapped". For a message which is exclusively displayed proportioal-spaced it is pretty likely that the specified _Minimum Form Width_ ist used - unless the length of the title determines a wider form width.
