@@ -1,7 +1,20 @@
 # MsgBox Alternative
 
 Displays a message in a dialog box, waits for the user to click a button, and returns a variant indicating which button the user clicked.
-Not sure whether it is worth it? See [Why another MsgBox](<Why%20another%20MsgBox.md>)
+
+### Why another MsgBox?
+The alternative addresses some of the MsgBox deficiencies.
+
+| VB MsgBox | Alternative "_Message Form_" |
+| ------ | ---- |
+| The message width and height is limited and cannot be altered | The maximum _Message Form_ width and height is specified as a percentage of the screen size. The width defaults to 80% the height defaults to  90% |
+| When a message exceeds the (hard to tell) size limit it is truncated | When the maximum _Message Form_ size is exceeded a vertical and/or a horizontal scroll bar is applied
+| The message is displayed with a proportional font | A message may optionally be displayed with a mono-spaced font |
+| Composing a fair designed message is time consuming and it is difficult to come up with a good result | With up to 3 _Message Sections_ each with an optional _Message Text Label_ and a _Monospaced_ option a good design is effortless |
+| The maximum reply _Buttons_) is 3 | Up to 7 reply _Buttons_ may be displayed in any order in up to 7 reply _Button Rows_   |
+| The content (caption) of the reply buttons is a limited number of - native English! - terms (Ok, Yes, No, Ignore, Cancel) | The caption of the reply _Buttons_ may be those known from MsgBox and additionally any multi-line text |
+| Specifying the default button | (yet) not implemented |
+| Display of an alert image like a ?, !, etc. | (yet) not implemented |
 
 ## Interfaces
 The alternative comes with 3 functions (interfaces) which use the  UserForm _fMsg_ for the message display and do receive the return value of the clicked reply _button_.
