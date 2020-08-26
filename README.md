@@ -2,22 +2,22 @@
 
 Displays a message in a dialog box, waits for the user to click a button, and returns a variant indicating which button the user clicked.
 
-### Why alternative MsgBox?
-The alternative implementation addresses nany of the MsgBox deficiencies.
+### Why an alternative MsgBox?
+The alternative implementation addresses many of the MsgBox's deficiencies - without re-implementing it to 100%.
 
 | VB MsgBox | Alternative |
 | ------ | ---- |
 | The message width and height is limited and cannot be altered | The maximum width and height is specified as a percentage of the screen size which defaults 80% width and  90% height (hardly ever used)|
 | When a message exceeds the (hard to tell) size limit it is truncated | When the maximum size is exceeded a vertical and/or a horizontal scroll bar is applied
 | The message is displayed with a proportional font | A message may (or part of it) may be displayed mono-spaced |
-| Composing a fair designed message is time consuming and it is difficult to come up with a good result | With up to 3 _Message Sections_ each with an optional _Message Text Label_ and a _Monospaced_ option an appealing design is effortless |
-| The maximum reply _Buttons_) is 3 | Up to 7 reply _Buttons_ may be displayed in up to 7 reply _Button Rows_ in any order |
-| The caption) of the reply _Buttons_ is based on a value (vbYesNo, vbOkOnly, etc. and result in untranslated native English! - terms (Ok, Yes, No, Ignore, Cancel) | The caption of the reply _Buttons_ may specified by those values known from the VB MsgBox but additionally any multi-line text may be specified |
+| Composing a fair designed message is time consuming and it is difficult to come up with a satisfying result | Up to 3 _Message Sections_ each with an optional _Message Text Label_ and a _Monospaced_ option allow an appealing design without any extra  effort |
+| The maximum reply _Buttons_ is 3 | Up to 7 reply _Buttons_ may be displayed in up to 7 reply _Button Rows_ in any order |
+| The caption of the reply _Buttons_ is based on a value (vbOKOnly=0, 	vbOKCancel=1, vbAbortRetryIgnore=2, vbYesNoCancel=	3, vbYesNo=	4, vbRetryCancel=5) which result in 1 to 3 reply _Buttons_ with corresponding untranslated native English captions | The caption of the reply _Buttons_ may be specified by those values known from the VB MsgBox but additionally allows any multi-line text |
 | Specifying the default button | (yet) not implemented |
-| Display of an alert image like a ?, !, etc. | (yet) not implemented |
+| Display of an ?, !, etc. image | (yet) not implemented |
 
 ## Interfaces
-The alternative implementation  comes with three functions (in module _mMsg_). These are interfaces to the UserForm _fMsg_ and return the clicked reply _Button_ value to the caller.
+The alternative implementation  comes with three functions (in module _mMsg_) which are the interface to the UserForm _fMsg_ and return the clicked reply _Button_ value to the caller.
 
 ### _Box_
 Pretty MsgBox alike, displays a single message with any number of line breaks, with up to 7 reply _buttons_ in up to 7 rows in any order.
@@ -31,7 +31,7 @@ The _Box_ function syntax has these named arguments:
 | Part | Description | Corresponding _fMsg_ Property |
 | ---- |-----------| --- |
 | title | Optional. String expression displayed in the title bar of the dialog box. When omitted, the application name is placed in the title bar. | Title |
-| prompt | String expression displayed as message. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line. | Text(1) |
+| prompt | String expression displayed as message. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (vbCr or Chr(13), a linefeed character (vbLf or Chr(10)), or carriage return - linefeed character combination (vbCrLf or Chr(13) & Chr(10)) between each line. | Text(1) |
 | buttons | Optional.  Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 7 reply buttons. If omitted, the default value for buttons is 0 (vbOkOnly). | Buttons |
 
 ### _Msg_
@@ -50,11 +50,11 @@ The _Msg_ function syntax has these named arguments:
 | ---- |-----------| --- |
 | title | Optional. String expression displayed in the title bar of the dialog box. When omitted, the application name is placed in the title bar. | Title |
 | label1<br>label2<br>label3 | Optional. String expression displayed as label above the corresponding text_ | Label(section) |
-| text1<br>text2<br>text3 | Optional.  String expression displayed as message section. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line. | Text(section) | monospaced1<br>monospaced2<br>monospaced3 | Optional. Defaults to False. When True,  the corresponding text is displayed with a mono-spaced font see [Proportional- versus Mono-spaced](#proportional-versus-mono-spaced) | Monospaced(section)
+| text1<br>text2<br>text3 | Optional.  String expression displayed as message section. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (vbCr or Chr(13), a linefeed character (vbLf or Chr(10)), or carriage return - linefeed character combination (vbCrLf or Chr(13) & Chr(10)) between each line. | Text(section) | monospaced1<br>monospaced2<br>monospaced3 | Optional. Defaults to False. When True,  the corresponding text is displayed with a mono-spaced font see [Proportional- versus Mono-spaced](#proportional-versus-mono-spaced) | Monospaced(section)
 | buttons | Optional.  Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 7 reply buttons. If omitted, the default value for buttons is 0 (vbOkOnly). | Buttons |
 
 ### _ErrMsg_
-Displays a well designed error message.
+Displays an appealingly designed error message.
 #### Syntax
 ```
 mMsg.ErrMsg(errornumber _
@@ -63,11 +63,11 @@ mMsg.ErrMsg(errornumber _
 | Part | Description | Corresponding _fMsg_ Property |
 | ---- |-----------| --- |
 | title | Optional. String expression displayed in the title bar of the dialog box. When omitted, the application name is placed in the title bar. | Title |
-| label1<br>label2<br>label3 | Optional. String expression displayed as label above the corresponding text_ | Label(section) |
-| text1<br>text2<br>text3 | Optional.  String expression displayed as message section. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line. | Text(section) | monospaced1<br>monospaced2<br>monospaced3 | Optional. Defaults to False. When True,  the corresponding text is displayed with a mono-spaced font see [Proportional- versus Mono-spaced](#proportional-versus-mono-spaced) | Monospaced(section)
-| buttons | Optional.  Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 7 reply buttons. If omitted, the default value for buttons is 0 (vbOkOnly). | Buttons |
+| errdescription | String expression displayed as top message section with an above label "Error Description". There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (vbLf or Chr(10)), or carriage return - linefeed character combination (vbCrLf or Chr(13) & Chr(10)) between each line. | Text(1) |
+| errsource | | |
+| errpath | Optional. The "call stack" from the entry procedure down to the error source procedure. Displayed mono-spaced in order to allow a properly indented layout | Text(2), Monospaced(2) see [Proportional- versus Mono-spaced](#proportional-versus-mono-spaced) |
 
-### Syntax of the buttons argument
+### Syntax of the _buttons_ argument
 ```
 button:=string|value[, rowbreak][, button2][, rowbreak][, button3][, rowbreak][, button4][, rowbreak][, button5][, rowbreak][, button6][, rowbreak][, button7]
 ```
