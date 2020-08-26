@@ -19,12 +19,20 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 ## Interfaces
 The alternative implementation  comes with three functions (in module _mMsg_) which are the interface to the UserForm _fMsg_ and return the clicked reply _Button_ value to the caller.
 
-### _Box_
+### _Box_ (see [example](#simple-message))
+
 Pretty MsgBox alike, displays a single message with any number of line breaks, with up to 7 reply _buttons_ in up to 7 rows in any order.
 
 #### Syntax
 ```
-mMsg.Box(prompt[ ,buttons][ ,title ])
+mMsg.Box prompt[, buttons][, title]
+```
+or alternatively when the clicked reply button matters:
+```
+Select Case mMsg.Box(prompt[, buttons][, title])
+   Case ....
+   Case ....
+End Select
 ```
 The _Box_ function syntax has these named arguments:
 
@@ -34,7 +42,7 @@ The _Box_ function syntax has these named arguments:
 | prompt | String expression displayed as message. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (vbCr or Chr(13), a linefeed character (vbLf or Chr(10)), or carriage return - linefeed character combination (vbCrLf or Chr(13) & Chr(10)) between each line. | Text(1) |
 | buttons | Optional.  Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 7 reply buttons. If omitted, the default value for buttons is 0 (vbOkOnly). | Buttons |
 
-### _Msg_
+### _Msg_ (see [example](#common-message))
 Displays a message in up to 3 sections, each with an optional label and optionally monospaced and up to 7 buttons in up to 7 rows in any order.
 #### Syntax
 ```
@@ -53,19 +61,22 @@ The _Msg_ function syntax has these named arguments:
 | text1<br>text2<br>text3 | Optional.  String expression displayed as message section. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (vbCr or Chr(13), a linefeed character (vbLf or Chr(10)), or carriage return - linefeed character combination (vbCrLf or Chr(13) & Chr(10)) between each line. | Text(section) | monospaced1<br>monospaced2<br>monospaced3 | Optional. Defaults to False. When True,  the corresponding text is displayed with a mono-spaced font see [Proportional- versus Mono-spaced](#proportional-versus-mono-spaced) | Monospaced(section)
 | buttons | Optional.  Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 7 reply buttons. If omitted, the default value for buttons is 0 (vbOkOnly). | Buttons |
 
-### _ErrMsg_
-Displays an appealingly designed error message.
+### _ErrMsg_ (see [example](#error-message))
+Displays an appealingly designed error message. This function is pretty specific because it is used by a common, nevertheless elaborated, error handler (yet not available on GitHub) with 
 #### Syntax
 ```
-mMsg.ErrMsg(errornumber _
-, errordescription[, errorpath[, errorline]
+mMsg.ErrMsg(errnumber _
+[, errsource][, errdescription][, errline][, errtitle][, errpath[, errinfo]
 ```
 | Part | Description | Corresponding _fMsg_ Property |
 | ---- |-----------| --- |
-| title | Optional. String expression displayed in the title bar of the dialog box. When omitted, the application name is placed in the title bar. | Title |
+| errnumber | Optional. Defaults to 0. A number expression. |
+| errsource | Optional. Defaults to vbNullString. String expression indicating the fully qualified name of the procedure where the error occoured. | - |
 | errdescription | String expression displayed as top message section with an above label "Error Description". There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (vbLf or Chr(10)), or carriage return - linefeed character combination (vbCrLf or Chr(13) & Chr(10)) between each line. | Text(1) |
-| errsource | | |
+| errline | Optional. Defaults to vbNullString. String expression indicating the line number within the error causing procedure's module where the error occured or had bee raised. | - |
+| errtitle | Optional. String expression displayed in the title bar of the dialog box. When not provided, the title is assembled by using errnumber, errsource, and errline. | AppTitle |
 | errpath | Optional. The "call stack" from the entry procedure down to the error source procedure. Displayed mono-spaced in order to allow a properly indented layout | Text(2), Monospaced(2) see [Proportional- versus Mono-spaced](#proportional-versus-mono-spaced) |
+| errinfo | Optional. Defaults to vbNullString. String expression providing an additional information about the error. Displayed under a label "Additional information". When not provided, the string is extracted from the errdescription which follows an "||" indication.| Text(3) |
 
 ### Syntax of the _buttons_ argument
 ```
@@ -91,53 +102,28 @@ string, button2 ... button7| captions for the buttons 1 to 7|
 
 ### Simple message
 
-Mainly for the compatibility with MsgBox it is displayed with
-
-```MsgBox (prompt, [ buttons, ] [ title, ]
-```
-or alternatively when the clicked reply matters:
-
-```
-Select Case mMsg.Box(title:=..., prompt:=...,buttons:=...)
-   Case vbYes
-   Case vbNo
-End Select
-```
-
-The MsgBox function syntax has these named arguments:
-
-
 image
 
 ### Error message
-The error message below (my standard one) is displayed with
-
-```
-mMsg.ErrMsg errtitle:=..., errnumber:=.., errdescription:=..., errline:=.., errpath:="....", errinfo:="..."
-```
-and makes use of all 3 _Message Sections_ each with a _Message Section Label_,
-a _Monospaced_ font is used for the  _errorsource_ to be displayed properly indented.
 
 image
 
-### Common decision message
-
-```
-Select Case mMsg.Box(title:=..., prompt:=...,buttons:=...)
-   Case ...
-   Case ...
-End Select
-```
+### Common message
 
 image
 
 
 ### Examples Summary
-The examples above illustrate the use of the 3 functions (interfaces) in the module _mMsg_ using the UserForm _fMsg_: _Box_, _Msg_, _ErrMsg_
+The examples above illustrate the use of the 3 functions (interfaces) in the module _mMsg_: _Box_, _Msg_, _ErrMsg_ using the UserForm _fMsg_
 
 Considering the [Common Public Properties](<Implementation.md#common-public-properties>) of the UserForm and the mechanism to receive the return value of the clicked reply button some can go ahead without the installation of the _mMsg_ module and implement his/her own application specific message function using those already implemented as examples only.
 
 ## Proportional versus Mono-Spaced
-The result of the two differs significantly
-- _Monospaced_ = True <br> The width of the _Message Form_ is determined by the longest text line (up to the maximum form width specified)  because the text is ++not++  "wrapped"
-- _Monospaced_ = False (default) <br> The width of a proportional-spaced text is determined by the form width because it is "wrapped". For a message which is exclusively displayed proportioal-spaced it is pretty likely that the specified _Minimum Form Width_ ist used - unless the length of the title determines a wider form width.
+
+#### _Monospaced_ = True
+
+Because the text is ++not++  "wrapped" the width of the _Message Form_ is determined by the longest text line (up to the _Maximum Form Width_ specified). When the maximum width is exceeded a vertical scroll bar is applied.<br>Note: The title and the broadest _Button Row_ May still determine an even broader final _Message Form_.
+
+#### _Monospaced_ = False (default)
+Because the text is "wrapped"
+the width of a proportional-spaced text is determined by the current form width.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the required space for the broadest _Buttons Row_ and the specified _Minimum Form Width_.

@@ -130,12 +130,12 @@ Note: This re-positioning may be done at any time for testing in order to displa
 
 ## Common Public Properties
 | Property | R/W | Meaning, Usage | Comment |
-| ---------- | --- | ------- | ----- |
-| Title      | W |         |
+| ---------- |:---:| ------- | ----- |
+| AppTitle | W |         |
 | Label      | W | `fMsg.Label(section) = "...."` | section = 1,2,or 3 |
 | Text       | W | `fMsg.Text(section) = "...."` | section = 1,2,or 3)  |
 | MonoSpaced | W | `fMsg.MonoSpaced(section) = True` | section = 1,2,3<br>defaults to False when not provided for a section |        |
-| Buttons    | W |         | |
+| AppButtons | W |  | |
 
 
 ## Public Size Properties
