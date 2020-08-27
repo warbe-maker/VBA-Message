@@ -136,10 +136,99 @@ displays the error message:
 image
 
 ### Common message
-The following code copied to any standard module:
+When the following code is copied into any standard module:
 ```
+Public Function Msg(ByVal title As String, _
+           Optional ByVal section1label As String = vbNullString, _
+           Optional ByVal section1text As String = vbNullString, _
+           Optional ByVal section1monospaced As Boolean = False, _
+           Optional ByVal section2label As String = vbNullString, _
+           Optional ByVal section2text As String = vbNullString, _
+           Optional ByVal section2monospaced As Boolean = False, _
+           Optional ByVal section3label As String = vbNullString, _
+           Optional ByVal section3text As String = vbNullString, _
+           Optional ByVal section3monospaced As Boolean = False, _
+           Optional ByVal monospacedfontsize As Long = 0, _
+           Optional ByVal buttons As Variant = vbOKOnly) As Variant
+    
+    With fMsg
+        .AppTitle = title
+        
+        .SectionLabel(1) = section1label
+        .SectionText(1) = section1text
+        .SectionMonoSpaced(1) = section1monospaced
+        
+        .SectionLabel(2) = section2label
+        .SectionText(2) = section2text
+        .SectionMonoSpaced(2) = section2monospaced
+        
+        .SectionLabel(3) = section3label
+        .SectionText(3) = section3text
+        .SectionMonoSpaced(3) = section3monospaced
+
+        .ApplButtons = buttons
+        .Show
+        Msg = .ReplyValue
+    End With
+    Unload fMsg
+
+End Function
 ```
-displays the following message
+the following code
+```
+Public Sub Demo_Msg()
+
+   Dim sTitle   As String
+   Dim sLabel1  As String
+   Dim sText1   As String
+   Dim sLabel2  As String
+   Dim sText2   As String
+   Dim sLabel3  As String
+   Dim sText3   As String
+   Dim sButton1 As String
+   Dim sButton2 As String
+   Dim sButton3 As String
+   Dim sButton4 As String
+   Dim sButton5 As String
+   Dim sButton6 As String
+   Dim sButton7 As String
+
+   sTitle = "Usage demo: Full featured multiple choice message"
+   sLabel1 = "Demo 1:"
+   sText1 = "Use of all 3 message sections, all with a label"
+   sLabel2 = "Demo 2"
+   sText2 = "Use of all 7 reply buttons, in a 2-2-2-1  order."
+   sLabel3 = "Demo 3:"
+   sText3 = "This part of the message just demonstrates the mono-spaced option." &vbLf & _
+   "Specifically the result it has on the message width," & vbLf & _
+   "which it determines through its longest line."
+   sButton1 = "Multiline reply button text" & vbLf & "Button-1"
+   sButton2 = "Multiline reply button text" & vbLf & "Button-2"
+   sButton3 = "Multiline reply button text" & vbLf & "Button-3" 
+   sButton4 = "Multiline reply button text" & vbLf & "Button-4"
+   sButton5 = "Multiline reply button text" & vbLf & "Button-5"
+   sButton6 = "Multiline reply button text" & vbLf & "Button-6"
+   sButton7 ="Ok"
+   '~~ Assemble the buttons argument string            
+   sButtons = _
+   sButton1 & "," & sButton2 & "," & vbLf & "," & _   
+   sButton3 & "," & sButton4 & "," & vbLf & "," & _   
+   sButton4 & "," & sButton5 & "," & vbLf & "," & sButton7 _
+
+   Do
+      If Msg( _
+         title:=sTitle, _
+         label1:=sLabel1, text1:=sText1, _
+         label2:=sLabel2, text2:=sText2, _
+         label3:=sLabel3, text3:=sText3, _
+         monospaced3:=True)
+      = sButton7 _
+      Then Exit Do
+   Loop
+   
+End Sub
+             
+re-displays the following message until the Ok button is clicked:
 
 image
 
