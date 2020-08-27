@@ -1,5 +1,9 @@
 # MsgBox Alternative
 
+[Abstract](#abstract)<br>
+[Why an alternative MsgBox](#why-an-alternative-msgbox)<br>[Interfaces](#interfaces)<br>[Installation](#installation)<br>[Usage](#usage)
+
+### Abstract
 Displays a message in a dialog box, waits for the user to click a button, and returns a variant indicating which button the user clicked.
 
 ### Why an alternative MsgBox?
@@ -16,14 +20,14 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 | Specifying the default button | (yet) not implemented |
 | Display of an ?, !, etc. image | (yet) not implemented |
 
-## Interfaces
+### Interfaces
 The alternative implementation  comes with three functions (in module _mMsg_) which are the interface to the UserForm _fMsg_ and return the clicked reply _Button_ value to the caller.
 
-### _Box_ (see [example](#simple-message))
+#### _Box_ (see [example](#simple-message))
 
 Pretty MsgBox alike, displays a single message with any number of line breaks, with up to 7 reply _buttons_ in up to 7 rows in any order.
 
-#### Syntax
+##### Syntax
 ```
 mMsg.Box prompt[, buttons][, title]
 ```
@@ -42,9 +46,9 @@ The _Box_ function syntax has these named arguments:
 | prompt | String expression displayed as message. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (vbCr or Chr(13), a linefeed character (vbLf or Chr(10)), or carriage return - linefeed character combination (vbCrLf or Chr(13) & Chr(10)) between each line. | Text(1) |
 | [buttons](#syntax-of-the-buttons-argument) | Optional. Defaults to vbOkOnly when omitted. Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 7 reply buttons. | Buttons |
 
-### _Msg_ (see [example](#common-message))
+#### _Msg_ (see [example](#common-message))
 Displays a message in up to 3 sections, each with an optional label and optionally monospaced and up to 7 buttons in up to 7 rows in any order.
-#### Syntax
+##### Syntax
 ```
 mMsg.Msg(title _
 [[, label1][, text1][, monospaced1]] _
@@ -90,33 +94,58 @@ string, button2 ... button7| captions for the buttons 1 to 7|
 
 ## Installation
 
-- Download
-  - fMsg.frm
-  - fmsg.frx
-  - mMsg.bas
-- Import
-  - fMsf.frm
-  - mMsg.bas
+1. Download fMsg.frm and fmsg.frx and import them to your project
+2. Download mMsg.bas and import it to your project<br>or<br>alternatively copy the desired code from the Usage section to any standard module
 
-## Usage, Examples
+## Usage
 
 ### Simple message
+The following code copied to any standard module:
+```
+Public Function Box( _
+       Optional ByVal title As String = vbNullString, _
+       Optional ByVal prompt As String = vbNullString, _
+       Optional ByVal buttons As Variant = vbOKOnly) As Variant
+
+    With fMsg
+        .AppTitle = title
+        .SectionText(1) = prompt
+        .ApplButtons = buttons
+        .Show
+        Box = .ReplyValue
+    End With
+    Unload fMsg
+    
+End Function
+```
+displays with:
+```
+Box title:="Any title" _
+  , prompt:="Any message text" _
+  ' buttons:=vbOkOnly
+```
+the message:
 
 image
 
 ### Error message
+The following code copied to any standard module:
+
+displays the error message:
 
 image
 
 ### Common message
+The following code copied to any standard module:
+```
+```
+displays the following message
 
 image
 
 
 ### Examples Summary
-The examples above illustrate the use of the 3 functions (interfaces) in the module _mMsg_: _Box_, _Msg_, _ErrMsg_ using the UserForm _fMsg_
-
-Considering the [Common Public Properties](<Implementation.md#common-public-properties>) of the UserForm and the mechanism to receive the return value of the clicked reply button some can go ahead without the installation of the _mMsg_ module and implement his/her own application specific message function using those already implemented as examples only.
+The examples above demonstrate  the use of the UserForm _fMsg_. Considering the [Common Public Properties](<Implementation.md#common-public-properties>) of the UserForm some can implement any similar kind of application specific message. 
 
 ## Proportional versus Mono-Spaced
 
