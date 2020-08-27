@@ -229,7 +229,7 @@ Public Function WidthDeterminedByMonoSpacedMessageSection( _
 repeat:
     With fMsg
 '        .FramesWithCaption = True  ' defaults to false, set to true for test purpose only
-'        .FramesWithBorder = True  ' defaults to false, set to true for test purpose only
+        .FramesWithBorder = True  ' defaults to false, set to true for test purpose only
     End With
     WidthDeterminedByMonoSpacedMessageSection = _
     mMsg.Msg( _

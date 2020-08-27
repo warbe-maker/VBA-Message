@@ -2,7 +2,7 @@ Attribute VB_Name = "mMsg"
 Option Explicit
 #Const AlternateMsgBox = 1 ' = 1 for ErrMsg use the fMsg UserForm instead of the MsgBox
 ' --------------------------------------------------------------------------------------------
-' Standard Module mMsg
+' Standard Module mMsg  Alternative MsgBox
 '          Procedures, methods, functions, etc. for displaying a message with a user response.
 '
 ' Methods:
@@ -196,6 +196,24 @@ Dim dMax As Double
     Max = dMax
 End Function
 
+' Used with Err.Raise AppErr() to convert a positive application error number
+' into a negative number to avoid any conflict with a VB error. Used when the
+' error is displayed with ErrMsg to turn the negative number back into the
+' original positive application number.
+' The function ensures that a programmed (application) error numbers never
+' conflicts with VB error numbers by adding vbObjectError which turns it
+' into a negative value. In return, translates a negative error number
+' back into an Application error number. The latter is the reason why this
+' function must never be used with a true VB error number.
+' ------------------------------------------------------------------------
+Public Function AppErr(ByVal lNo As Long) As Long
+    If lNo < 0 Then
+        AppErr = lNo - vbObjectError
+    Else
+        AppErr = vbObjectError + lNo
+    End If
+End Function
+
 ' MsgBox alternative providing up to 5 reply buttons, specified either
 ' by MsgBox vbOkOnly (the default), vbYesNo, etc. or a comma delimited
 ' string specifying the used button's caption. The function uses the
@@ -314,24 +332,5 @@ End Function
 
 Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "mMsg" & "." & sProc
-End Function
-
-Public Function AppErr(ByVal lNo As Long) As Long
-' -------------------------------------------------------------------------------
-' Attention: This function is dedicated for being used with Err.Raise AppErr()
-'            in conjunction with the common error handling module mErrHndlr when
-'            the call stack is supported. The error number passed on to the entry
-'            procedure is interpreted when the error message is displayed.
-' The function ensures that a programmed (application) error numbers never
-' conflicts with VB error numbers by adding vbObjectError which turns it into a
-' negative value. In return, translates a negative error number back into an
-' Application error number. The latter is the reason why this function must never
-' be used with a true VB error number.
-' -------------------------------------------------------------------------------
-    If lNo < 0 Then
-        AppErr = lNo - vbObjectError
-    Else
-        AppErr = vbObjectError + lNo
-    End If
 End Function
 
