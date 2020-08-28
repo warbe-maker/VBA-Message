@@ -226,10 +226,14 @@ Public Sub Demo_Msg()
    Loop
    
 End Sub
-             
-
+```             
 re-displays the following message until the Ok button is clicked:
+<<<<<<< HEAD
 ![](/images/demo-1.png?raw=true)
+=======
+
+![](/images/demo-1.jpg)
+>>>>>>> 35d2c048aad5addaa036bcb92c517c6b26898f4d
 
 ### Examples Summary
 The examples above demonstrate  the use of the UserForm _fMsg_. Considering the [Common Public Properties](<Implementation.md#common-public-properties>) of the UserForm some can implement any similar kind of application specific message. 
