@@ -101,17 +101,17 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
 
     '~~ Display error message by UserForm fErrMsg
     With fMsg
-        .AppTitle = errtitle
-        .SectionLabel(1) = "Error Message/Description:"
-        .SectionText(1) = sErrText
+        .ApplTitle = errtitle
+        .ApplLabel(1) = "Error Message/Description:"
+        .ApplText(1) = sErrText
         If errpath <> vbNullString Then
-            .SectionLabel(2) = "Error path (call stack):"
-            .SectionText(2) = errpath
-            .SectionMonoSpaced(2) = True
+            .ApplLabel(2) = "Error path (call stack):"
+            .ApplText(2) = errpath
+            .ApplMonoSpaced(2) = True
         End If
         If errinfo <> vbNullString Then
-            .SectionLabel(3) = "Info:"
-            .SectionText(3) = errinfo
+            .ApplLabel(3) = "Info:"
+            .ApplText(3) = errinfo
         End If
         .ApplButtons = vbOKOnly
         .Show
@@ -231,9 +231,9 @@ Public Function Box( _
 '    Dim siHeight    As Single
 
     With fMsg
-        .AppTitle = title
-        .SectionText(1) = MsgSectionText
-        .SectionMonoSpaced(1) = msgmonospaced
+        .ApplTitle = title
+        .ApplText(1) = MsgSectionText
+        .ApplMonoSpaced(1) = msgmonospaced
         .ApplButtons = buttons
         .Show
         Box = .ReplyValue
@@ -275,32 +275,32 @@ End Function
 ' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
 ' ------------------------------------------------------------------
 Public Function Msg(ByVal title As String, _
-           Optional ByVal section1label As String = vbNullString, _
-           Optional ByVal section1text As String = vbNullString, _
-           Optional ByVal section1monospaced As Boolean = False, _
-           Optional ByVal section2label As String = vbNullString, _
-           Optional ByVal section2text As String = vbNullString, _
-           Optional ByVal section2monospaced As Boolean = False, _
-           Optional ByVal section3label As String = vbNullString, _
-           Optional ByVal section3text As String = vbNullString, _
-           Optional ByVal section3monospaced As Boolean = False, _
+           Optional ByVal label1 As String = vbNullString, _
+           Optional ByVal text1 As String = vbNullString, _
+           Optional ByVal monospaced1 As Boolean = False, _
+           Optional ByVal label2 As String = vbNullString, _
+           Optional ByVal text2 As String = vbNullString, _
+           Optional ByVal monospaced2 As Boolean = False, _
+           Optional ByVal label3 As String = vbNullString, _
+           Optional ByVal text3 As String = vbNullString, _
+           Optional ByVal monospaced3 As Boolean = False, _
            Optional ByVal monospacedfontsize As Long = 0, _
            Optional ByVal buttons As Variant = vbOKOnly) As Variant
     
     With fMsg
-        .AppTitle = title
+        .ApplTitle = title
         
-        .SectionLabel(1) = section1label
-        .SectionText(1) = section1text
-        .SectionMonoSpaced(1) = section1monospaced
+        .ApplLabel(1) = label1
+        .ApplText(1) = text1
+        .ApplMonoSpaced(1) = monospaced1
         
-        .SectionLabel(2) = section2label
-        .SectionText(2) = section2text
-        .SectionMonoSpaced(2) = section2monospaced
+        .ApplLabel(2) = label2
+        .ApplText(2) = text2
+        .ApplMonoSpaced(2) = monospaced2
         
-        .SectionLabel(3) = section3label
-        .SectionText(3) = section3text
-        .SectionMonoSpaced(3) = section3monospaced
+        .ApplLabel(3) = label3
+        .ApplText(3) = text3
+        .ApplMonoSpaced(3) = monospaced3
 
         .ApplButtons = buttons
         .Show
@@ -308,7 +308,6 @@ Public Function Msg(ByVal title As String, _
         Msg = .ReplyValue
     End With
     Unload fMsg
-
 
 End Function
 

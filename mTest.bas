@@ -126,9 +126,9 @@ Repeat:
     WidthDeterminedByMinimumWidth = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, section2text:=sMsg2Text, _
-             section3label:=sMsg3Label, section3text:=sMsg3Text, _
+             label1:=sMsg1Label, text1:=sMsg1Text, _
+             label2:=sMsg2Label, text2:=sMsg2Text, _
+             label3:=sMsg3Label, text3:=sMsg3Text, _
              buttons:=vButtons _
             )
     Select Case WidthDeterminedByMinimumWidth
@@ -178,12 +178,12 @@ Public Function WidthDeterminedByTitle( _
     WidthDeterminedByTitle = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, _
-             section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, _
-             section2text:=sMsg2Text, _
-             section3label:=sMsg3Label, _
-             section3text:=sMsg3Text, _
+             label1:=sMsg1Label, _
+             text1:=sMsg1Text, _
+             label2:=sMsg2Label, _
+             text2:=sMsg2Text, _
+             label3:=sMsg3Label, _
+             text3:=sMsg3Text, _
              buttons:=vButtons _
             )
 End Function
@@ -234,13 +234,13 @@ Repeat:
     WidthDeterminedByMonoSpacedMessageSection = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, _
-             section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, _
-             section2text:=sMsg2Text, _
-             section3label:=sMsg3Label, _
-             section3text:=sMsg3Text, _
-             section3monospaced:=True, _
+             label1:=sMsg1Label, _
+             text1:=sMsg1Text, _
+             label2:=sMsg2Label, _
+             text2:=sMsg2Text, _
+             label3:=sMsg3Label, _
+             text3:=sMsg3Text, _
+             monospaced3:=True, _
              buttons:=vButtons _
             )
     Select Case WidthDeterminedByMonoSpacedMessageSection
@@ -296,12 +296,12 @@ Repeat:
     WidthDeterminedByReplyButtons = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, _
-             section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, _
-             section2text:=sMsg2Text, _
-             section3label:=sMsg3Label, _
-             section3text:=sMsg3Text, _
+             label1:=sMsg1Label, _
+             text1:=sMsg1Text, _
+             label2:=sMsg2Label, _
+             text2:=sMsg2Text, _
+             label3:=sMsg3Label, _
+             text3:=sMsg3Text, _
              buttons:=vButtons _
             )
     
@@ -362,13 +362,13 @@ Public Function MonoSpacedSectionWidthExceedsMaxFormWidth( _
     MonoSpacedSectionWidthExceedsMaxFormWidth = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, _
-             section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, _
-             section2text:=sMsg2Text, _
-             section3label:=sMsg3Label, _
-             section3text:=sMsg3Text, _
-             section3monospaced:=True, _
+             label1:=sMsg1Label, _
+             text1:=sMsg1Text, _
+             label2:=sMsg2Label, _
+             text2:=sMsg2Text, _
+             label3:=sMsg3Label, _
+             text3:=sMsg3Text, _
+             monospaced3:=True, _
              buttons:=vButtons _
             )
 End Function
@@ -401,13 +401,13 @@ Public Function MonoSpacedMessageSectionExceedMaxFormHeight() As Variant
     MonoSpacedMessageSectionExceedMaxFormHeight = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, _
-             section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, _
-             section2text:=sMsg2Text, _
-             section2monospaced:=True, _
-             section3label:=sMsg3Label, _
-             section3text:=sMsg3Text, _
+             label1:=sMsg1Label, _
+             text1:=sMsg1Text, _
+             label2:=sMsg2Label, _
+             text2:=sMsg2Text, _
+             monospaced2:=True, _
+             label3:=sMsg3Label, _
+             text3:=sMsg3Text, _
              buttons:=vButtons _
             )
 End Function
@@ -480,10 +480,10 @@ Public Function ButtonByValue()
     ButtonByValue = _
     mMsg.Msg( _
              title:="Test: Button by value (" & PROC & ")", _
-             section1label:="Test description:", _
-             section1text:="The ""buttons"" argument is provided as VB MsgBox value vbYesNo.", _
-             section2label:="Expected result:", _
-             section2text:="The buttons ""Yes"" an ""No"" are displayed centered in one row", _
+             label1:="Test description:", _
+             text1:="The ""buttons"" argument is provided as VB MsgBox value vbYesNo.", _
+             label2:="Expected result:", _
+             text2:="The buttons ""Yes"" an ""No"" are displayed centered in one row", _
              buttons:=vbYesNo _
             )
 End Function
@@ -498,10 +498,10 @@ Public Function ButtonByString()
     ButtonByString = _
     mMsg.Msg( _
              title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             section1label:="Test description:", _
-             section1text:="The ""buttons"" argument is provided as string expression.", _
-             section2label:="Expected result:", _
-             section2text:="The buttons ""Yes"" an ""No"" are displayed centered in two rows", _
+             label1:="Test description:", _
+             text1:="The ""buttons"" argument is provided as string expression.", _
+             label2:="Expected result:", _
+             text2:="The buttons ""Yes"" an ""No"" are displayed centered in two rows", _
              buttons:="Yes," & vbLf & ",No" _
             )
 End Function
@@ -528,12 +528,12 @@ Public Function Test_VerticalButtonScrollBar_1()
     Test_VerticalButtonScrollBar_1 = _
     mMsg.Msg( _
              title:=Readable(PROC), _
-             section1label:="Test description:", _
-             section1text:="The number of the used reply ""buttons"", their specific order respectively exceeds " & _
+             label1:="Test description:", _
+             text1:="The number of the used reply ""buttons"", their specific order respectively exceeds " & _
                            "the specified maximum forms height (for this test limited to " & _
                            fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen height", _
-             section2label:="Expected result:", _
-             section2text:="The height for the vertically ordered buttons is reduced to fit the specified " & _
+             label2:="Expected result:", _
+             text2:="The height for the vertically ordered buttons is reduced to fit the specified " & _
                            "maximum message form heigth and a vertical scroll bar is applied.", _
              buttons:=sButtons _
             )
@@ -561,15 +561,15 @@ Public Function Test_VerticalButtonScrollBar_2()
     
     While mMsg.Msg( _
              title:=Readable(PROC), _
-             section1label:="Test description:", _
-             section1text:="The number of the used reply ""buttons"", their specific order respectively exceeds " & _
+             label1:="Test description:", _
+             text1:="The number of the used reply ""buttons"", their specific order respectively exceeds " & _
                            "the specified maximum forms height (for this test limited to " & _
                            fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen height", _
-             section2label:="Expected result:", _
-             section2text:="The height for the vertically ordered buttons is reduced to fit the specified " & _
+             label2:="Expected result:", _
+             text2:="The height for the vertically ordered buttons is reduced to fit the specified " & _
                            "maximum message form heigth and a vertical scroll bar is applied.", _
-             section3label:="Finish test:", _
-             section3text:="This test is repeated with any button clicked othe than the ""Ok"" button", _
+             label3:="Finish test:", _
+             text3:="This test is repeated with any button clicked othe than the ""Ok"" button", _
              buttons:=sButtons _
             ) <> "Ok"
     Wend
