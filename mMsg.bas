@@ -304,31 +304,13 @@ Public Function Msg(ByVal title As String, _
 
         .ApplButtons = buttons
         .Show
+        On Error Resume Next ' Just in case the user has terminated the dialog without clicking a reply button
         Msg = .ReplyValue
     End With
     Unload fMsg
 
 
 End Function
-
-'' This part is from Leith Ross                                              |
-'' Found this Code on:                                                       |
-'' https://www.mrexcel.com/forum/excel-questions/485489-resize-userform.html |
-''                                                                           |
-'' All credits belong to him                                                 |
-'' ---------------------------------------------------------------------------
-'Private Sub MakeFormResizable()
-'Const WS_THICKFRAME = &H40000
-'Const GWL_STYLE As Long = (-16)
-'Dim lStyle As LongPtr
-'Dim hwnd As LongPtr
-'Dim RetVal
-'
-'    hwnd = GetForegroundWindow
-'
-'    lStyle = GetWindowLongPtr(hwnd, GWL_STYLE Or WS_THICKFRAME)
-'    RetVal = SetWindowLongPtr(hwnd, GWL_STYLE, lStyle)
-'End Sub
 
 Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "mMsg" & "." & sProc
