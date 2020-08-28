@@ -53,6 +53,7 @@ The message form is organized in a hierarchy of frames as follows.
     | | | Reply Row 7 Button 6               | | |
     | | | Reply Row 7 Button 7               | | |
     | | +------------------------------------+ | |
-    | +--------------------------------------+ | |    +--------------------------------------------+
+    | +--------------------------------------+ | |
+    +--------------------------------------------+
 ````    
 The [Implementation](#Implementation.md) is merely design driven. Not using control's name is achieved by storing  all controls (frames, text boxes, and command buttons) in collections by relying on the design rather than on control names. As a consequence, additional message sections and additional reply buttons are primarily a matter of a design change and require a minimum code change.
