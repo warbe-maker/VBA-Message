@@ -227,8 +227,9 @@ Public Sub Demo_Msg()
    
 End Sub
              
+
 re-displays the following message until the Ok button is clicked:
-![](/Demo-1.png?raw=true)
+![](/images/demo-1.png)
 
 ### Examples Summary
 The examples above demonstrate  the use of the UserForm _fMsg_. Considering the [Common Public Properties](<Implementation.md#common-public-properties>) of the UserForm some can implement any similar kind of application specific message. 
@@ -240,5 +241,4 @@ The examples above demonstrate  the use of the UserForm _fMsg_. Considering the 
 Because the text is ++not++  "wrapped" the width of the _Message Form_ is determined by the longest text line (up to the _Maximum Form Width_ specified). When the maximum width is exceeded a vertical scroll bar is applied.<br>Note: The title and the broadest _Button Row_ May still determine an even broader final _Message Form_.
 
 #### _Monospaced_ = False (default)
-Because the text is "wrapped"
-the width of a proportional-spaced text is determined by the current form width.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the required space for the broadest _Buttons Row_ and the specified _Minimum Form Width_.
+Because the text is "wrapped" the width of a proportional-spaced text is determined by the current form width.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the required space for the broadest _Buttons Row_ and the specified _Minimum Form Width_.
