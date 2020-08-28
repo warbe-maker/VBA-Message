@@ -229,7 +229,7 @@ End Sub
              
 
 re-displays the following message until the Ok button is clicked:
-![](/images/demo-1.png)
+![](/images/demo-1.png?raw=true)
 
 ### Examples Summary
 The examples above demonstrate  the use of the UserForm _fMsg_. Considering the [Common Public Properties](<Implementation.md#common-public-properties>) of the UserForm some can implement any similar kind of application specific message. 
