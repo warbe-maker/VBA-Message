@@ -78,6 +78,8 @@ Dim cllDsgnSections             As New Collection   '
 Dim cllDsgnSectionsLabel        As New Collection
 Dim cllDsgnSectionsText         As New Collection   ' Collection of section frames
 Dim cllDsgnSectionsTextFrame    As New Collection
+Dim dctApplButtons              As New Dictionary   ' Dictionary of applied buttons (key=CommandButton, item=row)
+Dim dctApplButtonRows           As New Dictionary   ' Dictionary of applied/used/visible button rows (key=frame, item=row)
 Dim dctApplButtonsRetVal        As New Dictionary   ' Dictionary of the applied buttons' reply value (key=CommandButton)
 Dim dctSectionsLabel            As New Dictionary   ' User provided Section Labels text through Property ApplLabel
 Dim dctSectionsMonoSpaced       As New Dictionary   ' User provided Section Monospaced option through Property SectionMonospaced
@@ -92,6 +94,7 @@ Dim siMaxButtonWidth            As Single
 Dim siMaxFormHeight             As Single           ' above converted to excel userform height
 Dim siMaxFormWidth              As Single           ' above converted to excel userform width
 Dim siMaxRowWidth               As Single
+Dim siMaxRowsHeight             As Single
 Dim siMaxSectionWidth           As Single
 Dim siMinimumFormWidth          As Single
 Dim siMonoSpacedFontSize        As Single
@@ -139,8 +142,9 @@ Private Sub UserForm_Initialize()
     For Each v In cllDsgnButtonRows
         Set cllDsgnRowButtons = New Collection
         Collect into:=cllDsgnRowButtons, ctltype:="CommandButton", fromparent:=v, ctlheight:=10, ctlwidth:=BUTTON_MIN_WIDTH
-        If cllDsgnRowButtons.Count > 0 _
-        Then cllDsgnButtons.Add cllDsgnRowButtons
+        If cllDsgnRowButtons.Count > 0 Then
+            cllDsgnButtons.Add cllDsgnRowButtons
+        End If
     Next v
     
     Me.Height = VSPACE_AREAS * 4
@@ -156,23 +160,25 @@ on_error:
     Debug.Print Err.Description: Stop: Resume Next
 End Sub
 
-' In contrast to the Let property which is the buttons specification provided by the caller
-' this returns a collection of the setup command button objects.
-' -----------------------------------------------------------------------------------------
-Private Property Get ApplButtons() As Variant
-        
-    Static cll As Collection
-    Dim i   As Long
+Private Sub UserForm_Terminate()
+
+    Set cllDsgnAreas = Nothing
+    Set cllDsgnButtonRows = Nothing
+    Set cllDsgnButtons = Nothing
+    Set cllDsgnRowButtons = Nothing
+    Set cllDsgnSections = Nothing
+    Set cllDsgnSectionsLabel = Nothing
+    Set cllDsgnSectionsText = Nothing
+    Set cllDsgnSectionsTextFrame = Nothing
+    Set dctApplButtonsRetVal = Nothing
+    Set dctSectionsLabel = Nothing
+    Set dctSectionsMonoSpaced = Nothing
+    Set dctSectionsText = Nothing
+    Set cllDsgnButtonsFrame = Nothing
+    Set dctApplButtons = Nothing
     
-    If Not cll Is Nothing Then Set cll = Nothing
-    Set cll = New Collection
-    For i = 1 To dctApplButtonsRetVal.Count
-        cll.Add dctApplButtonsRetVal.Keys(i - 1)
-    Next i
-    Set ApplButtons = cll
-    Set cll = Nothing
-    
-End Property
+End Sub
+
 Private Property Get ApplButtonRetVal(Optional ByVal button As MSForms.CommandButton) As Variant
     ApplButtonRetVal = dctApplButtonsRetVal(button)
 End Property
@@ -180,6 +186,12 @@ End Property
 Private Property Let ApplButtonRetVal(Optional ByVal button As MSForms.CommandButton, ByVal v As Variant)
     dctApplButtonsRetVal.Add button, v
 End Property
+
+' In contrast to the Let property which is the buttons specification provided by the caller
+' this returns a dictionary of the setup command button objects with the command button
+' as key and the row as item.
+' -----------------------------------------------------------------------------------------
+Private Property Get ApplButtons() As Variant:                                          Set ApplButtons = dctApplButtons:                                           End Property
 
 Public Property Let ApplButtons(ByVal v As Variant):                                    vButtons = v:                                                               End Property
 
@@ -213,7 +225,7 @@ Public Property Get ApplText(Optional ByVal section As Long) As String
         Else ApplText = vbNullString
     End With
 End Property
-Private Property Get DsgnButtonsFrame() As MSForms.Frame:                               Set DsgnButtonsFrame = cllDsgnButtonsFrame(1):                                  End Property
+
 Public Property Let ApplText(Optional ByVal section As Long, ByVal s As String):        dctSectionsText(section) = s:                                               End Property
 
 Public Property Let ApplTitle(ByVal s As String):                                       sTitle = s:                                                                 End Property
@@ -227,6 +239,8 @@ Private Property Get DsgnButtonRow(Optional ByVal row As Long) As MSForms.Frame:
 Private Property Get DsgnButtonRows() As Collection:                                    Set DsgnButtonRows = cllDsgnButtonRows:                                     End Property
 
 Private Property Get DsgnButtonsArea() As MSForms.Frame:                                Set DsgnButtonsArea = cllDsgnAreas(2):                                      End Property
+
+Private Property Get DsgnButtonsFrame() As MSForms.Frame:                               Set DsgnButtonsFrame = cllDsgnButtonsFrame(1):                                  End Property
 
 Private Property Get DsgnMsgArea() As MSForms.Frame:                                    Set DsgnMsgArea = cllDsgnAreas(1):                                          End Property
 
@@ -359,16 +373,34 @@ End Sub
 ' ---------------------------------------------
 Private Function ApplButtonRows() As Collection
 
-    Dim v   As Variant
     Dim cll As New Collection
+    Dim v   As Variant
     
     For Each v In cllDsgnButtonRows
         If v.Visible Then cll.Add v
     Next v
-    
     Set ApplButtonRows = cll
     
 End Function
+
+Public Sub ApplButtonRowsCenter()
+
+    Dim cllButtonRows   As Collection:  Set cllButtonRows = DsgnButtonRows
+    Dim lRow            As Long
+    Dim frRow           As MSForms.Frame
+    
+    For lRow = 1 To cllButtonRows.Count
+        Set frRow = cllButtonRows(lRow)
+        With frRow
+            If .Visible Then
+                Debug.Print frRow.Name
+                '~~ Center the button rows within the buttons frame horizontaly
+                CenterHorizontal centerfr:=frRow, infr:=frButtons
+            End If
+        End With
+    Next lRow
+
+End Sub
 
 ' Setup an applied reply buttonindex's (buttonindex) visibility and
 ' caption, calculate the maximum buttonindex width and height,
@@ -390,8 +422,9 @@ Private Sub ApplButtonSetup(ByVal buttonrow As Long, _
         .Height = .Height + 1 ' safety margin to ensure proper multilin caption display
         siMaxButtonHeight = Max(siMaxButtonHeight, .Height)
         siMaxButtonWidth = Max(siMaxButtonWidth, .width, BUTTON_MIN_WIDTH)
+        Debug.Print "Button " & .Name & " setup"
     End With
-    
+    dctApplButtons.Add cmb, buttonrow
     ApplButtonRetVal(cmb) = buttonreturnvalue ' keep record of the setup buttonindex's reply value
     
 End Sub
@@ -401,13 +434,17 @@ End Sub
 ' -----------------------------------------------------
 Private Sub ApplButtonsSetup(ByVal vButtons As Variant)
     
-    Dim frArea              As MSForms.Frame:   Set frArea = DsgnButtonsArea
-    Dim cllApplButtonRows   As Collection
+    Dim frArea              As MSForms.Frame
+    Dim frRow               As MSForms.Frame
+    Dim frButtons           As MSForms.Frame
     Dim siMaxRowHeight      As Single
     Dim v                   As Variant
     Dim lApplButtonRows     As Long
+    Dim lRow                As Long
     
     On Error GoTo on_error
+    Set frArea = DsgnButtonsArea
+    Set frButtons = DsgnButtonsFrame
     
     '~~ Setup all reply button by calculatig their maximum width and height
     Select Case TypeName(vButtons)
@@ -415,24 +452,19 @@ Private Sub ApplButtonsSetup(ByVal vButtons As Variant)
         Case "String":  ApplButtonsSetupFromString
     End Select
             
-    ApplButtonsUnifySize
-    ApplButtonRowsUnifyHeight
+    ResizeAndRepositionButtonsArea
                                                        
-    '~~ Adjust the buttons frame
-    lApplButtonRows = cllApplButtonRows.Count
-    DoEvents
-    With DsgnButtonsFrame
-        .Visible = True
-        .Top = siTestFramesVmargin
-        .width = siMaxRowWidth + (siTestFramesHmargin * 2)
-        .Height = (siMaxRowHeight * lApplButtonRows) + (VSPACE_BUTTON_ROWS * (lApplButtonRows - 1)) + siTestFramesVmargin
-    End With
+'    '~~ Adjust the buttons frame
+'    lApplButtonRows = dctApplButtonRows.Count
+'    DoEvents
+'    Application.Wait Now() + 0.00001
+'    With frButtons
+'        .Visible = True
+'        .Top = siTestFramesVmargin
+'        .width = siMaxRowWidth + (siTestFramesHmargin * 2)
+'        .Height = (siMaxRowHeight * lApplButtonRows) + (VSPACE_BUTTON_ROWS * (lApplButtonRows - 1)) + siTestFramesVmargin
+'    End With
     
-    '~~ CenterHorizontal the button rows within the buttons frame
-    For Each v In cllApplButtonRows
-        CenterHorizontal centerfr:=v, infr:=DsgnButtonsFrame
-    Next v
-
     '~~ Adjust the button row's surrounding area frame width to the maximum row width
     With frArea
         .Visible = True
@@ -443,11 +475,11 @@ Private Sub ApplButtonsSetup(ByVal vButtons As Variant)
                 
     '~~ CenterHorizontal the buttons area within the UserForm
     With frArea
-        .Height = (siMaxButtonHeight * cllApplButtonRows.Count) + (VSPACE_BUTTON_ROWS * (cllApplButtonRows.Count - 1)) + siTestFramesHmargin + VSPACE_SCROLLBAR
+        .Height = (siMaxButtonHeight * dctApplButtonRows.Count) + (VSPACE_BUTTON_ROWS * (dctApplButtonRows.Count - 1)) + siTestFramesHmargin + VSPACE_SCROLLBAR
         .width = .width + HSPACE_SCROLLBAR
     End With
     CenterHorizontal frArea
-    RePositioning
+'    RePositioning
     
     If frArea.width > MaxButtonsAreaWidth Then
         Debug.Print "max area width = " & MaxButtonsAreaWidth
@@ -479,6 +511,7 @@ Private Sub ApplButtonsSetupFromString()
         If v <> vbNullString Then
             If v = vbLf Or v = vbCr Or v = vbCrLf Then
                 '~~ prepare for the next row
+                dctApplButtonRows.Add DsgnButtonRow(lRow), lRow
                 lRow = lRow + 1
                 lButton = 0
             Else
@@ -488,9 +521,11 @@ Private Sub ApplButtonsSetupFromString()
             End If
         End If
     Next v
+    dctApplButtonRows.Add DsgnButtonRow(lRow), lRow
     DsgnButtonsArea.Visible = True
 
 End Sub
+
 ' Setup a row of standard VB MsgBox reply command buttons
 ' -------------------------------------------------------
 Private Sub ApplButtonsSetupFromValue()
@@ -520,47 +555,58 @@ Private Sub ApplButtonsSetupFromValue()
     End Select
     DsgnButtonsArea.Visible = True
     DsgnButtonRow(1).Visible = True
-
+    dctApplButtonRows.Add DsgnButtonRow(1), 1
+    
 End Sub
-' Assign all applied/visible button rows the same height
-' by the way calculating the maximum row width.
-' ------------------------------------------------------
-Private Sub ApplButtonRowsUnifyHeight()
-    
-    Dim v       As Variant
-    Dim siTop   As Single
-    
-    siTop = siTestFramesVmargin
-    For Each v In ApplButtonRows
-        With v
-            siMaxRowWidth = Max(siMaxRowWidth, .width)
-            .Height = siMaxButtonHeight + siTestFramesVmargin
-            .Top = siTop
-            siTop = siTop + .Height + VSPACE_BUTTON_ROWS
-        End With
-    Next v
+'
+'' Assign all applied/visible buttons the same width and height
+'' ------------------------------------------------------------
+'Private Sub ApplButtonsUnifySize()
+'
+'    Dim siLeft  As Single
+'    Dim v       As Variant
+'
+'    siLeft = siTestFramesHmargin
+'    For Each v In ApplButtons
+'        With v
+'            .width = siMaxButtonWidth
+'            .Height = siMaxButtonHeight
+'            .left = siLeft
+'            siLeft = siLeft + .width + HSPACE_BUTTONS
+'            Debug.Print "Button " & v.Name & " size unified"
+'        End With
+'    Next v
+'
+'End Sub
 
-End Sub
-
-'~~ Assign all applied/visible buttons the same width and height and adjust their left position
-Private Sub ApplButtonsUnifySize()
+' Return a collection of applied/used/visble buttons in frame frRow.
+' ------------------------------------------------------------------
+Private Function ApplRowButtons(ByVal frRow As MSForms.Frame) As Collection
     
-    Dim siLeft  As Single
-    Dim v       As Variant
-'    Dim cmb     As MSForms.CommandButton
+    On Error GoTo on_error
     
-    siLeft = siTestFramesHmargin
-    For Each v In ApplButtons
-'        Set cmb = v
-        With v
-            .width = siMaxButtonWidth
-            .Height = siMaxButtonHeight
-            .left = siLeft
-            siLeft = siLeft + .width + HSPACE_BUTTONS
-        End With
-    Next v
+    Dim lRow    As Long
+    Dim cll     As New Collection
+    Dim vButton    As Variant
+    
+    For lRow = 1 To cllDsgnButtonRows.Count
+        If cllDsgnButtonRows(lRow) Is frRow Then
+            For Each vButton In DsgnRowButtons(lRow)
+                If vButton.Visble = True Then
+                    Debug.Print vButton.Name
+                    cll.Add vButton
+                End If
+            Next vButton
+            Exit For
+        End If
+    Next lRow
+    Set ApplRowButtons = cll
 
-End Sub
+exit_proc:
+    Exit Function
+on_error:
+    Debug.Print Err.Description: Stop: Resume Next
+End Function
 
 Private Sub ApplSectionsMonoSpacedSetup()
                              
@@ -842,6 +888,12 @@ Private Sub DisplayTestFrameWithCaptions(ByVal b As Boolean)
 
 End Sub
 
+' Return a collection of applied/use/visible buttons in row buttonrow.
+' --------------------------------------------------------------------
+Private Function DsgnRowButtons(ByVal buttonrow As Long) As Collection
+    Set DsgnRowButtons = cllDsgnButtons(buttonrow)
+End Function
+
 ' Get coordinates of top-left corner and size of entire screen (stretched over
 ' all monitors) and convert to Points.
 ' ----------------------------------------------------------------------------
@@ -856,6 +908,31 @@ Private Sub GetScreenMetrics()
     ConvertPixelsToPoints wVirtualScreenWidth, wVirtualScreenHeight
 
 End Sub
+
+Private Function Max(ByVal v1 As Variant, _
+                    ByVal v2 As Variant, _
+           Optional ByVal v3 As Variant = 0, _
+           Optional ByVal v4 As Variant = 0, _
+           Optional ByVal v5 As Variant = 0, _
+           Optional ByVal v6 As Variant = 0, _
+           Optional ByVal v7 As Variant = 0, _
+           Optional ByVal v8 As Variant = 0, _
+           Optional ByVal v9 As Variant = 0) As Variant
+' -----------------------------------------------------
+' Returns the maximum (biggest) of all provided values.
+' -----------------------------------------------------
+Dim dMax As Double
+    dMax = v1
+    If v2 > dMax Then dMax = v2
+    If v3 > dMax Then dMax = v3
+    If v4 > dMax Then dMax = v4
+    If v5 > dMax Then dMax = v5
+    If v6 > dMax Then dMax = v6
+    If v7 > dMax Then dMax = v7
+    If v8 > dMax Then dMax = v8
+    If v9 > dMax Then dMax = v9
+    Max = dMax
+End Function
 
 ' Setup a message section with its label when one is specified
 ' and return the message's width when greater than any other.
@@ -1103,7 +1180,6 @@ Private Sub RePositioningButtonsArea()
     On Error GoTo on_error
     
     Dim frArea          As MSForms.Frame:   Set frArea = DsgnButtonsArea
-    Dim cllButtonRows   As Collection:      Set cllButtonRows = ApplButtonRows
     Dim frButtonRow     As MSForms.Frame
     Dim v               As Variant
     Dim siHeight        As Single
@@ -1111,33 +1187,33 @@ Private Sub RePositioningButtonsArea()
     
     siTopNext = siTestFramesHmargin
     
-    If cllButtonRows.Count = 0 _
-    Then Err.Raise AppErr(1), "fMsg.RePositioningButtonsArea", "None of the designed button rows is visible, has been setup respectively"
-    lButtonRows = ApplButtonRows.Count
+    If dctApplButtonRows.Count = 0 Then GoTo exit_proc
+    lButtonRows = dctApplButtonRows.Count
     
     '~~ Re-position button rows within the buttons frame vertically
-    For Each v In cllButtonRows
+    For Each v In dctApplButtonRows
         Set frButtonRow = v
         With frButtonRow
-'            Debug.Print .Name
+            Debug.Print "Re-position " & .Name
             siHeight = .Height
             .Top = siTopNext
             siTopNext = .Top + .Height + VSPACE_BUTTON_ROWS
         End With
     Next v
-
-    frButtons.Height = (siHeight * cllButtonRows.Count) + (VSPACE_BUTTON_ROWS * (cllButtonRows.Count - 1)) + siTestFramesVmargin
+    
+    frButtons.width = siMaxRowWidth + (siTestFramesHmargin * 2)
+    frButtons.Height = (siMaxRowsHeight * lButtonRows) + (VSPACE_BUTTON_ROWS * (lButtonRows - 1)) + siTestFramesVmargin
     frButtons.Top = siTestFramesVmargin
     
     With frArea
         '~~ Additional space for the horizontal scroll bar is added if required
         If .ScrollBars = fmScrollBarsNone Or .ScrollBars = fmScrollBarsVertical Then
-            .Height = frButtons.Height + siTestFramesHmargin + VSPACE_SCROLLBAR
+            .Height = frButtons.Top + frButtons.Height + siTestFramesHmargin + VSPACE_SCROLLBAR
         Else
-            .Height = frButtons.Height + siTestFramesHmargin
+            .Height = frButtons.Top + frButtons.Height + siTestFramesHmargin
         End If
     End With
-    
+   
 exit_proc:
     Exit Sub
     
@@ -1222,6 +1298,79 @@ on_error:
     
 End Sub
 
+' - Assign all applied/visible button rows the same height,
+' - Assign all applied/visible row buttons the same width
+'   and adjust their left position
+' - Adjust all applied/visible button rows the reqired width
+'   calculating the maximum row width.
+' ----------------------------------------------------------
+Private Sub ResizeAndRepositionButtonsArea()
+    
+    On Error GoTo on_error
+    
+    Dim cllButtonRows   As Collection:  Set cllButtonRows = DsgnButtonRows
+    Dim frRow           As MSForms.Frame
+    Dim siTop           As Single
+    Dim vButton         As Variant
+    Dim lRow            As Long
+    Dim siLeft          As Single
+    Dim lRowButtons     As Long
+    Dim cll             As New Collection
+    Dim v               As Variant
+    
+    siTop = siTestFramesVmargin
+    For lRow = 1 To cllButtonRows.Count
+        Set frRow = cllButtonRows(lRow)
+        With frRow
+            If .Visible Then
+                cll.Add frRow
+                Debug.Print frRow.Name
+                siLeft = siTestFramesHmargin
+                For Each vButton In DsgnRowButtons(lRow)
+                    If vButton.Visible Then
+                        Debug.Print vButton.Name
+                        vButton.left = siLeft
+                        vButton.width = siMaxButtonWidth
+                        vButton.Height = siMaxButtonHeight
+                        vButton.Top = siTestFramesVmargin
+                        siLeft = vButton.left + vButton.width + HSPACE_BUTTONS
+                        .width = vButton.left + vButton.width + siTestFramesHmargin
+                    End If
+                Next vButton
+                
+                siMaxRowWidth = Max(siMaxRowWidth, .width)
+                .Height = siMaxButtonHeight + (siTestFramesVmargin * 2)
+                .Top = siTop
+                siTop = siTop + .Height + VSPACE_BUTTON_ROWS
+            End If
+            
+'            frButtons.Height = .Top + .Height + siTestFramesVmargin
+            siMaxRowsHeight = .Height
+        End With
+    Next lRow
+    
+    frButtons.width = siMaxRowWidth + (siTestFramesHmargin * 2)
+    For Each v In cll
+        Set frRow = v
+        frRow.width = siMaxRowWidth
+        Debug.Print "Center " & frRow.Name & " in " & frButtons.Name
+        CenterHorizontal frRow, frButtons
+    Next v
+    Set cll = Nothing
+    
+    frButtons.Top = siTestFramesVmargin
+    frButtons.Visible = True
+    DsgnButtonsArea.Height = frButtons.Top + frButtons.Height + siTestFramesVmargin
+    
+    ApplButtonRowsCenter
+    
+exit_proc:
+    Exit Sub
+    
+on_error:
+    Debug.Print Err.Description: Stop: Resume Next
+End Sub
+
 Public Sub RowButtons(ByVal row As Long)
     
     Dim i   As Long
@@ -1280,6 +1429,7 @@ Private Sub SetupMessageForm()
     End With
     
     RePositioning
+      
     AdjustStartupPosition Me
 
 End Sub
@@ -1333,29 +1483,4 @@ End Sub
 Private Sub UserForm_Activate()
     SetupMessageForm
 End Sub
-
-Private Function Max(ByVal v1 As Variant, _
-                    ByVal v2 As Variant, _
-           Optional ByVal v3 As Variant = 0, _
-           Optional ByVal v4 As Variant = 0, _
-           Optional ByVal v5 As Variant = 0, _
-           Optional ByVal v6 As Variant = 0, _
-           Optional ByVal v7 As Variant = 0, _
-           Optional ByVal v8 As Variant = 0, _
-           Optional ByVal v9 As Variant = 0) As Variant
-' -----------------------------------------------------
-' Returns the maximum (biggest) of all provided values.
-' -----------------------------------------------------
-Dim dMax As Double
-    dMax = v1
-    If v2 > dMax Then dMax = v2
-    If v3 > dMax Then dMax = v3
-    If v4 > dMax Then dMax = v4
-    If v5 > dMax Then dMax = v5
-    If v6 > dMax Then dMax = v6
-    If v7 > dMax Then dMax = v7
-    If v8 > dMax Then dMax = v8
-    If v9 > dMax Then dMax = v9
-    Max = dMax
-End Function
 

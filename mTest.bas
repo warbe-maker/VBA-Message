@@ -477,6 +477,13 @@ Public Function ButtonByValue()
     
     Unload fMsg                     ' Ensures a message starts from scratch
     
+    With fMsg
+        .TestFrameWithBorders = True
+        .TestFrameWithCaptions = True
+        .TestFramesVmargin = 5
+        .TestFramesHmargin = 6
+    End With
+    
     ButtonByValue = _
     mMsg.Msg( _
              title:="Test: Button by value (" & PROC & ")", _
@@ -493,8 +500,11 @@ Public Function ButtonByString()
     Const PROC  As String = "ButtonByString"
     
     Unload fMsg                     ' Ensures a message starts from scratch
-    fMsg.TestFrameWithBorders = True
-    
+    With fMsg
+        .TestFrameWithBorders = True
+        .TestFrameWithCaptions = True
+        .TestFramesVmargin = 5
+    End With
     ButtonByString = _
     mMsg.Msg( _
              title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
