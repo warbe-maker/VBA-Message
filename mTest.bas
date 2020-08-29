@@ -113,7 +113,7 @@ Public Function WidthDeterminedByMinimumWidth( _
     
 Repeat:
     With fMsg
-'        .FramesWithBorder = True
+'        .TestFrameWithBorders = True
 '        .FramesWithCaption = True
     End With
     
@@ -228,8 +228,8 @@ Public Function WidthDeterminedByMonoSpacedMessageSection( _
     
 Repeat:
     With fMsg
-'        .FramesWithCaption = True  ' defaults to false, set to true for test purpose only
-        .FramesWithBorder = True  ' defaults to false, set to true for test purpose only
+'        .TestFrameWithCaptions = True  ' defaults to false, set to true for test purpose only
+        .TestFrameWithBorders = True  ' defaults to false, set to true for test purpose only
     End With
     WidthDeterminedByMonoSpacedMessageSection = _
     mMsg.Msg( _
@@ -271,7 +271,7 @@ Public Function WidthDeterminedByReplyButtons( _
     
     ' Initializations for this test
     With fMsg
-        .FramesWithBorder = True
+        .TestFrameWithBorders = True
     End With
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
@@ -343,7 +343,7 @@ Public Function MonoSpacedSectionWidthExceedsMaxFormWidth( _
     
     ' Initializations for this test
     With fMsg
-        .FramesWithBorder = True
+        .TestFrameWithBorders = True
         .MaxFormWidthPrcntgOfScreenSize = 50
     End With
     
@@ -383,7 +383,7 @@ Public Function MonoSpacedMessageSectionExceedMaxFormHeight() As Variant
     
     ' Initializations for this test
     With fMsg
-        .FramesWithBorder = True
+        .TestFrameWithBorders = True
         .MaxFormWidthPrcntgOfScreenSize = 80
         .MaxFormHeightPrcntgOfScreenSize = 50
     End With
@@ -493,7 +493,7 @@ Public Function ButtonByString()
     Const PROC  As String = "ButtonByString"
     
     Unload fMsg                     ' Ensures a message starts from scratch
-    fMsg.FramesWithBorder = True
+    fMsg.TestFrameWithBorders = True
     
     ButtonByString = _
     mMsg.Msg( _
@@ -507,15 +507,15 @@ Public Function ButtonByString()
 End Function
 
 
-Public Function Test_VerticalButtonScrollBar_1()
+Public Function Test_ButtonScrollBarVertical_1()
 
-    Const PROC      As String = "Test_VerticalButtonScrollBar_1"
+    Const PROC      As String = "Test_ButtonScrollBarVertical_1"
     Dim sButtons    As String
     Dim i           As Long
     
     Unload fMsg                     ' Ensures a message starts from scratch
     With fMsg
-'        .FramesWithBorder = True
+'        .TestFrameWithBorders = True
         .MaxFormHeightPrcntgOfScreenSize = 60 ' enforce vertical scroll bar
     End With
     
@@ -525,7 +525,7 @@ Public Function Test_VerticalButtonScrollBar_1()
     Debug.Print sButtons
     sButtons = Right(sButtons, Len(sButtons) - 1)
     
-    Test_VerticalButtonScrollBar_1 = _
+    Test_ButtonScrollBarVertical_1 = _
     mMsg.Msg( _
              title:=Readable(PROC), _
              label1:="Test description:", _
@@ -539,15 +539,15 @@ Public Function Test_VerticalButtonScrollBar_1()
             )
 End Function
 
-Public Function Test_VerticalButtonScrollBar_2()
+Public Function Test_ButtonScrollBarVertical_2()
 
-    Const PROC      As String = "Test_VerticalButtonScrollBar_2"
+    Const PROC      As String = "Test_ButtonScrollBarVertical_2"
     Dim sButtons    As String
     Dim i           As Long
     
     Unload fMsg                     ' Ensures a message starts from scratch
     With fMsg
-'        .FramesWithBorder = True
+'        .TestFrameWithBorders = True
 '        .MaxFormHeightPrcntgOfScreenSize = 60 ' enforce vertical scroll bar
     End With
     
@@ -573,6 +573,45 @@ Public Function Test_VerticalButtonScrollBar_2()
              buttons:=sButtons _
             ) <> "Ok"
     Wend
+    
+End Function
+
+Public Function ButtonScrollBarHorizontal()
+
+    Const PROC      As String = "ButtonScrollBarHorizontal"
+    Dim sButtons    As String
+    Dim i           As Long
+    
+    Unload fMsg                     ' Ensures a message starts from scratch
+    
+    sButtons = Repeat(6, ",Reply Button", True, False)
+    sButtons = Right(sButtons, Len(sButtons) - 1) & "," & vbLf & ",Ok"
+    Debug.Print sButtons
+    
+    Do
+    
+        With fMsg
+            .TestFrameWithBorders = True
+            .TestFrameWithCaptions = True
+            .TestFramesVmargin = 5
+            .TestFramesHmargin = 6
+            .MaxFormWidthPrcntgOfScreenSize = 40 ' enforce horizontal scroll bar
+        End With
+
+        If mMsg.Msg( _
+             title:=Readable(PROC), _
+             label1:="Test description:", _
+             text1:="The number of the used reply ""buttons"", their specific order respectively exceeds " & _
+                           "the specified maximum forms width (for this test limited to " & _
+                           fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen height", _
+             label2:="Expected result:", _
+             text2:="The width for the horizontally ordered buttons is reduced to fit the specified " & _
+                           "maximum message form width and a horizontal scroll bar is applied.", _
+             label3:="Finish test:", _
+             text3:="This test is repeated with any button clicked othe than the ""Ok"" button", _
+             buttons:=sButtons _
+            ) = "Ok" Then Exit Do
+    Loop
     
 End Function
 
