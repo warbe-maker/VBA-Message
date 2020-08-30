@@ -125,6 +125,11 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
             .ApplText(3) = errinfo
         End If
         .ApplButtons = vbOKOnly
+        
+        '~~ Setup prior activating/displaying the message form is essential!
+        '~~ To aviod flickering, the whole setup process must be done before the form is displayed.
+        '~~ This  m u s t  be the method called after passing the arguments and before .show
+        .Setup
         .show
     End With
 
@@ -236,7 +241,7 @@ Public Function Box( _
            Optional ByVal title As String = vbNullString, _
            Optional ByVal MsgSectionText As String = vbNullString, _
            Optional ByVal msgmonospaced As Boolean = False, _
-           Optional ByVal minformwidth As Single = 0, _
+           Optional ByVal MinFormWidth As Single = 0, _
            Optional ByVal buttons As Variant = vbOKOnly) As Variant
     
 '    Dim siHeight    As Single
@@ -246,7 +251,13 @@ Public Function Box( _
         .ApplText(1) = MsgSectionText
         .ApplMonoSpaced(1) = msgmonospaced
         .ApplButtons = buttons
+        
+        '~~ Setup prior activating/displaying the message form is essential!
+        '~~ To aviod flickering, the whole setup process must be done before the form is displayed.
+        '~~ This  m u s t  be the method called after passing the arguments and before .show
+        .Setup
         .show
+        
         Box = .ReplyValue
     End With
     Unload fMsg
@@ -314,6 +325,15 @@ Public Function Msg(ByVal title As String, _
         .ApplMonoSpaced(3) = monospaced3
 
         .ApplButtons = buttons
+         
+        '+-----------------------------------------------------------------------------+
+        '|| Setup prior showing the form i a true perfomance improvement and avoids   ||
+        '|| a flickering message window when the whole setup process is "displayed".  ||
+        '|| During testing however it may be appropriate to comment the Setup here in ||
+        '|| order to have it performed along with the UserForm_Activate event.        ||
+        .Setup '                                                                      ||
+        '+-----------------------------------------------------------------------------+
+        
         .show
         On Error Resume Next ' Just in case the user has terminated the dialog without clicking a reply button
         Msg = .ReplyValue
@@ -321,8 +341,9 @@ Public Function Msg(ByVal title As String, _
     Unload fMsg
 
 End Function
+
 #If Resizable Then
-Public Sub ResizeWindowSettings(frm As Object, show As Boolean)
+Public Sub ResizeWindowSettings(frm As Object, display As Boolean)
 
     Dim windowStyle As Long
     Dim windowHandle As Long
@@ -332,7 +353,7 @@ Public Sub ResizeWindowSettings(frm As Object, show As Boolean)
     windowStyle = GetWindowLong(windowHandle, GWL_STYLE)
     
     'Determine the style to apply based
-    If show = False Then
+    If display = False Then
         windowStyle = windowStyle And (Not WS_THICKFRAME)
     Else
         windowStyle = windowStyle + (WS_THICKFRAME)
