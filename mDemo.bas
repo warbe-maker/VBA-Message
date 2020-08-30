@@ -49,6 +49,9 @@ Public Sub Demo_Msg()
    sButton4 & "," & sButton5 & "," & vbLf & "," & sButton7 _
 
    Do
+      With fMsg
+        .TestFrameWithBorders = True
+      End With
       If mMsg.Msg( _
          title:=sTitle, _
          label1:=sLabel1, text1:=sText1, _

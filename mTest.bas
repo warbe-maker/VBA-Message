@@ -480,8 +480,8 @@ Public Function ButtonByValue()
     With fMsg
         .TestFrameWithBorders = True
         .TestFrameWithCaptions = True
-        .TestFramesVmargin = 5
-        .TestFramesHmargin = 6
+        .FramesVmargin = 5
+        .FramesHmargin = 6
     End With
     
     ButtonByValue = _
@@ -501,9 +501,10 @@ Public Function ButtonByString()
     
     Unload fMsg                     ' Ensures a message starts from scratch
     With fMsg
-        .TestFrameWithBorders = True
-        .TestFrameWithCaptions = True
-        .TestFramesVmargin = 5
+'        .TestFrameWithBorders = True
+'        .TestFrameWithCaptions = True
+'        .FramesVmargin = 2
+'        .FramesHmargin = 5
     End With
     ButtonByString = _
     mMsg.Msg( _
@@ -603,8 +604,8 @@ Public Function ButtonScrollBarHorizontal()
         With fMsg
             .TestFrameWithBorders = True
             .TestFrameWithCaptions = True
-            .TestFramesVmargin = 5
-            .TestFramesHmargin = 6
+            .FramesVmargin = 5
+            .FramesHmargin = 6
             .MaxFormWidthPrcntgOfScreenSize = 40 ' enforce horizontal scroll bar
         End With
 

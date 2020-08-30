@@ -30,6 +30,17 @@ Option Explicit
 'Private Declare PtrSafe Function SetWindowLongPtr Lib "User32.dll" Alias "SetWindowLongA" () As LongPtr
 '   (ByVal hwnd As LongPtr, ByVal nIndex As LongPtr, ByVal dwNewLong As LongPtr)
 '
+Public Const GWL_STYLE = -16
+Public Const WS_CAPTION = &HC00000
+Public Const WS_THICKFRAME = &H40000
+
+#If Resizable Then
+Public Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
+Public Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Public Declare PtrSafe Function DrawMenuBar Lib "user32" (ByVal hWnd As Long) As Long
+Public Declare PtrSafe Function FindWindowA Lib "user32" (ByVal lpClassName As String, ByVal lpWindowName As String) As Long
+#End If
+
 Public Type MessageSection
     sLabel As String
     sText As String
@@ -114,7 +125,7 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
             .ApplText(3) = errinfo
         End If
         .ApplButtons = vbOKOnly
-        .Show
+        .show
     End With
 
 End Sub
@@ -235,7 +246,7 @@ Public Function Box( _
         .ApplText(1) = MsgSectionText
         .ApplMonoSpaced(1) = msgmonospaced
         .ApplButtons = buttons
-        .Show
+        .show
         Box = .ReplyValue
     End With
     Unload fMsg
@@ -303,14 +314,38 @@ Public Function Msg(ByVal title As String, _
         .ApplMonoSpaced(3) = monospaced3
 
         .ApplButtons = buttons
-        .Show
+        .show
         On Error Resume Next ' Just in case the user has terminated the dialog without clicking a reply button
         Msg = .ReplyValue
     End With
     Unload fMsg
 
 End Function
+#If Resizable Then
+Public Sub ResizeWindowSettings(frm As Object, show As Boolean)
 
+    Dim windowStyle As Long
+    Dim windowHandle As Long
+
+    'Get the references to window and style position within the Windows memory
+    windowHandle = FindWindowA(vbNullString, frm.caption)
+    windowStyle = GetWindowLong(windowHandle, GWL_STYLE)
+    
+    'Determine the style to apply based
+    If show = False Then
+        windowStyle = windowStyle And (Not WS_THICKFRAME)
+    Else
+        windowStyle = windowStyle + (WS_THICKFRAME)
+    End If
+    
+    'Apply the new style
+    SetWindowLong windowHandle, GWL_STYLE, windowStyle
+    
+    'Recreate the UserForm window with the new style
+    DrawMenuBar windowHandle
+
+End Sub
+#End If
 Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "mMsg" & "." & sProc
 End Function
