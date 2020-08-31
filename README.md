@@ -29,9 +29,11 @@ When the UserForm _fMsg_ is installed in a VBA project ([download _fMsg.frm_](),
 |----------|---------|
 | _ApplTitle_| | String expression displayed in the message window's handle bar|
 | _ApplLabel(n)_ | Optional. String expression with _n__ as a numeric expression 1 to 3). Applied as a descriptive label above a below message text. Not displayed (even when provided) when no corresponding _ApplText_ is provided |
-| _ApplText(n) | Optional.String expression with _n__ as a numeric expression 1 to 3). Applied as message text of section _n_.|
-| Monospaced(n) | Optional. Boolean expression. Defaults to False when immitted. When True, the text in section _n_ is displayed mono-spaced.|
-| ApplButtons | Optional. Defaults to vbOkOnly.<br>A MsgBox buttons value,<br>a comma delimited String expression,<br>a Collection,<br>or a dictionary,<br>with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf)|
+| _ApplText(n)_ | Optional.String expression with _n__ as a numeric expression 1 to 3). Applied as message text of section _n_.|
+| _Monospaced(n)_ | Optional. Boolean expression. Defaults to False when immitted. When True, the text in section _n_ is displayed mono-spaced.|
+| _ApplButtons_ | Optional. Defaults to vbOkOnly.<br>A MsgBox buttons value,<br>a comma delimited String expression,<br>a Collection,<br>or a dictionary,<br>with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf)|
+| _Reply_ | Read only. The clicked button's caption string as provided through the ApplButtons property |
+| _iReply_ | The clicked button's index |
 
 #### Code examples
 ##### MsgBox
@@ -58,17 +60,22 @@ The first example isn't worth using the alternative since with MsgBox the result
 We take the example from above and have 2 button rows each with 3 buttons and a 3rd with an Ok button:
 ```
    Dim vReply As Variant
-   Dim cll   As New Collection
-   Dim sB1 As String
-   Dim sB2 As String
-   Dim sB3 As String
-   Dim sB4 As String
-   Dim sB5 As String
-   Dim sB6 As String
-   Dim sB7 As String
+   Dim cll    As New Collection
+   ' We will use the return index of the button
+   ' rather than it's caption
+   Dim iB1, iB2, iN3, iB4, iB5, iB6, iB7 As Long
     
-
-   cll.Add "Caption Button 1": sB1 = cll.Count
+   ' Note that because of the "row breaks" the button indices are not equal the position in the collection
+   cll.Add "Caption Button 1": iB1 = cll.Count
+   cll.Add "Caption Button 2": iB2 = cll.Count
+   cll.Add "Caption Button 3": iB3 = cll.Count
+   cll.Add vbLf
+   cll.Add "Caption Button 4": iB4 = cll.Count
+   cll.Add "Caption Button 5": iB5 = cll.Count
+   cll.Add "Caption Button 6": iB5 = cll.Count
+   cll.Add vbLf
+   cll.Add "Caption Button 7": iB7 = cll.Count
+   
      
    With fMsg
       .ApplTitle = "....."
@@ -76,12 +83,19 @@ We take the example from above and have 2 button rows each with 3 buttons and a 
       .ApplButtons = vbYesNoCancel
       .Setup
       .Show
-      vReply = .Reply ' obtaining the reply value unloads the form !
+      '~~ obtaining any of the two possible replies unloads the form.
+      '~~ So you cannot have both!
+      iReply = .iReply
+
    End With
-   Select Case vReply
-      Case vbYes
-      Case vbNo
-      Case vbCancel
+   Select Case iReply
+      Case iB1
+      Case iB2
+      Case iB3
+      Case iB4
+      Case iB5
+      Case iB6
+      Case iB7
    End Select
    
 ```
