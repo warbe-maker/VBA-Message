@@ -2,7 +2,7 @@ Attribute VB_Name = "mMsg"
 Option Explicit
 #Const AlternateMsgBox = 1 ' = 1 for ErrMsg use the fMsg UserForm instead of the MsgBox
 ' --------------------------------------------------------------------------------------------
-' Standard Module mMsg
+' Standard Module mMsg  Alternative MsgBox
 '          Procedures, methods, functions, etc. for displaying a message with a user response.
 '
 ' Methods:
@@ -30,6 +30,17 @@ Option Explicit
 'Private Declare PtrSafe Function SetWindowLongPtr Lib "User32.dll" Alias "SetWindowLongA" () As LongPtr
 '   (ByVal hwnd As LongPtr, ByVal nIndex As LongPtr, ByVal dwNewLong As LongPtr)
 '
+Public Const GWL_STYLE = -16
+Public Const WS_CAPTION = &HC00000
+Public Const WS_THICKFRAME = &H40000
+
+#If Resizable Then
+Public Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
+Public Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Public Declare PtrSafe Function DrawMenuBar Lib "user32" (ByVal hWnd As Long) As Long
+Public Declare PtrSafe Function FindWindowA Lib "user32" (ByVal lpClassName As String, ByVal lpWindowName As String) As Long
+#End If
+
 Public Type MessageSection
     sLabel As String
     sText As String
@@ -101,20 +112,25 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
 
     '~~ Display error message by UserForm fErrMsg
     With fMsg
-        .AppTitle = errtitle
-        .SectionLabel(1) = "Error Message/Description:"
-        .SectionText(1) = sErrText
+        .ApplTitle = errtitle
+        .ApplLabel(1) = "Error Message/Description:"
+        .ApplText(1) = sErrText
         If errpath <> vbNullString Then
-            .SectionLabel(2) = "Error path (call stack):"
-            .SectionText(2) = errpath
-            .SectionMonoSpaced(2) = True
+            .ApplLabel(2) = "Error path (call stack):"
+            .ApplText(2) = errpath
+            .ApplMonoSpaced(2) = True
         End If
         If errinfo <> vbNullString Then
-            .SectionLabel(3) = "Info:"
-            .SectionText(3) = errinfo
+            .ApplLabel(3) = "Info:"
+            .ApplText(3) = errinfo
         End If
         .ApplButtons = vbOKOnly
-        .Show
+        
+        '~~ Setup prior activating/displaying the message form is essential!
+        '~~ To aviod flickering, the whole setup process must be done before the form is displayed.
+        '~~ This  m u s t  be the method called after passing the arguments and before .show
+        .Setup
+        .show
     End With
 
 End Sub
@@ -196,6 +212,24 @@ Dim dMax As Double
     Max = dMax
 End Function
 
+' Used with Err.Raise AppErr() to convert a positive application error number
+' into a negative number to avoid any conflict with a VB error. Used when the
+' error is displayed with ErrMsg to turn the negative number back into the
+' original positive application number.
+' The function ensures that a programmed (application) error numbers never
+' conflicts with VB error numbers by adding vbObjectError which turns it
+' into a negative value. In return, translates a negative error number
+' back into an Application error number. The latter is the reason why this
+' function must never be used with a true VB error number.
+' ------------------------------------------------------------------------
+Public Function AppErr(ByVal lNo As Long) As Long
+    If lNo < 0 Then
+        AppErr = lNo - vbObjectError
+    Else
+        AppErr = vbObjectError + lNo
+    End If
+End Function
+
 ' MsgBox alternative providing up to 5 reply buttons, specified either
 ' by MsgBox vbOkOnly (the default), vbYesNo, etc. or a comma delimited
 ' string specifying the used button's caption. The function uses the
@@ -207,17 +241,23 @@ Public Function Box( _
            Optional ByVal title As String = vbNullString, _
            Optional ByVal MsgSectionText As String = vbNullString, _
            Optional ByVal msgmonospaced As Boolean = False, _
-           Optional ByVal minformwidth As Single = 0, _
+           Optional ByVal MinFormWidth As Single = 0, _
            Optional ByVal buttons As Variant = vbOKOnly) As Variant
     
 '    Dim siHeight    As Single
 
     With fMsg
-        .AppTitle = title
-        .SectionText(1) = MsgSectionText
-        .SectionMonoSpaced(1) = msgmonospaced
+        .ApplTitle = title
+        .ApplText(1) = MsgSectionText
+        .ApplMonoSpaced(1) = msgmonospaced
         .ApplButtons = buttons
-        .Show
+        
+        '~~ Setup prior activating/displaying the message form is essential!
+        '~~ To aviod flickering, the whole setup process must be done before the form is displayed.
+        '~~ This  m u s t  be the method called after passing the arguments and before .show
+        .Setup
+        .show
+        
         Box = .ReplyValue
     End With
     Unload fMsg
@@ -257,81 +297,77 @@ End Function
 ' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
 ' ------------------------------------------------------------------
 Public Function Msg(ByVal title As String, _
-           Optional ByVal section1label As String = vbNullString, _
-           Optional ByVal section1text As String = vbNullString, _
-           Optional ByVal section1monospaced As Boolean = False, _
-           Optional ByVal section2label As String = vbNullString, _
-           Optional ByVal section2text As String = vbNullString, _
-           Optional ByVal section2monospaced As Boolean = False, _
-           Optional ByVal section3label As String = vbNullString, _
-           Optional ByVal section3text As String = vbNullString, _
-           Optional ByVal section3monospaced As Boolean = False, _
+           Optional ByVal label1 As String = vbNullString, _
+           Optional ByVal text1 As String = vbNullString, _
+           Optional ByVal monospaced1 As Boolean = False, _
+           Optional ByVal label2 As String = vbNullString, _
+           Optional ByVal text2 As String = vbNullString, _
+           Optional ByVal monospaced2 As Boolean = False, _
+           Optional ByVal label3 As String = vbNullString, _
+           Optional ByVal text3 As String = vbNullString, _
+           Optional ByVal monospaced3 As Boolean = False, _
            Optional ByVal monospacedfontsize As Long = 0, _
            Optional ByVal buttons As Variant = vbOKOnly) As Variant
     
     With fMsg
-        .AppTitle = title
+        .ApplTitle = title
         
-        .SectionLabel(1) = section1label
-        .SectionText(1) = section1text
-        .SectionMonoSpaced(1) = section1monospaced
+        .ApplLabel(1) = label1
+        .ApplText(1) = text1
+        .ApplMonoSpaced(1) = monospaced1
         
-        .SectionLabel(2) = section2label
-        .SectionText(2) = section2text
-        .SectionMonoSpaced(2) = section2monospaced
+        .ApplLabel(2) = label2
+        .ApplText(2) = text2
+        .ApplMonoSpaced(2) = monospaced2
         
-        .SectionLabel(3) = section3label
-        .SectionText(3) = section3text
-        .SectionMonoSpaced(3) = section3monospaced
+        .ApplLabel(3) = label3
+        .ApplText(3) = text3
+        .ApplMonoSpaced(3) = monospaced3
 
         .ApplButtons = buttons
-        .Show
+         
+        '+-----------------------------------------------------------------------------+
+        '|| Setup prior showing the form i a true perfomance improvement and avoids   ||
+        '|| a flickering message window when the whole setup process is "displayed".  ||
+        '|| During testing however it may be appropriate to comment the Setup here in ||
+        '|| order to have it performed along with the UserForm_Activate event.        ||
+        .Setup '                                                                      ||
+        '+-----------------------------------------------------------------------------+
+        
+        .show
+        On Error Resume Next ' Just in case the user has terminated the dialog without clicking a reply button
         Msg = .ReplyValue
     End With
     Unload fMsg
 
-
 End Function
 
-'' This part is from Leith Ross                                              |
-'' Found this Code on:                                                       |
-'' https://www.mrexcel.com/forum/excel-questions/485489-resize-userform.html |
-''                                                                           |
-'' All credits belong to him                                                 |
-'' ---------------------------------------------------------------------------
-'Private Sub MakeFormResizable()
-'Const WS_THICKFRAME = &H40000
-'Const GWL_STYLE As Long = (-16)
-'Dim lStyle As LongPtr
-'Dim hwnd As LongPtr
-'Dim RetVal
-'
-'    hwnd = GetForegroundWindow
-'
-'    lStyle = GetWindowLongPtr(hwnd, GWL_STYLE Or WS_THICKFRAME)
-'    RetVal = SetWindowLongPtr(hwnd, GWL_STYLE, lStyle)
-'End Sub
+#If Resizable Then
+Public Sub ResizeWindowSettings(frm As Object, display As Boolean)
 
+    Dim windowStyle As Long
+    Dim windowHandle As Long
+
+    'Get the references to window and style position within the Windows memory
+    windowHandle = FindWindowA(vbNullString, frm.caption)
+    windowStyle = GetWindowLong(windowHandle, GWL_STYLE)
+    
+    'Determine the style to apply based
+    If display = False Then
+        windowStyle = windowStyle And (Not WS_THICKFRAME)
+    Else
+        windowStyle = windowStyle + (WS_THICKFRAME)
+    End If
+    
+    'Apply the new style
+    SetWindowLong windowHandle, GWL_STYLE, windowStyle
+    
+    'Recreate the UserForm window with the new style
+    DrawMenuBar windowHandle
+
+End Sub
+#End If
 Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "mMsg" & "." & sProc
-End Function
-
-Public Function AppErr(ByVal lNo As Long) As Long
-' -------------------------------------------------------------------------------
-' Attention: This function is dedicated for being used with Err.Raise AppErr()
-'            in conjunction with the common error handling module mErrHndlr when
-'            the call stack is supported. The error number passed on to the entry
-'            procedure is interpreted when the error message is displayed.
-' The function ensures that a programmed (application) error numbers never
-' conflicts with VB error numbers by adding vbObjectError which turns it into a
-' negative value. In return, translates a negative error number back into an
-' Application error number. The latter is the reason why this function must never
-' be used with a true VB error number.
-' -------------------------------------------------------------------------------
-    If lNo < 0 Then
-        AppErr = lNo - vbObjectError
-    Else
-        AppErr = vbObjectError + lNo
-    End If
 End Function
 

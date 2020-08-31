@@ -105,41 +105,41 @@ Public Function WidthDeterminedByMinimumWidth( _
     
     
     ' Initializations for this test
-    fMsg.MinimumFormWidth = wsMsg.InitMinFormWidth(lTest)
+    fMsg.MinFormWidth = wsMsg.InitMinFormWidth(lTest)
     
     vButton4 = "Repeat with" & vbLf & "minimum width" & vbLf & "+ " & lIncrDecrWidth
     vButton5 = "Repeat with" & vbLf & "minimum width" & vbLf & "- " & lIncrDecrWidth
     vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton4
     
-repeat:
+Repeat:
     With fMsg
-'        .FramesWithBorder = True
+'        .TestFrameWithBorders = True
 '        .FramesWithCaption = True
     End With
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
     sMsg1Label = "Test description:":       sMsg1Text = wsMsg.TestDescription(lTest)
-    sMsg2Label = "Expected test result:":   sMsg2Text = "The width of all message sections is adjusted to the current specified minimum form width (" & fMsg.MinimumFormWidth & " pt)."
+    sMsg2Label = "Expected test result:":   sMsg2Text = "The width of all message sections is adjusted to the current specified minimum form width (" & fMsg.MinFormWidth & " pt)."
     sMsg3Label = "Please also note:":       sMsg3Text = "The message form height is ajusted to the need " & _
                                                         "up to the specified maximum heigth which is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "% and not exceeded."
 
     WidthDeterminedByMinimumWidth = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, section2text:=sMsg2Text, _
-             section3label:=sMsg3Label, section3text:=sMsg3Text, _
+             label1:=sMsg1Label, text1:=sMsg1Text, _
+             label2:=sMsg2Label, text2:=sMsg2Text, _
+             label3:=sMsg3Label, text3:=sMsg3Text, _
              buttons:=vButtons _
             )
     Select Case WidthDeterminedByMinimumWidth
         Case vButton5
-            fMsg.MinimumFormWidth = wsMsg.InitMinFormWidth(lTest) - lIncrDecrWidth
+            fMsg.MinFormWidth = wsMsg.InitMinFormWidth(lTest) - lIncrDecrWidth
             vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton4
-            GoTo repeat
+            GoTo Repeat
         Case vButton4
-            fMsg.MinimumFormWidth = wsMsg.InitMinFormWidth(lTest) + lIncrDecrWidth
+            fMsg.MinFormWidth = wsMsg.InitMinFormWidth(lTest) + lIncrDecrWidth
             vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton5
-            GoTo repeat
+            GoTo Repeat
         Case Else ' Stop and Next are passed on to the caller
     End Select
     
@@ -162,7 +162,7 @@ Public Function WidthDeterminedByTitle( _
     '~~ Initial test values obtained from the Test Worksheet
     lIncrDecrWidth = wsMsg.MinFormWidthIncrDecr(lTest)
     With fMsg
-        .MinimumFormWidth = wsMsg.InitMinFormWidth(lTest)
+        .MinFormWidth = wsMsg.InitMinFormWidth(lTest)
     End With
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC) & "  (This title uses more space than the minimum specified message form width and thus the width is determined by the title)"
@@ -178,12 +178,12 @@ Public Function WidthDeterminedByTitle( _
     WidthDeterminedByTitle = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, _
-             section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, _
-             section2text:=sMsg2Text, _
-             section3label:=sMsg3Label, _
-             section3text:=sMsg3Text, _
+             label1:=sMsg1Label, _
+             text1:=sMsg1Text, _
+             label2:=sMsg2Label, _
+             text2:=sMsg2Text, _
+             label3:=sMsg3Label, _
+             text3:=sMsg3Text, _
              buttons:=vButtons _
             )
 End Function
@@ -226,32 +226,32 @@ Public Function WidthDeterminedByMonoSpacedMessageSection( _
                                                             "- The message form height is ajusted to the need up to the specified maximum heigth" & vbLf & _
                                                             "  based on the screen size which for this test is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
     
-repeat:
+Repeat:
     With fMsg
-'        .FramesWithCaption = True  ' defaults to false, set to true for test purpose only
-'        .FramesWithBorder = True  ' defaults to false, set to true for test purpose only
+'        .TestFrameWithCaptions = True  ' defaults to false, set to true for test purpose only
+        .TestFrameWithBorders = True  ' defaults to false, set to true for test purpose only
     End With
     WidthDeterminedByMonoSpacedMessageSection = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, _
-             section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, _
-             section2text:=sMsg2Text, _
-             section3label:=sMsg3Label, _
-             section3text:=sMsg3Text, _
-             section3monospaced:=True, _
+             label1:=sMsg1Label, _
+             text1:=sMsg1Text, _
+             label2:=sMsg2Label, _
+             text2:=sMsg2Text, _
+             label3:=sMsg3Label, _
+             text3:=sMsg3Text, _
+             monospaced3:=True, _
              buttons:=vButtons _
             )
     Select Case WidthDeterminedByMonoSpacedMessageSection
         Case vButton5
             fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsg.InitMaxFormWidth(lTest) - lIncrDecrWidth
             vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton4
-            GoTo repeat
+            GoTo Repeat
         Case vButton4
             fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsg.InitMaxFormWidth(lTest) + lIncrDecrWidth
             vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton5
-            GoTo repeat
+            GoTo Repeat
         Case Else ' Stop and Next are passed on to the caller
     End Select
     
@@ -271,7 +271,7 @@ Public Function WidthDeterminedByReplyButtons( _
     
     ' Initializations for this test
     With fMsg
-        .FramesWithBorder = True
+        .TestFrameWithBorders = True
     End With
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
@@ -292,16 +292,16 @@ Public Function WidthDeterminedByReplyButtons( _
         vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton4
     End If
     
-repeat:
+Repeat:
     WidthDeterminedByReplyButtons = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, _
-             section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, _
-             section2text:=sMsg2Text, _
-             section3label:=sMsg3Label, _
-             section3text:=sMsg3Text, _
+             label1:=sMsg1Label, _
+             text1:=sMsg1Text, _
+             label2:=sMsg2Label, _
+             text2:=sMsg2Text, _
+             label3:=sMsg3Label, _
+             text3:=sMsg3Text, _
              buttons:=vButtons _
             )
     
@@ -314,7 +314,7 @@ repeat:
                 '~~ Test is performed within Regression
                 vButtons = vButton1 & "," & vButton2 & "," & vButton3 & "," & vButton5
             End If
-            GoTo repeat
+            GoTo Repeat
         Case vButton5
             If vButton1 = vbNullString And vButton3 = vbNullString Then
                 '~~ Test is performed "standalone"
@@ -323,7 +323,7 @@ repeat:
                 '~~ Test is performed within Regression
                 vButtons = vButton1 & "," & vButton2 & "," & vButton3 & ",Dummy," & vButton4
             End If
-            GoTo repeat
+            GoTo Repeat
         Case Else ' passed on to caller
     End Select
     
@@ -343,7 +343,7 @@ Public Function MonoSpacedSectionWidthExceedsMaxFormWidth( _
     
     ' Initializations for this test
     With fMsg
-        .FramesWithBorder = True
+        .TestFrameWithBorders = True
         .MaxFormWidthPrcntgOfScreenSize = 50
     End With
     
@@ -362,13 +362,13 @@ Public Function MonoSpacedSectionWidthExceedsMaxFormWidth( _
     MonoSpacedSectionWidthExceedsMaxFormWidth = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, _
-             section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, _
-             section2text:=sMsg2Text, _
-             section3label:=sMsg3Label, _
-             section3text:=sMsg3Text, _
-             section3monospaced:=True, _
+             label1:=sMsg1Label, _
+             text1:=sMsg1Text, _
+             label2:=sMsg2Label, _
+             text2:=sMsg2Text, _
+             label3:=sMsg3Label, _
+             text3:=sMsg3Text, _
+             monospaced3:=True, _
              buttons:=vButtons _
             )
 End Function
@@ -383,7 +383,7 @@ Public Function MonoSpacedMessageSectionExceedMaxFormHeight() As Variant
     
     ' Initializations for this test
     With fMsg
-        .FramesWithBorder = True
+        .TestFrameWithBorders = True
         .MaxFormWidthPrcntgOfScreenSize = 80
         .MaxFormHeightPrcntgOfScreenSize = 50
     End With
@@ -392,7 +392,7 @@ Public Function MonoSpacedMessageSectionExceedMaxFormHeight() As Variant
     sMsg1Label = "Test description:"
     sMsg1Text = "The width used by the monospaced message section exxceeds the maximum form width for this test (" & fMsg.MaxFormWidth & ") which is the specified " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size."
     sMsg2Label = "Expected test result:"
-    sMsg2Text = repeat(20, "This monospaced message comes with a horizontal scroll bar." & vbLf, True)
+    sMsg2Text = Repeat(20, "This monospaced message comes with a horizontal scroll bar." & vbLf, True)
     sMsg3Label = "Please note the following:"
     sMsg3Text = "The message form height is adjusted to the required height limited by the specified percentage of the screen height, " & _
                 "which for this test is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
@@ -401,13 +401,13 @@ Public Function MonoSpacedMessageSectionExceedMaxFormHeight() As Variant
     MonoSpacedMessageSectionExceedMaxFormHeight = _
     mMsg.Msg( _
              title:=sMsgTitle, _
-             section1label:=sMsg1Label, _
-             section1text:=sMsg1Text, _
-             section2label:=sMsg2Label, _
-             section2text:=sMsg2Text, _
-             section2monospaced:=True, _
-             section3label:=sMsg3Label, _
-             section3text:=sMsg3Text, _
+             label1:=sMsg1Label, _
+             text1:=sMsg1Text, _
+             label2:=sMsg2Label, _
+             text2:=sMsg2Text, _
+             monospaced2:=True, _
+             label3:=sMsg3Label, _
+             text3:=sMsg3Text, _
              buttons:=vButtons _
             )
 End Function
@@ -416,32 +416,40 @@ Private Function ErrSrc(ByVal s As String) As String
     ErrSrc = "mTest." & s
 End Function
 
-' Repeat the string (pattern) n (ntimes) times, otionally prefixed
-' with a line number
+' Repeat the string (pattern) n (ntimes) times, otionally with a linenumber,
+' either prefixed (linenumbersprefix=True) or attached. When the pattern
+' ends with a vbLf, vbCr, or vbCrLf the attached line number is put at the
+' left. The string withlinebreak is attached to the assembled pattern.
 ' -------------------------------------------------------------------------
-Private Function repeat(ByVal ntimes As Long, _
+Private Function Repeat(ByVal ntimes As Long, _
                         ByVal pattern As String, _
-                        Optional withlinenumbers As Boolean = False) As String
+               Optional ByVal withlinenumbers As Boolean = False, _
+               Optional ByVal linenumbersprefix As Boolean = True, _
+               Optional ByVal withlinebreak As String = vbNullString) As String
     
     Const MAX_STRING_LENGTH = 12000
-    Dim i   As Long
-    Dim s   As String
-    Dim ln  As String
+    Dim i       As Long
+    Dim s       As String
+    Dim ln      As String
     Dim sFormat As String
     
     On Error Resume Next
-    If withlinenumbers Then sFormat = String$(Len(CStr(ntimes)), "0") & " "
+    If withlinenumbers Then sFormat = String$(Len(CStr(ntimes)), "0")
     
     For i = 1 To ntimes
         If withlinenumbers Then ln = Format(i, sFormat)
-        s = s & ln & pattern
+        If linenumbersprefix Then
+            s = s & ln & " " & pattern & withlinebreak
+        Else
+            s = s & pattern & " " & ln & withlinebreak
+        End If
         If Err.Number <> 0 Then
             Debug.Print "Repeate had to stop after " & i & "which resulted in a string length of " & Len(s)
-            repeat = s
+            Repeat = s
             Exit Function
         End If
     Next i
-    repeat = s
+    Repeat = s
 End Function
 
 ' Common error message test
@@ -463,17 +471,330 @@ Public Sub Test_Error_Message_Simple()
                 errline:="12"
 End Sub
 
-Public Sub Test_Repeat()
-    Debug.Print repeat(10000, "a" & vbLf, True)
+Public Function ButtonByValue()
+
+    Const PROC  As String = "ButtonByValue"
+    
+    Unload fMsg                     ' Ensures a message starts from scratch
+    
+    With fMsg
+        .TestFrameWithBorders = True
+        .TestFrameWithCaptions = True
+        .FramesVmargin = 5
+        .FramesHmargin = 6
+    End With
+    
+    ButtonByValue = _
+    mMsg.Msg( _
+             title:="Test: Button by value (" & PROC & ")", _
+             label1:="Test description:", _
+             text1:="The ""buttons"" argument is provided as VB MsgBox value vbYesNo.", _
+             label2:="Expected result:", _
+             text2:="The buttons ""Yes"" an ""No"" are displayed centered in one row", _
+             buttons:=vbYesNo _
+            )
+End Function
+
+Public Function ButtonByString()
+
+    Const PROC  As String = "ButtonByString"
+    
+    Unload fMsg                     ' Ensures a message starts from scratch
+    With fMsg
+'        .TestFrameWithBorders = True
+'        .TestFrameWithCaptions = True
+'        .FramesVmargin = 2
+'        .FramesHmargin = 5
+    End With
+    ButtonByString = _
+    mMsg.Msg( _
+             title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
+             label1:="Test description:", _
+             text1:="The ""buttons"" argument is provided as string expression.", _
+             label2:="Expected result:", _
+             text2:="The buttons ""Yes"" an ""No"" are displayed centered in two rows", _
+             buttons:="Yes," & vbLf & ",No" _
+            )
+End Function
+
+Public Function ButtonByCollection()
+
+    Const PROC  As String = "ButtonByCollection"
+    Dim cll As New Collection
+    
+    Unload fMsg                     ' Ensures a message starts from scratch
+    With fMsg
+'        .TestFrameWithBorders = True
+'        .TestFrameWithCaptions = True
+'        .FramesVmargin = 2
+'        .FramesHmargin = 5
+    End With
+    cll.Add "Yes"
+    cll.Add "No"
+    
+    ButtonByCollection = _
+    mMsg.Msg( _
+             title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
+             label1:="Test description:", _
+             text1:="The ""buttons"" argument is provided as string expression.", _
+             label2:="Expected result:", _
+             text2:="The buttons ""Yes"" an ""No"" are displayed centered in two rows", _
+             buttons:=cll _
+            )
+End Function
+
+Public Function ButtonByDictionary()
+
+    Const PROC  As String = "ButtonByDictionary"
+    Dim dct As New Collection
+    
+    Unload fMsg                     ' Ensures a message starts from scratch
+    With fMsg
+'        .TestFrameWithBorders = True
+'        .TestFrameWithCaptions = True
+'        .FramesVmargin = 2
+'        .FramesHmargin = 5
+    End With
+    dct.Add "Yes"
+    dct.Add "No"
+    
+    ButtonByDictionary = _
+    mMsg.Msg( _
+             title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
+             label1:="Test description:", _
+             text1:="The ""buttons"" argument is provided as string expression.", _
+             label2:="Expected result:", _
+             text2:="The buttons ""Yes"" an ""No"" are displayed centered in two rows", _
+             buttons:=dct _
+            )
+End Function
+
+Public Function Test_ButtonScrollBarVertical_1()
+
+    Const PROC      As String = "Test_ButtonScrollBarVertical_1"
+    Dim sButtons    As String
+    Dim i           As Long
+    
+    Unload fMsg                     ' Ensures a message starts from scratch
+    With fMsg
+'        .TestFrameWithBorders = True
+        .MaxFormHeightPrcntgOfScreenSize = 60 ' enforce vertical scroll bar
+    End With
+    
+    For i = 1 To 7
+        sButtons = sButtons & ",Reply Button" & i & "," & vbLf
+    Next i
+    Debug.Print sButtons
+    sButtons = Right(sButtons, Len(sButtons) - 1)
+    
+    Test_ButtonScrollBarVertical_1 = _
+    mMsg.Msg( _
+             title:=Readable(PROC), _
+             label1:="Test description:", _
+             text1:="The number of the used reply ""buttons"", their specific order respectively exceeds " & _
+                           "the specified maximum forms height (for this test limited to " & _
+                           fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen height", _
+             label2:="Expected result:", _
+             text2:="The height for the vertically ordered buttons is reduced to fit the specified " & _
+                           "maximum message form heigth and a vertical scroll bar is applied.", _
+             buttons:=sButtons _
+            )
+End Function
+
+Public Function Test_ButtonScrollBarVertical_2()
+
+    Const PROC      As String = "Test_ButtonScrollBarVertical_2"
+    Dim sButtons    As String
+    Dim i           As Long
+    
+    Unload fMsg                     ' Ensures a message starts from scratch
+    With fMsg
+'        .TestFrameWithBorders = True
+'        .MaxFormHeightPrcntgOfScreenSize = 60 ' enforce vertical scroll bar
+    End With
+    
+    For i = 1 To 6 Step 2
+        sButtons = sButtons & ",Reply" & vbLf & "Button" & vbLf & i & "," & ",Reply" & vbLf & "Button" & vbLf & i + 1 & "," & vbLf
+    Next i
+    sButtons = sButtons & ",Ok"
+    
+    Debug.Print sButtons
+    sButtons = Right(sButtons, Len(sButtons) - 1)
+    
+    While mMsg.Msg( _
+             title:=Readable(PROC), _
+             label1:="Test description:", _
+             text1:="The number of the used reply ""buttons"", their specific order respectively exceeds " & _
+                           "the specified maximum forms height (for this test limited to " & _
+                           fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen height", _
+             label2:="Expected result:", _
+             text2:="The height for the vertically ordered buttons is reduced to fit the specified " & _
+                           "maximum message form heigth and a vertical scroll bar is applied.", _
+             label3:="Finish test:", _
+             text3:="This test is repeated with any button clicked othe than the ""Ok"" button", _
+             buttons:=sButtons _
+            ) <> "Ok"
+    Wend
+    
+End Function
+
+Public Function ButtonScrollBarHorizontal()
+
+    Const PROC      As String = "ButtonScrollBarHorizontal"
+    Dim sButtons    As String
+    Dim i           As Long
+    
+    Unload fMsg                     ' Ensures a message starts from scratch
+    
+    sButtons = Repeat(6, ",Reply Button", True, False)
+    sButtons = Right(sButtons, Len(sButtons) - 1) & "," & vbLf & ",Ok"
+    Debug.Print sButtons
+    
+    Do
+    
+        With fMsg
+            .TestFrameWithBorders = True
+            .TestFrameWithCaptions = True
+            .FramesVmargin = 5
+            .FramesHmargin = 6
+            .MaxFormWidthPrcntgOfScreenSize = 40 ' enforce horizontal scroll bar
+        End With
+
+        If mMsg.Msg( _
+             title:=Readable(PROC), _
+             label1:="Test description:", _
+             text1:="The number of the used reply ""buttons"", their specific order respectively exceeds " & _
+                           "the specified maximum forms width (for this test limited to " & _
+                           fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen height", _
+             label2:="Expected result:", _
+             text2:="The width for the horizontally ordered buttons is reduced to fit the specified " & _
+                           "maximum message form width and a horizontal scroll bar is applied.", _
+             label3:="Finish test:", _
+             text3:="This test is repeated with any button clicked othe than the ""Ok"" button", _
+             buttons:=sButtons _
+            ) = "Ok" Then Exit Do
+    Loop
+    
+End Function
+
+' By nature this test has become quite complex because default values, usually unchanged,
+' are optionally adjusted by means of this "alternative MsgBox".
+' In practice the constraints tested will become rarely effective. However, it is one
+' of the major differences compared with the VB MsgBox that there is absolutely no message
+' size limit - other than the VB limit for a string lenght.
+' ----------------------------------------------------------------------------------------
+Public Sub AllInOne()
+
+    Dim lButton1                As Long
+    Dim lButton2                As Long
+    Dim lButton3                As Long
+    Dim lButton4                As Long
+    Dim lButton5                As Long
+    Dim lButton6                As Long
+    Dim lButton7                As Long
+    Dim sTitle                  As String
+    Dim sLabel1                 As String
+    Dim sText1                  As String
+    Dim sLabel2                 As String
+    Dim sText2                  As String
+    Dim sLabel3                 As String
+    Dim sText3                  As String
+    Dim cll                     As New Collection
+    Dim vReply                  As Variant
+    Dim lChangeHeightPcntg      As Long
+    Dim lChangeWidthPcntg       As Long
+    Dim lChangeMinWidthPt       As Long
+    Dim bMonospaced             As Boolean: bMonospaced = True ' initial test value
+    Dim lMinFormWidth           As Long
+    Dim lMaxFormWidth           As Long
+    Dim lMaxFormHeight          As Long
+    
+    '~~ Obtain initial test values and their corresponding change (increment/decrement) value
+    '~~ for this test (lTest) from the Test Worksheet
+    lTest = 5
+    With wsMsg
+        lMinFormWidth = .InitMinFormWidth(lTest):   lChangeMinWidthPt = .MinFormWidthIncrDecr(lTest)
+        lMaxFormWidth = .InitMaxFormWidth(lTest):   lChangeWidthPcntg = .MaxFormWidthIncrDecr(lTest)
+        lMaxFormHeight = .InitMaxFormHeight(lTest): lChangeHeightPcntg = .MaxFormHeightIncrDecr(lTest)
+    End With
+    
+    sTitle = "All-in-1-Test: Combines as much behaviour a possible"
+    sLabel1 = "Test Description:"
+    sText1 = "This test specifically combines all constraints issues. I.e. what will be displayed when the message exeeds the " & _
+             "maximimum specified widht or height."
+    sLabel2 = "Test Results:"
+   
+    '~~ Assemble the buttons argument string
+    cll.Add "Increase ""Minimum Width"" by " & lChangeMinWidthPt & "pt":    lButton1 = cll.Count
+    cll.Add "Decrease ""Minimum Width"" by " & lChangeMinWidthPt & "pt":    lButton2 = cll.Count
+    cll.Add vbLf
+    cll.Add "Increase ""Maximum Width"" by " & lChangeWidthPcntg & "%":     lButton3 = cll.Count
+    cll.Add "Decrease ""Maximum Width"" by " & lChangeWidthPcntg & "%":     lButton4 = cll.Count
+    cll.Add vbLf
+    cll.Add "Increase ""Maximum Height"" by " & lChangeHeightPcntg & "%":   lButton5 = cll.Count
+    cll.Add "Decrease ""Maximum Height"" by " & lChangeHeightPcntg & "%":   lButton6 = cll.Count
+    cll.Add vbLf
+    cll.Add "Finished":                                                     lButton7 = cll.Count
+    
+    Do
+        '~~ Assign initial - and as the test repeats the changed - values (contraints)
+        '~~ for this test to the UserForm's properties
+        With fMsg
+            .MinFormWidth = lMinFormWidth
+            .MaxFormWidthPrcntgOfScreenSize = lMaxFormWidth    ' for this demo to enforce a vertical scroll bar
+            .MaxFormHeightPrcntgOfScreenSize = lMaxFormHeight  ' for this demo to enbforce a vertical scroll bar for the message section
+        End With
+        
+        sText2 = "When the specified minimum form width (currently " & lMinFormWidth & "pt) is increased, the form height will decrease because the proportional spaced " & _
+                 "message section will require less height."
+        sLabel3 = "Please note:"
+        sText3 = "- The specified maximum form width (currently " & fMsg.MaxFormHeightPrcntgOfScreenSize & "% = " & Format(fMsg.MaxFormHeight, "##0") & "pt) cannot become less " & vbLf & _
+                 "  than the minimum form width (currently " & fMsg.MinFormWidth & "pt.""" & vbLf & _
+                 "  (it should be noted that the maximum constrants are a percentage value while" & vbLf & _
+                 "   the minimum width setting is in pt)" & vbLf & _
+                 "- This longest line of this section determines the width of the displayed form" & vbLf & _
+                 "  but only up to the maximum width specified." & vbLf & _
+                 "- In may take some time to understand the change of the displayed message" & vbLf & _
+                 "  depending on the changed contraint values."
+                 
+        vReply = mMsg.Msg( _
+                          title:=sTitle, _
+                          label1:=sLabel1, text1:=sText1, _
+                          label2:=sLabel2, text2:=sText2, _
+                          label3:=sLabel3, text3:=sText3, monospaced3:=bMonospaced, _
+                          buttons:=cll _
+                         )
+        With fMsg
+            Select Case vReply
+                Case cll(lButton1): lMinFormWidth = .MinFormWidth + lChangeMinWidthPt
+                Case cll(lButton2): lMinFormWidth = .MinFormWidth - lChangeMinWidthPt
+                Case cll(lButton3): lMaxFormWidth = .MaxFormWidthPrcntgOfScreenSize + lChangeWidthPcntg
+                Case cll(lButton4): lMaxFormWidth = .MinFormWidthPrcntg - lChangeWidthPcntg
+                Case cll(lButton5): lMaxFormHeight = .MaxFormHeightPrcntgOfScreenSize + lChangeHeightPcntg
+                Case cll(lButton6): lMaxFormHeight = .MaxFormHeightPrcntgOfScreenSize - lChangeHeightPcntg
+                Case cll(lButton7): Exit Do ' The very last item in the collection is the "Finished" button
+                Case Else
+            End Select
+        End With
+    Loop
+   
 End Sub
 
-' Repeat string function good enough for up to 10 thousand repetitions.
+Public Sub RepeatTest()
+    Debug.Print Repeat(10, "a", True, False, vbLf)
+End Sub
+
+' Convert a string (s) into a readable form by replacing all underscores
+' with a whitespace and all characters immediately following an underscore
+' to a lowercase letter.
 ' ---------------------------------------------------------------------
-Public Function Readable(ByVal s As String) As String
+Private Function Readable(ByVal s As String) As String
 
     Dim i       As Long
     Dim sResult As String
     
+    s = Replace(s, "_", " ")
+    s = Replace(s, "  ", " ")
     For i = 1 To Len(s)
         If IsUcase(Mid(s, i, 1)) Then
             sResult = sResult & " " & Mid(s, i, 1)
@@ -502,3 +823,4 @@ Function IsUcase(ByVal s As String) As Boolean
               (i = 163) Or _
               (i = 165)
 End Function
+

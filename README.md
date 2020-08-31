@@ -111,7 +111,7 @@ The _Box_ function syntax has these named arguments:
 | ---- |-----------| --- |
 | title | Optional. String expression displayed in the title bar of the dialog box. When omitted, the application name is placed in the title bar. | Title |
 | prompt | String expression displayed as message. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (vbCr or Chr(13), a linefeed character (vbLf or Chr(10)), or carriage return - linefeed character combination (vbCrLf or Chr(13) & Chr(10)) between each line. | Text(1) |
-| [buttons](#syntax-of-the-buttons-argument) | Optional. Defaults to vbOkOnly when omitted. Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 7 reply buttons. | Buttons |
+| [buttons](#syntax-of-the-buttons-argument) | Optional. Defaults to vbOkOnly when omitted. Variant expression, either a [VB MsgBox value](<https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function#settings>), a comma delimited string, a collection of string expressions, or a dictionary of string expressions. In case of a string, a collection, or a dictionary, each item either specifies a button's caption (up to 7) or a reply button row break (vbLf, vbCr, or vbCrLf). | Buttons |
 
 #### _Msg_ (see [example](#common-message))
 Displays a message in up to 3 sections, each with an optional label and optionally monospaced and up to 7 buttons in up to 7 rows in any order.
@@ -126,11 +126,12 @@ mMsg.Msg(title _
 The _Msg_ function syntax has these named arguments:
 
 | Part | Description | Corresponding _fMsg_ Property |
-| ---- |-----------| --- |
+| ---- |-------------| ----------------------------- |
 | title | Optional. String expression displayed in the title bar of the dialog box. When omitted, the application name is placed in the title bar. | Title |
 | label1<br>label2<br>label3 | Optional. String expression displayed as label above the corresponding text_ | Label(section) |
-| text1<br>text2<br>text3 | Optional.  String expression displayed as message section. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (vbCr or Chr(13), a linefeed character (vbLf or Chr(10)), or carriage return - linefeed character combination (vbCrLf or Chr(13) & Chr(10)) between each line. | Text(section) | monospaced1<br>monospaced2<br>monospaced3 | Optional. Defaults to False. When True,  the corresponding text is displayed with a mono-spaced font see [Proportional- versus Mono-spaced](#proportional-versus-mono-spaced) | Monospaced(section)
-| [buttons](#syntax-of-the-buttons-argument) | Optional.  Variant expression, either MsgBox values like vbOkOnly, vbYesNo, etc. or a comma delimited string specifying the caption of up to 7 reply buttons. If omitted, the default value for buttons is 0 (vbOkOnly). | Buttons |
+| text1<br>text2<br>text3 | Optional.  String expression displayed as message section. There is no length limit. When the maximum height or width is exceeded a vertical and/or horizontal scrollbars is displayed. Lines may be separated by using a carriage return character (vbCr or Chr(13), a linefeed character (vbLf or Chr(10)), or carriage return - linefeed character combination (vbCrLf or Chr(13) & Chr(10)) between each line. | Text(section) |
+| monospaced1<br>monospaced2<br>monospaced3 | Optional. Defaults to False. When True,  the corresponding text is displayed with a mono-spaced font see [Proportional- versus Mono-spaced](#proportional-versus-mono-spaced) | Monospaced(section)
+| [buttons](#syntax-of-the-buttons-argument) | Optional. Defaults to vbOkOnly when omitted. Variant expression, either a [VB MsgBox value](<https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function#settings>), a comma delimited string, a collection of string expressions, or a dictionary of string expressions. In case of a string, a collection, or a dictionary, each item either specifies a button's caption (up to 7) or a reply button row break (vbLf, vbCr, or vbCrLf). | Buttons |
 
 ### _ErrMsg_ (see [example](#error-message))
 Displays an appealingly designed error message. This function is pretty specific because it is used by a common, nevertheless elaborated, error handler (yet not available on GitHub) with 
@@ -147,7 +148,7 @@ mMsg.ErrMsg(errnumber _
 | errline | Optional. Defaults to vbNullString. String expression indicating the line number within the error causing procedure's module where the error occured or had bee raised. | - |
 | errtitle | Optional. String expression displayed in the title bar of the dialog box. When not provided, the title is assembled by using errnumber, errsource, and errline. | AppTitle |
 | errpath | Optional. The "call stack" from the entry procedure down to the error source procedure. Displayed mono-spaced in order to allow a properly indented layout | Text(2), Monospaced(2) see [Proportional- versus Mono-spaced](#proportional-versus-mono-spaced) |
-| errinfo | Optional. Defaults to vbNullString. String expression providing an additional information about the error. Displayed under a label "Additional information". When not provided, the string is extracted from the errdescription which follows an "||" indication.| Text(3) |
+| errinfo | Optional. Defaults to vbNullString. String expression providing an additional information about the error. Displayed under a label "Additional information". When not provided, the string is optionally extracted from the errdescription: When the string contains a "\|\|" it is split into errdescription and errinfo.| Text(3) |
 
 ### Syntax of the _buttons_ argument
 ```
@@ -192,7 +193,6 @@ Box title:="Any title" _
   ' buttons:=vbOkOnly
 ```
 the message:
-
 image
 
 ### Error message
@@ -203,38 +203,44 @@ displays the error message:
 image
 
 ### Common message
-When the following code is copied into any standard module:
+When the UserForm <a id="raw-url" href="https://www.dropbox.com/s/h91lcqa52qrdl5f/fMsg.frm?dl=1">fMsg.frm</a> and the <a id="raw-url" href="https://www.dropbox.com/s/0m5eggyy3vx3126/fMsg.frx?dl=1">fMsg.frx</a> had been downloaded and imported to your project and the following code is copied into any standard module:
 ```
+' MsgBox alternative providing three message sections, each optionally
+' monospaced and with an optional label/haeder. The function uses the
+' UserForm fMsg and returns the clicked reply button's caption or its
+' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
+' ------------------------------------------------------------------
 Public Function Msg(ByVal title As String, _
-           Optional ByVal section1label As String = vbNullString, _
-           Optional ByVal section1text As String = vbNullString, _
-           Optional ByVal section1monospaced As Boolean = False, _
-           Optional ByVal section2label As String = vbNullString, _
-           Optional ByVal section2text As String = vbNullString, _
-           Optional ByVal section2monospaced As Boolean = False, _
-           Optional ByVal section3label As String = vbNullString, _
-           Optional ByVal section3text As String = vbNullString, _
-           Optional ByVal section3monospaced As Boolean = False, _
+           Optional ByVal label1 As String = vbNullString, _
+           Optional ByVal text1 As String = vbNullString, _
+           Optional ByVal monospaced1 As Boolean = False, _
+           Optional ByVal label2 As String = vbNullString, _
+           Optional ByVal text2 As String = vbNullString, _
+           Optional ByVal monospaced2 As Boolean = False, _
+           Optional ByVal label3 As String = vbNullString, _
+           Optional ByVal text3 As String = vbNullString, _
+           Optional ByVal monospaced3 As Boolean = False, _
            Optional ByVal monospacedfontsize As Long = 0, _
            Optional ByVal buttons As Variant = vbOKOnly) As Variant
     
     With fMsg
-        .AppTitle = title
+        .ApplTitle = title
         
-        .SectionLabel(1) = section1label
-        .SectionText(1) = section1text
-        .SectionMonoSpaced(1) = section1monospaced
+        .ApplLabel(1) = label1
+        .ApplText(1) = text1
+        .ApplMonoSpaced(1) = monospaced1
         
-        .SectionLabel(2) = section2label
-        .SectionText(2) = section2text
-        .SectionMonoSpaced(2) = section2monospaced
+        .ApplLabel(2) = label2
+        .ApplText(2) = text2
+        .ApplMonoSpaced(2) = monospaced2
         
-        .SectionLabel(3) = section3label
-        .SectionText(3) = section3text
-        .SectionMonoSpaced(3) = section3monospaced
+        .ApplLabel(3) = label3
+        .ApplText(3) = text3
+        .ApplMonoSpaced(3) = monospaced3
 
         .ApplButtons = buttons
         .Show
+        On Error Resume Next ' Just in case the user has terminated the dialog without clicking a reply button
         Msg = .ReplyValue
     End With
     Unload fMsg
@@ -252,6 +258,7 @@ Public Sub Demo_Msg()
    Dim sText2   As String
    Dim sLabel3  As String
    Dim sText3   As String
+   Dim sButtons As String
    Dim sButton1 As String
    Dim sButton2 As String
    Dim sButton3 As String
@@ -260,45 +267,52 @@ Public Sub Demo_Msg()
    Dim sButton6 As String
    Dim sButton7 As String
 
+   fMsg.MaxFormWidthPrcntgOfScreenSize = 45 ' for this demo to enforce a vertical scroll bar
+   
    sTitle = "Usage demo: Full featured multiple choice message"
-   sLabel1 = "Demo 1:"
-   sText1 = "Use of all 3 message sections, all with a label"
-   sLabel2 = "Demo 2"
-   sText2 = "Use of all 7 reply buttons, in a 2-2-2-1  order."
-   sLabel3 = "Demo 3:"
-   sText3 = "This part of the message just demonstrates the mono-spaced option." &vbLf & _
-   "Specifically the result it has on the message width," & vbLf & _
-   "which it determines through its longest line."
-   sButton1 = "Multiline reply button text" & vbLf & "Button-1"
-   sButton2 = "Multiline reply button text" & vbLf & "Button-2"
-   sButton3 = "Multiline reply button text" & vbLf & "Button-3" 
-   sButton4 = "Multiline reply button text" & vbLf & "Button-4"
-   sButton5 = "Multiline reply button text" & vbLf & "Button-5"
-   sButton6 = "Multiline reply button text" & vbLf & "Button-6"
-   sButton7 ="Ok"
-   '~~ Assemble the buttons argument string            
+   sLabel1 = "1. Demonstration:"
+   sText1 = "Use of all 3 message sections, all with a label and use of all 7 reply buttons, in a 2-2-2-1  order."
+   sLabel2 = "2. Demonstration:"
+   sText2 = "The impact of the specified maximimum message form with, which for this test has been reduced to " & _
+            fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size (the default is 80%)."
+   sLabel3 = "3. Demonstration:"
+   sText3 = "This part of the message demonstrates the mono-spaced option and" & vbLf & _
+            "the impact it has on the width of the message form, which is" & vbLf & _
+            "determined by its longest line because mono-spaced message sections " & vbLf & _
+            "are not ""word wrapped"". However, because the specified maximum message form width is exceed" & vbLf & _
+            "a vertical scroll bar is applied - in practice it hardly will ever happen." & vbLf & _
+            "I.e. even for a mono-spaced text section there is no width limit." & vbLf & vbLf & _
+            "Attention: The result is redisplayed until the ""Ok"" button is clicked!"
+   sButton1 = "Multiline reply button caption" & vbLf & "Button-1"
+   sButton2 = "Multiline reply button caption" & vbLf & "Button-2"
+   sButton3 = "Multiline reply button caption" & vbLf & "Button-3"
+   sButton4 = "Multiline reply button caption" & vbLf & "Button-4"
+   sButton5 = "Multiline reply button caption" & vbLf & "Button-5"
+   sButton6 = "Multiline reply button caption" & vbLf & "Button-6"
+   sButton7 = "Ok"
+   '~~ Assemble the buttons argument string
    sButtons = _
-   sButton1 & "," & sButton2 & "," & vbLf & "," & _   
-   sButton3 & "," & sButton4 & "," & vbLf & "," & _   
+   sButton1 & "," & sButton2 & "," & vbLf & "," & _
+   sButton3 & "," & sButton4 & "," & vbLf & "," & _
    sButton4 & "," & sButton5 & "," & vbLf & "," & sButton7 _
 
    Do
-      If Msg( _
+      If mMsg.Msg( _
          title:=sTitle, _
          label1:=sLabel1, text1:=sText1, _
          label2:=sLabel2, text2:=sText2, _
          label3:=sLabel3, text3:=sText3, _
-         monospaced3:=True)
+         monospaced3:=True, _
+         buttons:=sButtons) _
       = sButton7 _
       Then Exit Do
    Loop
    
 End Sub
-             
+```             
 re-displays the following message until the Ok button is clicked:
 
-image
-
+![](images/demo-1.png)
 
 ### Examples Summary
 The examples above demonstrate  the use of the UserForm _fMsg_. Considering the [Common Public Properties](<Implementation.md#common-public-properties>) of the UserForm some can implement any similar kind of application specific message. 
@@ -310,5 +324,4 @@ The examples above demonstrate  the use of the UserForm _fMsg_. Considering the 
 Because the text is ++not++  "wrapped" the width of the _Message Form_ is determined by the longest text line (up to the _Maximum Form Width_ specified). When the maximum width is exceeded a vertical scroll bar is applied.<br>Note: The title and the broadest _Button Row_ May still determine an even broader final _Message Form_.
 
 #### _Monospaced_ = False (default)
-Because the text is "wrapped"
-the width of a proportional-spaced text is determined by the current form width.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the required space for the broadest _Buttons Row_ and the specified _Minimum Form Width_.
+Because the text is "wrapped" the width of a proportional-spaced text is determined by the current form width.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the required space for the broadest _Buttons Row_ and the specified _Minimum Form Width_.
