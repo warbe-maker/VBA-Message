@@ -69,8 +69,7 @@ We take the example from above and have 2 button rows each with 3 buttons and a 
     
 
    cll.Add "Caption Button 1": sB1 = cll.Count
-   
-   
+     
    With fMsg
       .ApplTitle = "....."
       .ApplText(1) = "....."
