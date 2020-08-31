@@ -20,6 +20,73 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 | Specifying the default button | (yet) not implemented |
 | Display of an ?, !, etc. image | (yet) not implemented |
 
+### Usage
+#### Properties of _fMsg_
+
+When the UserForm _fMsg_ is installed in a VBA project ([download _fMsg.frm_](), [download _fMsg.frx_]() and import the _fMsg.frm_), the following properties are available to display a message (see [Code Examples](#code-examples)  below).
+
+| Property | Meaning |
+|----------|---------|
+| _ApplTitle_| | String expression displayed in the message window's handle bar|
+| _ApplLabel(n)_ | Optional. String expression with _n__ as a numeric expression 1 to 3). Applied as a descriptive label above a below message text. Not displayed (even when provided) when no corresponding _ApplText_ is provided |
+| _ApplText(n) | Optional.String expression with _n__ as a numeric expression 1 to 3). Applied as message text of section _n_.|
+| Monospaced(n) | Optional. Boolean expression. Defaults to False when immitted. When True, the text in section _n_ is displayed mono-spaced.|
+| ApplButtons | Optional. Defaults to vbOkOnly.<br>A MsgBox buttons value,<br>a comma delimited String expression,<br>a Collection,<br>or a dictionary,<br>with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf)|
+
+#### Code examples
+##### MsgBox
+The first example isn't worth using the alternative since with MsgBox the result is achieved much simpler. It's a good start to explore the enormous flexibility however:
+```
+   Dim vReply As Variant
+   
+   With fMsg
+      .ApplTitle = "....."
+      .ApplText(1) = "....."
+      .ApplButtons = vbYesNoCancel
+      .Setup
+      .Show
+      vReply = .Reply ' obtaining the reply value unloads the form !
+   End With
+   Select Case vReply
+      Case vbYes
+      Case vbNo
+      Case vbCancel
+   End Select
+   
+```
+#### The full buttons flexibility
+We take the example from above and have 2 button rows each with 3 buttons and a 3rd with an Ok button:
+```
+   Dim vReply As Variant
+   Dim cll   As New Collection
+   Dim sB1 As String
+   Dim sB2 As String
+   Dim sB3 As String
+   Dim sB4 As String
+   Dim sB5 As String
+   Dim sB6 As String
+   Dim sB7 As String
+    
+
+   cll.Add "Caption Button 1": sB1 = cll.Count
+   
+   
+   With fMsg
+      .ApplTitle = "....."
+      .ApplText(1) = "....."
+      .ApplButtons = vbYesNoCancel
+      .Setup
+      .Show
+      vReply = .Reply ' obtaining the reply value unloads the form !
+   End With
+   Select Case vReply
+      Case vbYes
+      Case vbNo
+      Case vbCancel
+   End Select
+   
+```
+
 ### Interfaces
 The alternative implementation  comes with three functions (in module _mMsg_) which are the interface to the UserForm _fMsg_ and return the clicked reply _Button_ value to the caller.
 
