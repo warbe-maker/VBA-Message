@@ -26,6 +26,7 @@ The primary means is the UserForm _fMsg_. However, it makes sense to encapsulate
 #### Properties of _fMsg_
 
 When the UserForm _fMsg_ is installed in a VBA project ([download _fMsg.frm_](), [download _fMsg.frx_]() and import the _fMsg.frm_), the following properties are available to display a message (see [Code Examples](#code-examples)  below).
+Please Note: The VBA project requires a Reference to "Microsoft Scripting Runtime" 
 
 | Property | Meaning |
 |----------|---------|
@@ -38,36 +39,41 @@ When the UserForm _fMsg_ is installed in a VBA project ([download _fMsg.frm_](),
 | _iReply_ | The clicked button's index |
 
 #### Code examples
-##### MsgBox
+##### A very first try
+Copy the following into a standard module:
 ```
-   Dim vReply As Variant
-   
-   With fMsg
-      .ApplTitle = "....."
-      .ApplText(1) = "....."
-      .ApplButtons = vbYesNoCancel
-      .Setup
-      .Show
-      vReply = .Reply ' obtaining the reply value unloads the form !
+Public Enum StartupPosition
+    Manual = 0
+    CenterOwner = 1
+    CenterScreen = 2
+    WindowsDefault = 3
+End Enum
+
+Public Sub FirstTry()
+          
+    With fMsg
+        .ApplTitle = "Any title"
+        .ApplText(1) = "Any message"
+        .ApplButtons = vbYesNoCancel
+        .Setup
+        .Show
+        Select Case .Reply ' obtaining the reply value unloads the form !
+            Case vbYes:     MsgBox "Button ""Yes"" clicked"
+            Case vbNo:      MsgBox "Button ""No"" clicked"
+            Case vbCancel:  MsgBox "Button ""Cancel"" clicked"
+        End Select
    End With
-   Select Case vReply
-      Case vbYes
-      Case vbNo
-      Case vbCancel
-   End Select
-   
+End Sub
 ```
 This example seems not being worth using the alternative.
-However, when encapsulated in a function thing look different:
+However, when encapsulated in a function things look much better. Copy the following into a standard module:
 ```
 Public Function Box( _
-       ByVal title As String, _
-       ByVal prompt As String, _
-       ByVal buttons As Strong) _
-       As Variant
-       
-   Dim vReply As Variant
-   
+                    ByVal title As String, _
+                    ByVal prompt As String, _
+           Optional ByVal buttons As Variant = vbOKOnly _
+                   ) As Variant
+          
    With fMsg
       .ApplTitle = title
       .ApplText(1) = prompt
@@ -76,23 +82,25 @@ Public Function Box( _
       .Show
       Box = .Reply ' obtaining the reply value unloads the form !
    End With
+   
 End Function
 ```
-The call now looks pretty much the same as calling the MsgBox:
+Displaying the message now looks pretty much the same as using MsgBox:
 ```
-   Select Case Box( _
-          title:="....", _
-          prompt:="....." _
-          buttons:=vbYesNoCancel)
-      Case vbYes: ....
-      Case vbNo: ....
-      Case vbCancel: ....
-   End Select
+Public Sub Test_Box()
+    Select Case Box("Any title", _
+                    "Any message", _
+                    buttons:=vbYesNoCancel)
+        Case vbYes:     MsgBox "Button ""Yes"" clicked"
+        Case vbNo:      MsgBox "Button ""No"" clicked"
+        Case vbCancel:  MsgBox "Button ""Cancel"" clicked"
+    End Select
+End Sub
 ```
 
 #### The full buttons flexibility
 For the full flexibility we take the encapsulated example from above and have 2 button rows each with 3 buttons and a 3rd with an Ok button.
-In any standard module copy:
+In any standard module copy above the first procedure:
 ```
 Public Type tSection
        sLabel As String
@@ -104,13 +112,14 @@ Public Type tMessage
 End Type
 
 Public Function Msg( _
-       ByVal title As String _
-       ByVal prompt As tMessage _
-       ByVal buttons As Variant) As Variant
+                    ByVal title As String, _
+                    ByRef message As tMessage, _
+           Optional ByVal buttons As Variant = vbOKOnly _
+                   ) As Variant
 
    With fMsg
       .ApplTitle = title
-      .ApplMsg = prompt
+      .ApplMsg = message
       .ApplButtons = buttons
       .Setup
       .Show
@@ -118,46 +127,57 @@ Public Function Msg( _
    End With
 
 End Function
-```    
 ```
-   Dim vReply As Variant
-   Dim cll    As New Collection
-   ' We will use the return index of the button
-   ' rather than it's caption
-   Dim iB1, iB2, iN3, iB4, iB5, iB6, iB7 As Long
+Displaying a full featured message now looks as follows:
+```
+Public Sub Test_Msg()
+' ---------------------------------------------------------
+' Displays a message with 3 sections, each with a label and
+' 7 reply buttons ordered in rows 3-3-1
+' ---------------------------------------------------------
     
-   ' Note that because of the "row breaks" the button indices are not equal the position in the collection
-   cll.Add "Caption Button 1": iB1 = cll.Count
-   cll.Add "Caption Button 2": iB2 = cll.Count
-   cll.Add "Caption Button 3": iB3 = cll.Count
-   cll.Add vbLf
-   cll.Add "Caption Button 4": iB4 = cll.Count
-   cll.Add "Caption Button 5": iB5 = cll.Count
-   cll.Add "Caption Button 6": iB5 = cll.Count
-   cll.Add vbLf
-   cll.Add "Caption Button 7": iB7 = cll.Count
+    Dim tMsg    As tMessage                         ' structure of the message
+    Dim cll     As New Collection                   ' specification of the button
+    Dim iB1, iB2, iB3, iB4, iB5, iB6, iB7 As Long   ' indices for the return value
+    
+    ' Note that because of the "row breaks" the button indices are not equal the position in the collection
+    cll.Add "Caption Button 1": iB1 = cll.Count
+    cll.Add "Caption Button 2": iB2 = cll.Count
+    cll.Add "Caption Button 3": iB3 = cll.Count
+    cll.Add vbLf ' button row break (also with vbCr or vbCrLf)
+    cll.Add "Caption Button 4": iB4 = cll.Count
+    cll.Add "Caption Button 5": iB5 = cll.Count
+    cll.Add "Caption Button 6": iB6 = cll.Count
+    cll.Add vbLf ' button row break
+    cll.Add "Caption Button 7": iB7 = cll.Count
        
-   With fMsg
-      .ApplTitle = "....."
-      .ApplText(1) = "....."
-      .ApplButtons = vbYesNoCancel
-      .Setup
-      .Show
-      '~~ obtaining any of the two possible replies unloads the form.
-      '~~ So you cannot have both!
-      iReply = .iReply
-
+    With tMsg.Section(1)
+        .sLabel = "Label section 1"
+        .sText = "Message section 1 text"
+    End With
+    With tMsg.Section(2)
+        .sLabel = "Label section 2"
+        .sText = "Message section 2 text"
+        .bMonspaced = True ' Just to demostrate
+    End With
+    With tMsg.Section(3)
+        .sLabel = "Label section 3"
+        .sText = "Message section 3 text"
    End With
-   Select Case iReply
-      Case iB1
-      Case iB2
-      Case iB3
-      Case iB4
-      Case iB5
-      Case iB6
-      Case iB7
+       
+   Select Case Msg(title:="Any title", _
+                   message:=tMsg, _
+                   buttons:=cll)
+        Case cll(iB1): MsgBox "Button with caption """ & cll(iB1) & """ clicked"
+        Case cll(iB2): MsgBox "Button with caption """ & cll(iB2) & """ clicked"
+        Case cll(iB3): MsgBox "Button with caption """ & cll(iB3) & """ clicked"
+        Case cll(iB4): MsgBox "Button with caption """ & cll(iB4) & """ clicked"
+        Case cll(iB5): MsgBox "Button with caption """ & cll(iB5) & """ clicked"
+        Case cll(iB6): MsgBox "Button with caption """ & cll(iB6) & """ clicked"
+        Case cll(iB7): MsgBox "Button with caption """ & cll(iB7) & """ clicked"
    End Select
    
+End Sub
 ```
 
 ### Interfaces
