@@ -21,6 +21,8 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 | Display of an ?, !, etc. image | (yet) not implemented |
 
 ### Usage
+The primary means is the UserForm _fMsg_. However, it makes sense to encapsulate it in a function.
+
 #### Properties of _fMsg_
 
 When the UserForm _fMsg_ is installed in a VBA project ([download _fMsg.frm_](), [download _fMsg.frx_]() and import the _fMsg.frm_), the following properties are available to display a message (see [Code Examples](#code-examples)  below).
@@ -37,7 +39,6 @@ When the UserForm _fMsg_ is installed in a VBA project ([download _fMsg.frm_](),
 
 #### Code examples
 ##### MsgBox
-The first example isn't worth using the alternative since with MsgBox the result is achieved much simpler. It's a good start to explore the enormous flexibility however:
 ```
    Dim vReply As Variant
    
@@ -56,8 +57,68 @@ The first example isn't worth using the alternative since with MsgBox the result
    End Select
    
 ```
+This example seems not being worth using the alternative.
+However, when encapsulated in a function thing look different:
+```
+Public Function Box( _
+       ByVal title As String, _
+       ByVal prompt As String, _
+       ByVal buttons As Strong) _
+       As Variant
+       
+   Dim vReply As Variant
+   
+   With fMsg
+      .ApplTitle = title
+      .ApplText(1) = prompt
+      .ApplButtons = buttons
+      .Setup
+      .Show
+      Box = .Reply ' obtaining the reply value unloads the form !
+   End With
+End Function
+```
+The call now looks pretty much the same as calling the MsgBox:
+```
+   Select Case Box( _
+          title:="....", _
+          prompt:="....." _
+          buttons:=vbYesNoCancel)
+      Case vbYes: ....
+      Case vbNo: ....
+      Case vbCancel: ....
+   End Select
+```
+
 #### The full buttons flexibility
-We take the example from above and have 2 button rows each with 3 buttons and a 3rd with an Ok button:
+For the full flexibility we take the encapsulated example from above and have 2 button rows each with 3 buttons and a 3rd with an Ok button.
+In any standard module copy:
+```
+Public Type tSection
+       sLabel As String
+       sText As String
+       bMonspaced As Boolean
+End Type
+Public Type tMessage
+       Section(1 to 3) As tSection
+End Type
+
+Public Function Msg( _
+       ByVal title As String _
+       ByVal prompt As tMessage _
+       ByVal buttons As Variant) As Variant
+
+   With fMsg
+      .ApplTitle = title
+      .ApplMsg = prompt
+      .ApplButtons = buttons
+      .Setup
+      .Show
+      Msg = .Reply ' obtaining the reply value unloads the form !
+   End With
+
+End Function
+```    
 ```
    Dim vReply As Variant
    Dim cll    As New Collection
@@ -75,8 +136,7 @@ We take the example from above and have 2 button rows each with 3 buttons and a 
    cll.Add "Caption Button 6": iB5 = cll.Count
    cll.Add vbLf
    cll.Add "Caption Button 7": iB7 = cll.Count
-   
-     
+       
    With fMsg
       .ApplTitle = "....."
       .ApplText(1) = "....."
