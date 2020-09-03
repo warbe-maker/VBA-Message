@@ -34,13 +34,6 @@ Public Const GWL_STYLE = -16
 Public Const WS_CAPTION = &HC00000
 Public Const WS_THICKFRAME = &H40000
 
-#If Resizable Then
-Public Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
-Public Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
-Public Declare PtrSafe Function DrawMenuBar Lib "user32" (ByVal hWnd As Long) As Long
-Public Declare PtrSafe Function FindWindowA Lib "user32" (ByVal lpClassName As String, ByVal lpWindowName As String) As Long
-#End If
-
 Private vMsgReply As Variant
 
 Public Enum StartupPosition         ' ---------------------------
@@ -323,31 +316,6 @@ Public Function Msg( _
 
 End Function
 
-#If Resizable Then
-Public Sub ResizeWindowSettings(frm As Object, display As Boolean)
-
-    Dim windowStyle As Long
-    Dim windowHandle As Long
-
-    'Get the references to window and style position within the Windows memory
-    windowHandle = FindWindowA(vbNullString, frm.caption)
-    windowStyle = GetWindowLong(windowHandle, GWL_STYLE)
-    
-    'Determine the style to apply based
-    If display = False Then
-        windowStyle = windowStyle And (Not WS_THICKFRAME)
-    Else
-        windowStyle = windowStyle + (WS_THICKFRAME)
-    End If
-    
-    'Apply the new style
-    SetWindowLong windowHandle, GWL_STYLE, windowStyle
-    
-    'Recreate the UserForm window with the new style
-    DrawMenuBar windowHandle
-
-End Sub
-#End If
 Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "mMsg" & "." & sProc
 End Function

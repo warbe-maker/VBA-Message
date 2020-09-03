@@ -12,7 +12,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
 Option Explicit
 ' -------------------------------------------------------------------------------
 ' UserForm fMsg
@@ -30,7 +29,7 @@ Option Explicit
 '
 ' lScreenWidth. Rauschenberger Berlin March 2020
 ' --------------------------------------------------------------------------
-Const BUTTON_MIN_WIDTH          As Single = 70      ' Default minimum reply button width
+Const MIN_BUTTON_WIDTH          As Single = 70      ' Default minimum reply button width
 Const FONT_MONOSPACED_NAME      As String = "Courier New"   ' Default monospaced font
 Const FONT_MONOSPACED_SIZE      As Single = 9       ' Default monospaced font size
 Const FORM_MAX_HEIGHT_POW       As Long = 90        ' Max form height as a percentage of the screen size
@@ -38,7 +37,7 @@ Const FORM_MAX_WIDTH_POW        As Long = 80        ' Max form width as a percen
 Const FORM_MIN_WIDTH            As Single = 300     ' Default minimum message form width
 Const TEST_WITH_FRAME_BORDERS   As Boolean = False  ' For test purpose only! Display frames with visible border
 Const TEST_WITH_FRAME_CAPTIONS  As Boolean = False  ' For test purpose only! Display frames with their test captions (erased by default)
-Const HSPACE_BUTTONS            As Single = 10      ' Horizontal margin for reply buttons
+Const HSPACE_BUTTONS            As Single = 4      ' Horizontal margin for reply buttons
 Const HSPACE_BUTTON_AREA        As Single = 10      ' Minimum margin between buttons area and form when centered
 Const HSPACE_LEFT               As Single = 0       ' Left margin for labels and text boxes
 Const HSPACE_RIGHT              As Single = 15      ' Horizontal right space for labels and text boxes
@@ -68,14 +67,7 @@ Private Declare PtrSafe Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare PtrSafe Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long) As Long
 
-#If Resizable Then
-Private resizeEnabled   As Boolean
-Private mouseX          As Double
-Private mouseY          As Double
-Private minWidth        As Double
-Private minHeight       As Double
-#End If
-
+Dim siMinButtonWidth            As Single
 Dim bDisplayFramesWithCaptions  As Boolean
 Dim bDoneButtonsArea            As Boolean
 Dim bDoneHeightDecrement        As Boolean
@@ -137,6 +129,7 @@ Private Sub UserForm_Initialize()
         
     On Error GoTo on_error
     
+    siMinButtonWidth = MIN_BUTTON_WIDTH
     siHmarginButtons = HSPACE_BUTTONS
     siVmarginButtons = VSPACE_BUTTON_ROWS
     bFormEvents = False
@@ -164,7 +157,7 @@ Private Sub UserForm_Initialize()
     Dim v As Variant
     For Each v In cllDsgnButtonRows
         Set cllDsgnRowButtons = New Collection
-        Collect into:=cllDsgnRowButtons, ctltype:="CommandButton", fromparent:=v, ctlheight:=10, ctlwidth:=BUTTON_MIN_WIDTH
+        Collect into:=cllDsgnRowButtons, ctltype:="CommandButton", fromparent:=v, ctlheight:=10, ctlwidth:=siMinButtonWidth
         If cllDsgnRowButtons.Count > 0 Then
             cllDsgnButtons.Add cllDsgnRowButtons
         End If
@@ -228,7 +221,7 @@ Private Property Get ApplButtonsRowHeight() As Single:                          
 
 Private Property Get ApplButtonsRowWidth(Optional ByVal buttons As Long) As Single
     '~~ Extra space rquired for the button's design
-    ApplButtonsRowWidth = CInt((siMaxButtonWidth * buttons) + (HSPACE_BUTTONS * (buttons - 1)) + (siHmarginFrames * 2)) + 5
+    ApplButtonsRowWidth = CInt((siMaxButtonWidth * buttons) + (siHmarginButtons * (buttons - 1)) + (siHmarginFrames * 2)) + 5
 End Property
 
 Private Property Let Applied(ByVal v As Variant)
@@ -315,7 +308,8 @@ Private Property Get DsgnTextFrames() As Collection:                            
 Public Property Let ErrSrc(ByVal s As String):                                          sErrSrc = s:                                                                End Property
 
 Private Property Let FormWidth(ByVal w As Single)
-    Me.width = Max(Me.width, siMinimumFormWidth, w)
+    Dim siInOutDiff As Single:  siInOutDiff = Me.width - Me.InsideWidth
+    Me.width = Max(Me.width, siMinimumFormWidth, w + siInOutDiff)
 End Property
 
 Private Property Let HeightDecrementButtonsArea(ByVal b As Boolean)
@@ -360,13 +354,15 @@ Private Property Get MaxFormWidthUsable() As Single:                            
 
 Private Property Get MaxMsgAreaWidth() As Single:                                       MaxMsgAreaWidth = MaxFormWidthUsable - siHmarginFrames:                     End Property
 
-Private Property Get MaxRowsHeight() As Single:                                         MaxRowsHeight = siMaxButtonHeight + (siVmarginFrames * 2) + 4:              End Property
+Private Property Get MaxRowsHeight() As Single:                                         MaxRowsHeight = siMaxButtonHeight + (siVmarginFrames * 2):              End Property
 
 Private Property Get MaxSectionWidth() As Single:                                       MaxSectionWidth = MaxMsgAreaWidth - siHmarginFrames - HSPACE_SCROLLBAR:     End Property
 
 Private Property Get MaxTextBoxFrameWidth() As Single:                                  MaxTextBoxFrameWidth = MaxSectionWidth - siHmarginFrames:                   End Property
 
 Private Property Get MaxTextBoxWidth() As Single:                                       MaxTextBoxWidth = MaxTextBoxFrameWidth - siHmarginFrames:                   End Property
+
+Public Property Let MinButtonWidth(ByVal si As Single):                                 siMinButtonWidth = si:                                                      End Property
 
 Public Property Get MinFormWidth() As Single:                                           MinFormWidth = siMinimumFormWidth:                                          End Property
 
@@ -468,35 +464,15 @@ Public Function AppErr(ByVal lNo As Long) As Long
     AppErr = IIf(lNo < 0, AppErr = lNo - vbObjectError, AppErr = vbObjectError + lNo)
 End Function
 
-Public Sub ApplButtonRowsCenter()
-
-    Dim frButtons       As MSForms.Frame:   Set frButtons = DsgnButtonsFrame
-    Dim cllButtonRows   As Collection:      Set cllButtonRows = DsgnButtonRows
-    Dim lRow            As Long
-    Dim frRow           As MSForms.Frame
-    
-    For lRow = 1 To cllButtonRows.Count
-        Set frRow = cllButtonRows(lRow)
-        If IsApplied(frRow) Then
-            With frRow
-                If .Visible Then
-                    '~~ Center the button rows within the buttons frame horizontaly
-                    CenterHorizontal centerfr:=frRow, infr:=frButtons
-                End If
-            End With
-        End If
-    Next lRow
-
-End Sub
-
-' Setup an applied reply buttonindex's (buttonindex) visibility and
-' caption, calculate the maximum buttonindex width and height,
-' keep a record of the setup reply buttonindex's return value.
-' --------------------------------------------------------
 Private Sub ApplButtonSetup(ByVal buttonrow As Long, _
                             ByVal buttonindex As Long, _
                             ByVal buttoncaption As String, _
                             ByVal buttonreturnvalue As Variant)
+' -----------------------------------------------------------------
+' Setup an applied reply buttonindex's (buttonindex) visibility and
+' caption, calculate the maximum buttonindex width and height,
+' keep a record of the setup reply buttonindex's return value.
+' -----------------------------------------------------------------
     
     Dim cmb As MSForms.CommandButton:   Set cmb = DsgnButton(buttonrow, buttonindex)
     
@@ -508,7 +484,7 @@ Private Sub ApplButtonSetup(ByVal buttonrow As Long, _
         .AutoSize = False
         .Height = .Height + 1 ' safety margin to ensure proper multilin caption display
         siMaxButtonHeight = Max(siMaxButtonHeight, .Height)
-        siMaxButtonWidth = Max(siMaxButtonWidth, .width, BUTTON_MIN_WIDTH)
+        siMaxButtonWidth = Max(siMaxButtonWidth, .width, siMinButtonWidth)
     End With
     dctApplButtons.Add cmb, buttonrow
     ApplButtonRetVal(cmb) = buttonreturnvalue ' keep record of the setup buttonindex's reply value
@@ -555,6 +531,9 @@ Private Sub ApplButtonsResizeArea()
             FormWidth = (.width + siHmarginFrames * 2)
             .left = siHmarginFrames
         End With
+        If frArea.ScrollBars = fmScrollBarsNone _
+        Then CenterHorizontal frButtons, frArea
+    
         CenterHorizontal centerfr:=frArea
     End If
     
@@ -573,7 +552,7 @@ Private Sub ApplButtonsResizeFrame()
         .Visible = True
         .width = siMaxButtonRowWidth + (siHmarginFrames * 2)
         .Top = siVmarginFrames
-        .Height = VgridPos((MaxRowsHeight * l) + (VSPACE_BUTTON_ROWS * (l - 1)) + (siVmarginFrames * 2)) + 3
+        .Height = (MaxRowsHeight * l) + (siVmarginButtons * (l - 1)) + (siVmarginFrames * 2) + 20
     End With
 
 End Sub
@@ -634,6 +613,8 @@ End Sub
 ' ------------------------------------------------------------------------------
 Private Sub ApplButtonsSetupFromCollection(ByVal cllButtons As Collection)
 
+    On Error GoTo on_error
+    
     Dim lRow        As Long
     Dim lButton     As Long
     Dim v           As Variant
@@ -645,21 +626,36 @@ Private Sub ApplButtonsSetupFromCollection(ByVal cllButtons As Collection)
         If v <> vbNullString Then
             If v = vbLf Or v = vbCr Or v = vbCrLf Then
                 '~~ prepare for the next row
-                dctApplButtonRows.Add DsgnButtonRow(lRow), lRow
-                Applied = DsgnButtonRow(lRow)
-                lRow = lRow + 1
-                lButton = 0
+                If lRow <= 7 Then ' ignore exceeding rows
+                    dctApplButtonRows.Add DsgnButtonRow(lRow), lRow
+                    Applied = DsgnButtonRow(lRow)
+                    lRow = lRow + 1
+                    lButton = 0
+                Else
+                    MsgBox "Setup of button row " & lRow & " ignored! The maximimum applicable rows is 7."
+                End If
             Else
                 lButton = lButton + 1
-                DsgnButtonRow(lRow).Visible = True
-                ApplButtonSetup buttonrow:=lRow, buttonindex:=lButton, buttoncaption:=v, buttonreturnvalue:=v
+                If lButton <= 7 Then
+                    DsgnButtonRow(lRow).Visible = True
+                    ApplButtonSetup buttonrow:=lRow, buttonindex:=lButton, buttoncaption:=v, buttonreturnvalue:=v
+                Else
+                    MsgBox "Setup of a button " & lButton & " in row " & lRow & " ignored! The maximimum applicable buttons per row is 7."
+                End If
             End If
         End If
     Next v
-    dctApplButtonRows.Add DsgnButtonRow(lRow), lRow
-    Applied = DsgnButtonRow(lRow)
+    If lRow <= 7 Then
+        dctApplButtonRows.Add DsgnButtonRow(lRow), lRow
+        Applied = DsgnButtonRow(lRow)
+    End If
     DsgnButtonsArea.Visible = True
-
+    
+exit_proc:
+    Exit Sub
+    
+on_error:
+    Debug.Print Err.Description: Stop: Resume Next
 End Sub
 
 Private Sub ApplButtonsSetupFromString(ByVal sButtons As String)
@@ -709,13 +705,14 @@ Private Sub ApplButtonsSetupFromValue(ByVal lButtons As Long)
     
 End Sub
 
+Private Sub ApplButtonsUnify()
+' ---------------------------------------------------------------
 ' - Assign all applied/visible row buttons the same width, height
 '   and adjust their left position
 ' - Assign all applied/visible button rows the same height,
 ' - Adjust all applied/visible button rows the reqired width
 '   calculating the maximum row width.
-' ----------------------------------------------------------
-Private Sub ApplButtonsUnify()
+' ---------------------------------------------------------------
     
     On Error GoTo on_error
     
@@ -747,7 +744,7 @@ Private Sub ApplButtonsUnify()
                             .width = siMaxButtonWidth
                             .Height = siMaxButtonHeight
                             .Top = siVmarginFrames
-                            siLeft = .left + .width + HSPACE_BUTTONS
+                            siLeft = .left + .width + siHmarginButtons
                         End With
                         .width = vButton.left + vButton.width + siHmarginFrames
                     End If
@@ -756,7 +753,7 @@ Private Sub ApplButtonsUnify()
                 siMaxButtonRowWidth = Max(siMaxButtonRowWidth, .width)
                 .Height = ApplButtonsRowHeight
                 .Top = siTop
-                siTop = VgridPos(siTop + .Height + VSPACE_BUTTON_ROWS)
+                siTop = VgridPos(siTop + .Height + siVmarginButtons)
                 .width = ApplButtonsRowWidth(lButtons)
             End If
         End With
@@ -770,8 +767,6 @@ Private Sub ApplButtonsUnify()
         CenterHorizontal frRow, frButtons
     Next v
     Set cll = Nothing
-        
-    ApplButtonRowsCenter
     
 exit_proc:
     Exit Sub
@@ -834,7 +829,7 @@ Private Sub ApplRepositionButtonsArea()
                 .Visible = True
                 .Top = siTop
                 .Height = .Height
-                siTop = VgridPos(.Top + .Height + VSPACE_BUTTON_ROWS)
+                siTop = VgridPos(.Top + .Height + siVmarginButtons)
             End With
         End If
     Next v
@@ -1194,8 +1189,8 @@ Private Sub CenterHorizontal(ByVal centerfr As MSForms.Frame, _
           Optional ByVal infr As MSForms.Frame = Nothing)
     
     If infr Is Nothing _
-    Then centerfr.left = (Me.InsideWidth / 2) - (centerfr.width / 2) _
-    Else centerfr.left = (infr.width / 2) - (centerfr.width / 2)
+    Then centerfr.left = (Me.InsideWidth - centerfr.width) / 2 _
+    Else centerfr.left = (infr.width - centerfr.width) / 2
     
 End Sub
 
@@ -1380,21 +1375,25 @@ Private Sub ConvertPixelsToPoints(ByRef X As Single, ByRef Y As Single)
 End Sub
 
 Private Sub Debug_Sizes(ByVal stage As String)
-#If Test Then
+#If Debugging = 1 Then
     With Me
         Debug.Print vbLf & stage
+        
         Debug.Print String(Len(stage), "-")
-        Debug.Print "Form         width   = " & .width & " (specified max = " & Format(.MaxFormWidth, "##0") & ")"
-        Debug.Print "Form         height  = " & Format(.Height, "##0") & " (specified max = " & Format(.MaxFormHeight, "##0") & ")"
-        If IsApplied(DsgnMsgArea) Then
-            Debug.Print "Message Area width   = " & Format(DsgnMsgArea.width, "##0") & " (" & PrcntgWidthMsgArea * 100 & "%)"
-            Debug.Print "Message Area height  = " & Format(DsgnMsgArea.Height, "##0") & " (" & PrcntgHeightMsgArea * 100 & "%)"
-        End If
+            Debug.Print "Form (inside) width  = " & Format(.InsideWidth, "##0") & " (specified max = " & Format(.MaxFormWidth, "##0") & ")"
+        If IsApplied(DsgnMsgArea) Then _
+            Debug.Print "Message Area  width  = " & Format(DsgnMsgArea.width, "##0")
         If IsApplied(DsgnButtonsArea) Then
             Debug.Print "Buttons Frame width  = " & Format(DsgnButtonsFrame.width, "##0")
+            Debug.Print "Buttons Area  width  = " & Format(DsgnButtonsArea.width, "##0")
+        End If
+            Debug.Print "Form (inside) height = " & Format(.InsideHeight, "##0") & " (specified max = " & Format(.MaxFormHeight, "##0") & ")"
+        If IsApplied(DsgnMsgArea) Then _
+            Debug.Print "Message Area  height = " & Format(DsgnMsgArea.Height, "##0") & " (" & PrcntgHeightMsgArea * 100 & "%)"
+        If IsApplied(DsgnButtonsArea) Then
+            Debug.Print "Max button    height = " & siMaxButtonHeight & " (" & dctApplButtonRows.Count & " setup)"
             Debug.Print "Buttons Frame height = " & Format(DsgnButtonsFrame.Height, "##0")
-            Debug.Print "Buttons Area width   = " & Format(DsgnButtonsArea.width, "##0") & " (" & PrcntgWidthButtonsArea * 100 & "%)"
-            Debug.Print "Buttons Area height  = " & Format(DsgnButtonsArea.Height, "##0") & " (" & PrcntgHeightButtonsArea * 100 & "%)"
+            Debug.Print "Buttons Area  height = " & Format(DsgnButtonsArea.Height, "##0") & " (" & PrcntgHeightButtonsArea * 100 & "%)"
         End If
     End With
 '    Stop
@@ -1437,69 +1436,6 @@ Private Sub GetScreenMetrics()
     ConvertPixelsToPoints wVirtualScreenLeft, wVirtualScreenTop
     ConvertPixelsToPoints wVirtualScreenWidth, wVirtualScreenHeight
 
-End Sub
-
-' The user clicked on the lblResizer
-' ----------------------------------
-Private Sub lblResizer_MouseDown(ByVal Button As Integer, _
-                                 ByVal Shift As Integer, _
-                                 ByVal X As Single, _
-                                 ByVal Y As Single)
-#If Resizable Then
-    resizeEnabled = True    ' Capture the mouse position on click
-    mouseX = X
-    mouseY = Y
-#End If
-End Sub
-
-Private Sub lblResizer_MouseMove(ByVal Button As Integer, _
-                                 ByVal Shift As Integer, _
-                                 ByVal X As Single, _
-                                 ByVal Y As Single)
-#If Resizable Then
-    On Error GoTo on_error
-    
-    'Check if the UserForm is not resized too small
-    Dim allowResize     As Boolean
-        
-    allowResize = True
-    
-    If Me.width + X - mouseX < minWidth Then allowResize = False
-    If Me.Height + Y - mouseY < minHeight Then allowResize = False
-    
-    'Check if the mouse clicked on the lblResizer and above minimum size
-    If resizeEnabled = True And allowResize = True Then
-'        With Me
-'            .width = .width + X - mouseX
-'            .Height = .Height + Y - mouseY
-'        End With
-    End If
-
-exit_proc:
-    Exit Sub
-on_error:
-    Debug.Print Err.Description: Stop: Resume Next
-#End If
-End Sub
-
-Private Sub lblResizer_MouseUp(ByVal Button As Integer, _
-                               ByVal Shift As Integer, _
-                               ByVal X As Single, _
-                               ByVal Y As Single)
-#If Resizeable Then
-    resizeEnabled = False ' The user un-clicked on the lblResizer
-    
-    'Resize the UserForm
-    With Me
-        .width = .width + X - mouseX
-        .Height = .Height + Y - mouseY
-        .MaxFormWidthPrcntgOfScreenSize = .width / wVirtualScreenWidth
-        .MaxFormHeightPrcntgOfScreenSize = .Height / wVirtualScreenHeight
-    End With
-    Debug.Print "Resized!"
-    ApplReposition
-    RepositionResizer
-#End If
 End Sub
 
 Private Function Max(ParamArray va() As Variant) As Variant
@@ -1571,32 +1507,6 @@ Private Sub ReduceAreasHeight(ByVal totalexceedingheight As Single)
     
 End Sub
 
-Private Sub RepositionResizer()
-#If Resizable Then
-    With Me.lblResizer
-        .left = Me.InsideWidth - lblResizer.width
-        .Top = Me.InsideHeight - lblResizer.Height
-        .Visible = True
-    End With
-#End If
-End Sub
-
-Public Sub RowButtons(ByVal row As Long)
-    
-    Dim i   As Long
-    Dim cmb As MSForms.CommandButton
-        
-    For i = 1 To 7
-        Set cmb = DsgnButton(row, i)
-        With cmb
-            Debug.Print "Name  = " & .Name
-            Debug.Print "Top   = " & .Top
-            Debug.Print "Left  = " & .left
-        End With
-    Next i
-    
-End Sub
-
 Public Sub Setup()
     
     On Error GoTo on_error
@@ -1650,16 +1560,9 @@ Public Sub Setup()
     ApplReposition
     Debug_Sizes "All done! Setup and (possibly) height reduced:"
 
-#If Resizable Then
-    RepositionResizer
-#End If
     AdjustStartupPosition Me
-
-#If Resizable Then
-    ' ResizeWindowSettings Me, True
-#End If
-
     bDoneSetup = True
+    
 exit_proc:
     Exit Sub
 
@@ -1720,37 +1623,15 @@ Private Sub SetupTitle()
 End Sub
 
 Private Sub UserForm_Activate()
-        
     If Not bDoneSetup Then Setup
-
-#If Resizable Then
-        RepositionResizer
-        minHeight = 125
-        minWidth = 125
-#End If
-
-    Debug.Print siVmarginFrames
-    Debug.Print siHmarginFrames
-    
 End Sub
 
-Private Sub UserForm_Resize()
-#If Resizable Then
-    If Not bFormEvents Then GoTo exit_proc
-    
-exit_proc:
-    Exit Sub
-
-on_error:
-    Debug.Print Err.Description: Stop: Resume Next
-#End If
-End Sub
-
+Public Function VgridPos(ByVal si As Single) As Single
+' --------------------------------------------------------------
 ' Returns an integer of which the remainder (Int(si) / 6) is 0.
 ' Background: A controls content is only properly displayed
-' when the top position of it is aligned to such a position
+' when the top position of it is aligned to such a position.
 ' --------------------------------------------------------------
-Public Function VgridPos(ByVal si As Single) As Single
     Dim i As Long
     
     For i = 0 To 6

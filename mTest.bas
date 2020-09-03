@@ -263,7 +263,7 @@ Public Function WidthDeterminedByReplyButtons( _
     
     ' Initializations for this test
     With fMsg
-        .TestFrameWithBorders = True
+'        .TestFrameWithBorders = True
     End With
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
@@ -701,6 +701,7 @@ Public Sub AllInOne()
             .MinFormWidth = lMinFormWidth
             .MaxFormWidthPrcntgOfScreenSize = lMaxFormWidth    ' for this demo to enforce a vertical scroll bar
             .MaxFormHeightPrcntgOfScreenSize = lMaxFormHeight  ' for this demo to enbforce a vertical scroll bar for the message section
+'            .TestFrameWithBorders = True
         End With
         
         tMsg.Section(2).sText = "When the specified minimum form width (currently " & lMinFormWidth & "pt) is increased, the form height will decrease because the proportional spaced " & _
@@ -729,6 +730,133 @@ Public Sub AllInOne()
                 Case cll(lB6): lMaxFormHeight = .MaxFormHeightPrcntgOfScreenSize - lChangeHeightPcntg
                 Case cll(lB7): Exit Do ' The very last item in the collection is the "Finished" button
                 Case Else
+            End Select
+        End With
+    Loop
+   
+End Sub
+
+Public Sub ButtonsMatrix()
+
+    Dim i, j                    As Long
+    Dim sTitle                  As String
+    Dim tMsg                    As tMessage
+    Dim cllMatrix               As New Collection
+    Dim cllStory                As New Collection
+    Dim vReply                  As Variant
+    Dim lChangeHeightPcntg      As Long
+    Dim lChangeWidthPcntg       As Long
+    Dim lChangeMinWidthPt       As Long
+    Dim bMonospaced             As Boolean: bMonospaced = True ' initial test value
+    Dim lMinFormWidth           As Long
+    Dim lMaxFormWidth           As Long
+    Dim lMaxFormHeight          As Long
+    
+    '~~ Obtain initial test values and their corresponding change (increment/decrement) value
+    '~~ for this test (lTest) from the Test Worksheet
+    lTest = 6
+    With wsMsg
+        lMinFormWidth = .InitMinFormWidth(lTest):   lChangeMinWidthPt = .MinFormWidthIncrDecr(lTest)
+        lMaxFormWidth = .InitMaxFormWidth(lTest):   lChangeWidthPcntg = .MaxFormWidthIncrDecr(lTest)
+        lMaxFormHeight = .InitMaxFormHeight(lTest): lChangeHeightPcntg = .MaxFormHeightIncrDecr(lTest)
+    End With
+    
+    sTitle = "Buttons only test: No message, just buttons (finish with ""Ok"")"
+    tMsg.Section(1).sText = "Some can play around with a matrix of up to 7 rows each up to 7 buttons"
+    '~~ Assemble the matrix of buttons as collection for  the argument buttons
+    For i = 1 To 5 ' rows
+        For j = 1 To 7 ' row buttons
+            If j * i < 49 Then
+                cllMatrix.Add "Button" & vbLf & i & "-" & j
+            Else
+                cllMatrix.Add "Next"
+            End If
+        Next j
+        cllMatrix.Add vbLf
+    Next i
+    For i = 1 To 6
+        cllMatrix.Add "Button" & vbLf & "6-" & i
+    Next i
+    cllMatrix.Add vbLf
+    cllMatrix.Add "Ok"
+    
+    Do
+        '~~ Assign initial - and as the test repeats the changed - values (contraints)
+        '~~ for this test to the UserForm's properties
+        With fMsg
+            .MinButtonWidth = 40
+            .MinFormWidth = lMinFormWidth
+            .MaxFormWidthPrcntgOfScreenSize = lMaxFormWidth    ' for this demo to enforce a vertical scroll bar
+            .MaxFormHeightPrcntgOfScreenSize = lMaxFormHeight  ' for this demo to enbforce a vertical scroll bar for the message section
+            .TestFrameWithBorders = True
+        End With
+                         
+        vReply = mMsg.Msg( _
+                          title:=sTitle, _
+                          message:=tMsg, _
+                          buttons:=cllMatrix _
+                         )
+        With fMsg
+            Select Case vReply
+                Case "Ok": Exit Do ' The very last item in the collection is the "Finished" button
+            End Select
+        End With
+    Loop
+   
+End Sub
+
+
+Public Sub MostlyButtons()
+
+    Dim i, j                    As Long
+    Dim sTitle                  As String
+    Dim tMsg                    As tMessage
+    Dim cllStory                As New Collection
+    Dim vReply                  As Variant
+    Dim lChangeHeightPcntg      As Long
+    Dim lChangeWidthPcntg       As Long
+    Dim lChangeMinWidthPt       As Long
+    Dim bMonospaced             As Boolean: bMonospaced = True ' initial test value
+    Dim lMinFormWidth           As Long
+    Dim lMaxFormWidth           As Long
+    Dim lMaxFormHeight          As Long
+    
+    '~~ Obtain initial test values and their corresponding change (increment/decrement) value
+    '~~ for this test (lTest) from the Test Worksheet
+    lTest = 6
+    With wsMsg
+        lMinFormWidth = .InitMinFormWidth(lTest):   lChangeMinWidthPt = .MinFormWidthIncrDecr(lTest)
+        lMaxFormWidth = .InitMaxFormWidth(lTest):   lChangeWidthPcntg = .MaxFormWidthIncrDecr(lTest)
+        lMaxFormHeight = .InitMaxFormHeight(lTest): lChangeHeightPcntg = .MaxFormHeightIncrDecr(lTest)
+    End With
+    
+    sTitle = "Buttons only test: No message, just buttons (finish with ""Ok"")"
+    '~~ Assemble the matrix of buttons as collection for  the argument buttons
+    For i = 1 To 6 ' rows
+        cllStory.Add "Click this button in case ...." & vbLf & "(no lengthy message text above but everything is said in the button)"
+        cllStory.Add vbLf
+    Next i
+    cllStory.Add "Ok"
+    
+    Do
+        '~~ Assign initial - and as the test repeats the changed - values (contraints)
+        '~~ for this test to the UserForm's properties
+        With fMsg
+            .MinButtonWidth = 40
+            .MinFormWidth = lMinFormWidth
+            .MaxFormWidthPrcntgOfScreenSize = lMaxFormWidth    ' for this demo to enforce a vertical scroll bar
+            .MaxFormHeightPrcntgOfScreenSize = lMaxFormHeight  ' for this demo to enbforce a vertical scroll bar for the message section
+'            .TestFrameWithBorders = True
+        End With
+                         
+        vReply = mMsg.Msg( _
+                          title:=sTitle, _
+                          message:=tMsg, _
+                          buttons:=cllStory _
+                         )
+        With fMsg
+            Select Case vReply
+                Case "Ok": Exit Do ' The very last item in the collection is the "Finished" button
             End Select
         End With
     Loop

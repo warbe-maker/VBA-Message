@@ -104,11 +104,7 @@ Public Sub Usage_Msg()
     tMsg.Section(2).bMonspaced = True ' Just to demostrate
     tMsg.Section(3).sLabel = "Label section 3"
     tMsg.Section(3).sText = "Message section 3 text"
-       
-    With fMsg
-        .TestFrameWithBorders = True
-    End With
-    
+           
     Select Case Msg(title:="Any title", _
                    message:=tMsg, _
                    buttons:=cll)
