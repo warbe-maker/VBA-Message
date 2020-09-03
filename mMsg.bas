@@ -41,20 +41,23 @@ Public Declare PtrSafe Function DrawMenuBar Lib "user32" (ByVal hWnd As Long) As
 Public Declare PtrSafe Function FindWindowA Lib "user32" (ByVal lpClassName As String, ByVal lpWindowName As String) As Long
 #End If
 
-Public Type MessageSection
-    sLabel As String
-    sText As String
-    bMonospaced As Boolean
-End Type
-
 Private vMsgReply As Variant
 
-Public Enum StartupPosition
-    Manual = 0
-    CenterOwner = 1
-    CenterScreen = 2
-    WindowsDefault = 3
-End Enum
+Public Enum StartupPosition         ' ---------------------------
+    Manual = 0                      ' Used to position the
+    CenterOwner = 1                 ' final setup message form
+    CenterScreen = 2                ' horizontally and vertically
+    WindowsDefault = 3              ' centered on the screen
+End Enum                            ' ---------------------------
+
+Public Type tSection                ' ------------------
+       sLabel As String             ' Structure of the
+       sText As String              ' UserForm's
+       bMonspaced As Boolean        ' message area which
+End Type                            ' consists of
+Public Type tMessage                ' three message
+       Section(1 To 3) As tSection  ' sections
+End Type
 
 #If AlternateMsgBox Then
 ' Elaborated error message using fMsg which supports the display of
@@ -212,24 +215,21 @@ Dim dMax As Double
     Max = dMax
 End Function
 
-' Used with Err.Raise AppErr() to convert a positive application error number
-' into a negative number to avoid any conflict with a VB error. Used when the
-' error is displayed with ErrMsg to turn the negative number back into the
-' original positive application number.
-' The function ensures that a programmed (application) error numbers never
-' conflicts with VB error numbers by adding vbObjectError which turns it
-' into a negative value. In return, translates a negative error number
-' back into an Application error number. The latter is the reason why this
-' function must never be used with a true VB error number.
-' ------------------------------------------------------------------------
 Public Function AppErr(ByVal lNo As Long) As Long
-    If lNo < 0 Then
-        AppErr = lNo - vbObjectError
-    Else
-        AppErr = vbObjectError + lNo
-    End If
+' ---------------------------------------------------------------------------
+' Converts a positive (programmed "application") error number into a negative
+' number by adding vbObjectError. Converts a negative number back into a
+' positive i.e. the original programmed application error number.
+' Usage example:
+'    Err.Raise AppErr(1), .... ' when an application error is detected
+'    If Err.Number < 0 Then    ' when the error is displayed
+'       MsgBox "Application error " & AppErr(Err.Number)
+'    Else
+'       MsgBox "VB error " & Err.Number
+'    End If
+' ---------------------------------------------------------------------------
+    AppErr = IIf(lNo < 0, AppErr = lNo - vbObjectError, AppErr = vbObjectError + lNo)
 End Function
-
 ' MsgBox alternative providing up to 5 reply buttons, specified either
 ' by MsgBox vbOkOnly (the default), vbYesNo, etc. or a comma delimited
 ' string specifying the used button's caption. The function uses the
@@ -296,34 +296,15 @@ End Function
 ' UserForm fMsg and returns the clicked reply button's caption or its
 ' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
 ' ------------------------------------------------------------------
-Public Function Msg(ByVal title As String, _
-           Optional ByVal label1 As String = vbNullString, _
-           Optional ByVal text1 As String = vbNullString, _
-           Optional ByVal monospaced1 As Boolean = False, _
-           Optional ByVal label2 As String = vbNullString, _
-           Optional ByVal text2 As String = vbNullString, _
-           Optional ByVal monospaced2 As Boolean = False, _
-           Optional ByVal label3 As String = vbNullString, _
-           Optional ByVal text3 As String = vbNullString, _
-           Optional ByVal monospaced3 As Boolean = False, _
-           Optional ByVal monospacedfontsize As Long = 0, _
-           Optional ByVal buttons As Variant = vbOKOnly) As Variant
+Public Function Msg( _
+                    ByVal title As String, _
+                    ByRef message As tMessage, _
+           Optional ByVal buttons As Variant = vbOKOnly _
+                   ) As Variant
     
     With fMsg
         .ApplTitle = title
-        
-        .ApplLabel(1) = label1
-        .ApplText(1) = text1
-        .ApplMonoSpaced(1) = monospaced1
-        
-        .ApplLabel(2) = label2
-        .ApplText(2) = text2
-        .ApplMonoSpaced(2) = monospaced2
-        
-        .ApplLabel(3) = label3
-        .ApplText(3) = text3
-        .ApplMonoSpaced(3) = monospaced3
-
+        .ApplMsg = message
         .ApplButtons = buttons
          
         '+-----------------------------------------------------------------------------+
@@ -335,8 +316,8 @@ Public Function Msg(ByVal title As String, _
         '+-----------------------------------------------------------------------------+
         
         .show
-        On Error Resume Next ' Just in case the user has terminated the dialog without clicking a reply button
-        Msg = .ReplyValue
+        On Error Resume Next    ' Just in case the user has terminated the dialog without clicking a reply button
+        Msg = .ReplyValue       'This fetch of the clicked reply button's value unloads the form
     End With
     Unload fMsg
 
