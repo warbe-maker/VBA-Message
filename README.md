@@ -18,37 +18,58 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 | The maximum reply _Buttons_ is 3 | Up to 7 reply _Buttons_ may be displayed in up to 7 reply _Button Rows_ in any order |
 | The caption of the reply _Buttons_ is specified by a [value](<https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function#settings>) which results in 1 to 3 reply _Buttons_ with corresponding untranslated! native English captions | The caption of the reply _Buttons_ may be specified by the [VB MsgBox values](<https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function#settings>) **and** additionally by any multi-line text (see [Syntax of the _buttons_ argument](#syntax-of-the-buttons-argument) |
 | Specifying the default button | (yet) not implemented |
-| Display of an ?, !, etc. image | (yet) not implemented |
+| Display of an allert image (?, !, etc.) | (yet) not implemented |
 
-### Usage
-The primary means is the UserForm _fMsg_. However, it makes sense to encapsulate it in a function.
 
-#### Properties of _fMsg_
+### Installation
+1. Download [_fMsg.frm_](), and [_fMsg.frx_]()
+2. Import _fMsg.frm_ to a VBA project
+3. In the VBE add a Reference to "Microsoft Scripting Runtime
+4. Copy the following code into a standard module's global declarations section:
+5. Copy the following into a standard module:<br>
+```
+Public Enum StartupPosition         ' ---------------------------
+    Manual = 0                      ' Used to position the 
+    CenterOwner = 1                 ' final setup message form
+    CenterScreen = 2                ' horizontally and vertically
+    WindowsDefault = 3              ' centered on the screen         
+End Enum                            ' ---------------------------
 
-When the UserForm _fMsg_ is installed in a VBA project ([download _fMsg.frm_](), [download _fMsg.frx_]() and import the _fMsg.frm_), the following properties are available to display a message (see [Code Examples](#code-examples)  below).
-Please Note: The VBA project requires a Reference to "Microsoft Scripting Runtime" 
+Public Type tSection                ' ------------------
+       sLabel As String             ' Structure of the
+       sText As String              ' UserForm's 
+       bMonspaced As Boolean        ' message area which
+End Type                            ' consists of 
+Public Type tMessage                ' three message 
+       Section(1 to 3) As tSection  ' sections
+End Type                            ' ------------------
+
+```
+6. Before start using the UserForm have a look at its [Properties](#properties-of-the-fmsg-userform)
+7. Either continue with [Usage step by step](#usage-step-by-step) or start directly using the prepared [Interfaces](#Interfaces) in module _mMsg_.  
+
+#### Properties of the _fMsg_ UserForm
 
 | Property | Meaning |
 |----------|---------|
-| _ApplTitle_| | String expression displayed in the message window's handle bar|
-| _ApplLabel(n)_ | Optional. String expression with _n__ as a numeric expression 1 to 3). Applied as a descriptive label above a below message text. Not displayed (even when provided) when no corresponding _ApplText_ is provided |
+| _ApplTitle_| Mandatory. String expression. Applied in the message window's handle bar|
+| ApplMsg    | Optional. User defined type. Structure of the UserForm's message area.|
+| _ApplLabel(n)_ | Optional. String expression with _n__ as a numeric expression 1 to 3. Applied as a descriptive label above a below message text. Not displayed (even when provided) when no corresponding _ApplText_ is provided |
 | _ApplText(n)_ | Optional.String expression with _n__ as a numeric expression 1 to 3). Applied as message text of section _n_.|
 | _Monospaced(n)_ | Optional. Boolean expression. Defaults to False when immitted. When True, the text in section _n_ is displayed mono-spaced.|
 | _ApplButtons_ | Optional. Defaults to vbOkOnly.<br>A MsgBox buttons value,<br>a comma delimited String expression,<br>a Collection,<br>or a dictionary,<br>with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf)|
 | _Reply_ | Read only. The clicked button's caption string as provided through the ApplButtons property |
 | _iReply_ | The clicked button's index |
 
+### Usage
+#### Usage step-by-step
+The primary means is the UserForm _fMsg_. However, it makes sense to encapsulate it in a function.
+
+
 #### Code examples
 ##### A very first try
-Copy the following into a standard module:
-```
-Public Enum StartupPosition
-    Manual = 0
-    CenterOwner = 1
-    CenterScreen = 2
-    WindowsDefault = 3
-End Enum
 
+```
 Public Sub FirstTry()
           
     With fMsg
@@ -102,15 +123,6 @@ End Sub
 For the full flexibility we take the encapsulated example from above and have 2 button rows each with 3 buttons and a 3rd with an Ok button.
 In any standard module copy above the first procedure:
 ```
-Public Type tSection
-       sLabel As String
-       sText As String
-       bMonspaced As Boolean
-End Type
-Public Type tMessage
-       Section(1 to 3) As tSection
-End Type
-
 Public Function Msg( _
                     ByVal title As String, _
                     ByRef message As tMessage, _
