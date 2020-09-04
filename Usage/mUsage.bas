@@ -14,7 +14,7 @@ Public Type tSection                ' ------------------
        bMonspaced As Boolean        ' message area which
 End Type                            ' consists of
 Public Type tMessage                ' three message
-       Section(1 To 3) As tSection  ' sections
+       section(1 To 3) As tSection  ' sections
 End Type
 
 Public Function Box( _
@@ -97,13 +97,13 @@ Public Sub Usage_Msg()
     cll.Add vbLf ' button row break
     cll.Add "Caption Button 7": iB7 = cll.Count
        
-    tMsg.Section(1).sLabel = "Label section 1"
-    tMsg.Section(1).sText = "Message section 1 text"
-    tMsg.Section(2).sLabel = "Label section 2"
-    tMsg.Section(2).sText = "Message section 2 text"
-    tMsg.Section(2).bMonspaced = True ' Just to demostrate
-    tMsg.Section(3).sLabel = "Label section 3"
-    tMsg.Section(3).sText = "Message section 3 text"
+    tMsg.section(1).sLabel = "Label section 1"
+    tMsg.section(1).sText = "Message section 1 text"
+    tMsg.section(2).sLabel = "Label section 2"
+    tMsg.section(2).sText = "Message section 2 text"
+    tMsg.section(2).bMonspaced = True ' Just to demostrate
+    tMsg.section(3).sLabel = "Label section 3"
+    tMsg.section(3).sText = "Message section 3 text"
            
     Select Case Msg(title:="Any title", _
                    message:=tMsg, _

@@ -12,6 +12,8 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
+
 Option Explicit
 ' -------------------------------------------------------------------------------
 ' UserForm fMsg
@@ -1111,59 +1113,62 @@ Private Sub ResizeAndRepositionMsgSections()
     siTopSection = 6
     For i = 1 To cllDsgnSections.Count
         siTop = 0
-        Set frSection = DsgnSection(i)
-        Set la = DsgnSectionLabel(i)
-        Set frText = DsgnSectionTextFrame(i)
-        Set tb = DsgnSectionText(i)
-        Debug.Print "Section " & i
-        Debug.Print String(Len("Section " & i), "-")
-        If IsApplied(la) Then
-            With la
-                .Visible = True
-                .Top = siTop
-                siTop = VgridPos(.Top + .Height)
-                Debug.Print "Label-Top        = " & .Top
-                Debug.Print "Label-Height     = " & .Height
-                Debug.Print "Top next         = " & siTop
-            End With
-        End If
-        
-        If IsApplied(tb) Then
-            With tb
-                .Visible = True
-            End With
-            With frText
-                .Visible = True
-                .Top = siTop
-                siTop = .Top + .Height + siVmarginFrames
-                Debug.Print "TextFrame-Top    = " & .Top
-                Debug.Print "TextFrame-Height = " & .Height
+        If IsApplied(DsgnSection(i)) Then
+            Set frSection = DsgnSection(i)
+            Set la = DsgnSectionLabel(i)
+            Set frText = DsgnSectionTextFrame(i)
+            Set tb = DsgnSectionText(i)
+            Debug.Print "Section " & i
+            Debug.Print String(Len("Section " & i), "-")
+            If IsApplied(la) Then
+                With la
+                    .Visible = True
+                    .Top = siTop
+                    siTop = VgridPos(.Top + .Height)
+                    Debug.Print "Label-Top        = " & .Top
+                    Debug.Print "Label-Height     = " & .Height
+                    Debug.Print "Top next         = " & siTop
+                End With
+            End If
+            
+            If IsApplied(tb) Then
+                With tb
+                    .Visible = True
+                    .Top = siVmarginFrames
+                End With
+                With frText
+                    .Visible = True
+                    .Top = siTop
+                    .Height = tb.Height + (siVmarginFrames * 2)
+                    siTop = .Top + .Height + siVmarginFrames
+                    Debug.Print "TextFrame-Top    = " & .Top
+                    Debug.Print "TextFrame-Height = " & .Height
+                    
+                    If .ScrollBars = fmScrollBarsBoth Or frText.ScrollBars = fmScrollBarsHorizontal Then
+                        .Height = tb.Top + tb.Height + VSPACE_SCROLLBAR + siVmarginFrames
+                    Else
+                        .Height = tb.Top + tb.Height + siVmarginFrames
+                    End If
+                End With
+            End If
                 
-                If .ScrollBars = fmScrollBarsBoth Or frText.ScrollBars = fmScrollBarsHorizontal Then
-                    .Height = tb.Top + tb.Height + VSPACE_SCROLLBAR + siVmarginFrames
-                Else
-                    .Height = tb.Top + tb.Height + siVmarginFrames
-                End If
-            End With
+            If IsApplied(frSection) Then
+                With frSection
+                    .Top = siTopSection
+                    .Visible = True
+                    .Height = frText.Top + frText.Height + siVmarginFrames
+                    siTopSection = VgridPos(.Top + .Height + siVmarginFrames + VSPACE_SECTIONS)
+                    Debug.Print "Section-Top    = " & .Top
+                    Debug.Print "Section-Height = " & .Height
+                    Debug.Print "Top next       = " & siTopSection
+                End With
+            End If
+                
+            Select Case DsgnMsgArea.ScrollBars
+                Case fmScrollBarsBoth, fmScrollBarsVertical:    frSection.left = siHmarginFrames
+                Case fmScrollBarsHorizontal, fmScrollBarsNone:  frSection.left = siHmarginFrames + (VSPACE_SCROLLBAR / 2)
+            End Select
         End If
-            
-        If IsApplied(frSection) Then
-            With frSection
-                .Top = siTopSection
-                .Visible = True
-                .Height = frText.Top + frText.Height + siVmarginFrames
-                siTopSection = VgridPos(.Top + .Height + siVmarginFrames + VSPACE_SECTIONS)
-                Debug.Print "Section-Top    = " & .Top
-                Debug.Print "Section-Height = " & .Height
-                Debug.Print "Top next       = " & siTopSection
-            End With
-        End If
-            
-        Select Case DsgnMsgArea.ScrollBars
-            Case fmScrollBarsBoth, fmScrollBarsVertical:    frSection.left = siHmarginFrames
-            Case fmScrollBarsHorizontal, fmScrollBarsNone:  frSection.left = siHmarginFrames + (VSPACE_SCROLLBAR / 2)
-        End Select
-            
     Next i
     
     DsgnMsgArea.Height = frSection.Top + frSection.Height + siVmarginFrames
