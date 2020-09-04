@@ -49,7 +49,7 @@ Public Type tSection                ' ------------------
        bMonspaced As Boolean        ' message area which
 End Type                            ' consists of
 Public Type tMessage                ' three message
-       Section(1 To 3) As tSection  ' sections
+       section(1 To 3) As tSection  ' sections
 End Type
 
 #If AlternateMsgBox Then
@@ -305,7 +305,7 @@ Public Function Msg( _
         '|| a flickering message window when the whole setup process is "displayed".  ||
         '|| During testing however it may be appropriate to comment the Setup here in ||
         '|| order to have it performed along with the UserForm_Activate event.        ||
-        .Setup '                                                                      ||
+'        .Setup '                                                                      ||
         '+-----------------------------------------------------------------------------+
         
         .show
