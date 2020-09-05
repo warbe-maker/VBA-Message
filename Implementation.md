@@ -130,7 +130,7 @@ Note: This re-positioning may be done at any time for testing in order to displa
 
 ## Common public properies
 
-[See corresponding chapter in README](readme.md#properties-of-the-fmsg-userform)                          
+<small>[See chapter in README](<README.md#properties-of-the-fmsg-userform>)</small>                         
 
 ## Public properties for advanced usage of the message form
  
