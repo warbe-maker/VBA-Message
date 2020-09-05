@@ -61,7 +61,7 @@ End Type
 | _Reply_ | Read only. The clicked button's caption string as provided through the ApplButtons property |
 | _iReply_ | The clicked button's index |
 
-See [Additional properties for advanced usage]() to create application specific messages.
+See [Additional properties for advanced usage](Implementation.md#public-properties-for-advanced-usage-of-the-message-form) to create application specific messages.
 ### Usage
 #### Usage step-by-step
 The primary means is the UserForm _fMsg_. However, it requires the followingmakes sense to encapsulate it in a function.
