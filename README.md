@@ -1,7 +1,7 @@
 # MsgBox Alternative
 
 [Abstract](#abstract)<br>
-[Why an alternative MsgBox](#why-an-alternative-msgbox)<br>[Interfaces](#interfaces)<br>[Installation](#installation)<br>[Usage](#usage)
+[Why an alternative MsgBox](#why-an-alternative-msgbox)<br>[Installation](#installation)<br>[Properties of the _fMsg_ UserForm](#properties-of-the-fmsg- userform)<br>[Usage](#usage)<br>[Interfaces](#interfaces)
 
 ### Abstract
 Displays a message in a dialog box, waits for the user to click a button, and returns a variant indicating which button the user clicked.
@@ -65,7 +65,6 @@ See [Additional properties for advanced usage](<Implementation.md#public-propert
 ### Usage
 #### Usage step-by-step
 ##### A very first try
-
 ```
 Public Sub FirstTry()
           
