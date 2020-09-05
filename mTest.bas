@@ -160,7 +160,7 @@ Public Function WidthDeterminedByTitle(Optional ByVal vButton1 As Variant = vbNu
     lIncrDecrWidth = wsMsg.MinFormWidthIncrDecr(lTest)
     With fMsg
         .MinFormWidth = wsMsg.InitMinFormWidth(lTest)
-        .TestFrameWithBorders = True
+'        .TestFrameWithBorders = True
     End With
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC) & "  (This title uses more space than the minimum specified message form width and thus the width is determined by the title)"
@@ -226,8 +226,8 @@ Public Function WidthDeterminedByMonoSpacedMessageSection( _
     
     Do
         With fMsg
-    '        .TestFrameWithCaptions = True  ' defaults to false, set to true for test purpose only
-            .TestFrameWithBorders = True  ' defaults to false, set to true for test purpose only
+'            .TestFrameWithCaptions = True  ' defaults to false, set to true for test purpose only
+'            .TestFrameWithBorders = True  ' defaults to false, set to true for test purpose only
         End With
         WidthDeterminedByMonoSpacedMessageSection = _
         mMsg.Msg( _
@@ -263,9 +263,7 @@ Public Function WidthDeterminedByReplyButtons( _
     vButton2 = C_STOP
     
     ' Initializations for this test
-    With fMsg
-'        .TestFrameWithBorders = True
-    End With
+'    fMsg.TestFrameWithBorders = True
     
     sMsgTitle = "Test " & lTest & ": " & Readable(PROC)
     tMsg.section(1).sLabel = "Test description:"
@@ -332,7 +330,7 @@ Public Function MonoSpacedSectionWidthExceedsMaxFormWidth( _
     
     ' Initializations for this test
     With fMsg
-        .TestFrameWithBorders = True
+'        .TestFrameWithBorders = True
         .MaxFormWidthPrcntgOfScreenSize = 50
     End With
     
@@ -368,7 +366,7 @@ Public Function MonoSpacedMessageSectionExceedMaxFormHeight() As Variant
     
     ' Initializations for this test
     With fMsg
-        .TestFrameWithBorders = True
+'        .TestFrameWithBorders = True
         .MaxFormWidthPrcntgOfScreenSize = 80
         .MaxFormHeightPrcntgOfScreenSize = 50
     End With
@@ -458,8 +456,8 @@ Public Function ButtonByValue()
     Unload fMsg                     ' Ensures a message starts from scratch
     
     With fMsg
-        .TestFrameWithBorders = True
-        .TestFrameWithCaptions = True
+'        .TestFrameWithBorders = True
+'        .TestFrameWithCaptions = True
 '        .VmarginFrames = 5
 '        .HmarginFrames = 6
     End With
@@ -473,7 +471,7 @@ Public Function ButtonByValue()
     mMsg.Msg( _
              title:="Test: Button by value (" & PROC & ")", _
              message:=tMsg, _
-             buttons:=vbYesNo _
+             buttons:=vbOKOnly _
             )
 End Function
 
@@ -531,6 +529,9 @@ Public Function ButtonByCollection()
             )
 End Function
 
+Public Sub Test_ButtonByCollection()
+    Debug.Print ButtonByCollection
+End Sub
 Public Function ButtonByDictionary()
 ' -----------------------------------------------
 ' The buttons argument is provided as Dictionary.
@@ -541,7 +542,7 @@ Public Function ButtonByDictionary()
     
     Unload fMsg                     ' Ensures a message starts from scratch
     With fMsg
-        .TestFrameWithBorders = True
+'        .TestFrameWithBorders = True
 '        .TestFrameWithCaptions = True
 '        .VmarginFrames = 2
 '        .HmarginFrames = 5
@@ -573,7 +574,7 @@ Public Function Test_ButtonScrollBarVertical()
     
     Unload fMsg                     ' Ensures a message starts from scratch
     With fMsg
-        .TestFrameWithBorders = True
+'        .TestFrameWithBorders = True
         .MaxFormHeightPrcntgOfScreenSize = 60 ' enforce vertical scroll bar
     End With
     
@@ -796,19 +797,19 @@ Public Sub ButtonsMatrix()
             .MinFormWidth = lMinFormWidth
             .MaxFormWidthPrcntgOfScreenSize = lMaxFormWidth    ' for this demo to enforce a vertical scroll bar
             .MaxFormHeightPrcntgOfScreenSize = lMaxFormHeight  ' for this demo to enbforce a vertical scroll bar for the message section
-            .TestFrameWithBorders = True
+'            .TestFrameWithBorders = True
         End With
                          
         vReply = mMsg.Msg( _
                           title:=sTitle, _
                           message:=tMsg, _
-                          buttons:=cllMatrix _
+                          buttons:=cllMatrix, _
+                          returnindex:=True _
                          )
-        With fMsg
-            Select Case vReply
-                Case "Ok": Exit Do ' The very last item in the collection is the "Finished" button
-            End Select
-        End With
+        Select Case vReply
+            Case "Ok": Exit Do ' The very last item in the collection is the "Finished" button
+            Case 42: Exit Do
+        End Select
     Loop
    
 End Sub

@@ -108,19 +108,19 @@ Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
 
     '~~ Display error message by UserForm fErrMsg
     With fMsg
-        .ApplTitle = errtitle
-        .ApplLabel(1) = "Error Message/Description:"
-        .ApplText(1) = sErrText
+        .MsgTitle = errtitle
+        .MsgLabel(1) = "Error Message/Description:"
+        .MsgText(1) = sErrText
         If errpath <> vbNullString Then
-            .ApplLabel(2) = "Error path (call stack):"
-            .ApplText(2) = errpath
-            .ApplMonoSpaced(2) = True
+            .MsgLabel(2) = "Error path (call stack):"
+            .MsgText(2) = errpath
+            .MsgMonoSpaced(2) = True
         End If
         If errinfo <> vbNullString Then
-            .ApplLabel(3) = "Info:"
-            .ApplText(3) = errinfo
+            .MsgLabel(3) = "Info:"
+            .MsgText(3) = errinfo
         End If
-        .ApplButtons = vbOKOnly
+        .MsgButtons = vbOKOnly
         
         '~~ Setup prior activating/displaying the message form is essential!
         '~~ To aviod flickering, the whole setup process must be done before the form is displayed.
@@ -233,17 +233,17 @@ End Function
 Public Function Box( _
            Optional ByVal title As String = vbNullString, _
            Optional ByVal MsgSectionText As String = vbNullString, _
-           Optional ByVal msgmonospaced As Boolean = False, _
+           Optional ByVal MsgMonoSpaced As Boolean = False, _
            Optional ByVal MinFormWidth As Single = 0, _
            Optional ByVal buttons As Variant = vbOKOnly) As Variant
     
 '    Dim siHeight    As Single
 
     With fMsg
-        .ApplTitle = title
-        .ApplText(1) = MsgSectionText
-        .ApplMonoSpaced(1) = msgmonospaced
-        .ApplButtons = buttons
+        .MsgTitle = title
+        .MsgText(1) = MsgSectionText
+        .MsgMonoSpaced(1) = MsgMonoSpaced
+        .MsgButtons = buttons
         
         '~~ Setup prior activating/displaying the message form is essential!
         '~~ To aviod flickering, the whole setup process must be done before the form is displayed.
@@ -284,33 +284,34 @@ Dim dMin As Double
     Min = dMin
 End Function
 
-' MsgBox alternative providing three message sections, each optionally
-' monospaced and with an optional label/haeder. The function uses the
-' UserForm fMsg and returns the clicked reply button's caption or its
-' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
-' ------------------------------------------------------------------
-Public Function Msg( _
-                    ByVal title As String, _
+Public Function Msg(ByVal title As String, _
                     ByRef message As tMessage, _
-           Optional ByVal buttons As Variant = vbOKOnly _
-                   ) As Variant
+           Optional ByVal buttons As Variant = vbOKOnly, _
+           Optional ByVal returnindex As Boolean = False) As Variant
+' ------------------------------------------------------------------
+' General purpose MsgBox alternative message. By default returns
+' the clicked reply buttons value
+' ------------------------------------------------------------------
     
     With fMsg
-        .ApplTitle = title
-        .ApplMsg = message
-        .ApplButtons = buttons
+        .MsgTitle = title
+        .Msg = message
+        .MsgButtons = buttons
          
-        '+-----------------------------------------------------------------------------+
-        '|| Setup prior showing the form i a true perfomance improvement and avoids   ||
-        '|| a flickering message window when the whole setup process is "displayed".  ||
-        '|| During testing however it may be appropriate to comment the Setup here in ||
-        '|| order to have it performed along with the UserForm_Activate event.        ||
-'        .Setup '                                                                      ||
-        '+-----------------------------------------------------------------------------+
+        '+--------------------------------------------------------------------------+
+        '|| Setup prior showing the form is a true perfomance improvement as it    ||
+        '|| avoids a flickering message window when the setup is performed when    ||
+        '|| the message window is already displayed, i.e. with the Activate event. ||
+        '|| For testing however it may be appropriate to comment the Setup here in ||
+        '|| order to have it performed along with the UserForm_Activate event.     ||
+        .Setup '                                                                   ||
+        '+--------------------------------------------------------------------------+
         
         .show
         On Error Resume Next    ' Just in case the user has terminated the dialog without clicking a reply button
-        Msg = .ReplyValue       'This fetch of the clicked reply button's value unloads the form
+        '~~ Providing the caller with the clicked reply buttons value (or index) unloads the form.
+        '~~ It may have been already unloaded in case there were only one button to be clicked
+        If returnindex Then Msg = .ReplyIndex Else Msg = .ReplyValue
     End With
     Unload fMsg
 

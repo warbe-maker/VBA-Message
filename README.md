@@ -24,46 +24,47 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 ### Installation
 1. Download [_fMsg.frm_](), and [_fMsg.frx_]()
 2. Import _fMsg.frm_ to a VBA project
-3. In the VBE add a Reference to "Microsoft Scripting Runtime
+3. In the VBE add a Reference to "Microsoft Scripting Runtime"
 4. Copy the following code into a standard module's global declarations section:
 5. Copy the following into a standard module:<br>
 ```
-Public Enum StartupPosition         ' ---------------------------
-    Manual = 0                      ' Used to position the 
-    CenterOwner = 1                 ' final setup message form
-    CenterScreen = 2                ' horizontally and vertically
-    WindowsDefault = 3              ' centered on the screen         
-End Enum                            ' ---------------------------
+Public Enum StartupPosition         ' -------------------
+    Manual = 0                      ' Used to position
+    CenterOwner = 1                 ' the message window
+    CenterScreen = 2                ' horizontally and
+    WindowsDefault = 3              ' vertically centered
+End Enum                            ' -------------------
 
-Public Type tSection                ' ------------------
-       sLabel As String             ' Structure of the
-       sText As String              ' UserForm's 
-       bMonspaced As Boolean        ' message area which
-End Type                            ' consists of 
-Public Type tMessage                ' three message 
-       Section(1 to 3) As tSection  ' sections
-End Type                            ' ------------------
+Public Type tSection                ' --------------
+       sLabel As String             ' Structure of
+       sText As String              ' UserForm's
+       bMonspaced As Boolean        ' (fMsg) message
+End Type                            ' area with its
+Public Type tMessage                ' three message
+       section(1 To 3) As tSection  ' sections
+End Type
 
 ```
-6. Before start using the UserForm have a look at its [Properties](#properties-of-the-fmsg-userform)
+6. Before start have a look at the [UserForm's properties](#properties-of-the-fmsg-userform)
 7. Either continue with [Usage step by step](#usage-step-by-step) or start directly using the prepared [Interfaces](#Interfaces) in module _mMsg_.  
 
 #### Properties of the _fMsg_ UserForm
 
 | Property | Meaning |
 |----------|---------|
-| _ApplTitle_| Mandatory. String expression. Applied in the message window's handle bar|
-| ApplMsg    | Optional. User defined type. Structure of the UserForm's message area.|
-| _ApplLabel(n)_ | Optional. String expression with _n__ as a numeric expression 1 to 3. Applied as a descriptive label above a below message text. Not displayed (even when provided) when no corresponding _ApplText_ is provided |
-| _ApplText(n)_ | Optional.String expression with _n__ as a numeric expression 1 to 3). Applied as message text of section _n_.|
-| _Monospaced(n)_ | Optional. Boolean expression. Defaults to False when immitted. When True, the text in section _n_ is displayed mono-spaced.|
-| _ApplButtons_ | Optional. Defaults to vbOkOnly.<br>A MsgBox buttons value,<br>a comma delimited String expression,<br>a Collection,<br>or a dictionary,<br>with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf)|
+| _MsgTitle_| Mandatory. String expression. Applied in the message window's handle bar|
+| _Msg_     | Optional. User defined type. Structure of the UserForm's message area. May alternatively to the properties _MsgLable_, _MsgText_, and _MsgMonoSpaced_ be used to pass a complete message.<br>See .... |
+| _MsgLabel(n)_ | Optional. String expression with _n__ as a numeric expression 1 to 3. Applied as a descriptive label above a below message text. Not displayed (even when provided) when no corresponding _MsgText_ is provided |
+| _MsgText(n)_ | Optional.String expression with _n__ as a numeric expression 1 to 3). Applied as message text of section _n_.|
+| _MsgMonospaced(n)_ | Optional. Boolean expression. Defaults to False when immitted. When True, the text in section _n_ is displayed mono-spaced.|
+| _MsgButtons_ | Optional. Defaults to vbOkOnly.<br>A MsgBox buttons value,<br>a comma delimited String expression,<br>a Collection,<br>or a dictionary,<br>with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf)|
 | _Reply_ | Read only. The clicked button's caption string as provided through the ApplButtons property |
 | _iReply_ | The clicked button's index |
 
+See [Additional properties for advanced usage]() to create application specific messages.
 ### Usage
 #### Usage step-by-step
-The primary means is the UserForm _fMsg_. However, it makes sense to encapsulate it in a function.
+The primary means is the UserForm _fMsg_. However, it requires the followingmakes sense to encapsulate it in a function.
 
 
 #### Code examples

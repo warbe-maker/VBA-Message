@@ -1,21 +1,21 @@
 Attribute VB_Name = "mUsage"
 Option Explicit
 
-Public Enum StartupPosition         ' ---------------------------
-    Manual = 0                      ' Used to position the
-    CenterOwner = 1                 ' final setup message form
-    CenterScreen = 2                ' horizontally and vertically
-    WindowsDefault = 3              ' centered on the screen
-End Enum                            ' ---------------------------
+Public Enum StartupPosition         ' -------------------
+    Manual = 0                      ' Used to position
+    CenterOwner = 1                 ' the message window
+    CenterScreen = 2                ' horizontally and
+    WindowsDefault = 3              ' vertically centered
+End Enum                            ' -------------------
 
-Public Type tSection                ' ------------------
-       sLabel As String             ' Structure of the
+Public Type tSection                ' --------------
+       sLabel As String             ' Structure of
        sText As String              ' UserForm's
-       bMonspaced As Boolean        ' message area which
-End Type                            ' consists of
+       bMonspaced As Boolean        ' (fMsg) message
+End Type                            ' area with its
 Public Type tMessage                ' three message
        section(1 To 3) As tSection  ' sections
-End Type
+End Type                            ' --------------
 
 Public Function Box( _
                     ByVal title As String, _
@@ -24,9 +24,9 @@ Public Function Box( _
                    ) As Variant
           
    With fMsg
-      .ApplTitle = title
-      .ApplText(1) = prompt
-      .ApplButtons = buttons
+      .MsgTitle = title
+      .MsgText(1) = prompt
+      .MsgButtons = buttons
       .Setup
       .Show
       Box = .ReplyValue ' obtaining the reply value unloads the form !
@@ -37,9 +37,9 @@ End Function
 Public Sub FirstTry()
           
     With fMsg
-        .ApplTitle = "Any title"
-        .ApplText(1) = "Any message"
-        .ApplButtons = vbYesNoCancel
+        .MsgTitle = "Any title"
+        .MsgText(1) = "Any message"
+        .MsgButtons = vbYesNoCancel
         .Setup
         .Show
         Select Case .ReplyValue ' obtaining the reply value unloads the form !
@@ -58,9 +58,9 @@ Public Function Msg( _
                    ) As Variant
 
    With fMsg
-      .ApplTitle = title
-      .ApplMsg = message
-      .ApplButtons = buttons
+      .MsgTitle = title
+      .Msg = message
+      .MsgButtons = buttons
       .Setup
       .Show
       Msg = .ReplyValue ' obtaining the reply value unloads the form !
