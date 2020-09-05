@@ -128,26 +128,26 @@ Note: This re-positioning may be done at any time for testing in order to displa
 | MIN_WIDTH_REPLY_BUTTON | Minimum width of a _Reply Button_ |
 
 
-## Common Public Properties
-| Property | R/W | Meaning, Usage | Comment |
-| ---------- |:---:| ------- | ----- |
-| AppTitle | W |         |
-| Label      | W | `fMsg.Label(section) = "...."` | section = 1,2,or 3 |
-| Text       | W | `fMsg.Text(section) = "...."` | section = 1,2,or 3)  |
-| MonoSpaced | W | `fMsg.MonoSpaced(section) = True` | section = 1,2,3<br>defaults to False when not provided for a section |        |
-| AppButtons | W |  | |
+## Common public properies
 
+<small>[See chapter in README](<README.md#properties-of-the-fmsg-userform>)</small>                         
 
-## Public Size Properties
+## Public properties for advanced usage of the message form
  
-| Property | R/W | Default |
-| -------- | --- | ------- |
-| MaxFormHeightPrcntgOfScreenSize | R/W |  90 % |
-| MaxFormWidthPrcntgOfScreenSize  | R/W |  80 % |
-| MinimumFormWidth                |     |  300 pt | 
+|          Property               | R/W | Default |
+| ------------------------------- |:---:|:-------:|
+| MaxFormHeightPrcntgOfScreenSize | R/W |  90 %   |
+| MaxFormWidthPrcntgOfScreenSize  | R/W |  80 %   |
+| MaxFormHeight                   | R   | <small>derived from the<br>corresponding percentage value</small>  |
+| MaxFormWidth                    | R   | <small>derived from the<br> corresponding  percentage value</small>  |
+| MinButtonWidth                  | R/W |   70pt  |
+| MinFormWidth                    | R/W |  300pt  |
+| HmarginButtons                  | W   |    4pt  |
+
 
 ## Public Properties for test only
-| Property | R/W | Meaning |
-| -------- | --- | ------- |
-| FramesWithCaption | W | Defaults to False. Frames are displayed with their "test" caption |
-| FramesWithBorder  | W |  Defaults to False. Frames are displayed with a visible border |
+|       Property        | R/W | Meaning |
+| --------------------- |:---:| ------- |
+| _TestFramesWithCaption_ | W   | Defaults to False. Frames are displayed with their "test" caption |
+| _TestFramesWithBorder_  | W   | Defaults to False. Frames are displayed with a visible border |
+| _HmarginFrames_         | W   | Defaults to 0. May be used when borders are displayed to make their positioning transparent|
