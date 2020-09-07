@@ -708,6 +708,7 @@ Public Sub AllInOne()
             .MaxFormWidthPrcntgOfScreenSize = lMaxFormWidth    ' for this demo to enforce a vertical scroll bar
             .MaxFormHeightPrcntgOfScreenSize = lMaxFormHeight  ' for this demo to enbforce a vertical scroll bar for the message section
 '            .TestFrameWithBorders = True ' Just during test helpfull
+            .Setup
         End With
         
         tMsg.section(2).sText = "When the specified minimum form width (currently " & lMinFormWidth & "pt) is increased, the form height will decrease because the proportional spaced " & _

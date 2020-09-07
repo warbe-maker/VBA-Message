@@ -82,22 +82,22 @@ Dim bDoneTitle                  As Boolean
 Dim bFormEvents                 As Boolean
 Dim bTestFrameWithBorders       As Boolean
 Dim bWithFrames                 As Boolean          ' for test purpose only, defaults to False
-Dim cllDsgnAreas                As New Collection   ' Collection of the two primary/top frames
-Dim cllDsgnButtonRows           As New Collection   ' Collection of the designed reply button row frames
-Dim cllDsgnButtons              As New Collection   ' Collection of the collection of the designed reply buttons of a certain row
-Dim cllDsgnButtonsFrame         As New Collection
+Dim cllDsgnAreas                As Collection   ' Collection of the two primary/top frames
+Dim cllDsgnButtonRows           As Collection   ' Collection of the designed reply button row frames
+Dim cllDsgnButtons              As Collection   ' Collection of the collection of the designed reply buttons of a certain row
+Dim cllDsgnButtonsFrame         As Collection
 Dim cllDsgnRowButtons           As Collection       ' Collection of a designed reply button row's buttons
-Dim cllDsgnSections             As New Collection   '
-Dim cllDsgnSectionsLabel        As New Collection
-Dim cllDsgnSectionsText         As New Collection   ' Collection of section frames
-Dim cllDsgnSectionsTextFrame    As New Collection
-Dim dctApplButtonRows           As New Dictionary   ' Dictionary of applied/used/visible button rows (key=frame, item=row)
-Dim dctApplButtons              As New Dictionary   ' Dictionary of applied buttons (key=CommandButton, item=row)
-Dim dctApplButtonsRetVal        As New Dictionary   ' Dictionary of the applied buttons' reply value (key=CommandButton)
-Dim dctApplied                  As New Dictionary   ' Dictionary of all applied controls (versus just designed)
-Dim dctSectionsLabel            As New Dictionary   ' Section specific label either provided via properties MsgLabel or Msg
-Dim dctSectionsMonoSpaced       As New Dictionary   ' Section specific monospace option either provided via properties MsgMonospaced or Msg
-Dim dctSectionsText             As New Dictionary   ' Section specific text either provided via properties MsgText or Msg
+Dim cllDsgnSections             As Collection   '
+Dim cllDsgnSectionsLabel        As Collection
+Dim cllDsgnSectionsText         As Collection   ' Collection of section frames
+Dim cllDsgnSectionsTextFrame    As Collection
+Dim dctApplButtonRows           As Dictionary   ' Dictionary of applied/used/visible button rows (key=frame, item=row)
+Dim dctApplButtons              As Dictionary   ' Dictionary of applied buttons (key=CommandButton, item=row)
+Dim dctApplButtonsRetVal        As Dictionary   ' Dictionary of the applied buttons' reply value (key=CommandButton)
+Dim dctApplied                  As Dictionary   ' Dictionary of all applied controls (versus just designed)
+Dim dctSectionsLabel            As Dictionary   ' Section specific label either provided via properties MsgLabel or Msg
+Dim dctSectionsMonoSpaced       As Dictionary   ' Section specific monospace option either provided via properties MsgMonospaced or Msg
+Dim dctSectionsText             As Dictionary   ' Section specific text either provided via properties MsgText or Msg
 Dim lMaxFormHeightPoW           As Long             ' % of the screen height
 Dim lMaxFormWidthPoW            As Long             ' % of the screen width
 Dim lMinFormWidthPoW            As Long             ' % of the screen width - calculated when min form width in pt is assigend
@@ -129,7 +129,6 @@ Dim wVirtualScreenWidth         As Single
 Private Sub UserForm_Initialize()
         
     On Error GoTo on_error
-    
     siMinButtonWidth = MIN_BUTTON_WIDTH
     siHmarginButtons = HSPACE_BUTTONS
     siVmarginButtons = VSPACE_BUTTON_ROWS
@@ -143,32 +142,10 @@ Private Sub UserForm_Initialize()
     Me.width = siMinFormWidth
     bDisplayFramesWithCaptions = False
     bTestFrameWithBorders = False
-    
-    Collect into:=cllDsgnAreas, ctltype:="Frame", fromparent:=Me, ctlheight:=10, ctlwidth:=Me.width - siHmarginFrames
-    DsgnButtonsArea.width = 10  ' Will be adjusted to the max replies row width during setup
-    
-    Collect into:=cllDsgnSections, ctltype:="Frame", fromparent:=DsgnMsgArea, ctlheight:=50, ctlwidth:=DsgnMsgArea.width - siHmarginFrames
-    Collect into:=cllDsgnSectionsLabel, ctltype:="Label", fromparent:=cllDsgnSections, ctlheight:=15, ctlwidth:=DsgnMsgArea.width - (siHmarginFrames * 2)
-    Collect into:=cllDsgnSectionsTextFrame, ctltype:="Frame", fromparent:=cllDsgnSections, ctlheight:=20, ctlwidth:=DsgnMsgArea.width - (siHmarginFrames * 2)
-    Collect into:=cllDsgnSectionsText, ctltype:="TextBox", fromparent:=cllDsgnSectionsTextFrame, ctlheight:=20, ctlwidth:=DsgnMsgArea.width - (siHmarginFrames * 3)
-    
-    Collect into:=cllDsgnButtonsFrame, ctltype:="Frame", fromparent:=DsgnButtonsArea, ctlheight:=10, ctlwidth:=10
-    Collect into:=cllDsgnButtonRows, ctltype:="Frame", fromparent:=cllDsgnButtonsFrame, ctlheight:=10, ctlwidth:=10
-        
-    Dim v As Variant
-    For Each v In cllDsgnButtonRows
-        Set cllDsgnRowButtons = New Collection
-        Collect into:=cllDsgnRowButtons, ctltype:="CommandButton", fromparent:=v, ctlheight:=10, ctlwidth:=siMinButtonWidth
-        If cllDsgnRowButtons.Count > 0 Then
-            cllDsgnButtons.Add cllDsgnRowButtons
-        End If
-    Next v
-    
     Me.Height = VSPACE_AREAS * 4
     bWithFrames = False
     siHmarginFrames = 0     ' Ensures proper command buttons framing, may be used for test purpose
     Me.VmarginFrames = 0    ' Ensures proper command buttons framing and vertical positioning of controls
-    
     bDoneSetup = False
     bDoneTitle = False
     bDoneButtonsArea = False
@@ -184,23 +161,82 @@ on_error:
     Debug.Print Err.Description: Stop: Resume Next
 End Sub
 
-Private Sub UserForm_Terminate()
+Private Sub CollectDesignControls()
+' ----------------------------------------------------------------------
+' Collects all designed controls without concidering any control's name.
+' ----------------------------------------------------------------------
+    On Error GoTo on_error
+    
+    ProvideCollection cllDsgnAreas
+    Collect into:=cllDsgnAreas, ctltype:="Frame", fromparent:=Me, ctlheight:=10, ctlwidth:=Me.width - siHmarginFrames
+    DsgnButtonsArea.width = 10  ' Will be adjusted to the max replies row width during setup
+    
+    ProvideCollection cllDsgnSections
+    Collect into:=cllDsgnSections, ctltype:="Frame", fromparent:=DsgnMsgArea, ctlheight:=50, ctlwidth:=DsgnMsgArea.width - siHmarginFrames
+    ProvideCollection cllDsgnSectionsLabel
+    Collect into:=cllDsgnSectionsLabel, ctltype:="Label", fromparent:=cllDsgnSections, ctlheight:=15, ctlwidth:=DsgnMsgArea.width - (siHmarginFrames * 2)
+    ProvideCollection cllDsgnSectionsTextFrame
+    Collect into:=cllDsgnSectionsTextFrame, ctltype:="Frame", fromparent:=cllDsgnSections, ctlheight:=20, ctlwidth:=DsgnMsgArea.width - (siHmarginFrames * 2)
+    ProvideCollection cllDsgnSectionsText
+    Collect into:=cllDsgnSectionsText, ctltype:="TextBox", fromparent:=cllDsgnSectionsTextFrame, ctlheight:=20, ctlwidth:=DsgnMsgArea.width - (siHmarginFrames * 3)
+    ProvideCollection cllDsgnButtonsFrame
+    Collect into:=cllDsgnButtonsFrame, ctltype:="Frame", fromparent:=DsgnButtonsArea, ctlheight:=10, ctlwidth:=10
+    ProvideCollection cllDsgnButtonRows
+    Collect into:=cllDsgnButtonRows, ctltype:="Frame", fromparent:=cllDsgnButtonsFrame, ctlheight:=10, ctlwidth:=10
+        
+    Dim v As Variant
+    ProvideCollection cllDsgnButtons
+    For Each v In cllDsgnButtonRows
+        ProvideCollection cllDsgnRowButtons
+        Collect into:=cllDsgnRowButtons, ctltype:="CommandButton", fromparent:=v, ctlheight:=10, ctlwidth:=siMinButtonWidth
+        If cllDsgnRowButtons.Count > 0 Then
+            cllDsgnButtons.Add cllDsgnRowButtons
+        End If
+    Next v
+    ProvideDictionary dctApplied ' provides a clean or new dictionary for collection applied controls
+    ProvideDictionary dctApplButtons
+    ProvideDictionary dctApplButtonsRetVal
+    ProvideDictionary dctApplButtonRows
 
+exit_proc:
+    Exit Sub
+    
+on_error:
+    Debug.Print Err.Description: Stop: Resume Next
+End Sub
+
+Private Sub ProvideCollection(ByRef cll As Collection)
+' ----------------------------------------------------
+' Provides a clean/new Collection.
+' ----------------------------------------------------
+    If Not cll Is Nothing Then Set cll = Nothing
+    Set cll = New Collection
+End Sub
+
+Private Sub ProvideDictionary(ByRef dct As Dictionary)
+' ----------------------------------------------------
+' Provides a clean or new Dictionary.
+' ----------------------------------------------------
+    If Not dct Is Nothing Then dct.RemoveAll Else Set dct = New Dictionary
+End Sub
+
+Private Sub UserForm_Terminate()
     Set cllDsgnAreas = Nothing
     Set cllDsgnButtonRows = Nothing
     Set cllDsgnButtons = Nothing
+    Set cllDsgnButtonsFrame = Nothing
     Set cllDsgnRowButtons = Nothing
     Set cllDsgnSections = Nothing
     Set cllDsgnSectionsLabel = Nothing
     Set cllDsgnSectionsText = Nothing
     Set cllDsgnSectionsTextFrame = Nothing
+    Set dctApplButtonRows = Nothing
+    Set dctApplButtons = Nothing
     Set dctApplButtonsRetVal = Nothing
+    Set dctApplied = Nothing
     Set dctSectionsLabel = Nothing
     Set dctSectionsMonoSpaced = Nothing
     Set dctSectionsText = Nothing
-    Set cllDsgnButtonsFrame = Nothing
-    Set dctApplButtons = Nothing
-    
 End Sub
 
 Private Property Get ClickedButtonIndex(Optional ByVal cmb As MSForms.CommandButton) As Long
@@ -233,9 +269,9 @@ Private Property Get AppliedButtonRowWidth(Optional ByVal buttons As Long) As Si
 End Property
 
 Private Property Let AppliedControl(ByVal v As Variant)
+    If dctApplied Is Nothing Then Set dctApplied = New Dictionary
     If Not IsApplied(v) Then dctApplied.Add v, v.Name
 End Property
-
 
 Private Property Get ButtonsFrameHeight() As Single
     Dim l As Long:  l = dctApplButtonRows.Count
@@ -291,7 +327,11 @@ Public Property Let HmarginButtons(ByVal si As Single):                         
 
 Public Property Let HmarginFrames(ByVal si As Single):                                  siHmarginFrames = si:                                                       End Property
 
-Private Property Get IsApplied(Optional ByVal v As Variant) As Boolean:                 IsApplied = dctApplied.Exists(v):                                           End Property
+Private Property Get IsApplied(Optional ByVal v As Variant) As Boolean
+    If dctApplied Is Nothing _
+    Then IsApplied = False _
+    Else IsApplied = dctApplied.Exists(v)
+End Property
 
 Private Property Get MaxButtonsAreaWidth() As Single:                                   MaxButtonsAreaWidth = MaxFormWidthUsable - HSPACE_BUTTON_AREA:              End Property
 
@@ -359,30 +399,49 @@ Public Property Let MsgButtons(ByVal v As Variant)
 End Property
 
 Public Property Get MsgLabel(Optional ByVal section As Long) As String
-    MsgLabel = IIf(dctSectionsLabel.Exists(section), dctSectionsLabel(section), vbNullString)
+    If dctSectionsLabel Is Nothing _
+    Then MsgLabel = vbNullString _
+    Else MsgLabel = IIf(dctSectionsLabel.Exists(section), dctSectionsLabel(section), vbNullString)
 End Property
 
-Public Property Let MsgLabel(Optional ByVal section As Long, ByVal s As String):        dctSectionsLabel(section) = s:                                             End Property
+Public Property Let MsgLabel(Optional ByVal section As Long, ByVal s As String)
+    If dctSectionsLabel Is Nothing Then Set dctSectionsLabel = New Dictionary
+    dctSectionsLabel(section) = s
+End Property
 
 Public Property Get MsgMonoSpaced(Optional ByVal section As Long) As Boolean
-    With dctSectionsMonoSpaced
-        If .Exists(section) _
-        Then MsgMonoSpaced = .Item(section) _
-        Else MsgMonoSpaced = False
-    End With
+    If dctSectionsMonoSpaced Is Nothing Then
+        MsgMonoSpaced = False
+    Else
+        With dctSectionsMonoSpaced
+            If .Exists(section) _
+            Then MsgMonoSpaced = .Item(section) _
+            Else MsgMonoSpaced = False
+        End With
+    End If
 End Property
 
-Public Property Let MsgMonoSpaced(Optional ByVal section As Long, ByVal b As Boolean): dctSectionsMonoSpaced(section) = b:                                         End Property
+Public Property Let MsgMonoSpaced(Optional ByVal section As Long, ByVal b As Boolean)
+    If dctSectionsMonoSpaced Is Nothing Then Set dctSectionsMonoSpaced = New Dictionary
+    dctSectionsMonoSpaced(section) = b
+End Property
 
 Public Property Get MsgText(Optional ByVal section As Long) As String
-    With dctSectionsText
-        If .Exists(section) _
-        Then MsgText = .Item(section) _
-        Else MsgText = vbNullString
-    End With
+    If dctSectionsText Is Nothing Then
+        MsgText = vbNullString
+    Else
+        With dctSectionsText
+            If .Exists(section) _
+            Then MsgText = .Item(section) _
+            Else MsgText = vbNullString
+        End With
+    End If
 End Property
 
-Public Property Let MsgText(Optional ByVal section As Long, ByVal s As String):         dctSectionsText(section) = s:                                               End Property
+Public Property Let MsgText(Optional ByVal section As Long, ByVal s As String)
+    If dctSectionsText Is Nothing Then Set dctSectionsText = New Dictionary
+    dctSectionsText(section) = s
+End Property
 
 Public Property Let MsgTitle(ByVal s As String):                                        sTitle = s: SetupTitle:                                                     End Property
 
@@ -697,14 +756,17 @@ Private Sub Collect(ByRef into As Variant, _
                         .width = ctlwidth
                     End With
                     Select Case TypeName(into)
-                        Case "Collection":  into.Add ctl
+                        Case "Collection"
+                            Debug.Print ctl.Name
+                            into.Add ctl
                         Case Else
                             Set into = ctl
                     End Select
                 End If
             Next ctl
     End Select
-exist_proc:
+
+exit_proc:
     Exit Sub
     
 on_error:
@@ -1195,8 +1257,8 @@ End Sub
 Public Sub Setup()
     
     On Error GoTo on_error
-    
-    If bDoneSetup = True Then GoTo exit_proc
+        
+    CollectDesignControls
        
     DisplayFramesWithCaptions bDisplayFramesWithCaptions ' may be True for test purpose
     
@@ -1206,7 +1268,7 @@ Public Sub Setup()
     '~~ This setup ends width the final message form width and all elements adjusted to it.
     '~~ ----------------------------------------------------------------------------------------
     Me.width = siMinFormWidth ' Setup starts with the minimum message form width
-
+    Me.StartupPosition = 2
     '~~ Setup of those elements which determine the final form width
     If Not bDoneTitle Then SetupTitle
     
@@ -1246,7 +1308,7 @@ Public Sub Setup()
     Debug_Sizes "All done! Setup and (possibly) height reduced:"
 
     AdjustStartupPosition Me
-    bDoneSetup = True
+    bDoneSetup = True ' To indicate for the Activate event that the setup had already be done beforehand
     
 exit_proc:
     Exit Sub
@@ -1264,6 +1326,7 @@ Private Sub SetupButton(ByVal buttonrow As Long, _
 ' caption, calculate the maximum buttonindex width and height,
 ' keep a record of the setup reply buttonindex's return value.
 ' -----------------------------------------------------------------
+    On Error GoTo on_error
     
     Dim cmb As MSForms.CommandButton:   Set cmb = DsgnButton(buttonrow, buttonindex)
     
@@ -1280,7 +1343,13 @@ Private Sub SetupButton(ByVal buttonrow As Long, _
     dctApplButtons.Add cmb, buttonrow
     AppliedButtonRetVal(cmb) = buttonreturnvalue ' keep record of the setup buttonindex's reply value
     AppliedControl = cmb
+    AppliedControl = DsgnButtonRow(buttonrow)
     
+exit_proc:
+    Exit Sub
+    
+on_error:
+    Debug.Print Err.Description: Stop: Resume Next
 End Sub
 
 Private Sub SetupButtons(ByVal vButtons As Variant)
@@ -1305,8 +1374,8 @@ Private Sub SetupButtons(ByVal vButtons As Variant)
         Case "Collection":  SetupButtonsFromCollection vButtons
         Case "Dictionary":  SetupButtonsFromCollection vButtons
         Case Else
-            MsgBox "The format of the provided ""buttons"" argument is not supported!" & vbLf & _
-                   "The message will be setup with an Ok only button", vbExclamation
+'            MsgBox "The format of the provided ""buttons"" argument is not supported!" & vbLf & _
+'                   "The message will be setup with an Ok only button", vbExclamation
             SetupButtons vbOKOnly
     End Select
             
@@ -1397,6 +1466,7 @@ Private Sub SetupButtonsFromValue(ByVal lButtons As Long)
 ' -----------------------------------------------------------
 ' Setup a row of standard VB MsgBox reply command buttons
 ' -----------------------------------------------------------
+    On Error GoTo on_error
     
     Select Case lButtons
         Case vbOKOnly
@@ -1419,12 +1489,19 @@ Private Sub SetupButtonsFromValue(ByVal lButtons As Long)
             SetupButton buttonrow:=1, buttonindex:=2, buttoncaption:="Retry", buttonreturnvalue:=vbRetry
             SetupButton buttonrow:=1, buttonindex:=3, buttoncaption:="Ignore", buttonreturnvalue:=vbIgnore
         Case Else
-            Err.Raise AppErr(1), "fMsg.SetupButtons", "The value provided for the ""buttons"" argument is not a known VB MsgBox value"
+            MsgBox "The value provided for the ""buttons"" argument is not a known VB MsgBox value"
     End Select
     DsgnButtonsArea.Visible = True
     DsgnButtonRow(1).Visible = True
     dctApplButtonRows.Add DsgnButtonRow(1), 1
     AppliedControl = DsgnButtonRow(1)
+    AppliedControl = DsgnButtonsFrame
+    
+exit_proc:
+    Exit Sub
+    
+on_error:
+    Debug.Print Err.Description: Stop: Resume Next
     
 End Sub
 
@@ -1451,9 +1528,9 @@ Private Sub SetupMsgSection(ByVal section As Long)
     Set tbText = DsgnSectionText(section)
     Set frText = DsgnTextFrame(section)
     
-    sLabel = MsgLabel(section)
-    sText = MsgText(section)
-    bMonospaced = MsgMonoSpaced(section)
+    sLabel = Me.MsgLabel(section)
+    sText = Me.MsgText(section)
+    bMonospaced = Me.MsgMonoSpaced(section)
     
     frSection.width = frArea.width
     la.width = frSection.width
@@ -1694,7 +1771,13 @@ Private Sub SetupTitle()
 End Sub
 
 Private Sub UserForm_Activate()
-    If Not bDoneSetup Then Setup
+    '~~ To avoid screen flicker the setup may has been done already.
+    '~~ However for test purpose Setup may run with the Activate event i.e. the .Show
+    If bDoneSetup = True Then
+        bDoneSetup = False
+    Else
+        Setup
+    End If
 End Sub
 
 Public Function VgridPos(ByVal si As Single) As Single
