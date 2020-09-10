@@ -1,7 +1,7 @@
 # MsgBox Alternative
 
 [Abstract](#abstract)<br>
-[Why an alternative MsgBox](#why-an-alternative-msgbox)<br>[Installation](#installation)<br>[Properties of the _fMsg_ UserForm](#properties-of-the-fmsg- userform)<br>[Usage](#usage)<br>[Interfaces](#interfaces)
+[Why an alternative MsgBox](#why-an-alternative-msgbox)<br>[Installation](#installation)<br>[Properties of the _fMsg_ UserForm](#properties-of-the-fmsg-userform)<br>[Usage](#usage)<br>[Interfaces](#interfaces)
 
 ### Abstract
 Displays a message in a dialog box, waits for the user to click a button, and returns a variant indicating which button the user clicked.
@@ -22,7 +22,7 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 
 
 ### Installation
-1. Download [_fMsg.frm_](), and [_fMsg.frx_]()
+1. Download <a id="raw-url" href="https://www.dropbox.com/s/h91lcqa52qrdl5f/fMsg.frm?dl=1">fMsg.frm</a> and the <a id="raw-url" href="https://www.dropbox.com/s/0m5eggyy3vx3126/fMsg.frx?dl=1">fMsg.frx</a>.
 2. Import _fMsg.frm_ to a VBA project
 3. In the VBE add a Reference to "Microsoft Scripting Runtime"
 4. Copy the following code into a standard module's global declarations section:
@@ -301,47 +301,40 @@ image
 ### Common message
 When the UserForm <a id="raw-url" href="https://www.dropbox.com/s/h91lcqa52qrdl5f/fMsg.frm?dl=1">fMsg.frm</a> and the <a id="raw-url" href="https://www.dropbox.com/s/0m5eggyy3vx3126/fMsg.frx?dl=1">fMsg.frx</a> had been downloaded and imported to your project and the following code is copied into any standard module:
 ```
-' MsgBox alternative providing three message sections, each optionally
-' monospaced and with an optional label/haeder. The function uses the
-' UserForm fMsg and returns the clicked reply button's caption or its
-' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
-' ------------------------------------------------------------------
 Public Function Msg(ByVal title As String, _
-           Optional ByVal label1 As String = vbNullString, _
-           Optional ByVal text1 As String = vbNullString, _
-           Optional ByVal monospaced1 As Boolean = False, _
-           Optional ByVal label2 As String = vbNullString, _
-           Optional ByVal text2 As String = vbNullString, _
-           Optional ByVal monospaced2 As Boolean = False, _
-           Optional ByVal label3 As String = vbNullString, _
-           Optional ByVal text3 As String = vbNullString, _
-           Optional ByVal monospaced3 As Boolean = False, _
-           Optional ByVal monospacedfontsize As Long = 0, _
-           Optional ByVal buttons As Variant = vbOKOnly) As Variant
+                    ByRef message As tMessage, _
+           Optional ByVal buttons As Variant = vbOKOnly, _
+           Optional ByVal returnindex As Boolean = False) As Variant
+' ------------------------------------------------------------------
+' General purpose MsgBox alternative message. By default returns
+' the clicked reply buttons value
+' ------------------------------------------------------------------
     
     With fMsg
-        .ApplTitle = title
+        .MsgTitle = title
+        .Msg = message
+        .MsgButtons = buttons
+         
+        '+--------------------------------------------------------------------------+
+        '|| Setup prior showing the form is a true performance improvement as it    ||
+        '|| avoids a flickering message window when the setup is performed when    ||
+        '|| the message window is already displayed, i.e. with the Activate event. ||
+        '|| For testing however it may be appropriate to comment the Setup here in ||
+        '|| order to have it performed along with the UserForm_Activate event.     ||
+        .Setup '                                                                   ||
+        '+--------------------------------------------------------------------------+
         
-        .ApplLabel(1) = label1
-        .ApplText(1) = text1
-        .ApplMonoSpaced(1) = monospaced1
-        
-        .ApplLabel(2) = label2
-        .ApplText(2) = text2
-        .ApplMonoSpaced(2) = monospaced2
-        
-        .ApplLabel(3) = label3
-        .ApplText(3) = text3
-        .ApplMonoSpaced(3) = monospaced3
-
-        .ApplButtons = buttons
-        .Show
-        On Error Resume Next ' Just in case the user has terminated the dialog without clicking a reply button
-        Msg = .ReplyValue
+        .show
+        On Error Resume Next    ' Just in case the user has terminated the dialog without clicking a reply button
+        '~~ Fetching the clicked reply buttons value (or index) unloads the form.
+        '~~ In case there were only one button to be clicked, the form will have been unloaded already -
+        '~~ and a return value/index will not be available
+        If returnindex Then Msg = .ReplyIndex Else Msg = .ReplyValue
     End With
     Unload fMsg
 
 End Function
+
 ```
 the following code
 ```

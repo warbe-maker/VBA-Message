@@ -299,7 +299,7 @@ Public Function Msg(ByVal title As String, _
         .MsgButtons = buttons
          
         '+--------------------------------------------------------------------------+
-        '|| Setup prior showing the form is a true perfomance improvement as it    ||
+        '|| Setup prior showing the form is a true performance improvement as it    ||
         '|| avoids a flickering message window when the setup is performed when    ||
         '|| the message window is already displayed, i.e. with the Activate event. ||
         '|| For testing however it may be appropriate to comment the Setup here in ||
@@ -309,8 +309,9 @@ Public Function Msg(ByVal title As String, _
         
         .show
         On Error Resume Next    ' Just in case the user has terminated the dialog without clicking a reply button
-        '~~ Providing the caller with the clicked reply buttons value (or index) unloads the form.
-        '~~ It may have been already unloaded in case there were only one button to be clicked
+        '~~ Fetching the clicked reply buttons value (or index) unloads the form.
+        '~~ In case there were only one button to be clicked, the form will have been unloaded already -
+        '~~ and a return value/ibdex will not be available
         If returnindex Then Msg = .ReplyIndex Else Msg = .ReplyValue
     End With
     Unload fMsg
