@@ -183,29 +183,17 @@ Public Sub ErrMsg(ByVal errnumber As Long, _
 End Sub
 #End If
 
-Public Function Max(ByVal v1 As Variant, _
-                    ByVal v2 As Variant, _
-           Optional ByVal v3 As Variant = 0, _
-           Optional ByVal v4 As Variant = 0, _
-           Optional ByVal v5 As Variant = 0, _
-           Optional ByVal v6 As Variant = 0, _
-           Optional ByVal v7 As Variant = 0, _
-           Optional ByVal v8 As Variant = 0, _
-           Optional ByVal v9 As Variant = 0) As Variant
-' -----------------------------------------------------
-' Returns the maximum (biggest) of all provided values.
-' -----------------------------------------------------
-Dim dMax As Double
-    dMax = v1
-    If v2 > dMax Then dMax = v2
-    If v3 > dMax Then dMax = v3
-    If v4 > dMax Then dMax = v4
-    If v5 > dMax Then dMax = v5
-    If v6 > dMax Then dMax = v6
-    If v7 > dMax Then dMax = v7
-    If v8 > dMax Then dMax = v8
-    If v9 > dMax Then dMax = v9
-    Max = dMax
+Public Function Max(ParamArray va() As Variant) As Variant
+' ------------------------------------------------------
+' Returns the maximum value of all values provided (va).
+' ------------------------------------------------------
+    Dim v   As Variant
+    
+    On Error Resume Next
+    For Each v In va
+        If v > Max Then Max = v
+    Next v
+    
 End Function
 
 Public Function AppErr(ByVal lNo As Long, _
@@ -268,29 +256,17 @@ Public Function Box( _
 End Function
 
 
-Public Function Min(ByVal v1 As Variant, _
-                    ByVal v2 As Variant, _
-           Optional ByVal v3 As Variant = Nothing, _
-           Optional ByVal v4 As Variant = Nothing, _
-           Optional ByVal v5 As Variant = Nothing, _
-           Optional ByVal v6 As Variant = Nothing, _
-           Optional ByVal v7 As Variant = Nothing, _
-           Optional ByVal v8 As Variant = Nothing, _
-           Optional ByVal v9 As Variant = Nothing) As Variant
-' ------------------------------------------------------
+Public Function Min(ParamArray va() As Variant) As Variant
+' ---------------------------------------------------------
 ' Returns the minimum (smallest) of all provided values.
-' ------------------------------------------------------
-Dim dMin As Double
-    dMin = v1
-    If v2 < dMin Then dMin = v2
-    If TypeName(v3) <> "Nothing" Then If v3 < dMin Then dMin = v3
-    If TypeName(v4) <> "Nothing" Then If v4 < dMin Then dMin = v4
-    If TypeName(v5) <> "Nothing" Then If v5 < dMin Then dMin = v5
-    If TypeName(v6) <> "Nothing" Then If v6 < dMin Then dMin = v6
-    If TypeName(v7) <> "Nothing" Then If v7 < dMin Then dMin = v7
-    If TypeName(v8) <> "Nothing" Then If v8 < dMin Then dMin = v8
-    If TypeName(v9) <> "Nothing" Then If v9 < dMin Then dMin = v9
-    Min = dMin
+' ---------------------------------------------------------
+   Dim v As Variant
+   
+   Min = va(LBound(va))
+   On Error Resume Next
+   For Each v In va
+      If v < Min Then Min = v
+   Next v
 End Function
 
 Public Function Msg(ByVal title As String, _

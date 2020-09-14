@@ -389,9 +389,6 @@ Public Function MonoSpacedMessageSectionExceedMaxFormHeight() As Variant
             )
 End Function
 
-Private Function ErrSrc(ByVal s As String) As String
-    ErrSrc = "mTest." & s
-End Function
 
 ' Repeat the string (pattern) n (ntimes) times, otionally with a linenumber,
 ' either prefixed (linenumbersprefix=True) or attached. When the pattern
@@ -926,12 +923,12 @@ Public Sub Test_AppErr()
     Const PROC = "Test_AppErr"
     Dim sErrTitle   As String
     
-    Err.Raise AppErr(1), "mTest.Test_AppErr", "This is a programmed application error raised in the procedure metioned below as the error source."
+    Err.Raise AppErr(1), ErrSrc(PROC), "This is a programmed application error raised in the procedure metioned below as the error source."
 exit_proc:
     Exit Sub
 on_error:
     AppErr Err.Number, sErrTitle
-    MsgBox title:=sErrTitle & " in " & ErrSrc(PROC), _
+    MsgBox title:=sErrTitle & " in " & Err.Source, _
            prompt:="Error description: " & vbLf & vbLf & Err.Description & vbLf & vbLf & vbLf & _
                    "Error source:" & vbLf & vbLf & ErrSrc(PROC)
 End Sub
@@ -954,3 +951,15 @@ on_error:
                    "Error source:" & vbLf & vbLf & ErrSrc(PROC)
 End Sub
 
+'Private Function ErrSrc(ByVal s As String) As String
+'    ErrSrc = "mTest." & s
+'End Function
+
+Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mTest." & s:  End Property
+
+Public Sub Test_Max()
+    Debug.Assert mMsg.Max(9, , 100, 355, 2, 9, 50) = 355
+    Debug.Assert mMsg.Min(9, , 100, 355, 2, 9, 50) = 2
+    Debug.Print TypeName(mMsg.Max(9, , 100, 355.99, 2, 9, 50))
+    
+End Sub
