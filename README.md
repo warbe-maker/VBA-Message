@@ -20,9 +20,8 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 | Specifying the default button | (yet) not implemented |
 | Display of an alert image (?, !, etc.) | (yet) not implemented |
 
-
 ### Installation
-1. Download <a id="raw-url" href="https://www.dropbox.com/s/h91lcqa52qrdl5f/fMsg.frm?dl=1">fMsg.frm</a> and the <a id="raw-url" href="https://www.dropbox.com/s/0m5eggyy3vx3126/fMsg.frx?dl=1">fMsg.frx</a>.
+1. Download <a href="https://www.dropbox.com/s/h91lcqa52qrdl5f/fMsg.frm?dl=1">fMsg.frm</a> and the <a href="https://www.dropbox.com/s/h91lcqa52qrdl5f/fMsg.frm?dl=1">fMsg.frx</a>.
 2. Import _fMsg.frm_ to a VBA project
 3. In the VBE add a Reference to "Microsoft Scripting Runtime"
 4. Copy the following code into a standard module's global declarations section:
@@ -186,7 +185,7 @@ End Sub
 ```
 
 ### Interfaces
-The module _mMsg_ provides three interfaces to the UserForm _fMsg_ and return the clicked reply _Button_ value to the caller.
+The [downloaded module _mMsg_](https://www.dropbox.com/s/ld30m8bz7gj9jgq/mMsg.bas?dl=1) provides three interfaces to the UserForm _fMsg_ and return the clicked reply _Button_ value to the caller.
 
 #### _Box_ (see [example](#simple-message))
 Pretty MsgBox alike, displays a single message with any number of line breaks, with up to 7 reply _buttons_ in up to 7 rows in any order.
