@@ -920,3 +920,37 @@ End Function
 Public Sub Test_WidthDeterminedByReplyButtons()
     WidthDeterminedByReplyButtons
 End Sub
+
+Public Sub Test_AppErr()
+    On Error GoTo on_error
+    Const PROC = "Test_AppErr"
+    Dim sErrTitle   As String
+    
+    Err.Raise AppErr(1), "mTest.Test_AppErr", "This is a programmed application error raised in the procedure metioned below as the error source."
+exit_proc:
+    Exit Sub
+on_error:
+    AppErr Err.Number, sErrTitle
+    MsgBox title:=sErrTitle & " in " & ErrSrc(PROC), _
+           prompt:="Error description: " & vbLf & vbLf & Err.Description & vbLf & vbLf & vbLf & _
+                   "Error source:" & vbLf & vbLf & ErrSrc(PROC)
+End Sub
+
+Public Sub Test_VBErr()
+    On Error GoTo on_error
+    
+    Const PROC = "Test_VBErr"
+    Dim sErrTitle   As String
+    Dim l           As Long
+    
+    l = l / 0
+    
+exit_proc:
+    Exit Sub
+on_error:
+    AppErr Err.Number, sErrTitle
+    MsgBox title:=sErrTitle & " in " & ErrSrc(PROC), _
+           prompt:="Error description: " & vbLf & vbLf & Err.Description & vbLf & vbLf & vbLf & _
+                   "Error source:" & vbLf & vbLf & ErrSrc(PROC)
+End Sub
+

@@ -208,21 +208,30 @@ Dim dMax As Double
     Max = dMax
 End Function
 
-Public Function AppErr(ByVal lNo As Long) As Long
+Public Function AppErr(ByVal lNo As Long, _
+              Optional ByRef sError As String = vbNullString) As Variant
 ' ---------------------------------------------------------------------------
-' Converts a positive (programmed "application") error number into a negative
-' number by adding vbObjectError. Converts a negative number back into a
-' positive i.e. the original programmed application error number.
-' Usage example:
-'    Err.Raise AppErr(1), .... ' when an application error is detected
-'    If Err.Number < 0 Then    ' when the error is displayed
-'       MsgBox "Application error " & AppErr(Err.Number)
-'    Else
-'       MsgBox "VB error " & Err.Number
-'    End If
+' Usage example when a programmed application error occurs:
+'    If ..... Then Err.Raise AppErr(1), ....
+' Usage example when the error message is displayed, e.g. by means of MsgBox:
+'   AppErr Err.Number, sErrTitle
+'   MsgBox title:=sErrTitle
 ' ---------------------------------------------------------------------------
-    AppErr = IIf(lNo < 0, AppErr = lNo - vbObjectError, AppErr = vbObjectError + lNo)
+    If lNo < 0 Then
+        '~~ This is an application error number which had turned into a negative number
+        '~~ in order to avoid any conflict with a VB error. The function returns the
+        '~~ original positive application error number and a corresponding title
+        AppErr = lNo - vbObjectError
+        If Not IsMissing(sError) Then sError = "Application error " & AppErr
+    Else
+        '~~ This is a positive error number regarded as a programmed application error
+        '~~ The function returns a negative number in order to avoid any conflict with
+        '~~ a VB error.
+        AppErr = vbObjectError + lNo
+        If Not IsMissing(sError) Then sError = "Microsoft Visual Basic runtime error " & lNo
+    End If
 End Function
+
 ' MsgBox alternative providing up to 5 reply buttons, specified either
 ' by MsgBox vbOkOnly (the default), vbYesNo, etc. or a comma delimited
 ' string specifying the used button's caption. The function uses the
