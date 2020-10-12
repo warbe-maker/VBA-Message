@@ -161,7 +161,7 @@ exit_sub:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 Private Sub CollectDesignControls()
@@ -205,7 +205,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 Private Sub ProvideCollection(ByRef cll As Collection)
@@ -773,7 +773,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
  
@@ -954,7 +954,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 
 End Sub
 
@@ -1031,7 +1031,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 Private Sub ResizeAndRepositionButtons()
@@ -1071,7 +1071,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 Private Sub ResizeAndRepositionButtonsArea()
@@ -1115,7 +1115,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 Private Sub ResizeAndRepositionButtonsFrame()
@@ -1144,7 +1144,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 Private Sub ResizeAndRepositionMsgArea()
@@ -1169,7 +1169,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 Private Sub ResizeAndRepositionMsgSections()
@@ -1254,7 +1254,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 Public Sub Setup()
@@ -1317,7 +1317,7 @@ exit_proc:
     Exit Sub
 
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 Private Sub SetupButton(ByVal buttonrow As Long, _
@@ -1352,7 +1352,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 Private Sub SetupButtons(ByVal vButtons As Variant)
@@ -1369,10 +1369,11 @@ Private Sub SetupButtons(ByVal vButtons As Variant)
     
     AppliedControl = frArea
     AppliedControl = DsgnButtonsFrame
-
+    lSetupRows = 1
+    
     '~~ Setup all reply button by calculatig their maximum width and height
     Select Case TypeName(vButtons)
-        Case "Long":        SetupButtonsFromValue vButtons
+        Case "Long":        SetupButtonsFromValue vButtons ' buttons are specified by an MsgBox buttons value only
         Case "String":      SetupButtonsFromString vButtons
         Case "Collection":  SetupButtonsFromCollection vButtons
         Case "Dictionary":  SetupButtonsFromCollection vButtons
@@ -1400,7 +1401,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 ' Setup the reply buttons based on the comma delimited string of button captions
@@ -1473,44 +1474,44 @@ Private Sub SetupButtonsFromString(ByVal sButtons As String)
 End Sub
 
 Private Sub SetupButtonsFromValue(ByVal lButtons As Long)
-' -----------------------------------------------------------
+' -------------------------------------------------------
 ' Setup a row of standard VB MsgBox reply command buttons
-' -----------------------------------------------------------
+' -------------------------------------------------------
     On Error GoTo on_error
     
     Select Case lButtons
         Case vbOKOnly
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="Ok", buttonreturnvalue:=vbOK
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Ok", buttonreturnvalue:=vbOK
         Case vbOKCancel
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="Ok", buttonreturnvalue:=vbOK
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Ok", buttonreturnvalue:=vbOK
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="Cancel", buttonreturnvalue:=vbCancel
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Cancel", buttonreturnvalue:=vbCancel
         Case vbYesNo
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="Yes", buttonreturnvalue:=vbYes
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Yes", buttonreturnvalue:=vbYes
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="No", buttonreturnvalue:=vbNo
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="No", buttonreturnvalue:=vbNo
         Case vbRetryCancel
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="Retry", buttonreturnvalue:=vbRetry
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Retry", buttonreturnvalue:=vbRetry
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="Cancel", buttonreturnvalue:=vbCancel
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Cancel", buttonreturnvalue:=vbCancel
         Case vbYesNoCancel
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="Yes", buttonreturnvalue:=vbYes
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Yes", buttonreturnvalue:=vbYes
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="No", buttonreturnvalue:=vbNo
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="No", buttonreturnvalue:=vbNo
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="Cancel", buttonreturnvalue:=vbCancel
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Cancel", buttonreturnvalue:=vbCancel
         Case vbAbortRetryIgnore
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="Abort", buttonreturnvalue:=vbAbort
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Abort", buttonreturnvalue:=vbAbort
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="Retry", buttonreturnvalue:=vbRetry
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Retry", buttonreturnvalue:=vbRetry
             lSetupRowButtons = lSetupRowButtons + 1
-            SetupButton buttonrow:=1, buttonindex:=lSetupRowButtons, buttoncaption:="Ignore", buttonreturnvalue:=vbIgnore
+            SetupButton buttonrow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Ignore", buttonreturnvalue:=vbIgnore
         Case Else
             MsgBox "The value provided for the ""buttons"" argument is not a known VB MsgBox value"
     End Select
@@ -1524,8 +1525,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
-    
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 ' Setup a message section with its label when one is specified
@@ -1592,7 +1592,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 ' Setup the applied monospaced message section (section) with the text (text),
@@ -1623,8 +1623,8 @@ Private Sub SetupMsgSectionMonoSpaced(ByVal section As Long, _
         .left = siHmarginFrames
         .Height = .Height + 2 ' ensure text is not squeeced
         frText.width = .width + (siHmarginFrames * 2)
-        Debug.Print "tbText.Width = " & .width
-        Debug.Print "frText.width = " & frText.width
+'        Debug.Print "tbText.Width = " & .width
+'        Debug.Print "frText.width = " & frText.width
         frText.left = siHmarginFrames
                    
         frSection.width = frText.width + (siHmarginFrames * 2)
@@ -1634,7 +1634,7 @@ Private Sub SetupMsgSectionMonoSpaced(ByVal section As Long, _
         frArea.width = Max(frArea.width, frSection.left + frSection.width + siHmarginFrames + HSPACE_SCROLLBAR)
         FormWidth = frArea.width + siHmarginFrames + 7
         
-        Debug.Print "MaxTextBoxWidth = " & MaxTextBoxWidth
+'        Debug.Print "MaxTextBoxWidth = " & MaxTextBoxWidth
         If .width > MaxTextBoxWidth Then
             frSection.width = MaxSectionWidth
             frArea.width = MaxMsgAreaWidth
@@ -1657,7 +1657,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 ' Setup the proportional spaced Message Section (section) with the text (text)
@@ -1722,7 +1722,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 Private Sub SetupMsgSectionsPropSpaced()
@@ -1738,7 +1738,7 @@ exit_proc:
     Exit Sub
     
 on_error:
-    Debug.Print Err.Description: Stop: Resume Next
+    Debug.Print Err.Description: Stop: Resume
 End Sub
 
 ' When a specific font name and/or size is specified, the extra title label is actively used
