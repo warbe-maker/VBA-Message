@@ -12,7 +12,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
 Option Explicit
 ' -------------------------------------------------------------------------------
 ' UserForm fMsg
@@ -540,7 +539,6 @@ Private Sub ApplyScrollBarHorizontal(ByVal fr As MSForms.Frame, _
     Dim siScrollWidth   As Single
     
     With fr
-        Debug.Print "fr.width = " & .width
         siScrollWidth = .width + 1
         .width = widthnew
         .Height = .Height + VSPACE_SCROLLBAR
@@ -760,7 +758,6 @@ Private Sub Collect(ByRef into As Variant, _
                     End With
                     Select Case TypeName(into)
                         Case "Collection"
-                            Debug.Print ctl.Name
                             into.Add ctl
                         Case Else
                             Set into = ctl
@@ -797,31 +794,28 @@ Private Sub ConvertPixelsToPoints(ByRef X As Single, ByRef Y As Single)
 End Sub
 
 Private Sub Debug_Sizes(ByVal stage As String, Optional ByVal frSectionMonoSpaced As MSForms.Frame = Nothing)
-#If Debugging = 1 Then
-    With Me
-        Debug.Print vbLf & stage
-        
-        Debug.Print String(Len(stage), "-")
-            Debug.Print "Form (inside) width  = " & Format(.InsideWidth, "##0") & " (specified max = " & Format(.MaxFormWidth, "##0") & "pt = " & .MaxFormWidthPrcntgOfScreenSize & "%)"
-        If IsApplied(DsgnMsgArea) Then _
-            Debug.Print "Message Area  width  = " & Format(DsgnMsgArea.width, "##0")
-        If Not frSectionMonoSpaced Is Nothing Then _
-            Debug.Print "Monosp. sect. width  = " & frSectionMonoSpaced.width
-        If IsApplied(DsgnButtonsArea) Then
-            Debug.Print "Buttons Frame width  = " & Format(DsgnButtonsFrame.width, "##0")
-            Debug.Print "Buttons Area  width  = " & Format(DsgnButtonsArea.width, "##0")
-        End If
-            Debug.Print "Form (inside) height = " & Format(.InsideHeight, "##0") & " (specified max = " & Format(.MaxFormHeight, "##0") & ")"
-        If IsApplied(DsgnMsgArea) Then _
-            Debug.Print "Message Area  height = " & Format(DsgnMsgArea.Height, "##0") & " (" & PrcntgHeightMsgArea * 100 & "%)"
-        If IsApplied(DsgnButtonsArea) Then
-            Debug.Print "Max button    height = " & siMaxButtonHeight & " (" & dctApplButtonRows.Count & " setup)"
-            Debug.Print "Buttons Frame height = " & Format(DsgnButtonsFrame.Height, "##0")
-            Debug.Print "Buttons Area  height = " & Format(DsgnButtonsArea.Height, "##0") & " (" & PrcntgHeightButtonsArea * 100 & "%)"
-        End If
-    End With
-'    Stop
-#End If
+'    With Me
+'        Debug.Print vbLf & stage
+'
+'        Debug.Print String(Len(stage), "-")
+'            Debug.Print "Form (inside) width  = " & Format(.InsideWidth, "##0") & " (specified max = " & Format(.MaxFormWidth, "##0") & "pt = " & .MaxFormWidthPrcntgOfScreenSize & "%)"
+'        If IsApplied(DsgnMsgArea) Then _
+'            Debug.Print "Message Area  width  = " & Format(DsgnMsgArea.Width, "##0")
+'        If Not frSectionMonoSpaced Is Nothing Then _
+'            Debug.Print "Monosp. sect. width  = " & frSectionMonoSpaced.Width
+'        If IsApplied(DsgnButtonsArea) Then
+'            Debug.Print "Buttons Frame width  = " & Format(DsgnButtonsFrame.Width, "##0")
+'            Debug.Print "Buttons Area  width  = " & Format(DsgnButtonsArea.Width, "##0")
+'        End If
+'            Debug.Print "Form (inside) height = " & Format(.InsideHeight, "##0") & " (specified max = " & Format(.MaxFormHeight, "##0") & ")"
+'        If IsApplied(DsgnMsgArea) Then _
+'            Debug.Print "Message Area  height = " & Format(DsgnMsgArea.Height, "##0") & " (" & PrcntgHeightMsgArea * 100 & "%)"
+'        If IsApplied(DsgnButtonsArea) Then
+'            Debug.Print "Max button    height = " & siMaxButtonHeight & " (" & dctApplButtonRows.Count & " setup)"
+'            Debug.Print "Buttons Frame height = " & Format(DsgnButtonsFrame.Height, "##0")
+'            Debug.Print "Buttons Area  height = " & Format(DsgnButtonsArea.Height, "##0") & " (" & PrcntgHeightButtonsArea * 100 & "%)"
+'        End If
+'    End With
 End Sub
 
 ' When False (the default) captions are removed from all frames
@@ -955,7 +949,6 @@ exit_proc:
     
 on_error:
     Debug.Print Err.Description: Stop: Resume
-
 End Sub
 
 Private Sub ResizeAndRepositionAreas()
@@ -1195,16 +1188,11 @@ Private Sub ResizeAndRepositionMsgSections()
             Set la = DsgnSectionLabel(i)
             Set frText = DsgnSectionTextFrame(i)
             Set tb = DsgnSectionText(i)
-            Debug.Print "Section " & i
-            Debug.Print String(Len("Section " & i), "-")
             If IsApplied(la) Then
                 With la
                     .Visible = True
                     .Top = siTop
                     siTop = VgridPos(.Top + .Height)
-                    Debug.Print "Label-Top        = " & .Top
-                    Debug.Print "Label-Height     = " & .Height
-                    Debug.Print "Top next         = " & siTop
                 End With
             End If
             
@@ -1218,9 +1206,6 @@ Private Sub ResizeAndRepositionMsgSections()
                     .Top = siTop
                     .Height = tb.Height + (siVmarginFrames * 2)
                     siTop = .Top + .Height + siVmarginFrames
-                    Debug.Print "TextFrame-Top    = " & .Top
-                    Debug.Print "TextFrame-Height = " & .Height
-                    
                     If .ScrollBars = fmScrollBarsBoth Or frText.ScrollBars = fmScrollBarsHorizontal Then
                         .Height = tb.Top + tb.Height + VSPACE_SCROLLBAR + siVmarginFrames
                     Else
@@ -1235,9 +1220,6 @@ Private Sub ResizeAndRepositionMsgSections()
                     .Visible = True
                     .Height = frText.Top + frText.Height + siVmarginFrames
                     siTopSection = VgridPos(.Top + .Height + siVmarginFrames + VSPACE_SECTIONS)
-                    Debug.Print "Section-Top    = " & .Top
-                    Debug.Print "Section-Height = " & .Height
-                    Debug.Print "Top next       = " & siTopSection
                 End With
             End If
                 
@@ -1623,8 +1605,6 @@ Private Sub SetupMsgSectionMonoSpaced(ByVal section As Long, _
         .left = siHmarginFrames
         .Height = .Height + 2 ' ensure text is not squeeced
         frText.width = .width + (siHmarginFrames * 2)
-'        Debug.Print "tbText.Width = " & .width
-'        Debug.Print "frText.width = " & frText.width
         frText.left = siHmarginFrames
                    
         frSection.width = frText.width + (siHmarginFrames * 2)
@@ -1634,7 +1614,6 @@ Private Sub SetupMsgSectionMonoSpaced(ByVal section As Long, _
         frArea.width = Max(frArea.width, frSection.left + frSection.width + siHmarginFrames + HSPACE_SCROLLBAR)
         FormWidth = frArea.width + siHmarginFrames + 7
         
-'        Debug.Print "MaxTextBoxWidth = " & MaxTextBoxWidth
         If .width > MaxTextBoxWidth Then
             frSection.width = MaxSectionWidth
             frArea.width = MaxMsgAreaWidth
@@ -1824,4 +1803,3 @@ Public Function VgridPos(ByVal si As Single) As Single
     Next i
 
 End Function
-
