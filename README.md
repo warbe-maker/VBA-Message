@@ -1,3 +1,4 @@
+
 # MsgBox Alternative
 
 [Abstract](#abstract)<br>
@@ -413,11 +414,3 @@ Because the text is ++not++  "wrapped" the width of the _Message Form_ is determ
 
 #### _Monospaced_ = False (default)
 Because the text is "wrapped" the width of a proportional-spaced text is determined by the current form width.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the required space for the broadest _Buttons Row_ and the specified _Minimum Form Width_.
-
-<script src="https://utteranc.es/client.js"
-        repo="https://github.com/warbe-maker/VBA-MsgBox-Alternative"
-        issue-term="pathname"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>
