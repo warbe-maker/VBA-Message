@@ -12,6 +12,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 Option Explicit
 ' -------------------------------------------------------------------------------
 ' UserForm fMsg
@@ -32,7 +33,7 @@ Option Explicit
 Const MIN_BUTTON_WIDTH          As Single = 70      ' Default minimum reply button width
 Const FONT_MONOSPACED_NAME      As String = "Courier New"   ' Default monospaced font
 Const FONT_MONOSPACED_SIZE      As Single = 9       ' Default monospaced font size
-Const FORM_MAX_HEIGHT_POW       As Long = 90        ' Max form height as a percentage of the screen size
+Const FORM_MAX_HEIGHT_POW       As Long = 70        ' Max form height as a percentage of the screen size
 Const FORM_MAX_WIDTH_POW        As Long = 80        ' Max form width as a percentage of the screen size
 Const FORM_MIN_WIDTH            As Single = 300     ' Default minimum message form width
 Const TEST_WITH_FRAME_BORDERS   As Boolean = False  ' For test purpose only! Display frames with visible border
@@ -341,7 +342,7 @@ Public Property Get MaxFormHeightPrcntgOfScreenSize() As Long:                  
 
 Public Property Let MaxFormHeightPrcntgOfScreenSize(ByVal l As Long)
     lMaxFormHeightPoW = l
-    siMaxFormHeight = wVirtualScreenHeight * (Min(l, 99) / 100)   ' maximum form height based on screen size
+    siMaxFormHeight = wVirtualScreenHeight * (Min(l, 70) / 100)   ' maximum form height based on screen size must not exceed 80 %
 End Property
 
 Public Property Get MaxFormWidth() As Single:                                           MaxFormWidth = siMaxFormWidth:                                              End Property
@@ -825,7 +826,7 @@ Private Sub DisplayFramesWithCaptions(Optional ByVal b As Boolean = True)
     If Not b Then
         For Each ctl In Me.Controls
             If TypeName(ctl) = "Frame" Then
-                ctl.Caption = vbNullString
+                ctl.caption = vbNullString
             End If
         Next ctl
     End If
@@ -1300,7 +1301,7 @@ Private Sub SetupButton(ByVal buttonrow As Long, _
         .Visible = True
         .AutoSize = True
         .WordWrap = False ' the longest line determines the buttonindex's width
-        .Caption = buttoncaption
+        .caption = buttoncaption
         .AutoSize = False
         .Height = .Height + 1 ' safety margin to ensure proper multilin caption display
         siMaxButtonHeight = Max(siMaxButtonHeight, .Height)
@@ -1526,7 +1527,7 @@ Private Sub SetupMsgSection(ByVal section As Long)
             Set la = DsgnSectionLabel(section)
             With la
                 .width = Me.InsideWidth - (siHmarginFrames * 2)
-                .Caption = sLabel
+                .caption = sLabel
             End With
             frText.top = la.top + la.Height
             AppliedControl = la
@@ -1710,7 +1711,7 @@ Private Sub SetupTitle()
                     .Font.Size = sTitleFontSize
                 End If
                 .AutoSize = True
-                .Caption = " " & sTitle    ' some left margin
+                .caption = " " & sTitle    ' some left margin
                 siTitleWidth = .width + HSPACE_RIGHT
             End With
             AppliedControl = .laMsgTitle
@@ -1725,10 +1726,10 @@ Private Sub SetupTitle()
                 End With
                 .Visible = False
                 .AutoSize = True
-                .Caption = " " & sTitle    ' some left margin
+                .caption = " " & sTitle    ' some left margin
                 siTitleWidth = .width + 30
             End With
-            .Caption = " " & sTitle    ' some left margin
+            .caption = " " & sTitle    ' some left margin
             .laMsgTitleSpaceBottom.Visible = False
         End If
                 
