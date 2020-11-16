@@ -49,7 +49,7 @@ Public Type tSection                ' ------------------
        bMonspaced As Boolean        ' message area which
 End Type                            ' consists of
 Public Type tMessage                ' three message
-       section(1 To 3) As tSection  ' sections
+       section(1 To 4) As tSection  ' sections
 End Type
 
 #If AlternateMsgBox Then
