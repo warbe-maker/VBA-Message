@@ -5,31 +5,12 @@ Option Explicit
 ' Standard Module mMsg  Alternative MsgBox
 '          Procedures, methods, functions, etc. for displaying a message with a user response.
 '
-' Methods:
-' - AppErr              Converts a positive number into a negative error number
-'                       ensuring it not conflicts with a VB error. A negative error
-'                       number is turned back into the original positive Application
-'                       Error Number.
-' - Msg                 Displays a message with any possible 4 replies and the
+' Methods: Dsply        Displays a message with any possible 4 replies and the
 '                       message either with a foxed or proportional font.
-' - Msg3                Displays a message with any possible 4 replies and 3
-'                       message sections each either with a foxed or proportional
-'                       font.
-' - ErrMsg              Displays a common error message either by means of the
-'                       VB MsgBox or by means of the common method Msg.
 '
-' lScreenWidth. Rauschenberger Berlin June 2020
+' W. Rauschenberger, Berlin Nov 2020
 ' -------------------------------------------------------------------------------
 
-' Declarations for the function MakeFormResizable (yet unused)
-'Private Declare PtrSafe Function GetForegroundWindow Lib "User32.dll" () As Long
-'
-'Private Declare PtrSafe Function GetWindowLongPtr Lib "User32.dll" Alias "GetWindowLongA" () As LongPtr
-'    (ByVal hwnd As LongPtr, ByVal nIndex As Long)
-'
-'Private Declare PtrSafe Function SetWindowLongPtr Lib "User32.dll" Alias "SetWindowLongA" () As LongPtr
-'   (ByVal hwnd As LongPtr, ByVal nIndex As LongPtr, ByVal dwNewLong As LongPtr)
-'
 Public Const GWL_STYLE = -16
 Public Const WS_CAPTION = &HC00000
 Public Const WS_THICKFRAME = &H40000
@@ -52,137 +33,6 @@ Public Type tMessage                ' three message
        section(1 To 4) As tSection  ' sections
 End Type
 
-#If AlternateMsgBox Then
-' Elaborated error message using fMsg which supports the display of
-' up to 3 message sections, optionally monospaced (here used for the
-' error path) and each optionally with a label (here used to specify
-' the message sections).
-' Note: The error title is automatically assembled.
-' -------------------------------------------------------------------
-Public Sub ErrMsg(Optional ByVal errnumber As Long = 0, _
-                  Optional ByVal errsource As String = vbNullString, _
-                  Optional ByVal errdescription As String = vbNullString, _
-                  Optional ByVal errline As String = vbNullString, _
-                  Optional ByVal errtitle As String = vbNullString, _
-                  Optional ByVal errpath As String = vbNullString, _
-                  Optional ByVal errinfo As String = vbNullString)
-
-    Const PROC      As String = "ErrMsg"
-    Dim sIndicate   As String
-    Dim sErrText    As String   ' May be a first part of the errdescription
-
-    If errnumber = 0 _
-    Then MsgBox "Apparently there is no exit statement line above the error handling! Error number is 0!", vbCritical, "Application error in " & ErrSrc(PROC) & "!"
-
-    '~~ Error line info in case one had been provided - additionally integrated in the assembled error title
-    If errline = vbNullString Or errline = "0" Then
-        sIndicate = vbNullString
-    Else
-        sIndicate = " (at line " & errline & ")"
-    End If
-
-    If errtitle = vbNullString Then
-        '~~ When no title is provided, one is assembled by the provided info
-        errtitle = errtitle & sIndicate
-        '~~ Distinguish between VBA and Application error
-        Select Case errnumber
-            Case Is > 0:    errtitle = "VBA Error " & errnumber
-            Case Is < 0:    errtitle = "Application Error " & AppErr(errnumber)
-        End Select
-        errtitle = errtitle & " in:  " & errsource & sIndicate
-    End If
-
-    If errinfo = vbNullString Then
-        '~~ When no error information is provided one may be within the error description
-        '~~ which is only possible with an application error raised by Err.Raise
-        If InStr(errdescription, "||") <> 0 Then
-            sErrText = Split(errdescription, "||")(0)
-            errinfo = Split(errdescription, "||")(1)
-        Else
-            sErrText = errdescription
-            errinfo = vbNullString
-        End If
-    Else
-        sErrText = errdescription
-    End If
-
-    '~~ Display error message by UserForm fErrMsg
-    With fMsg
-        .MsgTitle = errtitle
-        .MsgLabel(1) = "Error Message/Description:"
-        .MsgText(1) = sErrText
-        If errpath <> vbNullString Then
-            .MsgLabel(2) = "Error path (call stack):"
-            .MsgText(2) = errpath
-            .MsgMonoSpaced(2) = True
-        End If
-        If errinfo <> vbNullString Then
-            .MsgLabel(3) = "Info:"
-            .MsgText(3) = errinfo
-        End If
-        .MsgButtons = vbOKOnly
-        
-        '~~ Setup prior activating/displaying the message form is essential!
-        '~~ To aviod flickering, the whole setup process must be done before the form is displayed.
-        '~~ This  m u s t  be the method called after passing the arguments and before .show
-        .Setup
-        .show
-    End With
-
-End Sub
-
-#Else
-
-' Common error message using MsgBox.
-' ---------------------------------------------
-Public Sub ErrMsg(ByVal errnumber As Long, _
-                  ByVal errsource As String, _
-                  ByVal errdescription As String, _
-                  ByVal errline As String, _
-         Optional ByVal errpath As String = vbNullString)
-    
-    Const PROC          As String = "ErrMsg"
-    Dim sMsg            As String
-    Dim sMsgTitle       As String
-    Dim sDescription    As String
-    Dim sInfo           As String
-
-    If errnumber = 0 _
-    Then MsgBox "Exit statement before error handling missing! Error number is 0!", vbCritical, "Application error in " & ErrSrc(PROC) & "!"
-
-    '~~ Prepare Title
-    If errnumber < 0 Then
-        sMsgTitle = "Application Error " & AppErr(errnumber)
-    Else
-        sMsgTitle = "VB Error " & errnumber
-    End If
-    sMsgTitle = sMsgTitle & " in " & errsource
-    If errline <> 0 Then sMsgTitle = sMsgTitle & " (at line " & errline & ")"
-
-    '~~ Prepare message
-    If InStr(errdescription, "||") <> 0 Then
-        '~~ Split error description/message and info
-        sDescription = Split(errdescription, "||")(0)
-        sInfo = Split(errdescription, "||")(1)
-    Else
-        sDescription = errdescription
-    End If
-    sMsg = "Description: " & vbLf & sDescription & vbLf & vbLf & _
-           "Source:" & vbLf & errsource
-    If errline <> 0 Then sMsg = sMsg & " (at line " & errline & ")"
-    If errpath <> vbNullString Then
-        sMsg = sMsg & vbLf & vbLf & _
-               "Path:" & vbLf & errpath
-    End If
-    If sInfo <> vbNullString Then
-        sMsg = sMsg & vbLf & vbLf & _
-               "Info:" & vbLf & sInfo
-    End If
-    MsgBox sMsg, vbCritical, sMsgTitle
-
-End Sub
-#End If
-
 Public Function Max(ParamArray va() As Variant) As Variant
 ' ------------------------------------------------------
 ' Returns the maximum value of all values provided (va).
@@ -195,66 +45,66 @@ Public Function Max(ParamArray va() As Variant) As Variant
     Next v
     
 End Function
+'
+'Public Function AppErr(ByVal lNo As Long, _
+'              Optional ByRef sError As String = vbNullString) As Variant
+'' ---------------------------------------------------------------------------
+'' Usage example when a programmed application error occurs:
+''    If ..... Then Err.Raise AppErr(1), ....
+'' Usage example when the error message is displayed, e.g. by means of MsgBox:
+''   AppErr Err.Number, sErrTitle
+''   MsgBox dsply_title:=sErrTitle
+'' ---------------------------------------------------------------------------
+'    If lNo < 0 Then
+'        '~~ This is an application error number which had turned into a negative number
+'        '~~ in order to avoid any conflict with a VB error. The function returns the
+'        '~~ original positive application error number and a corresponding title
+'        AppErr = lNo - vbObjectError
+'        If Not IsMissing(sError) Then sError = "Application error " & AppErr
+'    Else
+'        '~~ This is a positive error number regarded as a programmed application error
+'        '~~ The function returns a negative number in order to avoid any conflict with
+'        '~~ a VB error.
+'        AppErr = vbObjectError + lNo
+'        If Not IsMissing(sError) Then sError = "Microsoft Visual Basic runtime error " & lNo
+'    End If
+'End Function
 
-Public Function AppErr(ByVal lNo As Long, _
-              Optional ByRef sError As String = vbNullString) As Variant
-' ---------------------------------------------------------------------------
-' Usage example when a programmed application error occurs:
-'    If ..... Then Err.Raise AppErr(1), ....
-' Usage example when the error message is displayed, e.g. by means of MsgBox:
-'   AppErr Err.Number, sErrTitle
-'   MsgBox title:=sErrTitle
-' ---------------------------------------------------------------------------
-    If lNo < 0 Then
-        '~~ This is an application error number which had turned into a negative number
-        '~~ in order to avoid any conflict with a VB error. The function returns the
-        '~~ original positive application error number and a corresponding title
-        AppErr = lNo - vbObjectError
-        If Not IsMissing(sError) Then sError = "Application error " & AppErr
-    Else
-        '~~ This is a positive error number regarded as a programmed application error
-        '~~ The function returns a negative number in order to avoid any conflict with
-        '~~ a VB error.
-        AppErr = vbObjectError + lNo
-        If Not IsMissing(sError) Then sError = "Microsoft Visual Basic runtime error " & lNo
-    End If
-End Function
-
-' MsgBox alternative providing up to 5 reply buttons, specified either
-' by MsgBox vbOkOnly (the default), vbYesNo, etc. or a comma delimited
-' string specifying the used button's caption. The function uses the
-' UserForm fMsg and returns the clicked reply button's caption or its
-' corresponding vb variable (vbOk, vbYes, vbNo, etc.).
-' Note: This is a simplified version of the Msg function.
-' --------------------------------------------------------------------
-Public Function Box( _
-           Optional ByVal title As String = vbNullString, _
-           Optional ByVal MsgSectionText As String = vbNullString, _
-           Optional ByVal MsgMonoSpaced As Boolean = False, _
-           Optional ByVal MinFormWidth As Single = 0, _
-           Optional ByVal buttons As Variant = vbOKOnly) As Variant
-    
-'    Dim siHeight    As Single
+Public Function Dsply(ByVal dsply_title As String, _
+                      ByRef dsply_message As tMessage, _
+             Optional ByVal dsply_buttons As Variant = vbOKOnly, _
+             Optional ByVal dsply_returnindex As Boolean = False, _
+             Optional ByVal dsply_min_width As Long = 200) As Variant
+' ------------------------------------------------------------------------------------
+' Common VBA Message Display: A service using the Common VBA (alternative) MsgBox.
+' See: https://warbe-maker.github.io/vba/common/2020/10/19/Alternative-VBA-MsgBox.html
+'
+' W. Rauschenberger, Berlin, Nov 2020
+' ------------------------------------------------------------------------------------
 
     With fMsg
-        .MsgTitle = title
-        .MsgText(1) = MsgSectionText
-        .MsgMonoSpaced(1) = MsgMonoSpaced
-        .MsgButtons = buttons
-        
-        '~~ Setup prior activating/displaying the message form is essential!
-        '~~ To aviod flickering, the whole setup process must be done before the form is displayed.
-        '~~ This  m u s t  be the method called after passing the arguments and before .show
-        .Setup
+        .MinFormWidth = dsply_min_width
+        .MsgTitle = dsply_title
+        .Msg = dsply_message
+        .MsgButtons = dsply_buttons
+        '+------------------------------------------------------------------------+
+        '|| Setup prior showing the form improves the performance significantly  ||
+        '|| and avoids any flickering message window with its setup.             ||
+        '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
+        .Setup '                                                                 ||
+        '+------------------------------------------------------------------------+
         .show
-        
-        Box = .ReplyValue
     End With
-    Unload fMsg
-
     
-End Function
+    ' -----------------------------------------------------------------------------
+    ' Obtaining the reply value/index is only possible when more than one button is
+    ' displayed! When the user had a choice the form is hidden when the button is
+    ' pressed and the UserForm is unloade when the return value/index (either of
+    ' the two) is obtained!
+    ' -----------------------------------------------------------------------------
+    Dsply = IIf(dsply_returnindex, fMsg.ReplyIndex, fMsg.ReplyValue)
 
+End Function
 
 Public Function Min(ParamArray va() As Variant) As Variant
 ' ---------------------------------------------------------
@@ -269,39 +119,6 @@ Public Function Min(ParamArray va() As Variant) As Variant
    Next v
 End Function
 
-Public Function Msg(ByVal title As String, _
-                    ByRef message As tMessage, _
-           Optional ByVal buttons As Variant = vbOKOnly, _
-           Optional ByVal returnindex As Boolean = False) As Variant
-' ------------------------------------------------------------------
-' General purpose MsgBox alternative message. By default returns
-' the clicked reply buttons value
-' ------------------------------------------------------------------
-    
-    With fMsg
-        .MsgTitle = title
-        .Msg = message
-        .MsgButtons = buttons
-         
-        '+--------------------------------------------------------------------------+
-        '|| Setup prior showing the form is a true performance improvement as it    ||
-        '|| avoids a flickering message window when the setup is performed when    ||
-        '|| the message window is already displayed, i.e. with the Activate event. ||
-        '|| For testing however it may be appropriate to comment the Setup here in ||
-        '|| order to have it performed along with the UserForm_Activate event.     ||
-        .Setup '                                                                   ||
-        '+--------------------------------------------------------------------------+
-        
-        .show
-        On Error Resume Next    ' Just in case the user has terminated the dialog without clicking a reply button
-        '~~ Fetching the clicked reply buttons value (or index) unloads the form.
-        '~~ In case there were only one button to be clicked, the form will have been unloaded already -
-        '~~ and a return value/ibdex will not be available
-        If returnindex Then Msg = .ReplyIndex Else Msg = .ReplyValue
-    End With
-    Unload fMsg
-
-End Function
 
 Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "mMsg" & "." & sProc

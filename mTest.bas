@@ -123,10 +123,10 @@ Repeat:
     tMsg.section(3).sLabel = "Please also note:":       tMsg.section(3).sText = "The message form height is ajusted to the need " & _
                                                                                 "up to the specified maximum heigth which is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "% and not exceeded."
     WidthDeterminedByMinimumWidth = _
-    mMsg.Msg( _
-             title:=sMsgTitle, _
-             message:=tMsg, _
-             buttons:=vButtons _
+    mMsg.Dsply( _
+             dsply_title:=sMsgTitle, _
+             dsply_message:=tMsg, _
+             dsply_buttons:=vButtons _
             )
     Select Case WidthDeterminedByMinimumWidth
         Case vButton5
@@ -174,10 +174,10 @@ Public Function WidthDeterminedByTitle(Optional ByVal vButton1 As Variant = vbNu
     vButtons = vButton1 & "," & vButton2 & "," & vButton3
     
     WidthDeterminedByTitle = _
-    mMsg.Msg( _
-             title:=sMsgTitle, _
-             message:=tMsg, _
-             buttons:=vButtons _
+    mMsg.Dsply( _
+             dsply_title:=sMsgTitle, _
+             dsply_message:=tMsg, _
+             dsply_buttons:=vButtons _
             )
 End Function
 
@@ -230,10 +230,10 @@ Public Function WidthDeterminedByMonoSpacedMessageSection( _
 '            .TestFrameWithBorders = True  ' defaults to false, set to true for test purpose only
         End With
         WidthDeterminedByMonoSpacedMessageSection = _
-        mMsg.Msg( _
-                 title:=sMsgTitle, _
-                 message:=tMsg, _
-                 buttons:=vButtons _
+        mMsg.Dsply( _
+                   dsply_title:=sMsgTitle, _
+                   dsply_message:=tMsg, _
+                   dsply_buttons:=vButtons _
                 )
         Select Case WidthDeterminedByMonoSpacedMessageSection
             Case vButton5
@@ -285,10 +285,10 @@ Public Function WidthDeterminedByReplyButtons( _
     
     Do
         WidthDeterminedByReplyButtons = _
-        mMsg.Msg( _
-                 title:=sMsgTitle, _
-                 message:=tMsg, _
-                 buttons:=vButtons _
+        mMsg.Dsply( _
+                   dsply_title:=sMsgTitle, _
+                   dsply_message:=tMsg, _
+                   dsply_buttons:=vButtons _
                 )
         
         Select Case WidthDeterminedByReplyButtons
@@ -347,10 +347,10 @@ Public Function MonoSpacedSectionWidthExceedsMaxFormWidth( _
     vButtons = vButton1 & "," & vButton2 & "," & vButton3
     
     MonoSpacedSectionWidthExceedsMaxFormWidth = _
-    mMsg.Msg( _
-             title:=sMsgTitle, _
-             message:=tMsg, _
-             buttons:=vButtons _
+    mMsg.Dsply( _
+             dsply_title:=sMsgTitle, _
+             dsply_message:=tMsg, _
+             dsply_buttons:=vButtons _
             )
 End Function
 
@@ -382,10 +382,10 @@ Public Function MonoSpacedMessageSectionExceedMaxFormHeight() As Variant
     vButtons = vButton1 & "," & vButton2 & "," & vButton3
     
     MonoSpacedMessageSectionExceedMaxFormHeight = _
-    mMsg.Msg( _
-             title:=sMsgTitle, _
-             message:=tMsg, _
-             buttons:=vButtons _
+    mMsg.Dsply( _
+             dsply_title:=sMsgTitle, _
+             dsply_message:=tMsg, _
+             dsply_buttons:=vButtons _
             )
 End Function
 
@@ -426,25 +426,6 @@ Private Function Repeat(ByVal ntimes As Long, _
     Repeat = s
 End Function
 
-' Common error message test
-' ------------------------------------
-Public Sub Test_Error_Message_Simple()
-    
-    Const PROC = "Test_Error_Message_Simple"
-    Dim sMsg    As String
-    Dim sInfo   As String
-    
-    sMsg = "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog."
-    sInfo = "Note 1: The error line is only displayed when one not 0 is provided" & vbLf & _
-            "Note 2: This optional additional info has been provided via the errdescription parameter delimited by two vertical bars (""|"")"
-    
-    mMsg.ErrMsg errnumber:=1, _
-                errdescription:=sMsg & "||" & sInfo, _
-                errsource:=ErrSrc(PROC), _
-                errpath:="None provided (optional!)", _
-                errline:="12"
-End Sub
-
 Public Function ButtonByValue()
 
     Const PROC  As String = "ButtonByValue"
@@ -465,10 +446,10 @@ Public Function ButtonByValue()
     tMsg.section(2).sText = "The buttons ""Yes"" an ""No"" are displayed centered in one row"
 
     ButtonByValue = _
-    mMsg.Msg( _
-             title:="Test: Button by value (" & PROC & ")", _
-             message:=tMsg, _
-             buttons:=vbOKOnly _
+    mMsg.Dsply( _
+             dsply_title:="Test: Button by value (" & PROC & ")", _
+             dsply_message:=tMsg, _
+             dsply_buttons:=vbOKOnly _
             )
 End Function
 
@@ -490,10 +471,10 @@ Public Function ButtonByString()
     tMsg.section(2).sText = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
     
     ButtonByString = _
-    mMsg.Msg( _
-             title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             message:=tMsg, _
-             buttons:="Yes," & vbLf & ",No" _
+    mMsg.Dsply( _
+             dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
+             dsply_message:=tMsg, _
+             dsply_buttons:="Yes," & vbLf & ",No" _
             )
 End Function
 
@@ -519,10 +500,10 @@ Public Function ButtonByCollection()
     tMsg.section(2).sText = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
 
     ButtonByCollection = _
-    mMsg.Msg( _
-             title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             message:=tMsg, _
-             buttons:=cll _
+    mMsg.Dsply( _
+             dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
+             dsply_message:=tMsg, _
+             dsply_buttons:=cll _
             )
 End Function
 
@@ -553,10 +534,10 @@ Public Function ButtonByDictionary()
     dct.Add "No"
     
     ButtonByDictionary = _
-    mMsg.Msg( _
-             title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             message:=tMsg, _
-             buttons:=dct _
+    mMsg.Dsply( _
+             dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
+             dsply_message:=tMsg, _
+             dsply_buttons:=dct _
             )
 End Function
 
@@ -593,10 +574,10 @@ Public Function Test_ButtonScrollBarVertical()
     Next i
     cll.Add "Ok"
     
-    While mMsg.Msg( _
-                   title:=Readable(PROC), _
-                   message:=tMsg, _
-                   buttons:=cll _
+    While mMsg.Dsply( _
+                   dsply_title:=Readable(PROC), _
+                   dsply_message:=tMsg, _
+                   dsply_buttons:=cll _
                   ) <> "Ok"
     Wend
     
@@ -636,10 +617,10 @@ Public Function Test_ButtonScrollBarHorizontal()
             .MaxFormWidthPrcntgOfScreenSize = 50 ' enforce horizontal scroll bar
         End With
 
-        If mMsg.Msg( _
-             title:=Readable(PROC), _
-             message:=tMsg, _
-             buttons:=cll _
+        If mMsg.Dsply( _
+             dsply_title:=Readable(PROC), _
+             dsply_message:=tMsg, _
+             dsply_buttons:=cll _
             ) = "Ok" Then Exit Do
     Loop
     
@@ -722,10 +703,10 @@ Public Sub AllInOne()
                                 "- In may take some time to understand the change of the displayed message" & vbLf & _
                                 "  depending on the changed contraint values."
                  
-        vReply = mMsg.Msg( _
-                          title:=sTitle, _
-                          message:=tMsg, _
-                          buttons:=cll _
+        vReply = mMsg.Dsply( _
+                          dsply_title:=sTitle, _
+                          dsply_message:=tMsg, _
+                          dsply_buttons:=cll _
                          )
         With fMsg
             Select Case vReply
@@ -798,11 +779,11 @@ Public Sub ButtonsMatrix()
 '            .TestFrameWithBorders = True
         End With
                          
-        vReply = mMsg.Msg( _
-                          title:=sTitle, _
-                          message:=tMsg, _
-                          buttons:=cllMatrix, _
-                          returnindex:=True _
+        vReply = mMsg.Dsply( _
+                          dsply_title:=sTitle, _
+                          dsply_message:=tMsg, _
+                          dsply_buttons:=cllMatrix, _
+                          dsply_returnindex:=True _
                          )
         Select Case vReply
             Case "Ok": Exit Do ' The very last item in the collection is the "Finished" button
@@ -856,10 +837,10 @@ Public Sub MostlyButtons()
 '            .TestFrameWithBorders = True
         End With
                          
-        vReply = mMsg.Msg( _
-                          title:=sTitle, _
-                          message:=tMsg, _
-                          buttons:=cllStory _
+        vReply = mMsg.Dsply( _
+                          dsply_title:=sTitle, _
+                          dsply_message:=tMsg, _
+                          dsply_buttons:=cllStory _
                          )
         With fMsg
             Select Case vReply
@@ -917,43 +898,6 @@ End Function
 Public Sub Test_WidthDeterminedByReplyButtons()
     WidthDeterminedByReplyButtons
 End Sub
-
-Public Sub Test_AppErr()
-    On Error GoTo on_error
-    Const PROC = "Test_AppErr"
-    Dim sErrTitle   As String
-    
-    Err.Raise AppErr(1), ErrSrc(PROC), "This is a programmed application error raised in the procedure metioned below as the error source."
-exit_proc:
-    Exit Sub
-on_error:
-    AppErr Err.Number, sErrTitle
-    MsgBox title:=sErrTitle & " in " & Err.Source, _
-           prompt:="Error description: " & vbLf & vbLf & Err.Description & vbLf & vbLf & vbLf & _
-                   "Error source:" & vbLf & vbLf & ErrSrc(PROC)
-End Sub
-
-Public Sub Test_VBErr()
-    On Error GoTo on_error
-    
-    Const PROC = "Test_VBErr"
-    Dim sErrTitle   As String
-    Dim l           As Long
-    
-    l = l / 0
-    
-exit_proc:
-    Exit Sub
-on_error:
-    AppErr Err.Number, sErrTitle
-    MsgBox title:=sErrTitle & " in " & ErrSrc(PROC), _
-           prompt:="Error description: " & vbLf & vbLf & Err.Description & vbLf & vbLf & vbLf & _
-                   "Error source:" & vbLf & vbLf & ErrSrc(PROC)
-End Sub
-
-'Private Function ErrSrc(ByVal s As String) As String
-'    ErrSrc = "mTest." & s
-'End Function
 
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mTest." & s:  End Property
 

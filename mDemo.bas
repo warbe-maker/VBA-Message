@@ -18,7 +18,7 @@ Public Sub FirstTry()
    
 End Sub
 
-Public Sub Demo_Msg()
+Public Sub Demo_Dsply()
 
     Dim sTitle  As String
     Dim tMsg    As tMessage
@@ -59,31 +59,8 @@ Public Sub Demo_Msg()
     Next j
     cll.Add "Ok"
     
-    While Msg(msg_title:=sTitle, msg_message:=tMsg, msg_buttons:=cll, msg_min_width:=600) <> cll(cll.Count)
+    While mMsg.Dsply(dsply_title:=sTitle, dsply_message:=tMsg, dsply_buttons:=cll, dsply_min_width:=600) <> cll(cll.Count)
     Wend
     
 End Sub
 
-Public Function Msg(ByVal msg_title As String, _
-                    ByRef msg_message As tMessage, _
-           Optional ByVal msg_buttons As Variant = vbOKOnly, _
-           Optional ByVal msg_returnindex As Boolean = False, _
-           Optional ByVal msg_min_width As Long = 200) As Variant
-' ---------------------------------------------------------------
-'
-' ---------------------------------------------------------------
-
-    With fMsg
-        .MinFormWidth = msg_min_width
-        .MsgTitle = msg_title
-        .Msg = msg_message
-        .MsgButtons = msg_buttons
-        .Setup
-        .show
-    End With
-      '~~ Obtaining the reply value or index unloads the form !
-    If msg_returnindex _
-    Then Msg = fMsg.ReplyIndex _
-    Else Msg = fMsg.ReplyValue
-
-End Function
