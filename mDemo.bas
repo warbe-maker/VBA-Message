@@ -21,7 +21,7 @@ End Sub
 Public Sub Demo_Dsply()
 
     Dim sTitle  As String
-    Dim tMsg    As tMessage
+    Dim tMsg    As tMsg
     Dim cll     As New Collection
     Dim i, j    As Long
     
