@@ -68,6 +68,13 @@ Private Declare PtrSafe Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare PtrSafe Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long) As Long
 
+Private Enum enStartupPosition      ' ---------------------------
+    sup_Manual = 0                  ' Used to position the
+    sup_CenterOwner = 1             ' final setup message form
+    sup_CenterScreen = 2            ' horizontally and vertically
+    sup_WindowsDefault = 3          ' centered on the screen
+End Enum                            ' ---------------------------
+
 Dim bDoneButtonsArea            As Boolean
 Dim bDoneHeightDecrement        As Boolean
 Dim bDoneMonoSpacedSections     As Boolean
@@ -160,7 +167,7 @@ exit_sub:
     Exit Sub
     
 eh:
-    Debug.Print Err.Description: Stop: Resume
+    Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub CollectDesignControls()
@@ -202,7 +209,7 @@ Private Sub CollectDesignControls()
 
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub ProvideCollection(ByRef cll As Collection)
@@ -491,17 +498,17 @@ Public Sub AdjustStartupPosition(ByRef pUserForm As Object, _
     On Error Resume Next
         
     Select Case pUserForm.StartupPosition
-        Case Manual, WindowsDefault ' Do nothing
-        Case CenterOwner            ' Position centered on top of the 'Owner'. Usually this is Application.
+        Case sup_Manual, sup_WindowsDefault ' Do nothing
+        Case sup_CenterOwner            ' Position centered on top of the 'Owner'. Usually this is Application.
             If Not pOwner Is Nothing Then Set pOwner = Application
             With pUserForm
                 .StartupPosition = 0
                 .left = pOwner.left + ((pOwner.width - .width) / 2)
                 .top = pOwner.top + ((pOwner.Height - .Height) / 2)
             End With
-        Case CenterScreen           ' Assign the Left and Top properties after switching to Manual positioning.
+        Case sup_CenterScreen           ' Assign the Left and Top properties after switching to sup_Manual positioning.
             With pUserForm
-                .StartupPosition = Manual
+                .StartupPosition = sup_Manual
                 .left = (wVirtualScreenWidth - .width) / 2
                 .top = (wVirtualScreenHeight - .Height) / 2
             End With
@@ -769,7 +776,7 @@ Private Sub Collect(ByRef into As Variant, _
 
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
  
@@ -951,7 +958,7 @@ Private Sub ResizeAndReposition()
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub ResizeAndRepositionAreas()
@@ -1025,7 +1032,7 @@ Private Sub ResizeAndRepositionButtonRows()
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub ResizeAndRepositionButtons()
@@ -1063,7 +1070,7 @@ Private Sub ResizeAndRepositionButtons()
         
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub ResizeAndRepositionButtonsArea()
@@ -1105,7 +1112,7 @@ Private Sub ResizeAndRepositionButtonsArea()
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub ResizeAndRepositionButtonsFrame()
@@ -1132,7 +1139,7 @@ Private Sub ResizeAndRepositionButtonsFrame()
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub ResizeAndRepositionMsgArea()
@@ -1155,7 +1162,7 @@ Private Sub ResizeAndRepositionMsgArea()
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub ResizeAndRepositionMsgSections()
@@ -1227,7 +1234,7 @@ Private Sub ResizeAndRepositionMsgSections()
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Public Sub Setup()
@@ -1287,7 +1294,7 @@ Public Sub Setup()
     
 xt: Exit Sub
 
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub SetupButton(ByVal buttonrow As Long, _
@@ -1320,7 +1327,7 @@ Private Sub SetupButton(ByVal buttonrow As Long, _
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub SetupButtons(ByVal vbuttons As Variant)
@@ -1367,7 +1374,7 @@ Private Sub SetupButtons(ByVal vbuttons As Variant)
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 ' Setup the reply buttons based on the comma delimited string of button captions
@@ -1422,7 +1429,7 @@ Private Sub SetupButtonsFromCollection(ByVal cllButtons As Collection)
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub SetupButtonsFromString(ByVal sButtons As String)
@@ -1487,7 +1494,7 @@ Private Sub SetupButtonsFromValue(ByVal lButtons As Long)
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 ' Setup a message section with its label when one is specified
@@ -1552,7 +1559,7 @@ Private Sub SetupMsgSection(ByVal section As Long)
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 ' Setup the applied monospaced message section (section) with the text (text),
@@ -1612,7 +1619,7 @@ Private Sub SetupMsgSectionMonoSpaced(ByVal section As Long, _
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 ' Setup the proportional spaced Message Section (section) with the text (text)
@@ -1677,7 +1684,7 @@ Private Sub SetupMsgSectionsMonoSpaced()
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 Private Sub SetupMsgSectionsPropSpaced()
@@ -1692,7 +1699,7 @@ Private Sub SetupMsgSectionsPropSpaced()
     
 xt: Exit Sub
     
-eh: Debug.Print Err.Description: Stop: Resume
+eh: Debug.Print err.Description: Stop: Resume
 End Sub
 
 ' When a specific font name and/or size is specified, the extra title label is actively used

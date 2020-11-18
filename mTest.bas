@@ -172,7 +172,7 @@ Private Function Repeat( _
         Else
             s = s & rep_pattern & " " & ln & rep_with_with_line_breaks
         End If
-        If Err.Number <> 0 Then
+        If err.Number <> 0 Then
             Debug.Print "Repeate had to stop after " & i & "which resulted in a string length of " & Len(s)
             Repeat = s
             Exit Function
