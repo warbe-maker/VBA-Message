@@ -475,7 +475,7 @@ Public Function Test_06_MonoSpacedMessageSectionExceedMaxFormHeight( _
     Test_06_MonoSpacedMessageSectionExceedMaxFormHeight = _
     mMsg.Dsply( _
                dsply_max_width:=80, _
-               dsply_max_height:=50, _
+               dsply_max_height:=70, _
                dsply_title:=sMsgTitle, _
                dsply_message:=tMsg, _
                dsply_buttons:=vbuttons _

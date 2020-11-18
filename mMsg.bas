@@ -23,13 +23,14 @@ Public Function Dsply(ByVal dsply_title As String, _
              Optional ByVal dsply_min_width As Long = 300, _
              Optional ByVal dsply_max_width As Long = 80, _
              Optional ByVal dsply_max_height As Long = 70, _
-             Optional ByVal dsply_min_button_width = 30) As Variant
-' ------------------------------------------------------------------------------------
-' Common VBA Message Display: A service using the Common VBA (alternative) MsgBox.
-' See: https://warbe-maker.github.io/vba/common/2020/10/19/Alternative-VBA-MsgBox.html
+             Optional ByVal dsply_min_button_width = 70) As Variant
+' -------------------------------------------------------------------------------------
+' Common VBA Message Display: A service using the Common VBA Message Form as an
+' alternative MsgBox.
+' See: https://warbe-maker.github.io/vba/common/2020/11/17/Common-VBA-Message-Form.html
 '
 ' W. Rauschenberger, Berlin, Nov 2020
-' ------------------------------------------------------------------------------------
+' -------------------------------------------------------------------------------------
 
     With fMsg
         .MaxFormHeightPrcntgOfScreenSize = dsply_max_height ' percentage of screen size

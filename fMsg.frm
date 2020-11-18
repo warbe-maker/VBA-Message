@@ -30,7 +30,7 @@ Option Explicit
 ' lScreenWidth. Rauschenberger Berlin March 2020
 ' --------------------------------------------------------------------------
 Const NO_OF_DESIGNED_SECTIONS   As Single = 4       ' Needs to be changed when the design is changed !
-Const MIN_BTTN_WIDTH          As Single = 70      ' Default minimum reply button width
+Const MIN_BTTN_WIDTH            As Single = 70      ' Default minimum reply button width
 Const FONT_MONOSPACED_NAME      As String = "Courier New"   ' Default monospaced font
 Const FONT_MONOSPACED_SIZE      As Single = 9       ' Default monospaced font size
 Const FORM_MAX_HEIGHT_POW       As Long = 70        ' Max form height as a percentage of the screen size
@@ -39,14 +39,14 @@ Const FORM_MIN_WIDTH            As Single = 300     ' Default minimum message fo
 Const TEST_WITH_FRAME_BORDERS   As Boolean = False  ' For test purpose only! Display frames with visible border
 Const TEST_WITH_FRAME_CAPTIONS  As Boolean = False  ' For test purpose only! Display frames with their test captions (erased by default)
 Const HSPACE_BUTTONS            As Single = 4       ' Horizontal space between reply buttons
-Const HSPACE_BTTN_AREA        As Single = 10      ' Minimum margin between buttons area and form when centered
+Const HSPACE_BTTN_AREA          As Single = 10      ' Minimum margin between buttons area and form when centered
 Const HSPACE_LEFT               As Single = 0       ' Left margin for labels and text boxes
 Const HSPACE_RIGHT              As Single = 15      ' Horizontal right space for labels and text boxes
 Const HSPACE_SCROLLBAR          As Single = 18      ' Additional horizontal space required for a frame with a vertical scroll bar
 Const NEXT_ROW                  As String = vbLf    ' Reply button row break
 Const VSPACE_AREAS              As Single = 10      ' Vertical space between message area and replies area
 Const VSPACE_BOTTOM             As Single = 50      ' Bottom space after the last displayed reply row
-Const VSPACE_BTTN_ROWS        As Single = 5       ' Vertical space between button rows
+Const VSPACE_BTTN_ROWS          As Single = 5       ' Vertical space between button rows
 Const VSPACE_LABEL              As Single = 0       ' Vertical space between label and the following text
 Const VSPACE_SCROLLBAR          As Single = 12      ' Additional vertical space required for a frame with a horizontal scroll barr
 Const VSPACE_SECTIONS           As Single = 5       ' Vertical space between displayed message sections

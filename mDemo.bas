@@ -64,3 +64,52 @@ Public Sub Demo_Dsply()
     
 End Sub
 
+Public Sub Test_Dsply()
+' ---------------------------------------------------------
+' Displays a message with 3 sections, each with a label and
+' 7 reply buttons ordered in rows 3-3-1
+' ---------------------------------------------------------
+    Const B1 = "Caption Button 1"
+    Const B2 = "Caption Button 2"
+    Const B3 = "Caption Button 3"
+    Const B4 = "Caption Button 4"
+    Const B5 = "Caption Button 5"
+    Const B6 = "Caption Button 6"
+    Const B7 = "Caption Button 7"
+    Dim vMsg    As tMsg                      ' structure of the message
+    Dim cll     As New Collection                   ' specification of the displayed buttons
+    
+    ' Preparing for the buttons
+    cll.Add B1: cll.Add B2: cll.Add B3: cll.Add vbLf ' 3 buttons in row 1
+    cll.Add B4: cll.Add B5: cll.Add B6: cll.Add vbLf ' 3 buttons in row 2
+    cll.Add B7                                       ' 1 button in row 3
+       
+    ' Preparing for the message
+    With vMsg.section(1)
+        .sLabel = "Any label 1"
+        .sText = "Any section text 1"
+    End With
+    With vMsg.section(2)
+        .sLabel = "Any label 2"
+        .sText = "Any section 2 text"
+        .bMonspaced = True ' Just to demonstrate
+    End With
+    With vMsg.section(3)
+        .sLabel = "Any label 3"
+        .sText = "Any section text 3"
+   End With
+       
+   Select Case Dsply(dsply_title:="Any title", _
+                     dsply_message:=vMsg, _
+                     dsply_buttons:=cll)
+        Case B1: Debug.Print "Button with caption """ & B1 & """ clicked"
+        Case B2: Debug.Print "Button with caption """ & B2 & """ clicked"
+        Case B3: Debug.Print "Button with caption """ & B3 & """ clicked"
+        Case B4: Debug.Print "Button with caption """ & B4 & """ clicked"
+        Case B5: Debug.Print "Button with caption """ & B5 & """ clicked"
+        Case B6: Debug.Print "Button with caption """ & B6 & """ clicked"
+        Case B7: Debug.Print "Button with caption """ & B7 & """ clicked"
+    End Select
+   
+End Sub
+
