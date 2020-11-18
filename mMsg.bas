@@ -1,19 +1,12 @@
 Attribute VB_Name = "mMsg"
 Option Explicit
-' --------------------------------------------------------------------------------------------
+' -----------------------------------------------------------------------------------------
 ' Standard Module mMsg Interface for the Common VBA "Alternative" MsgBox (fMsg UserForm)
 '
 ' Methods: Dsply  Exposes all properties and methods for the display of any kind of message
 '
 ' W. Rauschenberger, Berlin Nov 2020
-' -------------------------------------------------------------------------------
-Public Enum StartupPosition             ' ---------------------------
-    Manual = 0                          ' Used to position the
-    CenterOwner = 1                     ' final setup message form
-    CenterScreen = 2                    ' horizontally and vertically
-    WindowsDefault = 3                  ' centered on the screen
-End Enum                                ' ---------------------------
-
+' -----------------------------------------------------------------------------------------
 Public Type tMsgSection                 ' ---------------------
        sLabel As String                 ' Structure of the
        sText As String                  ' UserForm's message
