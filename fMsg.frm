@@ -13,6 +13,8 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
+
 Option Explicit
 ' -------------------------------------------------------------------------------
 ' UserForm fMsg
@@ -427,7 +429,7 @@ Public Property Get MsgMonoSpaced(Optional ByVal section As Long) As Boolean
     Else
         With dctSectionsMonoSpaced
             If .Exists(section) _
-            Then MsgMonoSpaced = .item(section) _
+            Then MsgMonoSpaced = .Item(section) _
             Else MsgMonoSpaced = False
         End With
     End If
@@ -444,7 +446,7 @@ Public Property Get MsgText(Optional ByVal section As Long) As String
     Else
         With dctSectionsText
             If .Exists(section) _
-            Then MsgText = .item(section) _
+            Then MsgText = .Item(section) _
             Else MsgText = vbNullString
         End With
     End If
@@ -533,7 +535,7 @@ Public Function AppErr(ByVal lNo As Long) As Long
 ' number by adding vbObjectError. Converts a negative number back into a
 ' positive i.e. the original programmed application error number.
 ' Usage example:
-'    Err.Raise AppErr(1), .... ' when an application error is detected
+'    Err.Raise mErH.AppErr(1), .... ' when an application error is detected
 '    If Err.Number < 0 Then    ' when the error is displayed
 '       MsgBox "Application error " & AppErr(Err.Number)
 '    Else
