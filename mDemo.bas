@@ -59,7 +59,7 @@ Public Sub Demo_Dsply()
     Next j
     cll.Add "Ok"
     
-    While mMsg.Dsply(dsply_title:=sTitle, dsply_message:=tMsg, dsply_buttons:=cll, dsply_min_width:=600) <> cll(cll.Count)
+    While mMsg.Dsply(dsply_title:=sTitle, dsply_msg_type:=tMsg, dsply_buttons:=cll, dsply_min_width:=600) <> cll(cll.Count)
     Wend
     
 End Sub
@@ -100,7 +100,7 @@ Public Sub Test_Dsply()
    End With
        
    Select Case Dsply(dsply_title:="Any title", _
-                     dsply_message:=vMsg, _
+                     dsply_msg_type:=vMsg, _
                      dsply_buttons:=cll)
         Case B1: Debug.Print "Button with caption """ & B1 & """ clicked"
         Case B2: Debug.Print "Button with caption """ & B2 & """ clicked"
