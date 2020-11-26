@@ -1,5 +1,5 @@
 
-# MsgBox Alternative
+# Common VBA Message Service (a MsgBox Alternative)
 
 [Abstract](#abstract)<br>
 [Why an alternative MsgBox](#why-an-alternative-msgbox)<br>[Installation](#installation)<br>[Properties of the _fMsg_ UserForm](#properties-of-the-fmsg-userform)<br>[Usage](#usage)<br>[Interfaces](#interfaces)
