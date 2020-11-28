@@ -73,31 +73,40 @@ Public Function Buttons(ParamArray dsply_buttons() As Variant) As Collection
     
     Dim cll As New Collection
     Dim i   As Long
-    Dim j   As Long ' buttons in a row counter
-    Dim k   As Long ' button rows counter
+    Dim j   As Long         ' buttons in a row counter
+    Dim k   As Long: k = 1  ' button rows counter
+    Dim l   As Long         ' total buttons count
     
     On Error Resume Next
     i = LBound(dsply_buttons)
     If Err.Number <> 0 Then GoTo xt
     For i = LBound(dsply_buttons) To UBound(dsply_buttons)
+        If (k = 7 And j = 7) Or l = 49 Then GoTo xt
         Select Case dsply_buttons(i)
             Case vbLf, vbCrLf, vbCr
                 cll.Add dsply_buttons(i)
                 j = 0
                 k = k + 1
             Case vbOKOnly, vbOKCancel, vbAbortRetryIgnore, vbYesNoCancel, vbYesNo, vbRetryCancel
-                If cll.Count = 7 Then
+                If j = 7 Then
                     cll.Add vbLf
                     j = 0
                     k = k + 1
                 End If
                 cll.Add dsply_buttons(i)
                 j = j + 1
+                l = l + 1
             Case Else
                 If TypeName(dsply_buttons(i)) = "String" Then
                     ' Any invalid buttons value will be ignored without notice
+                    If j = 7 Then
+                        cll.Add vbLf
+                        j = 0
+                        k = k + 1
+                    End If
                     cll.Add dsply_buttons(i)
                     j = j + 1
+                    l = l + 1
                 End If
         End Select
     Next i

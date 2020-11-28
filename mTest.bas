@@ -49,21 +49,6 @@ End Property
 
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mTest." & s:  End Property
 
-Private Function ButtonsCollection( _
-      ParamArray vbuttons() As Variant) As Collection
-' ---------------------------------------------------
-' Returns a collection of provided strings.
-' ---------------------------------------------------
-    Dim cll As New Collection
-    Dim i As Long
-    
-    For i = LBound(vbuttons) To UBound(vbuttons)
-        If vbuttons(i) <> vbNullString Then cll.Add vbuttons(i)
-    Next i
-    Set ButtonsCollection = cll
-    
-End Function
-
 Function IsUcase(ByVal s As String) As Boolean
 
     Dim i   As Integer: i = Asc(s)
@@ -189,6 +174,32 @@ Public Sub RepeatTest()
     Debug.Print Repeat(10, "a", True, False, vbLf)
 End Sub
 
+Public Function Test_00_The_Buttons_Service_1( _
+       Optional regression_test As Boolean = False) As Variant
+    Const PROC  As String = "Test_00_The_Buttons_Service_1"
+    
+    Dim cll As Collection
+    
+    Set cll = mMsg.Buttons("B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29", "B30", "B31", "B32", "B33", "B34", "B35", "B36", "B37", "B38", "B39", "B40", "B41", "B42", "B43", "B44", "B45", "B46", "B47", "B48", "B49", "B50")
+    Test_00_The_Buttons_Service_1 = _
+    mMsg.Box(dsply_title:="49 buttons ordered in 7 rows, row breaks are inserted by the Buttons service, excessive 50th button ignored)", _
+             dsply_buttons:=cll)
+
+End Function
+
+Public Function Test_00_The_Buttons_Service_2( _
+       Optional regression_test As Boolean = False) As Variant
+    Const PROC  As String = "Test_00_The_Buttons_Service_2"
+    
+    Dim cll As Collection
+    
+    Set cll = mMsg.Buttons(2843, "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29", "B30", "B31", "B32", "B33", "B34", "B35", "B36", "B37", "B38", "B39", "B40", "B41", "B42", "B43", "B44", "B45", "B46", "B47", "B48", "B49", "B50")
+    Test_00_The_Buttons_Service_2 = _
+    mMsg.Box(dsply_title:="49 buttons ordered in 7 rows, row breaks are inserted by the Buttons service, excessive 50th button ignored)", _
+             dsply_buttons:=cll)
+
+End Function
+
 Public Function Test_01_WidthDeterminedByMinimumWidth( _
        Optional regression_test As Boolean = False) As Variant
 ' ---------------------------------------------------------------------------------
@@ -206,8 +217,8 @@ Public Function Test_01_WidthDeterminedByMinimumWidth( _
     vButton4 = "Repeat with" & vbLf & "minimum width" & vbLf & "+ " & lIncrDecrWidth
     vButton5 = "Repeat with" & vbLf & "minimum width" & vbLf & "- " & lIncrDecrWidth
     If regression_test _
-    Then Set vbuttons = ButtonsCollection(BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton4, vButton5) _
-    Else Set vbuttons = ButtonsCollection(BTTN_FINISH, vButton4, vButton5) _
+    Then Set vbuttons = mMsg.Buttons(BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton4, vButton5) _
+    Else Set vbuttons = mMsg.Buttons(BTTN_FINISH, vButton4, vButton5) _
 
     
 Repeat:
@@ -231,14 +242,14 @@ Repeat:
         Case vButton5
             fMsg.MinFormWidth = wsMsg.InitMinFormWidth(TEST_NO) - lIncrDecrWidth
             If regression_test _
-            Then Set vbuttons = ButtonsCollection(BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton4) _
-            Else Set vbuttons = ButtonsCollection(BTTN_FINISH, vbLf, vButton4)
+            Then Set vbuttons = mMsg.Buttons(BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton4) _
+            Else Set vbuttons = mMsg.Buttons(BTTN_FINISH, vbLf, vButton4)
             GoTo Repeat
         Case vButton4
             fMsg.MinFormWidth = wsMsg.InitMinFormWidth(TEST_NO) + lIncrDecrWidth
             If regression_test _
-            Then Set vbuttons = ButtonsCollection(BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton5) _
-            Else Set vbuttons = ButtonsCollection(BTTN_FINISH, vbLf, vButton5)
+            Then Set vbuttons = mMsg.Buttons(BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton5) _
+            Else Set vbuttons = mMsg.Buttons(BTTN_FINISH, vbLf, vButton5)
             GoTo Repeat
         Case Else ' Stop and Next are passed on to the caller
     End Select
@@ -274,7 +285,7 @@ Public Function Test_02_WidthDeterminedByTitle( _
                                                                                 "maximum heigth based on the screen size which for this test is " & _
                                                                                 fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
     If regression_test _
-    Then Set vbuttons = ButtonsCollection(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT) _
+    Then Set vbuttons = mMsg.Buttons(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT) _
     
     Test_02_WidthDeterminedByTitle = _
     mMsg.Dsply( _
@@ -310,8 +321,8 @@ Public Function Test_03_WidthDeterminedByMonoSpacedMessageSection( _
     vButton7 = "Repeat with" & vbLf & "maximum height" & vbLf & "- " & lIncrDecrHeight
     
     If regression_test _
-    Then Set vbuttons = ButtonsCollection(BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton5, vButton6, vButton7) _
-    Else Set vbuttons = ButtonsCollection(BTTN_FINISH, vButton5, vButton6, vButton7)
+    Then Set vbuttons = mMsg.Buttons(BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton5, vButton6, vButton7) _
+    Else Set vbuttons = mMsg.Buttons(BTTN_FINISH, vButton5, vButton6, vButton7)
 
     sMsgTitle = Readable(PROC)
     tMsg.section(1).sLabel = "Test description:"
@@ -343,13 +354,13 @@ Public Function Test_03_WidthDeterminedByMonoSpacedMessageSection( _
             Case vButton5
                 fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsg.InitMaxFormWidth(TEST_NO) - lIncrDecrWidth
                 If regression_test _
-                Then Set vbuttons = ButtonsCollection(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton4) _
-                Else Set vbuttons = ButtonsCollection(BTTN_FINISH, vbLf, vButton4)
+                Then Set vbuttons = mMsg.Buttons(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton4) _
+                Else Set vbuttons = mMsg.Buttons(BTTN_FINISH, vbLf, vButton4)
             Case vButton4
                 fMsg.MaxFormWidthPrcntgOfScreenSize = wsMsg.InitMaxFormWidth(TEST_NO) + lIncrDecrWidth
                 If regression_test _
-                Then Set vbuttons = ButtonsCollection(BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton5) _
-                Else Set vbuttons = ButtonsCollection(BTTN_FINISH, vbLf, vButton5)
+                Then Set vbuttons = mMsg.Buttons(BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton5) _
+                Else Set vbuttons = mMsg.Buttons(BTTN_FINISH, vbLf, vButton5)
             Case Else: Exit Do ' Stop, Previous, and Next are passed on to the caller
         End Select
     Loop
@@ -383,8 +394,8 @@ Public Function Test_04_WidthDeterminedByReplyButtons( _
     vButton5 = "Repeat with" & vbLf & "4 buttons"
     
     If regression_test _
-    Then Set vbuttons = ButtonsCollection(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton4, vButton5, vButton6) _
-    Else Set vbuttons = ButtonsCollection(BTTN_FINISH, vbLf, vButton4, vButton5, vButton6)
+    Then Set vbuttons = mMsg.Buttons(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton4, vButton5, vButton6) _
+    Else Set vbuttons = mMsg.Buttons(BTTN_FINISH, vbLf, vButton4, vButton5, vButton6)
     
     Do
         Test_04_WidthDeterminedByReplyButtons = _
@@ -397,12 +408,12 @@ Public Function Test_04_WidthDeterminedByReplyButtons( _
         Select Case Test_04_WidthDeterminedByReplyButtons
             Case vButton4
                 If regression_test _
-                Then Set vbuttons = ButtonsCollection(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton5) _
-                Else Set vbuttons = ButtonsCollection(BTTN_FINISH, vbLf, vButton5)
+                Then Set vbuttons = mMsg.Buttons(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton5) _
+                Else Set vbuttons = mMsg.Buttons(BTTN_FINISH, vbLf, vButton5)
             Case vButton5
                 If regression_test _
-                Then Set vbuttons = ButtonsCollection(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton4) _
-                Else Set vbuttons = ButtonsCollection(BTTN_FINISH, vbLf, vButton4)
+                Then Set vbuttons = mMsg.Buttons(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton4) _
+                Else Set vbuttons = mMsg.Buttons(BTTN_FINISH, vbLf, vButton4)
             Case Else: Exit Do ' passed on to caller
         End Select
     Loop
@@ -438,8 +449,8 @@ Public Function Test_05_MonoSpacedSectionWidthExceedsMaxFormWidth( _
                             "- The message form height is adjusted to the required height, limited to " & fMsg.MaxFormHeight & " pt," & vbLf & _
                             "  the equivalent of " & fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen size, for this test and not reached or exceeded."
     If regression_test _
-    Then Set vbuttons = ButtonsCollection(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT) _
-    Else Set vbuttons = ButtonsCollection(BTTN_FINISH)
+    Then Set vbuttons = mMsg.Buttons(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT) _
+    Else Set vbuttons = mMsg.Buttons(BTTN_FINISH)
     
     Test_05_MonoSpacedSectionWidthExceedsMaxFormWidth = _
     mMsg.Dsply( _
@@ -479,8 +490,8 @@ Public Function Test_06_MonoSpacedMessageSectionExceedMaxFormHeight( _
     tMsg.section(3).sText = "The message form height is adjusted to the required height limited by the specified percentage of the screen height, " & _
                             "which for this test is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
     If regression_test _
-    Then Set vbuttons = ButtonsCollection(BTTN_PREVIOUS, BTTN_TERMINATE) _
-    Else Set vbuttons = ButtonsCollection(BTTN_FINISH)
+    Then Set vbuttons = mMsg.Buttons(BTTN_PREVIOUS, BTTN_TERMINATE) _
+    Else Set vbuttons = mMsg.Buttons(BTTN_FINISH)
     
     Test_06_MonoSpacedMessageSectionExceedMaxFormHeight = _
     mMsg.Dsply( _
@@ -922,11 +933,8 @@ Public Function Test_17_MessageAsString( _
 ' ------------------------------------------------------------
 ' The buttons argument is provided as Dictionary.
 ' ------------------------------------------------------------
-    Const PROC  As String = "Test_16_ButtonByDictionary"
-    
-    Dim dct     As New Collection
-    Dim tMsg    As tMsg
-    
+    Const PROC  As String = "Test_17_MessageAsString"
+        
     Unload fMsg                     ' Ensures a message starts from scratch
     With fMsg
 '        .TestFrameWithBorders = True
@@ -936,7 +944,7 @@ Public Function Test_17_MessageAsString( _
     End With
     
     If regression_test _
-    Then Set vbuttons = ButtonsCollection(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT) _
+    Then Set vbuttons = mMsg.Buttons(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT) _
     Else vbuttons = vbOKOnly
         
     Test_17_MessageAsString = _
