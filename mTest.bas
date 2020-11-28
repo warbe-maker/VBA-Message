@@ -224,7 +224,7 @@ Repeat:
     Test_01_WidthDeterminedByMinimumWidth = _
     mMsg.Dsply( _
              dsply_title:=sMsgTitle, _
-             dsply_msg_type:=tMsg, _
+             dsply_msg:=tMsg, _
              dsply_buttons:=vbuttons _
             )
     Select Case Test_01_WidthDeterminedByMinimumWidth
@@ -279,7 +279,7 @@ Public Function Test_02_WidthDeterminedByTitle( _
     Test_02_WidthDeterminedByTitle = _
     mMsg.Dsply( _
              dsply_title:=sMsgTitle, _
-             dsply_msg_type:=tMsg, _
+             dsply_msg:=tMsg, _
              dsply_buttons:=vbuttons _
             )
 End Function
@@ -336,7 +336,7 @@ Public Function Test_03_WidthDeterminedByMonoSpacedMessageSection( _
         Test_03_WidthDeterminedByMonoSpacedMessageSection = _
         mMsg.Dsply( _
                    dsply_title:=sMsgTitle, _
-                   dsply_msg_type:=tMsg, _
+                   dsply_msg:=tMsg, _
                    dsply_buttons:=vbuttons _
                 )
         Select Case Test_03_WidthDeterminedByMonoSpacedMessageSection
@@ -390,7 +390,7 @@ Public Function Test_04_WidthDeterminedByReplyButtons( _
         Test_04_WidthDeterminedByReplyButtons = _
         mMsg.Dsply( _
                    dsply_title:=sMsgTitle, _
-                   dsply_msg_type:=tMsg, _
+                   dsply_msg:=tMsg, _
                    dsply_buttons:=vbuttons _
                   )
         
@@ -444,7 +444,7 @@ Public Function Test_05_MonoSpacedSectionWidthExceedsMaxFormWidth( _
     Test_05_MonoSpacedSectionWidthExceedsMaxFormWidth = _
     mMsg.Dsply( _
              dsply_title:=sMsgTitle, _
-             dsply_msg_type:=tMsg, _
+             dsply_msg:=tMsg, _
              dsply_buttons:=vbuttons _
             )
 End Function
@@ -487,7 +487,7 @@ Public Function Test_06_MonoSpacedMessageSectionExceedMaxFormHeight( _
                dsply_max_width:=80, _
                dsply_max_height:=70, _
                dsply_title:=sMsgTitle, _
-               dsply_msg_type:=tMsg, _
+               dsply_msg:=tMsg, _
                dsply_buttons:=vbuttons _
               )
               
@@ -574,7 +574,7 @@ Public Sub Test_07_AllInOne()
                  
         vReply = mMsg.Dsply( _
                           dsply_title:=sTitle, _
-                          dsply_msg_type:=tMsg, _
+                          dsply_msg:=tMsg, _
                           dsply_buttons:=cll _
                          )
         With fMsg
@@ -639,7 +639,7 @@ Public Sub Test_08_MostlyButtons()
                          
         vReply = mMsg.Dsply( _
                           dsply_title:=sTitle, _
-                          dsply_msg_type:=tMsg, _
+                          dsply_msg:=tMsg, _
                           dsply_buttons:=cllStory _
                          )
         With fMsg
@@ -709,7 +709,7 @@ Public Sub Test_09_ButtonsMatrix()
                          
         vReply = mMsg.Dsply( _
                           dsply_title:=sTitle, _
-                          dsply_msg_type:=tMsg, _
+                          dsply_msg:=tMsg, _
                           dsply_buttons:=cllMatrix, _
                           dsply_returnindex:=True _
                          )
@@ -755,7 +755,7 @@ Public Function Test_10_ButtonScrollBarVertical()
     
     While mMsg.Dsply( _
                    dsply_title:=Readable(PROC), _
-                   dsply_msg_type:=tMsg, _
+                   dsply_msg:=tMsg, _
                    dsply_buttons:=cll _
                   ) <> "Ok"
     Wend
@@ -798,7 +798,7 @@ Public Function Test_11_ButtonScrollBarHorizontal()
 
         If mMsg.Dsply( _
              dsply_title:=Readable(PROC), _
-             dsply_msg_type:=tMsg, _
+             dsply_msg:=tMsg, _
              dsply_buttons:=cll _
             ) = "Ok" Then Exit Do
     Loop
@@ -827,7 +827,7 @@ Public Function Test_13_ButtonByValue()
     Test_13_ButtonByValue = _
     mMsg.Dsply( _
              dsply_title:="Test: Button by value (" & PROC & ")", _
-             dsply_msg_type:=tMsg, _
+             dsply_msg:=tMsg, _
              dsply_buttons:=vbOKOnly _
             )
 End Function
@@ -852,7 +852,7 @@ Public Function Test_14_ButtonByString()
     Test_14_ButtonByString = _
     mMsg.Dsply( _
              dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             dsply_msg_type:=tMsg, _
+             dsply_msg:=tMsg, _
              dsply_buttons:="Yes," & vbLf & ",No" _
             )
 End Function
@@ -881,7 +881,7 @@ Public Function Test_15_ButtonByCollection()
     Test_15_ButtonByCollection = _
     mMsg.Dsply( _
              dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             dsply_msg_type:=tMsg, _
+             dsply_msg:=tMsg, _
              dsply_buttons:=cll _
             )
 End Function
@@ -912,7 +912,7 @@ Public Function Test_16_ButtonByDictionary()
     Test_16_ButtonByDictionary = _
     mMsg.Dsply( _
              dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             dsply_msg_type:=tMsg, _
+             dsply_msg:=tMsg, _
              dsply_buttons:=dct _
             )
 End Function
@@ -940,10 +940,9 @@ Public Function Test_17_MessageAsString( _
     Else vbuttons = vbOKOnly
         
     Test_17_MessageAsString = _
-    mMsg.Dsply( _
+    mMsg.Box( _
                dsply_title:="Test: Message provided as string - instead of type tMsg (" & ErrSrc(PROC) & ")", _
-               dsply_msg_type:=tMsg, _
-               dsply_msg_strng:="This is a message provided as a simple string argument!", dsply_buttons:=vbuttons _
+               dsply_msg:="This is a message provided as a simple string argument!", dsply_buttons:=vbuttons _
               )
 End Function
 

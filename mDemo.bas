@@ -59,7 +59,7 @@ Public Sub Demo_Dsply()
     Next j
     cll.Add "Ok"
     
-    While mMsg.Dsply(dsply_title:=sTitle, dsply_msg_type:=tMsg, dsply_buttons:=cll, dsply_min_width:=600) <> cll(cll.Count)
+    While mMsg.Dsply(dsply_title:=sTitle, dsply_msg:=tMsg, dsply_buttons:=cll, dsply_min_width:=600) <> cll(cll.Count)
     Wend
     
 End Sub
@@ -76,15 +76,12 @@ Public Sub Test_Dsply()
     Const B5 = "Caption Button 5"
     Const B6 = "Caption Button 6"
     Const B7 = "Caption Button 7"
+    
     Dim vMsg    As tMsg                      ' structure of the message
     Dim cll     As New Collection                   ' specification of the displayed buttons
-    
-    ' Preparing for the buttons
-    cll.Add B1: cll.Add B2: cll.Add B3: cll.Add vbLf ' 3 buttons in row 1
-    cll.Add B4: cll.Add B5: cll.Add B6: cll.Add vbLf ' 3 buttons in row 2
-    cll.Add B7                                       ' 1 button in row 3
-       
-    ' Preparing for the message
+    Dim vReturn As Variant
+           
+    ' Preparing the message
     With vMsg.section(1)
         .sLabel = "Any label 1"
         .sText = "Any section text 1"
@@ -99,17 +96,10 @@ Public Sub Test_Dsply()
         .sText = "Any section text 3"
    End With
        
-   Select Case Dsply(dsply_title:="Any title", _
-                     dsply_msg_type:=vMsg, _
-                     dsply_buttons:=cll)
-        Case B1: Debug.Print "Button with caption """ & B1 & """ clicked"
-        Case B2: Debug.Print "Button with caption """ & B2 & """ clicked"
-        Case B3: Debug.Print "Button with caption """ & B3 & """ clicked"
-        Case B4: Debug.Print "Button with caption """ & B4 & """ clicked"
-        Case B5: Debug.Print "Button with caption """ & B5 & """ clicked"
-        Case B6: Debug.Print "Button with caption """ & B6 & """ clicked"
-        Case B7: Debug.Print "Button with caption """ & B7 & """ clicked"
-    End Select
+   vReturn = Dsply(dsply_title:="Any title", _
+                   dsply_msg:=vMsg, _
+                   dsply_buttons:=mMsg.Buttons(vbAbortRetryIgnore, vbLf, B1, B2, B3, vbLf, B4, B5, B6, vbLf, B7) _
+                  )
+   MsgBox "Button """ & mMsg.ReplyString(vReturn) & """ had been clicked"
    
 End Sub
-

@@ -275,9 +275,9 @@ Private Property Let AppliedButtonRetVal(Optional ByVal Button As MSForms.Comman
 End Property
 
 Private Property Get AppliedButtonRowHeight() As Single:                                        AppliedButtonRowHeight = siMaxButtonHeight + (siVmarginFrames * 2) + 2:       End Property
-Private Property Get AppliedButtonRowWidth(Optional ByVal buttons As Long) As Single
+Private Property Get AppliedButtonRowWidth(Optional ByVal Buttons As Long) As Single
     '~~ Extra space required for the button's design
-    AppliedButtonRowWidth = CInt((siMaxButtonWidth * buttons) + (siHmarginButtons * (buttons - 1)) + (siHmarginFrames * 2)) + 5
+    AppliedButtonRowWidth = CInt((siMaxButtonWidth * Buttons) + (siHmarginButtons * (Buttons - 1)) + (siHmarginFrames * 2)) + 5
 End Property
 
 Private Property Let AppliedControl(ByVal v As Variant)
