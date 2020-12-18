@@ -182,8 +182,8 @@ Public Function Test_00_The_Buttons_Service_1( _
     
     Set cll = mMsg.Buttons("B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29", "B30", "B31", "B32", "B33", "B34", "B35", "B36", "B37", "B38", "B39", "B40", "B41", "B42", "B43", "B44", "B45", "B46", "B47", "B48", "B49", "B50")
     Test_00_The_Buttons_Service_1 = _
-    mMsg.Box(dsply_title:="49 buttons ordered in 7 rows, row breaks are inserted by the Buttons service, excessive 50th button ignored)", _
-             dsply_buttons:=cll)
+    mMsg.Box(msg_title:="49 buttons ordered in 7 rows, row breaks are inserted by the Buttons service, excessive 50th button ignored)", _
+             msg_buttons:=cll)
 
 End Function
 
@@ -195,8 +195,8 @@ Public Function Test_00_The_Buttons_Service_2( _
     
     Set cll = mMsg.Buttons(2843, "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29", "B30", "B31", "B32", "B33", "B34", "B35", "B36", "B37", "B38", "B39", "B40", "B41", "B42", "B43", "B44", "B45", "B46", "B47", "B48", "B49", "B50")
     Test_00_The_Buttons_Service_2 = _
-    mMsg.Box(dsply_title:="49 buttons ordered in 7 rows, row breaks are inserted by the Buttons service, excessive 50th button ignored)", _
-             dsply_buttons:=cll)
+    mMsg.Box(msg_title:="49 buttons ordered in 7 rows, row breaks are inserted by the Buttons service, excessive 50th button ignored)", _
+             msg_buttons:=cll)
 
 End Function
 
@@ -234,9 +234,9 @@ Repeat:
                                                                                 "up to the specified maximum heigth which is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "% and not exceeded."
     Test_01_WidthDeterminedByMinimumWidth = _
     mMsg.Dsply( _
-             dsply_title:=sMsgTitle, _
-             dsply_msg:=tMsg, _
-             dsply_buttons:=vbuttons _
+             msg_title:=sMsgTitle, _
+             msg_sections:=tMsg, _
+             msg_buttons:=vbuttons _
             )
     Select Case Test_01_WidthDeterminedByMinimumWidth
         Case vButton5
@@ -289,9 +289,9 @@ Public Function Test_02_WidthDeterminedByTitle( _
     
     Test_02_WidthDeterminedByTitle = _
     mMsg.Dsply( _
-             dsply_title:=sMsgTitle, _
-             dsply_msg:=tMsg, _
-             dsply_buttons:=vbuttons _
+             msg_title:=sMsgTitle, _
+             msg_sections:=tMsg, _
+             msg_buttons:=vbuttons _
             )
 End Function
 
@@ -346,9 +346,9 @@ Public Function Test_03_WidthDeterminedByMonoSpacedMessageSection( _
         End With
         Test_03_WidthDeterminedByMonoSpacedMessageSection = _
         mMsg.Dsply( _
-                   dsply_title:=sMsgTitle, _
-                   dsply_msg:=tMsg, _
-                   dsply_buttons:=vbuttons _
+                   msg_title:=sMsgTitle, _
+                   msg_sections:=tMsg, _
+                   msg_buttons:=vbuttons _
                 )
         Select Case Test_03_WidthDeterminedByMonoSpacedMessageSection
             Case vButton5
@@ -400,9 +400,9 @@ Public Function Test_04_WidthDeterminedByReplyButtons( _
     Do
         Test_04_WidthDeterminedByReplyButtons = _
         mMsg.Dsply( _
-                   dsply_title:=sMsgTitle, _
-                   dsply_msg:=tMsg, _
-                   dsply_buttons:=vbuttons _
+                   msg_title:=sMsgTitle, _
+                   msg_sections:=tMsg, _
+                   msg_buttons:=vbuttons _
                   )
         
         Select Case Test_04_WidthDeterminedByReplyButtons
@@ -454,9 +454,9 @@ Public Function Test_05_MonoSpacedSectionWidthExceedsMaxFormWidth( _
     
     Test_05_MonoSpacedSectionWidthExceedsMaxFormWidth = _
     mMsg.Dsply( _
-             dsply_title:=sMsgTitle, _
-             dsply_msg:=tMsg, _
-             dsply_buttons:=vbuttons _
+             msg_title:=sMsgTitle, _
+             msg_sections:=tMsg, _
+             msg_buttons:=vbuttons _
             )
 End Function
 
@@ -495,11 +495,11 @@ Public Function Test_06_MonoSpacedMessageSectionExceedMaxFormHeight( _
     
     Test_06_MonoSpacedMessageSectionExceedMaxFormHeight = _
     mMsg.Dsply( _
-               dsply_max_width:=80, _
-               dsply_max_height:=70, _
-               dsply_title:=sMsgTitle, _
-               dsply_msg:=tMsg, _
-               dsply_buttons:=vbuttons _
+               msg_max_width:=80, _
+               msg_max_height:=70, _
+               msg_title:=sMsgTitle, _
+               msg_sections:=tMsg, _
+               msg_buttons:=vbuttons _
               )
               
 End Function
@@ -584,9 +584,9 @@ Public Sub Test_07_AllInOne()
                                 "  depending on the changed contraint values."
                  
         vReply = mMsg.Dsply( _
-                          dsply_title:=sTitle, _
-                          dsply_msg:=tMsg, _
-                          dsply_buttons:=cll _
+                          msg_title:=sTitle, _
+                          msg_sections:=tMsg, _
+                          msg_buttons:=cll _
                          )
         With fMsg
             Select Case vReply
@@ -649,9 +649,9 @@ Public Sub Test_08_MostlyButtons()
         End With
                          
         vReply = mMsg.Dsply( _
-                          dsply_title:=sTitle, _
-                          dsply_msg:=tMsg, _
-                          dsply_buttons:=cllStory _
+                          msg_title:=sTitle, _
+                          msg_sections:=tMsg, _
+                          msg_buttons:=cllStory _
                          )
         With fMsg
             Select Case vReply
@@ -719,10 +719,10 @@ Public Sub Test_09_ButtonsMatrix()
         End With
                          
         vReply = mMsg.Dsply( _
-                          dsply_title:=sTitle, _
-                          dsply_msg:=tMsg, _
-                          dsply_buttons:=cllMatrix, _
-                          dsply_returnindex:=True _
+                          msg_title:=sTitle, _
+                          msg_sections:=tMsg, _
+                          msg_buttons:=cllMatrix, _
+                          msg_returnindex:=True _
                          )
         Select Case vReply
             Case "Ok": Exit Do ' The very last item in the collection is the "Finished" button
@@ -765,9 +765,9 @@ Public Function Test_10_ButtonScrollBarVertical()
     cll.Add "Ok"
     
     While mMsg.Dsply( _
-                   dsply_title:=Readable(PROC), _
-                   dsply_msg:=tMsg, _
-                   dsply_buttons:=cll _
+                   msg_title:=Readable(PROC), _
+                   msg_sections:=tMsg, _
+                   msg_buttons:=cll _
                   ) <> "Ok"
     Wend
     
@@ -808,9 +808,9 @@ Public Function Test_11_ButtonScrollBarHorizontal()
         End With
 
         If mMsg.Dsply( _
-             dsply_title:=Readable(PROC), _
-             dsply_msg:=tMsg, _
-             dsply_buttons:=cll _
+             msg_title:=Readable(PROC), _
+             msg_sections:=tMsg, _
+             msg_buttons:=cll _
             ) = "Ok" Then Exit Do
     Loop
     
@@ -837,9 +837,9 @@ Public Function Test_13_ButtonByValue()
 
     Test_13_ButtonByValue = _
     mMsg.Dsply( _
-             dsply_title:="Test: Button by value (" & PROC & ")", _
-             dsply_msg:=tMsg, _
-             dsply_buttons:=vbOKOnly _
+             msg_title:="Test: Button by value (" & PROC & ")", _
+             msg_sections:=tMsg, _
+             msg_buttons:=vbOKOnly _
             )
 End Function
 
@@ -862,9 +862,9 @@ Public Function Test_14_ButtonByString()
     
     Test_14_ButtonByString = _
     mMsg.Dsply( _
-             dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             dsply_msg:=tMsg, _
-             dsply_buttons:="Yes," & vbLf & ",No" _
+             msg_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
+             msg_sections:=tMsg, _
+             msg_buttons:="Yes," & vbLf & ",No" _
             )
 End Function
 
@@ -891,9 +891,9 @@ Public Function Test_15_ButtonByCollection()
 
     Test_15_ButtonByCollection = _
     mMsg.Dsply( _
-             dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             dsply_msg:=tMsg, _
-             dsply_buttons:=cll _
+             msg_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
+             msg_sections:=tMsg, _
+             msg_buttons:=cll _
             )
 End Function
 
@@ -922,9 +922,9 @@ Public Function Test_16_ButtonByDictionary()
     
     Test_16_ButtonByDictionary = _
     mMsg.Dsply( _
-             dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             dsply_msg:=tMsg, _
-             dsply_buttons:=dct _
+             msg_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
+             msg_sections:=tMsg, _
+             msg_buttons:=dct _
             )
 End Function
 
@@ -949,8 +949,9 @@ Public Function Test_17_MessageAsString( _
         
     Test_17_MessageAsString = _
     mMsg.Box( _
-               dsply_title:="Test: Message provided as string - instead of type tMsg (" & ErrSrc(PROC) & ")", _
-               dsply_msg:="This is a message provided as a simple string argument!", dsply_buttons:=vbuttons _
-              )
+             msg_title:="Test: Message provided as string - instead of type tMsg (" & ErrSrc(PROC) & ")" _
+           , msg_text:="This is a message provided as a simple string argument!" _
+           , msg_buttons:=vbuttons _
+            )
 End Function
 
