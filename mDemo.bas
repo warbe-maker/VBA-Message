@@ -59,7 +59,7 @@ Public Sub Demo_Dsply()
     Next j
     cll.Add "Ok"
     
-    While mMsg.Dsply(msg_title:=sTitle, msg_sections:=tMsg, msg_buttons:=cll, msg_min_width:=600) <> cll(cll.Count)
+    While mMsg.Dsply(msg_title:=sTitle, msg:=tMsg, msg_buttons:=cll, msg_min_width:=600) <> cll(cll.Count)
     Wend
     
 End Sub
@@ -97,7 +97,7 @@ Public Sub Test_Dsply()
    End With
        
    vReturn = Dsply(msg_title:="Any title", _
-                   msg_sections:=vMsg, _
+                   msg:=vMsg, _
                    msg_buttons:=mMsg.Buttons(vbAbortRetryIgnore, vbLf, B1, B2, B3, vbLf, B4, B5, B6, vbLf, B7) _
                   )
    MsgBox "Button """ & mMsg.ReplyString(vReturn) & """ had been clicked"
