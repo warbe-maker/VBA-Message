@@ -1,12 +1,21 @@
 Attribute VB_Name = "mMsg"
 Option Explicit
-' -----------------------------------------------------------------------------------------
-' Standard Module mMsg Interface for the Common VBA "Alternative" MsgBox (fMsg UserForm)
+' ----------------------------------------------------------------------------------
+' Standard Module mMsg  Interface for the Common VBA Message Service (fMsg UserForm)
 '
-' Methods: Dsply  Exposes all properties and methods for the display of any kind of message
+' Public services:
+' - Dsply               Exposes all properties and methods for the display of any
+'                       kind of message
+' - Box                 In analogy to the MsgBox, provides a simple message but with
+'                       all the fexibility for the display of up to 49 reply buttons
+' - Buttons             Supports the specification of the design buttons displayed
+'                       in 7 rows by 7 buttons each
 '
-' W. Rauschenberger, Berlin Nov 2020
-' -----------------------------------------------------------------------------------------
+' See details at to:
+' https://warbe-maker.github.io/warbe-maker.github.io/vba/common/2020/11/17/Common-VBA-Message-Services.html
+'
+' W. Rauschenberger, Berlin Jan 2021 (last revision)
+' ----------------------------------------------------------------------------------
 Public Type tMsgSection                 ' ---------------------
        sLabel As String                 ' Structure of the
        sText As String                  ' UserForm's message
@@ -21,7 +30,7 @@ Public Function Box(ByVal msg_title As String, _
            Optional ByVal msg_monospaced As Boolean = False, _
            Optional ByVal msg_buttons As Variant = vbOKOnly, _
            Optional ByVal msg_returnindex As Boolean = False, _
-           Optional ByVal msg_min_width As Long = 300, _
+           Optional ByVal msg_min_width As Long = 400, _
            Optional ByVal msg_max_width As Long = 80, _
            Optional ByVal msg_max_height As Long = 70, _
            Optional ByVal msg_min_button_width = 70) As Variant

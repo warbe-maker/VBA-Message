@@ -390,8 +390,8 @@ Public Function Test_04_WidthDeterminedByReplyButtons( _
     tMsg.section(3).sLabel = "Please also note:"
     tMsg.section(3).sText = "The message form height is adjusted to the required height limited only by the specified maximum heigth " & _
                             "which is a percentage of the screen size (for this test = " & fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
-    vButton4 = "Repeat with" & vbLf & "5 buttons"
-    vButton5 = "Repeat with" & vbLf & "4 buttons"
+    vButton4 = "Repeat with 5 buttons"
+    vButton5 = "Repeat with 4 buttons"
     
     If regression_test _
     Then Set vbuttons = mMsg.Buttons(BTTN_PREVIOUS, BTTN_TERMINATE, BTTN_NEXT, vbLf, vButton4, vButton5, vButton6) _
