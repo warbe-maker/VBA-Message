@@ -228,9 +228,9 @@ Repeat:
     End With
     
     sMsgTitle = Readable(PROC)
-    tMsg.section(1).sLabel = "Test description:":       tMsg.section(1).sText = wsMsg.TestDescription(TEST_NO)
-    tMsg.section(2).sLabel = "Expected test result:":   tMsg.section(2).sText = "The width of all message sections is adjusted to the current specified minimum form width (" & fMsg.MinFormWidth & " pt)."
-    tMsg.section(3).sLabel = "Please also note:":       tMsg.section(3).sText = "The message form height is ajusted to the need " & _
+    tMsg.Section(1).sLabel = "Test description:":       tMsg.Section(1).sText = wsMsg.TestDescription(TEST_NO)
+    tMsg.Section(2).sLabel = "Expected test result:":   tMsg.Section(2).sText = "The width of all message sections is adjusted to the current specified minimum form width (" & fMsg.MinFormWidth & " pt)."
+    tMsg.Section(3).sLabel = "Please also note:":       tMsg.Section(3).sText = "The message form height is ajusted to the need " & _
                                                                                 "up to the specified maximum heigth which is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "% and not exceeded."
     Test_01_WidthDeterminedByMinimumWidth = _
     mMsg.Dsply( _
@@ -277,9 +277,9 @@ Public Function Test_02_WidthDeterminedByTitle( _
     End With
     
     sMsgTitle = Readable(PROC) & "  (This title uses more space than the minimum specified message form width and thus the width is determined by the title)"
-    tMsg.section(1).sLabel = "Test description:":       tMsg.section(1).sText = wsMsg.TestDescription(TEST_NO)
-    tMsg.section(2).sLabel = "Expected test result:":   tMsg.section(2).sText = "The message form width is adjusted to the title's lenght."
-    tMsg.section(3).sLabel = "Please note:":            tMsg.section(3).sText = "The two message sections in this test do use a proportional font " & _
+    tMsg.Section(1).sLabel = "Test description:":       tMsg.Section(1).sText = wsMsg.TestDescription(TEST_NO)
+    tMsg.Section(2).sLabel = "Expected test result:":   tMsg.Section(2).sText = "The message form width is adjusted to the title's lenght."
+    tMsg.Section(3).sLabel = "Please note:":            tMsg.Section(3).sText = "The two message sections in this test do use a proportional font " & _
                                                                                 "and thus are adjusted to form width determined by other factors." & vbLf & _
                                                                                 "The message form height is ajusted to the need up to the specified " & _
                                                                                 "maximum heigth based on the screen size which for this test is " & _
@@ -325,19 +325,19 @@ Public Function Test_03_WidthDeterminedByMonoSpacedMessageSection( _
     Else Set vbuttons = mMsg.Buttons(BTTN_FINISH, vButton5, vButton6, vButton7)
 
     sMsgTitle = Readable(PROC)
-    tMsg.section(1).sLabel = "Test description:"
-    tMsg.section(1).sText = wsMsg.TestDescription(TEST_NO)
-    tMsg.section(2).sLabel = "Expected test result:"
-    tMsg.section(2).sText = "Initally, the message form width is adjusted to the longest line in the " & _
+    tMsg.Section(1).sLabel = "Test description:"
+    tMsg.Section(1).sText = wsMsg.TestDescription(TEST_NO)
+    tMsg.Section(2).sLabel = "Expected test result:"
+    tMsg.Section(2).sText = "Initally, the message form width is adjusted to the longest line in the " & _
                             "monospaced message section and all other message sections are adjusted " & _
                             "to this (enlarged) width." & vbLf & _
                             "When the maximum form width is reduced by " & lIncrDecrWidth & " % the monospaced message section is displayed with a horizontal scroll bar."
-    tMsg.section(3).sLabel = "Please note the following:"
-    tMsg.section(3).sText = "- In contrast to the message sections above, this section uses the ""monospaced"" option which ensures" & vbLf & _
+    tMsg.Section(3).sLabel = "Please note the following:"
+    tMsg.Section(3).sText = "- In contrast to the message sections above, this section uses the ""monospaced"" option which ensures" & vbLf & _
                             "  the message text is not ""wrapped around""." & vbLf & _
                             "- The message form height is ajusted to the need up to the specified maximum heigth" & vbLf & _
                             "  based on the screen size which for this test is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
-    tMsg.section(3).bMonspaced = True
+    tMsg.Section(3).bMonspaced = True
     
     Do
         With fMsg
@@ -375,7 +375,7 @@ Public Function Test_04_WidthDeterminedByReplyButtons( _
     Const PROC      As String = "WidthDeterminedByReplyButtons1"
     Const TEST_NO   As Long = 4
     
-    Dim tMsg        As tMsg
+    Dim msg         As tMsg
     
     Unload fMsg                     ' Ensures a message starts from scratch
     
@@ -383,12 +383,12 @@ Public Function Test_04_WidthDeterminedByReplyButtons( _
 '    fMsg.TestFrameWithBorders = True
     
     sMsgTitle = Readable(PROC)
-    tMsg.section(1).sLabel = "Test description:"
-    tMsg.section(1).sText = "The width used by the reply buttons determines the width of the message form - unless they does not exceed the specified maximum form width which for this test is " & fMsg.MaxFormWidth & " (which is the specified " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size)."
-    tMsg.section(2).sLabel = "Expected test result:"
-    tMsg.section(2).sText = "The message form width is adjusted to the space required by the number of reply buttons and all message sections are adjusted to this (enlarged) width."
-    tMsg.section(3).sLabel = "Please also note:"
-    tMsg.section(3).sText = "The message form height is adjusted to the required height limited only by the specified maximum heigth " & _
+    msg.Section(1).sLabel = "Test description:"
+    msg.Section(1).sText = "The width used by the reply buttons determines the width of the message form - unless they does not exceed the specified maximum form width which for this test is " & fMsg.MaxFormWidth & " (which is the specified " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size)."
+    msg.Section(2).sLabel = "Expected test result:"
+    msg.Section(2).sText = "The message form width is adjusted to the space required by the number of reply buttons and all message sections are adjusted to this (enlarged) width."
+    msg.Section(3).sLabel = "Please also note:"
+    msg.Section(3).sText = "The message form height is adjusted to the required height limited only by the specified maximum heigth " & _
                             "which is a percentage of the screen size (for this test = " & fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
     vButton4 = "Repeat with 5 buttons"
     vButton5 = "Repeat with 4 buttons"
@@ -401,7 +401,7 @@ Public Function Test_04_WidthDeterminedByReplyButtons( _
         Test_04_WidthDeterminedByReplyButtons = _
         mMsg.Dsply( _
                    msg_title:=sMsgTitle, _
-                   msg:=tMsg, _
+                   msg:=msg, _
                    msg_buttons:=vbuttons _
                   )
         
@@ -439,12 +439,12 @@ Public Function Test_05_MonoSpacedSectionWidthExceedsMaxFormWidth( _
     End With
     
     sMsgTitle = Readable(PROC)
-    tMsg.section(1).sLabel = "Test description:"
-    tMsg.section(1).sText = "The width used by the 3rd ""monospaced"" message section exceeds the maximum form width which for this test is " & fMsg.MaxFormWidth & " pt (the equivalent of " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size)."
-    tMsg.section(2).sLabel = "Expected test result:"
-    tMsg.section(2).sText = "The monospaced message section comes with a horizontal scroll bar."
-    tMsg.section(3).sLabel = "Please note the following:"
-    tMsg.section(3).sText = "- This monspaced message section exceeds the specified maximum form width which for this test is " & fMsg.MaxFormWidth & " pt," & vbLf & _
+    tMsg.Section(1).sLabel = "Test description:"
+    tMsg.Section(1).sText = "The width used by the 3rd ""monospaced"" message section exceeds the maximum form width which for this test is " & fMsg.MaxFormWidth & " pt (the equivalent of " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size)."
+    tMsg.Section(2).sLabel = "Expected test result:"
+    tMsg.Section(2).sText = "The monospaced message section comes with a horizontal scroll bar."
+    tMsg.Section(3).sLabel = "Please note the following:"
+    tMsg.Section(3).sText = "- This monspaced message section exceeds the specified maximum form width which for this test is " & fMsg.MaxFormWidth & " pt," & vbLf & _
                             "  the equivalent of " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size." & vbLf & _
                             "- The message form height is adjusted to the required height, limited to " & fMsg.MaxFormHeight & " pt," & vbLf & _
                             "  the equivalent of " & fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen size, for this test and not reached or exceeded."
@@ -482,12 +482,12 @@ Public Function Test_06_MonoSpacedMessageSectionExceedMaxFormHeight( _
     ' Initializations for this test
     
     sMsgTitle = Readable(PROC)
-    tMsg.section(1).sLabel = "Test description:"
-    tMsg.section(1).sText = "The width used by the monospaced message section exxceeds the maximum form width for this test (" & fMsg.MaxFormWidth & ") which is the specified " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size."
-    tMsg.section(2).sLabel = "Expected test result:"
-    tMsg.section(2).sText = Repeat(20, "This monospaced message comes with a horizontal scroll bar." & vbLf, True)
-    tMsg.section(3).sLabel = "Please note the following:"
-    tMsg.section(3).sText = "The message form height is adjusted to the required height limited by the specified percentage of the screen height, " & _
+    tMsg.Section(1).sLabel = "Test description:"
+    tMsg.Section(1).sText = "The width used by the monospaced message section exxceeds the maximum form width for this test (" & fMsg.MaxFormWidth & ") which is the specified " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size."
+    tMsg.Section(2).sLabel = "Expected test result:"
+    tMsg.Section(2).sText = Repeat(20, "This monospaced message comes with a horizontal scroll bar." & vbLf, True)
+    tMsg.Section(3).sLabel = "Please note the following:"
+    tMsg.Section(3).sText = "The message form height is adjusted to the required height limited by the specified percentage of the screen height, " & _
                             "which for this test is " & fMsg.MaxFormHeightPrcntgOfScreenSize & "%."
     If regression_test _
     Then Set vbuttons = mMsg.Buttons(BTTN_PREVIOUS, BTTN_TERMINATE) _
@@ -537,14 +537,14 @@ Public Sub Test_07_AllInOne()
     End With
     
     sTitle = Readable(PROC) & ": Combines as much behaviour a possible"
-    tMsg.section(1).sLabel = "Test Description:"
-    tMsg.section(1).sText = "This test specifically focuses on constraint issues." & vbLf & _
+    tMsg.Section(1).sLabel = "Test Description:"
+    tMsg.Section(1).sText = "This test specifically focuses on constraint issues." & vbLf & _
                             "The test environment allows to increase/decrease the maximum and minimm form width and height " & _
                             "in order to test what happens when the message and/or the buttons area's width and height " & _
                             "exceed the specified limits."
-    tMsg.section(2).sLabel = "Test Results:"
-    tMsg.section(3).sLabel = "Please note:"
-    tMsg.section(3).bMonspaced = True
+    tMsg.Section(2).sLabel = "Test Results:"
+    tMsg.Section(3).sLabel = "Please note:"
+    tMsg.Section(3).bMonspaced = True
     
     '~~ Assemble the buttons argument as collection
     cll.Add "Increase ""Minimum Width"" by " & lChangeMinWidthPt & "pt":    lB1 = cll.Count
@@ -569,12 +569,12 @@ Public Sub Test_07_AllInOne()
             .Setup
         End With
         
-        tMsg.section(2).sText = "When the specified minimum form width (currently " & lMinFormWidth & "pt) is increased, the form height will decrease because the proportional spaced " & _
+        tMsg.Section(2).sText = "When the specified minimum form width (currently " & lMinFormWidth & "pt) is increased, the form height will decrease because the proportional spaced " & _
                                 "message section will require less height." & vbLf & _
                                 "When the specified maximum width is reduced, the monospaced message section below and also the buttons area may get a horizontal scroll-bar." & vbLf & _
                                 "When the specified maximum height is reduced, the message area and/or the buttons area may get a vertical scroll bar." & vbLf & _
                                 "When the maximum is squeezed enough the scroll-bars may be applied alltogether."
-        tMsg.section(3).sText = "- The specified maximum form width (currently " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% = " & Format(fMsg.MaxFormWidth, "##0") & "pt) cannot become less " & vbLf & _
+        tMsg.Section(3).sText = "- The specified maximum form width (currently " & fMsg.MaxFormWidthPrcntgOfScreenSize & "% = " & Format(fMsg.MaxFormWidth, "##0") & "pt) cannot become less " & vbLf & _
                                 "  than the minimum form width (currently " & fMsg.MinFormWidthPrcntg & "% = " & fMsg.MinFormWidth & "pt.) it may thus may have been limited automatically." & vbLf & _
                                 "  (it should be noted that the maximum constraints are a percentage value while" & vbLf & _
                                 "   the minimum width setting is in pt)" & vbLf & _
@@ -689,7 +689,7 @@ Public Sub Test_09_ButtonsMatrix()
     End With
     
     sTitle = "Buttons only test: No message, just buttons (finish with ""Ok"")"
-    tMsg.section(1).sText = "Some can play around with button matrix of 7 by 7 buttons"
+    tMsg.Section(1).sText = "Some can play around with button matrix of 7 by 7 buttons"
     '~~ Assemble the matrix of buttons as collection for  the argument buttons
     For i = 1 To 5 ' rows
         For j = 1 To 7 ' row buttons
@@ -746,15 +746,15 @@ Public Function Test_10_ButtonScrollBarVertical()
         .MaxFormHeightPrcntgOfScreenSize = 60 ' enforce vertical scroll bar
     End With
     
-    tMsg.section(1).sLabel = "Test description:"
-    tMsg.section(1).sText = "The number of the used reply ""buttons"", their specific order respectively exceeds " & _
+    tMsg.Section(1).sLabel = "Test description:"
+    tMsg.Section(1).sText = "The number of the used reply ""buttons"", their specific order respectively exceeds " & _
                            "the specified maximum forms height (for this test limited to " & _
                            fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen height"
-    tMsg.section(2).sLabel = "Expected result:"
-    tMsg.section(2).sText = "The height for the vertically ordered buttons is reduced to fit the specified " & _
+    tMsg.Section(2).sLabel = "Expected result:"
+    tMsg.Section(2).sText = "The height for the vertically ordered buttons is reduced to fit the specified " & _
                            "maximum message form heigth and a vertical scroll bar is applied."
-    tMsg.section(3).sLabel = "Finish test:"
-    tMsg.section(3).sText = "This test is repeated with any button clicked othe than the ""Ok"" button"
+    tMsg.Section(3).sLabel = "Finish test:"
+    tMsg.Section(3).sText = "This test is repeated with any button clicked othe than the ""Ok"" button"
 
     For i = 1 To 5
         For j = 0 To 1
@@ -783,15 +783,15 @@ Public Function Test_11_ButtonScrollBarHorizontal()
     
     Unload fMsg                     ' Ensures a message starts from scratch
     
-    tMsg.section(1).sLabel = "Test description:"
-    tMsg.section(1).sText = "The number of the used reply ""buttons"", their specific order respectively exceeds " & _
+    tMsg.Section(1).sLabel = "Test description:"
+    tMsg.Section(1).sText = "The number of the used reply ""buttons"", their specific order respectively exceeds " & _
                             "the specified maximum forms width (for this test limited to " & _
                             fMsg.MaxFormHeightPrcntgOfScreenSize & "% of the screen height"
-    tMsg.section(2).sLabel = "Expected result:"
-    tMsg.section(2).sText = "The width for the horizontally ordered buttons is reduced to fit the specified " & _
+    tMsg.Section(2).sLabel = "Expected result:"
+    tMsg.Section(2).sText = "The width for the horizontally ordered buttons is reduced to fit the specified " & _
                             "maximum message form width and a horizontal scroll bar is applied."
-    tMsg.section(3).sLabel = "Finish test:"
-    tMsg.section(3).sText = "This test is repeated with any button clicked othe than the ""Ok"" button"
+    tMsg.Section(3).sLabel = "Finish test:"
+    tMsg.Section(3).sText = "This test is repeated with any button clicked othe than the ""Ok"" button"
 
     For i = 1 To 6
         cll.Add "Reply Button " & i
@@ -830,10 +830,10 @@ Public Function Test_13_ButtonByValue()
 '        .HmarginFrames = 6
     End With
     
-    tMsg.section(1).sLabel = "Test description:"
-    tMsg.section(1).sText = "The ""buttons"" argument is provided as VB MsgBox value vbYesNo."
-    tMsg.section(2).sLabel = "Expected result:"
-    tMsg.section(2).sText = "The buttons ""Yes"" an ""No"" are displayed centered in one row"
+    tMsg.Section(1).sLabel = "Test description:"
+    tMsg.Section(1).sText = "The ""buttons"" argument is provided as VB MsgBox value vbYesNo."
+    tMsg.Section(2).sLabel = "Expected result:"
+    tMsg.Section(2).sText = "The buttons ""Yes"" an ""No"" are displayed centered in one row"
 
     Test_13_ButtonByValue = _
     mMsg.Dsply( _
@@ -855,10 +855,10 @@ Public Function Test_14_ButtonByString()
 '        .VmarginFrames = 2
 '        .HmarginFrames = 5
     End With
-    tMsg.section(1).sLabel = "Test description:"
-    tMsg.section(1).sText = "The ""buttons"" argument is provided as string expression."
-    tMsg.section(2).sLabel = "Expected result:"
-    tMsg.section(2).sText = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
+    tMsg.Section(1).sLabel = "Test description:"
+    tMsg.Section(1).sText = "The ""buttons"" argument is provided as string expression."
+    tMsg.Section(2).sLabel = "Expected result:"
+    tMsg.Section(2).sText = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
     
     Test_14_ButtonByString = _
     mMsg.Dsply( _
@@ -884,10 +884,10 @@ Public Function Test_15_ButtonByCollection()
     cll.Add "Yes"
     cll.Add "No"
     
-    tMsg.section(1).sLabel = "Test description:"
-    tMsg.section(1).sText = "The ""buttons"" argument is provided as string expression."
-    tMsg.section(2).sLabel = "Expected result:"
-    tMsg.section(2).sText = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
+    tMsg.Section(1).sLabel = "Test description:"
+    tMsg.Section(1).sText = "The ""buttons"" argument is provided as string expression."
+    tMsg.Section(2).sLabel = "Expected result:"
+    tMsg.Section(2).sText = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
 
     Test_15_ButtonByCollection = _
     mMsg.Dsply( _
@@ -913,10 +913,10 @@ Public Function Test_16_ButtonByDictionary()
 '        .HmarginFrames = 5
     End With
     
-    tMsg.section(1).sLabel = "Test description:"
-    tMsg.section(1).sText = "The ""buttons"" argument is provided as string expression."
-    tMsg.section(1).sLabel = "Expected result:"
-    tMsg.section(1).sText = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
+    tMsg.Section(1).sLabel = "Test description:"
+    tMsg.Section(1).sText = "The ""buttons"" argument is provided as string expression."
+    tMsg.Section(1).sLabel = "Expected result:"
+    tMsg.Section(1).sText = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
     dct.Add "Yes"
     dct.Add "No"
     
@@ -954,4 +954,37 @@ Public Function Test_17_MessageAsString( _
            , msg_buttons:=vbuttons _
             )
 End Function
+
+Public Sub Test_18_Individual()
+' ---------------------------------------------------------------------------------
+' Test 1 (optional arguments are used in conjunction with the Regression test only)
+' ---------------------------------------------------------------------------------
+    Const PROC = "Test_18_Individual"
+    
+    Dim ThisMsg As tMsg
+         
+    With fMsg
+'        .MinFormWidth = 300
+        .DsplyFrmsWthBrdrsTestOnly = True
+'        .FramesWithCaption = True
+    End With
+    
+    ThisMsg.Section(1).sLabel = "Test label extra long for this specific test:"
+    ThisMsg.Section(1).sText = "A short message text" & vbLf & _
+                               "A short message text" & vbLf & _
+                               "A short message text" & vbLf & _
+                               "A short message text" & vbLf & _
+                               "A short message text"
+    ThisMsg.Section(2).sLabel = "Test label extra long for this specific test:"
+    ThisMsg.Section(2).sText = "A short message text"
+    ThisMsg.Section(2).bMonspaced = True
+    ThisMsg.Section(3).sLabel = "Test label extra long for this specific test:"
+    ThisMsg.Section(3).sText = "A short message text"
+    mMsg.Dsply msg_title:="This title is rather short" _
+             , msg:=ThisMsg _
+             , msg_buttons:=mMsg.Buttons("Button-1", "Button-2") _
+             , msg_button_default:="Button-1"
+    
+End Sub
+
 
