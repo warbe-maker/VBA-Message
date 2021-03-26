@@ -22,29 +22,10 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 | Display of an alert image (?, !, etc.) | (yet) not implemented |
 
 ### Installation
-1. Download <a href="https://www.dropbox.com/s/h91lcqa52qrdl5f/fMsg.frm?dl=1">fMsg.frm</a> and the <a href="https://www.dropbox.com/s/h91lcqa52qrdl5f/fMsg.frm?dl=1">fMsg.frx</a>.
+1. Download [fMsg.frm][1] and the [fMsg.frx][2].
 2. Import _fMsg.frm_ to a VBA project
-3. In the VBE add a Reference to "Microsoft Scripting Runtime"
-4. Copy the following code into a standard module's global declarations section:
-5. Copy the following into a standard module:<br>
-```
-Public Enum StartupPosition         ' -------------------
-    Manual = 0                      ' Used to position
-    CenterOwner = 1                 ' the message window
-    CenterScreen = 2                ' horizontally and
-    WindowsDefault = 3              ' vertically centered
-End Enum                            ' -------------------
-
-Public Type tSection                ' --------------
-       sLabel As String             ' Structure of
-       sText As String              ' UserForm's
-       bMonspaced As Boolean        ' (fMsg) message
-End Type                            ' area with its
-Public Type tMessage                ' three message
-       section(1 To 3) As tSection  ' sections
-End Type
-
-```
+3. Download [mMsg.bas][3] and import it
+4. In the VBE add a Reference to "Microsoft Scripting Runtime"
 6. Before start have a look at the [UserForm's properties](#properties-of-the-fmsg-userform)
 7. Either continue with [Usage step by step](#usage-step-by-step) or start directly using the prepared [Interfaces](#Interfaces) in module _mMsg_.  
 
@@ -414,3 +395,8 @@ Because the text is ++not++  "wrapped" the width of the _Message Form_ is determ
 
 #### _Monospaced_ = False (default)
 Because the text is "wrapped" the width of a proportional-spaced text is determined by the current form width.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the required space for the broadest _Buttons Row_ and the specified _Minimum Form Width_.
+
+
+[1]:https://gitcdn.link/repo/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frm
+[2]:https://gitcdn.link/repo/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frx
+[3]:https://gitcdn.link/repo/warbe-maker/Common-VBA-Message-Service/edit/master/source/mMsg.bas
