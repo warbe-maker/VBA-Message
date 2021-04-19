@@ -5,16 +5,17 @@ Public Sub FirstTry()
           
     Dim Message As TypeMsgText
     
-    Message.Text = "Any message"
-    Message.FontColor = rgbRed
-    Message.FontBold = True
-    
+    With Message
+        .Text = "Any message"
+        .FontColor = rgbRed
+        .FontBold = True
+    End With
     With fMsg
         .MsgTitle = "Any title"
-        .MsgButtons = vbYesNoCancel
         .MsgText(1) = Message
+        .MsgButtons = vbYesNoCancel
         .Setup
-        .show
+        .Show vbModal
         Select Case .ReplyValue ' obtaining it unloads the form !
             Case vbYes:     MsgBox "Button ""Yes"" clicked"
             Case vbNo:      MsgBox "Button ""No"" clicked"
