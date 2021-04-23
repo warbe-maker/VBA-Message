@@ -1,81 +1,79 @@
 Attribute VB_Name = "mDemo"
 Option Explicit
 
-Public Sub FirstTry()
-          
-    Dim Message As TypeMsgText
-    
-    With Message
-        .Text = "Any message"
-        .FontColor = rgbRed
-        .FontBold = True
-    End With
-    With fMsg
-        .MsgTitle = "Any title"
-        .MsgText(1) = Message
-        .MsgButtons = vbYesNoCancel
-        .Setup
-        .Show vbModal
-        Select Case .ReplyValue ' obtaining it unloads the form !
-            Case vbYes:     MsgBox "Button ""Yes"" clicked"
-            Case vbNo:      MsgBox "Button ""No"" clicked"
-            Case vbCancel:  MsgBox "Button ""Cancel"" clicked"
-        End Select
-   End With
-   
+Public Sub Demos()
+    DemoMsgDsplyService_1
+    DemoMsgDsplyService_2
 End Sub
 
-Public Sub Demo_Dsply()
+Public Sub DemoMsgDsplyService_1()
+    Const MAX_WIDTH     As Long = 50
+    Const MAX_HEIGHT    As Long = 60
 
-    Dim sTitle  As String
-    Dim Message    As TypeMsg
-    Dim cll     As New Collection
-    Dim i, j    As Long
-    
-    With fMsg
-        .MaxFormWidthPrcntgOfScreenSize = 45    ' for this demo to enforce a vertical scroll bar
-        .MaxFormHeightPrcntgOfScreenSize = 75   ' for this demo to enbforce a vertical scroll bar for the message section
-    End With
+    Dim sTitle          As String
+    Dim cll             As New Collection
+    Dim i, j            As Long
+    Dim Message         As TypeMsg
    
     sTitle = "Usage demo: Full featured multiple choice message"
-    Message.Section(1).Label.Text = "1. Demonstration:"
-    Message.Section(1).Text.Text = "Use of all 3 message sections, all with a label and use of all 7 reply buttons, in a 2-2-2-1  order."
-    Message.Section(2).Label.Text = "2. Demonstration:"
-    Message.Section(2).Text.Text = "The impact of the specified maximimum message form with, which for this test has been reduced to " _
-                          & fMsg.MaxFormWidthPrcntgOfScreenSize & "% of the screen size (the default is 80%)." & vbLf & vbLf _
-                          & "Because this message section is very tall (for this demo specifically) the total message " _
-                          & "area's height exceeds the specified maximum message form height." & vbLf _
-                          & "When it is reduced to its limit the whole message area is provided with a vertical scroll bar." & vbLf & vbLf & _
-                            "By this, the alternative MsgBox has in fact no message size limit."
-    Message.Section(3).Label.Text = "3. Demonstration:"
-    Message.Section(3).Text.Text = "This part of the message demonstrates the mono-spaced option and the impact it " _
-                          & "has on the width of the message form, which is determined by its longest line " _
-                          & "because mono-spaced message sections are not ""word wrapped"". However, because " _
-                          & "the specified maximum message form width is exceed a vertical scroll bar is applied " _
-                          & "- in practice it hardly will ever happen. I.e. even for a mono-spaced text section " _
-                          & "there is no width limit."
-    Message.Section(4).Label.Text = "Attention!"
-    Message.Section(4).Text.Text = "The result is re-displayed until the ""Ok"" button is clicked!"
-   
-   '~~ Prepare the buttons collection
-   For j = 1 To 3
-        For i = 1 To 3
+    With Message.Section(1)
+        .Label.Text = "Demonstration overview:"
+        .Label.FontColor = rgbBlue
+        .Text.Text = "- Use of all 4 message sections" & vbLf _
+                   & "- All sections with a label" & vbLf _
+                   & "- One section monospaced exceeding the specified maximum message form width" & vbLf _
+                   & "- Use of some of the 7x7 reply buttons in a 4-4-1 order" & vbLf _
+                   & "- An an example for available text font options all labels in blue"
+    End With
+    With Message.Section(2)
+        .Label.Text = "Unlimited message width!:"
+        .Label.FontColor = rgbBlue
+        .Text.Text = "Because this section's text is mono-spaced (which is not word-wrapped) and the maximimum message form width" & vbLf _
+                   & "for this demo has been specified " & MAX_WIDTH & "% of the sreen width (the default would be 80%)" & vbLf _
+                   & "the text is displayed with a horizontal scrollbar. There is no message size limit for the display despite the" & vbLf & vbLf _
+                   & "limit of VBA for text strings  which is about 1GB!"
+        .Text.Monospaced = True
+    End With
+    With Message.Section(3)
+        .Label.Text = "Unlimited message height!:"
+        .Label.FontColor = rgbBlue
+        .Text.Text = "Because this section lext has many lines (line breaks)" & vbLf _
+                   & "the default word-wrapping for this proportional-spaced text" & vbLf _
+                   & "has not the otherwise usuall effect. The message area thus" & vbLf _
+                   & "exeeds the for this demo specified " & MAX_HEIGHT & "% of the screen size" & vbLf _
+                   & "(defaults to 80%) it is displayed with a vertical scrollbar." & vbLf _
+                   & "So even a proportional spaced text's size - which usually is word-wrapped -" & vbLf _
+                   & "is only limited by the system's limit for a String which is abut 1GB !!!"
+    End With
+    With Message.Section(4)
+        .Label.Text = "Great reply buttons flexibility:"
+        .Label.FontColor = rgbBlue
+        .Text.Text = "This demo displays only some of the 49 possible reply buttons (7 rows by 7 buttons). " _
+                   & "It also shows that a reply button can have any caption text and the buttons can be " _
+                   & "displayed in any order within the 7 x 7 limit. Of cource the VBA.MsgBox classic " _
+                   & "vbOkOnly, vbYesNoCancel, etc. are also possible - even in a mixture." & vbLf & vbLf _
+                   & "By the way: This demo ends only with the Ok button clicked and loops with all the ohter."
+    End With
+    '~~ Prepare the buttons collection
+    For j = 1 To 2
+        For i = 1 To 4
             cll.Add "Multiline reply" & vbLf & "button caption" & vbLf & "Button-" & j & "-" & i
         Next i
         cll.Add vbLf
     Next j
-    cll.Add "Ok"
+    cll.Add vbOKOnly ' The reply when clicked will be vbOK though
     
     While mMsg.Dsply(dsply_title:=sTitle _
                    , dsply_msg:=Message _
                    , dsply_buttons:=cll _
-                   , dsply_min_width:=600 _
-                    ) <> cll(cll.Count)
+                   , dsply_max_height:=MAX_HEIGHT _
+                   , dsply_max_width:=MAX_WIDTH _
+                    ) <> vbOK
     Wend
     
 End Sub
 
-Public Sub Test_Dsply()
+Public Sub DemoMsgDsplyService_2()
 ' ---------------------------------------------------------
 ' Displays a message with 3 sections, each with a label and
 ' 7 reply buttons ordered in rows 3-3-1
@@ -88,29 +86,39 @@ Public Sub Test_Dsply()
     Const B6 = "Caption Button 6"
     Const B7 = "Caption Button 7"
     
-    Dim vMsg    As TypeMsg                      ' structure of the message
-    Dim cll     As New Collection                   ' specification of the displayed buttons
     Dim vReturn As Variant
-           
+    Dim Message As TypeMsg
+    
     ' Preparing the message
-    With vMsg.Section(1)
-        .Label.Text = "Any label 1"
-        .Text.Text = "Any section text 1"
+    With Message.Section(1)
+        .Label.Text = "Any section-1 label (bold, blue)"
+        .Label.FontBold = True
+        .Label.FontColor = rgbBlue
+        .Text.Text = "This is a section-1 text (darkgreen)"
+        .Text.FontColor = rgbDarkGreen
     End With
-    With vMsg.Section(2)
-        .Label.Text = "Any label 2"
-        .Text.Text = "Any section 2 text"
-        .Text.Monospaced = True ' Just to demonstrate
+    With Message.Section(2)
+        .Label.Text = "Any section-2 label (bold, blue)"
+        .Label.FontBold = True
+        .Label.FontColor = rgbBlue
+        With .Text
+            .Text = "This is a section-2 text (bold, italic, red, monospaced, font-size=10)"
+            .FontBold = True
+            .FontItalic = True
+            .FontColor = rgbRed
+            .Monospaced = True ' Just to demonstrate
+            .FontSize = 10
+        End With
     End With
-    With vMsg.Section(3)
-        .Label.Text = "Any label 3"
-        .Text.Text = "Any section text 3"
+    With Message.Section(3)
+        .Text.Text = "Any section-3 text (without a label)"
    End With
        
    vReturn = Dsply(dsply_title:="Any title", _
-                   dsply_msg:=vMsg, _
+                   dsply_msg:=Message, _
                    dsply_buttons:=mMsg.Buttons(vbAbortRetryIgnore, vbLf, B1, B2, B3, vbLf, B4, B5, B6, vbLf, B7) _
                   )
    MsgBox "Button """ & mMsg.ReplyString(vReturn) & """ had been clicked"
    
 End Sub
+
