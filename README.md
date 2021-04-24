@@ -176,7 +176,6 @@ End Sub
 which displays:
 
 ![](images/demo-1.png)
-![](/images/demo-1.png)
 
 #### Proportional versus Mono-Spaced
 ##### _Monospaced_ = True
