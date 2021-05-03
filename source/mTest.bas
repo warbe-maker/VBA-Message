@@ -1175,11 +1175,32 @@ eh: ErrMsg ErrSrc(PROC)
 #End If
 End Function
 
-Public Sub Test_18_Individual()
+Public Sub Test_20_Progress_Messages()
+
+    Dim i As Long
+    Dim Msg As TypeMsg
+    With Msg.Section(1).Text
+        .Text = " No. Status  Step"
+        .Monospaced = True
+    End With
+    For i = 1 To 30
+        With Msg.Section(2).Text
+            .Text = Align(i, 4, AlignRight, " ") & Align("Passed", 8, AlignCentered, " ") & Align(i, 2, AlignRight) & ". Follow-Up line"
+            .Monospaced = True
+        End With
+             
+        mMsg.Progress prgrs_title:="Follow-Up-Test" _
+                    , prgrs_msg:=Msg _
+                    , prgrs_section:=2
+    Next i
+    
+End Sub
+
+Public Sub Test_99_Individual()
 ' ---------------------------------------------------------------------------------
 ' Test 1 (optional arguments are used in conjunction with the Regression test only)
 ' ---------------------------------------------------------------------------------
-    Const PROC = "Test_18_Individual"
+    Const PROC = "Test_99_Individual"
     
     On Error GoTo eh
     With fMsg

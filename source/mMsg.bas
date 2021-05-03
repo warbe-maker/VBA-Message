@@ -16,6 +16,16 @@ Option Explicit
 '
 ' W. Rauschenberger, Berlin Jan 2021 (last revision)
 ' ----------------------------------------------------------------------------------
+Public Const END_OF_PROGRESS As String = "EndOfProgress"
+
+Public Enum StringAlign
+    AlignLeft = 1
+    AlignRight = 2
+    AlignCentered = 3
+End Enum
+
+Public ProgressText As String
+
 Public Type TypeMsgLabel
         FontBold As Boolean
         FontColor As XlRgbColor
@@ -50,6 +60,113 @@ Public RepliedWith     As Variant
 
 Public Property Get Modeless() As Boolean:          Modeless = bModeless:   End Property
 Public Property Let Modeless(ByVal b As Boolean):   bModeless = b:          End Property
+
+Public Function Align( _
+                ByVal align_s As String, _
+                ByVal align_lngth As Long, _
+       Optional ByVal align_mode As StringAlign = AlignLeft, _
+       Optional ByVal align_margin As String = vbNullString, _
+       Optional ByVal align_fill As String = " ") As String
+' ---------------------------------------------------------
+' Returns a string (align_s) with a lenght (align_lngth)
+' aligned (aligned) filled with characters (align_fill).
+' ---------------------------------------------------------
+    Dim SpaceLeft       As Long
+    Dim LengthRemaining As Long
+    
+    Select Case align_mode
+        Case AlignLeft
+            If Len(align_s & align_margin) >= align_lngth _
+            Then Align = VBA.Left$(align_s & align_margin, align_lngth) _
+            Else Align = align_s & align_margin & VBA.String$(align_lngth - (Len(align_s & align_margin)), align_fill)
+        Case AlignRight
+            If Len(align_margin & align_s) >= align_lngth _
+            Then Align = VBA.Left$(align_margin & align_s, align_lngth) _
+            Else Align = VBA.String$(align_lngth - (Len(align_margin & align_s)), align_fill) & align_margin & align_s
+        Case AlignCentered
+            If Len(align_margin & align_s & align_margin) >= align_lngth Then
+                Align = align_margin & Left$(align_s, align_lngth - (2 * Len(align_margin))) & align_margin
+            Else
+                SpaceLeft = Max(1, ((align_lngth - Len(align_s) - (2 * Len(align_margin))) / 2))
+                Align = VBA.String$(SpaceLeft, align_fill) & align_margin & align_s & align_margin & VBA.String$(SpaceLeft, align_fill)
+                Align = VBA.Right$(Align, align_lngth)
+            End If
+    End Select
+
+End Function
+
+Private Function Max(ParamArray va() As Variant) As Variant
+' --------------------------------------------------------
+' Returns the maximum value of all values provided (va).
+' --------------------------------------------------------
+    Dim v As Variant
+    
+    Max = va(LBound(va)): If LBound(va) = UBound(va) Then Exit Function
+    For Each v In va
+        If v > Max Then Max = v
+    Next v
+    
+End Function
+
+Public Sub Progress( _
+              ByVal prgrs_title As String, _
+              ByRef prgrs_msg As TypeMsg, _
+     Optional ByVal prgrs_section As Long = 1, _
+     Optional ByVal prgrs_append As Boolean = True, _
+     Optional ByVal prgrs_monospaced As Boolean = False, _
+     Optional ByVal prgrs_buttons As Variant = vbOKOnly, _
+     Optional ByVal prgrs_button_default = 1, _
+     Optional ByVal prgrs_returnindex As Boolean = False, _
+     Optional ByVal prgrs_min_width As Long = 400, _
+     Optional ByVal prgrs_max_width As Long = 80, _
+     Optional ByVal prgrs_max_height As Long = 70, _
+     Optional ByVal prgrs_min_button_width = 70)
+' -------------------------------------------------------------------------------------
+' Common VBA Progress Message: A service using the Common VBA Message Form as an
+' alternative MsgBox.
+'
+' See: https://warbe-maker.github.io/vba/common/2020/11/17/Common-VBA-Message-Form.html
+'
+' W. Rauschenberger, Berlin, Nov 2020
+' -------------------------------------------------------------------------------------
+    Dim Msg As TypeMsg
+    Dim i   As Long
+        
+    If Trim(fMsg.MsgTitle) <> Trim(prgrs_title) Then
+        With fMsg
+            '~~ A new title starts a new progress message
+            .MaxMsgHeightPrcntgOfScreenSize = prgrs_max_height ' percentage of sreen height
+            .MaxMsgWidthPrcntgOfScreenSize = prgrs_max_width   ' percentage of sreen width
+            .MinMsgWidthPts = prgrs_min_width                  ' defaults to 300 pt. the absolute minimum is 200 pt
+            .MinButtonWidth = prgrs_min_button_width
+            .MsgTitle = prgrs_title
+            For i = 1 To prgrs_section
+                .MsgText(i) = prgrs_msg.Section(i).Text
+            Next i
+            .MsgButtons = prgrs_buttons
+            .DefaultBttn = prgrs_button_default
+            '+------------------------------------------------------------------------+
+            '|| Setup prior showing the form improves the performance significantly  ||
+            '|| and avoids any flickering message window with its setup.             ||
+            '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
+            .Setup '                                                                 ||
+            '+------------------------------------------------------------------------+
+            .Show vbModeless
+            GoTo xt
+        End With
+    Else
+        '~~ Another progress message with the same title is appended or relpaces the message in the provided section
+        Application.ScreenUpdating = False
+        fMsg.Progress prgrs_text:=prgrs_msg.Section(prgrs_section).Text.Text _
+                    , prgrs_section:=prgrs_section _
+                    , prgrs_append:=prgrs_append
+        DoEvents
+        Application.ScreenUpdating = True
+    End If
+      
+xt: Exit Sub
+
+End Sub
 
 Public Function Box(ByVal box_title As String, _
            Optional ByVal box_msg As String = vbNullString, _
@@ -346,6 +463,7 @@ Public Function Dsply(ByVal dsply_title As String, _
         '|| and avoids any flickering message window with its setup.             ||
         '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
         '+------------------------------------------------------------------------+
+
         .Setup '                                                                 ||
         If dsply_modeless Then
             DisplayDone = False
