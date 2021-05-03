@@ -115,6 +115,7 @@ Dim dctSectionsText                 As Dictionary   ' Section specific text eith
 Dim lMaxMsgHeightPoSh               As Long         ' Maximum % of the screen height
 Dim lMaxMsgWidthPoSw                As Long         ' Maximum % of the screen width
 Dim lMinMsgWidthPoSw                As Long         ' Minimum % of the screen width - calculated when min form width in pt is assigend
+Dim lMinMsgHeightPoSw               As Long
 Dim lMinMsgHeightPoSh               As Long         ' Minimum % of the screen width - calculated when min form width in pt is assigend
 Dim lReplyIndex                     As Long         ' Index of the clicked reply button (a value ranging from 1 to 49)
 Dim lSetupRowButtons                As Long         ' number of buttons setup in a row
@@ -128,6 +129,7 @@ Dim siMaxMsgHeightPts               As Single       ' above converted to excel u
 Dim siMaxMsgWidthPts                As Single       ' above converted to excel userform width
 Dim siMaxSectionWidth               As Single
 Dim siMinButtonWidth                As Single
+Dim siMinMsgHeightPts               As Single
 Dim siMinMsgWidthPts                As Single
 Dim siTitleWidth                    As Single
 Dim siVmarginButtons                As Single
@@ -224,7 +226,7 @@ End Property
 
 Private Property Let AppliedControls(ByVal v As Variant)
     If dctAppliedControls Is Nothing Then Set dctAppliedControls = New Dictionary
-    If Not IsApplied(v) Then dctAppliedControls.Add v, v.Name
+    If Not IsApplied(v) Then dctAppliedControls.Add v, v.name
 End Property
 
 Private Property Get BttnsAreaWidthUsable() As Single
@@ -251,6 +253,7 @@ Private Property Get ClickedButtonIndex(Optional ByVal cmb As MSForms.CommandBut
 
 End Property
 
+Public Property Get ReplyValue() As Variant:    ReplyValue = vReplyValue:   End Property
 Public Property Let DefaultBttn(ByVal vDefault As Variant)
     vDefaultBttn = vDefault
 End Property
@@ -683,9 +686,11 @@ Private Sub ButtonClicked(ByVal cmb As MSForms.CommandButton)
 ' ------------------------------------------------------------------------------
     On Error Resume Next
     If bReplyWithIndex Then
+        vReplyValue = ClickedButtonIndex(cmb)
         mMsg.RepliedWith = ClickedButtonIndex(cmb)
     Else
-        RepliedWith = AppliedButtonRetVal(cmb)  ' global variable of calling module mMsg
+        vReplyValue = AppliedButtonRetVal(cmb)  ' global variable of calling module mMsg
+        mMsg.RepliedWith = AppliedButtonRetVal(cmb)  ' global variable of calling module mMsg
     End If
     
     DisplayDone = True ' in case the form has been displayed modeless this will indicate the end of the wait loop
@@ -1799,10 +1804,10 @@ Private Sub SetupMsgSect(ByVal msg_section As Long)
                 .Caption = SectionLabel.Text
                 With .Font
                     If SectionLabel.Monospaced Then
-                        If SectionLabel.FontName <> vbNullString Then .Name = SectionLabel.FontName Else .Name = DEFAULT_LBL_MONOSPACED_FONT_NAME
+                        If SectionLabel.FontName <> vbNullString Then .name = SectionLabel.FontName Else .name = DEFAULT_LBL_MONOSPACED_FONT_NAME
                         If SectionLabel.FontSize <> 0 Then .Size = SectionLabel.FontSize Else .Size = DEFAULT_LBL_MONOSPACED_FONT_SIZE
                     Else
-                        If SectionLabel.FontName <> vbNullString Then .Name = SectionLabel.FontName Else .Name = DEFAULT_LBL_PROPSPACED_FONT_NAME
+                        If SectionLabel.FontName <> vbNullString Then .name = SectionLabel.FontName Else .name = DEFAULT_LBL_PROPSPACED_FONT_NAME
                         If SectionLabel.FontSize <> 0 Then .Size = SectionLabel.FontSize Else .Size = DEFAULT_LBL_PROPSPACED_FONT_SIZE
                     End If
                     If SectionLabel.FontItalic Then .Italic = True
@@ -1867,7 +1872,7 @@ Const PROC = "SetupMsgSectMonoSpaced"
             .Italic = MsgSectText.FontItalic
             .Underline = MsgSectText.FontUnderline
             If MsgSectText.FontSize <> 0 Then .Size = MsgSectText.FontSize Else .Size = DEFAULT_LBL_MONOSPACED_FONT_SIZE
-            If MsgSectText.FontName <> vbNullString Then .Name = MsgSectText.FontName Else .Name = DEFAULT_LBL_MONOSPACED_FONT_NAME
+            If MsgSectText.FontName <> vbNullString Then .name = MsgSectText.FontName Else .name = DEFAULT_LBL_MONOSPACED_FONT_NAME
         End With
         If MsgSectText.FontColor <> 0 Then .ForeColor = MsgSectText.FontColor Else .ForeColor = rgbBlack
         .MultiLine = True
@@ -1961,7 +1966,7 @@ Private Sub SetupMsgSectPropSpaced( _
     With tbText
         .Visible = True
         With .Font
-            If MsgSectText.FontName <> vbNullString Then .Name = MsgSectText.FontName Else .Name = DEFAULT_TXT_PROPSPACED_FONT_NAME
+            If MsgSectText.FontName <> vbNullString Then .name = MsgSectText.FontName Else .name = DEFAULT_TXT_PROPSPACED_FONT_NAME
             If MsgSectText.FontSize <> 0 Then .Size = MsgSectText.FontSize Else .Size = DEFAULT_TXT_PROPSPACED_FONT_SIZE
             If MsgSectText.FontBold Then .Bold = True
             If MsgSectText.FontItalic Then .Italic = True
@@ -2065,12 +2070,12 @@ Private Sub SetupTitle()
         '~~ When a font name other then the standard UserForm font name is
         '~~ provided the extra hidden title label which mimics the title bar
         '~~ width is displayed. Otherwise it remains hidden.
-        If sTitleFontName <> vbNullString And sTitleFontName <> .Font.Name Then
+        If sTitleFontName <> vbNullString And sTitleFontName <> .Font.name Then
             With .laMsgTitle   ' Hidden by default
                 .Visible = True
                 .Top = siTop
                 siTop = VgridPos(.Top + .Height)
-                .Font.Name = sTitleFontName
+                .Font.name = sTitleFontName
                 If sTitleFontSize <> 0 Then
                     .Font.Size = sTitleFontSize
                 End If
@@ -2085,7 +2090,7 @@ Private Sub SetupTitle()
             With .laMsgTitle
                 With .Font
                     .Bold = False
-                    .Name = Me.Font.Name
+                    .name = Me.Font.name
                     .Size = 8.65    ' Value which comes to a length close to the length required
                 End With
                 .Visible = True

@@ -1185,7 +1185,7 @@ Public Sub Test_20_Progress_Messages()
     End With
     For i = 1 To 30
         With Msg.Section(2).Text
-            .Text = Align(i, 4, AlignRight, " ") & Align("Passed", 8, AlignCentered, " ") & Align(i, 2, AlignRight) & ". Follow-Up line"
+            .Text = mBasic.Align(i, 4, AlignRight, " ") & mBasic.Align("Passed", 8, AlignCentered, " ") & mBasic.Align(i, 2, AlignRight) & ". Follow-Up line"
             .Monospaced = True
         End With
              

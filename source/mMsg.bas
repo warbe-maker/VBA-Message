@@ -18,12 +18,6 @@ Option Explicit
 ' ----------------------------------------------------------------------------------
 Public Const END_OF_PROGRESS As String = "EndOfProgress"
 
-Public Enum StringAlign
-    AlignLeft = 1
-    AlignRight = 2
-    AlignCentered = 3
-End Enum
-
 Public ProgressText As String
 
 Public Type TypeMsgLabel
@@ -60,40 +54,6 @@ Public RepliedWith     As Variant
 
 Public Property Get Modeless() As Boolean:          Modeless = bModeless:   End Property
 Public Property Let Modeless(ByVal b As Boolean):   bModeless = b:          End Property
-
-Public Function Align( _
-                ByVal align_s As String, _
-                ByVal align_lngth As Long, _
-       Optional ByVal align_mode As StringAlign = AlignLeft, _
-       Optional ByVal align_margin As String = vbNullString, _
-       Optional ByVal align_fill As String = " ") As String
-' ---------------------------------------------------------
-' Returns a string (align_s) with a lenght (align_lngth)
-' aligned (aligned) filled with characters (align_fill).
-' ---------------------------------------------------------
-    Dim SpaceLeft       As Long
-    Dim LengthRemaining As Long
-    
-    Select Case align_mode
-        Case AlignLeft
-            If Len(align_s & align_margin) >= align_lngth _
-            Then Align = VBA.Left$(align_s & align_margin, align_lngth) _
-            Else Align = align_s & align_margin & VBA.String$(align_lngth - (Len(align_s & align_margin)), align_fill)
-        Case AlignRight
-            If Len(align_margin & align_s) >= align_lngth _
-            Then Align = VBA.Left$(align_margin & align_s, align_lngth) _
-            Else Align = VBA.String$(align_lngth - (Len(align_margin & align_s)), align_fill) & align_margin & align_s
-        Case AlignCentered
-            If Len(align_margin & align_s & align_margin) >= align_lngth Then
-                Align = align_margin & Left$(align_s, align_lngth - (2 * Len(align_margin))) & align_margin
-            Else
-                SpaceLeft = Max(1, ((align_lngth - Len(align_s) - (2 * Len(align_margin))) / 2))
-                Align = VBA.String$(SpaceLeft, align_fill) & align_margin & align_s & align_margin & VBA.String$(SpaceLeft, align_fill)
-                Align = VBA.Right$(Align, align_lngth)
-            End If
-    End Select
-
-End Function
 
 Private Function Max(ParamArray va() As Variant) As Variant
 ' --------------------------------------------------------
@@ -151,7 +111,7 @@ Public Sub Progress( _
             '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
             .Setup '                                                                 ||
             '+------------------------------------------------------------------------+
-            .Show vbModeless
+            .show vbModeless
             GoTo xt
         End With
     Else
@@ -214,7 +174,7 @@ Public Function Box(ByVal box_title As String, _
         '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
         .Setup '                                                                 ||
         '+------------------------------------------------------------------------+
-        .Show
+        .show
     End With
     Box = RepliedWith
 
@@ -467,10 +427,10 @@ Public Function Dsply(ByVal dsply_title As String, _
         .Setup '                                                                 ||
         If dsply_modeless Then
             DisplayDone = False
-            .Show vbModeless
+            .show vbModeless
             Do While DisplayDone = False:   DoEvents: Loop
         Else
-            .Show vbModal
+            .show vbModal
         End If
     End With
 
