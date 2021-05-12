@@ -1,5 +1,8 @@
 # Common VBA Message Form and Display services
-An implementation with major flaws of the VBA.MsgBox eliminated:
+
+Supplements the README and the [Common-VBA-Message-Services](https://warbe-maker.github.io/vba/common/2020/11/17/Common-VBA-Message-Services.html) post focusing on technical aspects.
+
+This implementation of a kind of unwith major flaws of the VBA.MsgBox eliminated:
 * limited window width, resulting in a truncated title
 * limited message text space
 * limited reply button options (number caption text)
@@ -40,6 +43,4 @@ With this first width adjustment the message form's width has become **final**.
 ### Height Adjustment
 1. Any proportional spaced message sections use the final form width but still determine the overall height of the message window
 2. When the overall message window height exceeds the maximum specified, the message area and/or the buttons area is reduced in its height and a vertical scrollbars is added. When one of the areas occupies 70% or more if the total height only this area is reduced, else both. When the message area is about to be height reduced any section occupying 65% or more will be reduced and a vertically scrollbars added, else the scrollbars is applied for the message area as a whole.
-
-
 
