@@ -1,6 +1,6 @@
 # Common VBA Message Form and Display services
 
-Supplements the README and the [Common-VBA-Message-Services](https://warbe-maker.github.io/vba/common/2020/11/17/Common-VBA-Message-Services.html) post focusing on technical aspects.
+Supplements the README and the [Common-VBA-Message-Services](https://warbe-maker.github.io/vba/common/2020/11/17/Common-VBA-Message-Services.html) post focusing on technical/implementation aspects.
 
 The implementation addresses the major shortcomings of the VBA.MsgBox thereby providing a sort of common message services. Addressed shortcomings:
 * limited window width, resulting in title truncation
@@ -85,13 +85,60 @@ A frames content's **width** is the maximum width of all directly contained cont
 Let/Get oroperty with the argument _ctrl_ of type UserForms.Control which may be a TextBox, a TextBox-Frame, or a Section-Frame, defaults to False, may be assigned True when a monospaced section is setup.
 
 Syntax: `Monospaced(ctrl) = True`
-### Property TextBoxWidth
+
+### Property _TextBoxWidth_
 A Let-only property of a TextBox, when changed  triggers the property _[FrameWidth](#property-framewidth)_
 
-### Property FrameWidth
+### Property _FrameWidth_
 A Let-only property with the arguments  _frame\_object_ and _child\_width_.
 
 Syntax: `FrameWidth(frame_object, child_width) = new_frame_width`
 
 When decreased and the _Frame_ is _[Monospaced](#property-monospaced)_ and has already a horizontal scrollbar the scrollbar's width is assigned the  _child\_width_ else the _Frames's_ width is assigned the minimum(frame_width, max_frame_width). When the resulting width is less than the _child\_width_  a horizontal  is established with _.ScrollWidth_ = _child\_width_.
 When increased and the frame has a horizontal scrollbar and the width has become less or equal the _child\_width_ the scrollbar is removed.
+
+### Property _FrameHeight_
+Syntax: `FrameHeight(frame_object) = new_frame_height`
+
+### Property _FrameContentHeight_
+Get-only property of a _MsForm.Frame_ object, returns the height of it's content defined by the maximum `.Top + .Height` which is the bottommost control.
+
+Syntax: `FrameContentHeight(frame_object) = new_frame_height`
+
+### Property _FrameContentWidth_
+Get-only property of an _MsForm.Frame_ object, returns the width of it's content defined by the maximum `.Left + .Widt`
+
+Syntax: `FrameContentHeight(frame_object) = new_frame_height`
+
+## Etc
+### Autosize Height only
+### Align vertical position to grid
+When a TextBox or a Label is vertically misplaced the text may not appear as it should - which results in an ugly display. Aligning to the grid avoids this problem.
+
+```vbs
+Public Function VgridPos(ByVal si As Single) As Single
+' --------------------------------------------------------------
+' Returns a value which is the next position vertically down 
+' which is aligned to a UserForm's grid.
+' Background: A controls content is only properly displayed
+' when the top position of it is aligned to such a position.
+' --------------------------------------------------------------
+    Dim i As Long
+    
+    For i = 0 To 6
+        If Int(si) = 0 Then
+            VgridPos = 0
+        Else
+            If Int(si) < 6 Then si = 6
+            If (Int(si) + i) Mod 6 = 0 Then
+                VgridPos = Int(si) + i
+                Exit For
+            End If
+        End If
+    Next i
+
+End Function
+
+code
+```
+### Explore Control
