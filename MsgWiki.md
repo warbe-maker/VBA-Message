@@ -101,14 +101,14 @@ When increased and the frame has a horizontal scrollbar and the width has become
 Syntax: `FrameHeight(frame_object) = new_frame_height`
 
 ### Property _FrameContentHeight_
-Get-only property of a _MsForm.Frame_ object, returns the height of it's content defined by the maximum `.Top + .Height` which is the bottommost control.
+Get-only property of a _MsForm.Frame_ object, returns the height of it's content defined by:<br>`Max(FrameContentHeight, ctl.Top + ctl.Height)` which is the bottommost control.
 
-Syntax: `FrameContentHeight(frame_object) = new_frame_height`
+Syntax: `FrameContentHeight(frame_object)`
 
 ### Property _FrameContentWidth_
-Get-only property of an _MsForm.Frame_ object, returns the width of it's content defined by the maximum `.Left + .Widt`
+Get-only property of an _MsForm.Frame_ object, returns the width of it's content defined by: <br>`Max(FrameContentWidth, ctl.Left + ctl.Width)`
 
-Syntax: `FrameContentHeight(frame_object) = new_frame_height`
+Syntax: `FrameContentHeight(frame_object)`
 
 ## Etc
 ### Autosize Height only
