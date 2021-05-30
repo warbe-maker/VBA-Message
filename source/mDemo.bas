@@ -29,7 +29,7 @@ Public Sub DemoMsgDsplyService_1()
         .Label.Text = "Unlimited message width!:"
         .Label.FontColor = rgbBlue
         .Text.Text = "Because this section's text is mono-spaced (which is not word-wrapped) and the maximimum message form width" & vbLf _
-                   & "for this demo has been specified " & MAX_WIDTH & "% of the sreen width (the default would be 80%)" & vbLf _
+                   & "for this demo has been specified " & MAX_WIDTH & "% of the screen width (the default would be 80%)" & vbLf _
                    & "the text is displayed with a horizontal scrollbar. There is no message size limit for the display despite the" & vbLf & vbLf _
                    & "limit of VBA for text strings  which is about 1GB!"
         .Text.Monospaced = True
