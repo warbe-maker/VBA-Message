@@ -1113,16 +1113,16 @@ Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
     Const PROC              As String = "Test_11_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar"
     
     On Error GoTo eh
-    Dim i, j                As Long
-    Dim sTitle              As String
-    Dim cllMatrix           As Collection
-    Dim lChangeHeightPcntg  As Long
-    Dim lChangeWidthPcntg   As Long
-    Dim lChangeMinWidthPt   As Long
-    Dim bMonospaced         As Boolean: bMonospaced = True ' initial test value
-    Dim TestMsgWidthMinSpecInPt       As Long
-    Dim TestMsgWidthMaxSpecInPt        As Long
-    Dim TestMsgHeightMaxSpecAsPoSS       As Long
+    Dim i, j                        As Long
+    Dim sTitle                      As String
+    Dim cllMatrix                   As Collection
+    Dim lChangeHeightPcntg          As Long
+    Dim lChangeWidthPcntg           As Long
+    Dim lChangeMinWidthPt           As Long
+    Dim bMonospaced                 As Boolean: bMonospaced = True ' initial test value
+    Dim TestMsgWidthMinSpecInPt     As Long
+    Dim TestMsgWidthMaxSpecInPt     As Long
+    Dim TestMsgHeightMaxSpecAsPoSS  As Long
     
     wsTest.TestNumber = 11
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
@@ -1140,11 +1140,12 @@ Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
     Set cllMatrix = New Collection
     For i = 1 To 7 ' rows
         For j = 1 To 7 ' row buttons
-            If (j * i) < 48 Then
-                cllMatrix.Add vbLf & " ---- Button ---- " & vbLf & i & "-" & j & vbLf & " "
-            Else
+            If i = 7 And j = 5 Then
                 cllMatrix.Add BTTN_PASSED
                 cllMatrix.Add BTTN_FAILED
+                Exit For
+            Else
+                cllMatrix.Add vbLf & " ---- Button ---- " & vbLf & i & "-" & j & vbLf & " "
             End If
         Next j
         If i < 7 Then cllMatrix.Add vbLf
