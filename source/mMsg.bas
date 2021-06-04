@@ -485,17 +485,15 @@ Public Function Dsply(ByVal dsply_title As String, _
         '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
         '+------------------------------------------------------------------------+
         .Setup '                                                                 ||
-'        .Show vbModeless
         If dsply_modeless Then
             DisplayDone = False
             .Show vbModeless
-            Do While DisplayDone = False:   DoEvents: Loop
         Else
             .Show vbModal
         End If
     End With
-
     Dsply = RepliedWith
+
 xt: Exit Function
 
 eh: ErrMsg ErrSrc(PROC)

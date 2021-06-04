@@ -452,7 +452,7 @@ Public Function Test_01_WidthDeterminedByMinimumWidth() As Variant
         .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-        .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     End With
     TestMsgWidthIncrDecr = wsTest.MsgWidthIncrDecr
     TestMsgHeightIncrDecr = wsTest.MsgHeightIncrDecr
@@ -479,10 +479,10 @@ Public Function Test_01_WidthDeterminedByMinimumWidth() As Variant
         End With
                                                                                                   
         Test_01_WidthDeterminedByMinimumWidth = _
-        mMsg.Dsply( _
-                 dsply_title:=sMsgTitle, _
-                 dsply_msg:=Message, _
-                 dsply_buttons:=vbuttons _
+        mMsg.Dsply(dsply_title:=sMsgTitle _
+                 , dsply_msg:=Message _
+                 , dsply_buttons:=vbuttons _
+                 , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                 )
         Select Case Test_01_WidthDeterminedByMinimumWidth
             Case vButton5
@@ -523,7 +523,7 @@ Public Function Test_02_WidthDeterminedByTitle() As Variant
         .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-        .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     End With
     
     MessageInit ' set test-global message specifications
@@ -624,7 +624,7 @@ Public Function Test_03_WidthDeterminedByMonoSpacedMessageSection() As Variant
             .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
             .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
             .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-            .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+            .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
         End With
         
         Test_03_WidthDeterminedByMonoSpacedMessageSection = _
@@ -667,7 +667,7 @@ Public Function Test_04_WidthDeterminedByReplyButtons() As Variant
     Unload fMsg                     ' Ensures a message starts from scratch
     
     ' Initializations for this test
-    fMsg.DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+    fMsg.DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     
     MessageInit    ' set test-global message specifications
     With Message.Section(1)
@@ -734,7 +734,7 @@ Public Function Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth() As Variant
         .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-        .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     End With
     
     MessageInit ' set test-global message specifications
@@ -790,7 +790,7 @@ Public Function Test_06_MonoSpacedMessageSectionExceedsMaxHeight() As Variant
         .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-        .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     End With
        
     MessageInit ' set test-global message specifications
@@ -871,7 +871,7 @@ Public Function Test_07_OnlyButtons() As Variant
             .MsgWidthMinSpecInPt = TestMsgWidthMinSpecInPt
             .MsgWidthMaxSpecAsPoSS = TestMsgWidthMaxSpecAsPoSS    ' for this demo to enforce a vertical scrollbar
             .MsgHeightMaxSpecAsPoSS = TestMsgHeightMaxSpecAsPoSS  ' for this demo to enbforce a vertical scrollbar for the message section
-            .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+            .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
         End With
                          
         Test_07_OnlyButtons = _
@@ -942,7 +942,7 @@ Public Function Test_08_ButtonsMatrix() As Variant
             .MsgWidthMaxSpecInPt = TestMsgWidthMinSpecInPt
             .MsgWidthMaxSpecAsPoSS = TestMsgWidthMaxSpecAsPoSS    ' for this demo to enforce a vertical scrollbar
             .MsgHeightMaxSpecAsPoSS = TestMsgHeightMaxSpecAsPoSS  ' for this demo to enbforce a vertical scrollbar for the message section
-            .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+            .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
         End With
                              
         Test_08_ButtonsMatrix = _
@@ -992,7 +992,7 @@ Public Function Test_09_ButtonScrollBarVertical() As Variant
     With fMsg
         .MsgWidthMaxSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-        .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     End With
     
     MessageInit ' set test-global message specifications
@@ -1086,7 +1086,7 @@ Public Function Test_10_ButtonScrollBarHorizontal() As Variant
             .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
             .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
             .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-            .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+            .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
         End With
     
         Test_10_ButtonScrollBarHorizontal = _
@@ -1157,7 +1157,7 @@ Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
             .MsgWidthMaxSpecInPt = TestMsgWidthMaxSpecInPt
             .MsgWidthMaxSpecAsPoSS = TestMsgWidthMaxSpecInPt    ' for this demo to enforce a vertical scrollbar
             .MsgHeightMaxSpecAsPoSS = TestMsgHeightMaxSpecAsPoSS  ' for this demo to enbforce a vertical scrollbar for the message section
-            .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+            .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
         End With
                              
         Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar = _
@@ -1197,7 +1197,7 @@ Public Function Test_16_ButtonByDictionary()
         .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-        .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     End With
     
     MessageInit ' set test-global message specifications
@@ -1243,7 +1243,7 @@ Public Function Test_17_MessageAsString() As Variant
         .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-        .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     End With
     
     Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED)
@@ -1276,7 +1276,7 @@ Public Function Test_20_ButtonByValue()
         .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-        .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     End With
     
     MessageInit ' set test-global message specifications
@@ -1315,7 +1315,7 @@ Public Function Test_21_ButtonByString()
         .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-        .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     End With
     
     MessageInit ' set test-global message specifications
@@ -1355,7 +1355,7 @@ Public Function Test_22_ButtonByCollection()
         .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-        .DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     End With
     
     cll.Add "Yes"
@@ -1398,7 +1398,7 @@ Public Function Test_30_Progress_FollowUp() As Variant
     sMsgTitle = Readable(PROC)
     Unload mMsg.Form(sMsgTitle)                     ' Ensures a message starts from scratch
     
-    mMsg.Form(sMsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+    mMsg.Form(sMsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     
     For i = 1 To iLoops
         PrgrsMsg = mBasic.Align(i, 4, AlignRight, " ") & mBasic.Align("Passed", 8, AlignCentered, " ") & Repeat(repeat_n_times:=(Int((i / 10)) + 1) + 1, repeat_string:="  " & mBasic.Align(i, 2, AlignRight) & ".  Follow-Up line")
@@ -1502,7 +1502,7 @@ Public Function Test_90_All_in_one_Demonstration() As Variant
     Next j
     cll.Add BTTN_PASSED
     cll.Add BTTN_FAILED
-    fMsg.DsplyFrmsWthBrdrsTestOnly = wsTest.DisplayFramesOption
+    fMsg.DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     
     Do
         Test_90_All_in_one_Demonstration = _
