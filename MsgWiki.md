@@ -59,30 +59,14 @@ With the setup of the title, all monospaced sections and all buttons had been se
 - The reply button rows are height adjusted and top positioned
 - At last the buttons area's top position is adjusted
 
-### Frame size adjustment and scrollbar  application
-Frames are the means for the application of scrollbars, becoming  required when
-- the [content's size](#frame-content-size) expands
-- when the frame size shrinks
-
-The frame size adjustment process starts with the lowest level frame, triggered by a content size change and continues up to the next parent frame until the top level frame (the UserForm) has been reached. When the UserForm's size then exceeds the maximum specified, the process continues back down to the lowest level frame by reducing their size to fit.<br>
-Needless to state that a frame size or a content size Chang may cause scrollbars become obsolete. 
-
-frame size adjustment is usually due when the [frame's content](#frame-content-size) - which again may be just a couple of frames - may have changed in it's size.
-When the [frame's content](#frame-content-size) exceeds its - optionally limited - size, vertical and or horizontal scrollbars is added of which the height/width = content height/width.<br>
-A frame's size can be limited by a surrounding frame and - in case - applied scrollbars. 
-
-### Frame content size
-A frames content's **width** is the maximum width of all directly contained controls in it. I.e. those controls Wich have the frame as the parent control.<br>A frames content's **height** is determined by the bottom most control's top position and height 
-
-#### Vertical scrollbars
-###
-### Scroll width adjustment
-
-### Scroll height adjustment
+### Scrollbar application and adjustment
+Frames are the means for the application of scrollbars, becoming  required when the [content's height](#property-framecontentheight) or [width](#property-framecontentwidth) expands or when the frame size shrinks. Scrollbars may become obsolete when the content's height/width shrinks or the frame size expands.
+When scrollbars are already applied only the width/height is adjusted to the content's width/height. When the content's width/height is no longer greater than the surrounding frame the scrollbars are removed.
+  
 
 ## Properties
 ### Property Monospaced
-Let/Get oroperty with the argument _ctrl_ of type UserForms.Control which may be a TextBox, a TextBox-Frame, or a Section-Frame, defaults to False, may be assigned True when a monospaced section is setup.
+Let/Get property with the argument _ctrl_ of type UserForms.Control which may be a TextBox, a TextBox-Frame, or a Section-Frame, defaults to False, may be assigned True when a monospaced section is setup.
 
 Syntax: `Monospaced(ctrl) = True`
 
@@ -92,13 +76,11 @@ A Let-only property of a TextBox, when changed  triggers the property _[FrameWid
 ### Property _FrameWidth_
 A Let-only property with the arguments  _frame\_object_ and _child\_width_.
 
-Syntax: `FrameWidth(frame_object, child_width) = new_frame_width`
-
-When decreased and the _Frame_ is _[Monospaced](#property-monospaced)_ and has already a horizontal scrollbar the scrollbar's width is assigned the  _child\_width_ else the _Frames's_ width is assigned the minimum(frame_width, max_frame_width). When the resulting width is less than the _child\_width_  a horizontal  is established with _.ScrollWidth_ = _child\_width_.
-When increased and the frame has a horizontal scrollbar and the width has become less or equal the _child\_width_ the scrollbar is removed.
+Syntax: `FrameWidth(frame_object, child_width) = new_frame`<br>Triggers the application or removal of a horizontal scrollbar depending on the content's width.
 
 ### Property _FrameHeight_
-Syntax: `FrameHeight(frame_object) = new_frame_height`
+A Let-only property with the frame as argument.
+Syntax: `FrameHeight(frame_object) = new_frame_height`<br>Triggers the application or removal of a vertical scrollbar depending on the content's height.
 
 ### Property _FrameContentHeight_
 Get-only property of a _MsForm.Frame_ object, returns the height of it's content defined by:<br>`Max(FrameContentHeight, ctl.Top + ctl.Height)` which is the bottommost control.
@@ -141,4 +123,17 @@ End Function
 
 code
 ```
+
+## Test, test environment
+### Test Worksheet
+#### Test-Procedures Command button
+for the mandatory test procedure
+#### Regression-Test Command button
+for the consecutive execution of test procedures marked for the Regression-Test
+
+#### Initial test values
+#### Display Frames Option
+Shows the message with visible frame boundaries
+#### Display Modeless Option
+Allows interaction with the displayed message form in the Immediate Window - with the little disadvantage that pressed reply buttons are not recognized (each of them just closes the window).
 ### Explore Control
