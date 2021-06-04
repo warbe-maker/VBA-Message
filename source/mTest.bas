@@ -483,7 +483,7 @@ Public Function Test_01_WidthDeterminedByMinimumWidth() As Variant
                  , dsply_msg:=Message _
                  , dsply_buttons:=vbuttons _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
-                )
+                  )
         Select Case Test_01_WidthDeterminedByMinimumWidth
             Case vButton5
                 fMsg.MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt - TestMsgWidthIncrDecr
@@ -546,11 +546,11 @@ Public Function Test_02_WidthDeterminedByTitle() As Variant
     Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED)
     
     Test_02_WidthDeterminedByTitle = _
-    mMsg.Dsply( _
-             dsply_title:=sMsgTitle, _
-             dsply_msg:=Message, _
-             dsply_buttons:=vbuttons _
-            )
+    mMsg.Dsply(dsply_title:=sMsgTitle _
+             , dsply_msg:=Message _
+             , dsply_buttons:=vbuttons _
+             , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+              )
     Select Case Test_02_WidthDeterminedByTitle
         Case BTTN_PASSED:       wsTest.Passed = True
         Case BTTN_FAILED:       wsTest.Failed = True
@@ -633,7 +633,8 @@ Public Function Test_03_WidthDeterminedByMonoSpacedMessageSection() As Variant
                  , dsply_buttons:=vbuttons _
                  , dsply_max_width:=TestMsgWidthMaxSpecAsPoSS _
                  , dsply_max_height:=TestMsgHeightMaxSpecAsPoSS _
-                )
+                 , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+                  )
         Select Case Test_03_WidthDeterminedByMonoSpacedMessageSection
             Case BttnRepeatMaxWidthDecreased
                 TestMsgWidthMaxSpecAsPoSS = TestMsgWidthMaxSpecAsPoSS - TestMsgWidthIncrDecr
@@ -692,12 +693,11 @@ Public Function Test_04_WidthDeterminedByReplyButtons() As Variant
     Do
         fMsg.MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
         Test_04_WidthDeterminedByReplyButtons = _
-        mMsg.Dsply( _
-                   dsply_title:=sMsgTitle, _
-                   dsply_msg:=Message, _
-                   dsply_buttons:=vbuttons _
+        mMsg.Dsply(dsply_title:=sMsgTitle _
+                 , dsply_msg:=Message _
+                 , dsply_buttons:=vbuttons _
+                 , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                   )
-        
         Select Case Test_04_WidthDeterminedByReplyButtons
             Case vButton4
                 Set vbuttons = mMsg.Buttons(sBttnTerminate, vButton4, vButton5, vButton6, vbLf, BTTN_PASSED, BTTN_FAILED)
@@ -755,11 +755,11 @@ Public Function Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth() As Variant
     Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED)
     
     Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth = _
-    mMsg.Dsply( _
-             dsply_title:=sMsgTitle, _
-             dsply_msg:=Message, _
-             dsply_buttons:=vbuttons _
-            )
+    mMsg.Dsply(dsply_title:=sMsgTitle _
+             , dsply_msg:=Message _
+             , dsply_buttons:=vbuttons _
+             , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+              )
     Select Case Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth
         Case BTTN_PASSED:       wsTest.Passed = True
         Case BTTN_FAILED:       wsTest.Failed = True
@@ -811,10 +811,10 @@ Public Function Test_06_MonoSpacedMessageSectionExceedsMaxHeight() As Variant
     Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED)
     
     Test_06_MonoSpacedMessageSectionExceedsMaxHeight = _
-    mMsg.Dsply( _
-               dsply_title:=sMsgTitle, _
-               dsply_msg:=Message, _
-               dsply_buttons:=vbuttons _
+    mMsg.Dsply(dsply_title:=sMsgTitle _
+             , dsply_msg:=Message _
+             , dsply_buttons:=vbuttons _
+             , dsply_modeless:=wsTest.TestOptionDisplayModeless _
               )
     Select Case Test_06_MonoSpacedMessageSectionExceedsMaxHeight
         Case BTTN_PASSED:       wsTest.Passed = True
@@ -875,9 +875,10 @@ Public Function Test_07_OnlyButtons() As Variant
         End With
                          
         Test_07_OnlyButtons = _
-        mMsg.Dsply(dsply_title:=sMsgTitle, _
-                   dsply_msg:=Message, _
-                   dsply_buttons:=cllStory _
+        mMsg.Dsply(dsply_title:=sMsgTitle _
+                 , dsply_msg:=Message _
+                 , dsply_buttons:=cllStory _
+                 , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                   )
         Select Case Test_07_OnlyButtons
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
@@ -951,7 +952,8 @@ Public Function Test_08_ButtonsMatrix() As Variant
                  , dsply_buttons:=cllMatrix _
                  , dsply_reply_with_index:=False _
                  , dsply_button_default:=BTTN_PASSED _
-                 , dsply_modeless:=True)
+                 , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+                  )
             
         Select Case Test_08_ButtonsMatrix
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
@@ -1025,6 +1027,7 @@ Public Function Test_09_ButtonScrollBarVertical() As Variant
         mMsg.Dsply(dsply_title:=sMsgTitle _
                  , dsply_msg:=Message _
                  , dsply_buttons:=cll _
+                 , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                   )
         Select Case Test_09_ButtonScrollBarVertical
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
@@ -1092,7 +1095,9 @@ Public Function Test_10_ButtonScrollBarHorizontal() As Variant
         Test_10_ButtonScrollBarHorizontal = _
         mMsg.Dsply(dsply_title:=sMsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_buttons:=mMsg.Buttons(Bttn10Plus, Bttn10Minus, BTTN_PASSED, BTTN_FAILED))
+                 , dsply_buttons:=mMsg.Buttons(Bttn10Plus, Bttn10Minus, BTTN_PASSED, BTTN_FAILED) _
+                 , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+                  )
         Select Case Test_10_ButtonScrollBarHorizontal
             Case Bttn10Minus:   WidthMax = WidthMax - CHANGE_WIDTH
             Case Bttn10Plus:    WidthMax = WidthMax + CHANGE_WIDTH
@@ -1167,7 +1172,8 @@ Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
                  , dsply_buttons:=cllMatrix _
                  , dsply_reply_with_index:=True _
                  , dsply_button_default:=BTTN_PASSED _
-                 , dsply_modeless:=True)
+                 , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+                  )
         Select Case Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
             Case BTTN_FAILED:       wsTest.Failed = True:                   Exit Do
@@ -1214,11 +1220,11 @@ Public Function Test_16_ButtonByDictionary()
     dct.Add "No"
     
     Test_16_ButtonByDictionary = _
-    mMsg.Dsply( _
-             dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             dsply_msg:=Message, _
-             dsply_buttons:=dct _
-            )
+    mMsg.Dsply(dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")" _
+             , dsply_msg:=Message _
+             , dsply_buttons:=dct _
+             , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+              )
 
 xt: Exit Function
 
@@ -1290,11 +1296,11 @@ Public Function Test_20_ButtonByValue()
         .Text.Text = "The buttons ""Yes"" an ""No"" are displayed centered in one row"
     End With
     Test_20_ButtonByValue = _
-    mMsg.Dsply( _
-             dsply_title:="Test: Button by value (" & PROC & ")", _
-             dsply_msg:=Message, _
-             dsply_buttons:=vbOKOnly _
-            )
+    mMsg.Dsply(dsply_title:="Test: Button by value (" & PROC & ")" _
+             , dsply_msg:=Message _
+             , dsply_buttons:=vbOKOnly _
+             , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+              )
             
 xt: Exit Function
 
@@ -1329,11 +1335,11 @@ Public Function Test_21_ButtonByString()
         .Text.Text = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
     End With
     Test_21_ButtonByString = _
-    mMsg.Dsply( _
-             dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             dsply_msg:=Message, _
-             dsply_buttons:="Yes," & vbLf & ",No" _
-            )
+    mMsg.Dsply(dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")" _
+             , dsply_msg:=Message _
+             , dsply_buttons:="Yes," & vbLf & ",No" _
+             , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+              )
 
 xt: Exit Function
 
@@ -1372,11 +1378,11 @@ Public Function Test_22_ButtonByCollection()
         .Text.Text = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
     End With
     Test_22_ButtonByCollection = _
-    mMsg.Dsply( _
-             dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")", _
-             dsply_msg:=Message, _
-             dsply_buttons:=cll _
-            )
+    mMsg.Dsply(dsply_title:="Test: Button by value (" & ErrSrc(PROC) & ")" _
+             , dsply_msg:=Message _
+             , dsply_buttons:=cll _
+             , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+              )
 
 xt: Exit Function
 
@@ -1508,12 +1514,13 @@ Public Function Test_90_All_in_one_Demonstration() As Variant
     Do
         Test_90_All_in_one_Demonstration = _
         mMsg.Dsply(dsply_title:=sMsgTitle _
-                   , dsply_msg:=Message _
-                   , dsply_buttons:=cll _
-                   , dsply_button_default:=BTTN_PASSED _
-                   , dsply_max_height:=TEST_MAX_HEIGHT _
-                   , dsply_max_width:=TEST_MAX_WIDTH _
-                    )
+                 , dsply_msg:=Message _
+                 , dsply_buttons:=cll _
+                 , dsply_button_default:=BTTN_PASSED _
+                 , dsply_max_height:=TEST_MAX_HEIGHT _
+                 , dsply_max_width:=TEST_MAX_WIDTH _
+                 , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+                  )
         Select Case Test_90_All_in_one_Demonstration
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
             Case BTTN_FAILED:       wsTest.Failed = True:                   Exit Do
