@@ -48,6 +48,7 @@ Const HSPACE_BTTN_AREA              As Single = 15              ' Minimum left a
 Const HSPACE_BUTTONS                As Single = 4               ' Horizontal space between reply buttons
 Const HSPACE_LEFT                   As Single = 0               ' Left margin for labels and text boxes
 Const HSPACE_RIGHT                  As Single = 15              ' Horizontal right space for labels and text boxes
+Const HSPACE_LEFTRIGHT_BUTTONS      As Long = 8                 ' The margin before the left most and after the right most button
 Const MARGIN_RIGHT_MSG_AREA         As String = 7
 Const NEXT_ROW                      As String = vbLf            ' Reply button row break
 Const VSCROLLBAR_WIDTH              As Single = 18              ' Additional horizontal space required for a frame with a vertical scrollbar
@@ -1328,18 +1329,17 @@ Private Sub ResizeAndRepositionBttns1()
 ' Unify all applied/visible button's size by assigning the maximum width and
 ' height provided with their setup, and adjust their resulting left position.
 ' ------------------------------------------------------------------------------
-    Const PROC = "ResizeAndRepositionBttns1"
-    
+    Const PROC          As String = "ResizeAndRepositionBttns1"
     On Error GoTo eh
     Dim cllButtonRows   As Collection:      Set cllButtonRows = DsgnBttnRows
     Dim siLeft          As Single
-    Dim frRow           As MSForms.Frame
+    Dim frRow           As MSForms.Frame    ' Frame for the buttons in a row
     Dim vButton         As Variant
     Dim lRow            As Long
     Dim lButton         As Long
     
     For lRow = 1 To cllButtonRows.Count
-        siLeft = siHmarginFrames
+        siLeft = HSPACE_LEFTRIGHT_BUTTONS
         Set frRow = cllButtonRows(lRow)
         If IsApplied(frRow) Then
             For Each vButton In DsgnRowBttns(lRow)
@@ -1360,6 +1360,7 @@ Private Sub ResizeAndRepositionBttns1()
                 End If
             Next vButton
         End If
+        frRow.Width = frRow.Width + HSPACE_LEFTRIGHT_BUTTONS
     Next lRow
         
 xt: Exit Sub
@@ -1373,7 +1374,9 @@ End Sub
 Private Sub ResizeAndRepositionBttns2Rows()
 ' ------------------------------------------------------------------------------
 ' Adjust all applied/visible button rows height to the maximum buttons height
-' and the row frames width to the number of displayed buttons.
+' and the row frames width to the number of the displayed buttons considering a
+' certain margin between the buttons (siHmarginButtons) and a margin at the
+' left and the right.
 ' ------------------------------------------------------------------------------
     Const PROC = "ResizeAndRepositionBttns2Rows"
     
@@ -1398,14 +1401,13 @@ Private Sub ResizeAndRepositionBttns2Rows()
         lButtons = dct(v)
         If IsApplied(BttnRowFrame) Then
             With BttnRowFrame
-                
                 .Top = siTop
                 .Height = siHeight
                 '~~ Provide some extra space for the button's design
                 BttnsFrameWidth = CInt((siMaxButtonWidth * lButtons) _
                                + (siHmarginButtons * (lButtons - 1)) _
                                + (siHmarginFrames * 2)) - siHmarginButtons + 7
-                .Width = BttnsFrameWidth
+                .Width = BttnsFrameWidth + (HSPACE_LEFTRIGHT_BUTTONS * 2)
                 siTop = .Top + .Height + siVmarginButtons
             End With
         End If
