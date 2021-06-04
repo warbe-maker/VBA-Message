@@ -642,7 +642,7 @@ End Property
 
 Public Property Let MsgTitle(ByVal s As String)
     sTitle = s
-    SetupTitle
+    Setup1_Title
 End Property
 
 Public Property Get MsgWidthMaxSpecAsPoSS() As Long:                            MsgWidthMaxSpecAsPoSS = lMsgWidthMaxSpecAsPoSS:                           End Property
@@ -1821,14 +1821,14 @@ Public Sub Setup()
     '~~ This setup ends width the final message form width and all elements adjusted to it.
     '~~ ----------------------------------------------------------------------------------------
     '~~ Setup of the title - may determine the final message width
-    If Not bDoneTitle Then SetupTitle
+    If Not bDoneTitle Then Setup1_Title
     
     '~~ Setup of any monospaced message sections - may determine the final message width
     '~~ In case the section widht exceeds the max msg form width it will be applied with a horizontal scrol bar
-    SetupMsgSectsMonoSpaced
+    Setup2_MsgSectsMonoSpaced
     
     '~~ Setup the reply buttons - may determine the final message section
-    SetupBttns vbuttons
+    Setup3_Bttns vbuttons
     ResizeAndRepositionBttns1
     ResizeAndRepositionBttns2Rows
     ResizeAndRepositionBttns3Frame
@@ -1839,7 +1839,7 @@ Public Sub Setup()
     ' just buttons but no message. The setup of proportional spaced message sections will
     ' determine the final message height - when exeeding the maximum with a vertical scrollbar.
     ' -----------------------------------------------------------------------------------------
-    SetupMsgSectsPropSpaced
+    Setup4_MsgSectsPropSpaced
         
     If IsApplied(DsgnMsgArea) _
     Then ResizeAndRepositionMsgSects
@@ -1880,13 +1880,13 @@ eh: ErrMsg ErrSrc(PROC)
 #End If
 End Sub
 
-Private Sub SetupBttns(ByVal vbuttons As Variant)
+Private Sub Setup3_Bttns(ByVal vbuttons As Variant)
 ' --------------------------------------------------------------------------------------
 ' Setup and position the applied reply buttons and calculate the max reply button width.
 ' Note: When the provided vButtons argument is a string it wil be converted into a
 '       collection and the procedure is performed recursively with it.
 ' --------------------------------------------------------------------------------------
-    Const PROC = "SetupBttns"
+    Const PROC = "Setup3_Bttns"
     
     On Error GoTo eh
     Dim BttnsAreaFrame As MSForms.Frame:   Set BttnsAreaFrame = DsgnBttnsArea
@@ -1904,7 +1904,7 @@ Private Sub SetupBttns(ByVal vbuttons As Variant)
         Case Else
             '~~ Because vbuttons is not provided by a known/accepted format
             '~~ the message will be setup with an Ok only button", vbExclamation
-            SetupBttns vbOKOnly
+            Setup3_Bttns vbOKOnly
     End Select
     
 xt: Exit Sub
@@ -1986,7 +1986,7 @@ Private Sub SetupBttnsFromString(ByVal buttons_string As String)
     For Each v In Split(buttons_string, ",")
         cll.Add v
     Next v
-    SetupBttns cll
+    Setup3_Bttns cll
     
 End Sub
 
@@ -2296,8 +2296,8 @@ Private Sub SetupMsgSectPropSpaced( _
 
 End Sub
 
-Private Sub SetupMsgSectsMonoSpaced()
-    Const PROC = "SetupMsgSectsMonoSpaced"
+Private Sub Setup2_MsgSectsMonoSpaced()
+    Const PROC = "Setup2_MsgSectsMonoSpaced"
     
     On Error GoTo eh
     Dim i       As Long
@@ -2319,8 +2319,8 @@ eh: ErrMsg ErrSrc(PROC)
 #End If
 End Sub
 
-Private Sub SetupMsgSectsPropSpaced()
-    Const PROC = "SetupMsgSectsPropSpaced"
+Private Sub Setup4_MsgSectsPropSpaced()
+    Const PROC = "Setup4_MsgSectsPropSpaced"
     
     On Error GoTo eh
     Dim i       As Long
@@ -2341,12 +2341,12 @@ eh: ErrMsg ErrSrc(PROC)
 #End If
 End Sub
 
-Private Sub SetupTitle()
+Private Sub Setup1_Title()
 ' ------------------------------------------------------------------------------------------
 ' When a specific font name and/or size is specified, the extra title label is actively used
 ' and the UserForm's title bar is not displayed - which means that there is no X to cancel.
 ' ------------------------------------------------------------------------------------------
-    Const PROC = "SetupTitle"
+    Const PROC = "Setup1_Title"
     
     On Error GoTo eh
     Dim siTop           As Single
