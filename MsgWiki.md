@@ -96,20 +96,43 @@ Syntax: `FrameContentHeight(frame_object)`
 ### Autosize Height only
 ```vbs
 codePublic Sub AutoSizeHeight( _
-                    ByRef as_tbx As MSForms.TextBox, _
-                    ByVal as_tbx_width As Single, _
-                    ByVal as_text As String)
+                    ByRef as_ctl As Variant, _
+                    ByVal as_text As String, _
+           Optional ByVal as_width As Single = 0, _
+           Optional ByVal as_height As Single = 0, _
+           Optional ByVal as_append As Boolean = False)
 ' ------------------------------------------------------------------------------
-' Autosizes the TextBoxes (as_tbx) height for the text (as_text) with a given
-' width (as_tbx_width). I.e the less the width the more the height. ------------------------------------------------------------------------------
-    With as_tbx
-        .MultiLine = True
-        .WordWrap = True
-        .AutoSize = False
-        .Width = as_tbx_width
-        .Value = as_text
-        .AutoSize = True
-    End With
+' Autosizes the control (ctl) a TextBoxe or Label. When a width (as_width)
+' is provided, the width is maintained and the height varies.
+' When a height (as_height) is provided, the height is maintained and
+' the width varies
+' Note: A provided height is ignored when a width is provided!.
+' ------------------------------------------------------------------------------
+    Dim tbx As My forms.TextBox
+    Dim lbl As My forms.Label
+    
+    Select TypeName(ctl)
+        Case  "TextBox"
+            Set tbx = ctl
+            With as_tbx
+                .MultiLine = True
+                .WordWrap = True
+                .AutoSize = False
+                If as_width > 0 Then
+                    .Width = as_width
+                Else if as_height > 0 Then
+                    .Height = as_height
+                End If
+                If Not as_append Then
+                    .Value = as_text
+                Else
+                EndIf
+                .AutoSize = True
+            End With
+        Case "Label"
+            Set lbl = ctl
+        Case Else
+    End Select
 
 End Sub
 ```
