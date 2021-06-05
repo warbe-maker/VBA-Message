@@ -92,8 +92,27 @@ Get-only property of an _MsForm.Frame_ object, returns the width of it's content
 
 Syntax: `FrameContentHeight(frame_object)`
 
-## Etc
+## Procedures, code snippets, etc.
 ### Autosize Height only
+```vbs
+codePublic Sub AutoSizeHeight( _
+                    ByRef as_tbx As MSForms.TextBox, _
+                    ByVal as_tbx_width As Single, _
+                    ByVal as_text As String)
+' ------------------------------------------------------------------------------
+' Autosizes the TextBoxes (as_tbx) height for the text (as_text) with a given
+' width (as_tbx_width). I.e the less the width the more the height. ------------------------------------------------------------------------------
+    With as_tbx
+        .MultiLine = True
+        .WordWrap = True
+        .AutoSize = False
+        .Width = as_tbx_width
+        .Value = as_text
+        .AutoSize = True
+    End With
+
+End Sub
+```
 ### Align vertical position to grid
 When a TextBox or a Label is vertically misplaced the text may not appear as it should - which results in an ugly display. Aligning to the grid avoids this problem.
 
