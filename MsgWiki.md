@@ -95,7 +95,7 @@ Syntax: `FrameContentHeight(frame_object)`
 ## Procedures, code snippets, etc.
 ### Autosize Height only
 ```vbs
-codePublic Sub AutoSizeHeight( _
+codePublic Sub AutoSize( _
                     ByRef as_ctl As Variant, _
                     ByVal as_text As String, _
            Optional ByVal as_width_limit As Single = 0, _
