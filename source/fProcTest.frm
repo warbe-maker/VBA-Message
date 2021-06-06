@@ -1,14 +1,13 @@
 VERSION 5.00
-Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} fTest 
+Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} fProcTest 
    Caption         =   "Test-Msg-Form"
    ClientHeight    =   3015
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   4560
-   OleObjectBlob   =   "fTest.frx":0000
-   StartUpPosition =   1  'Fenstermitte
+   OleObjectBlob   =   "fProcTest.frx":0000
 End
-Attribute VB_Name = "fTest"
+Attribute VB_Name = "fProcTest"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
@@ -19,13 +18,13 @@ Const VSCROLLBAR_WIDTH              As Single = 18              ' Additional hor
 Const HSCROLLBAR_HEIGHT             As Single = 18              ' Additional vertical space required for a frame with a horizontal scroll barr
 
 Public Property Get FrameContentHeight( _
-                                 ByRef frm As MSForms.Frame, _
+                                 ByRef frm As MsForms.Frame, _
                         Optional ByVal applied As Boolean = False) As Single
 ' ------------------------------------------------------------------------------
 ' Returns the height of the Frames (frm) content by considering only
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
-    Dim ctl As MSForms.Control
+    Dim ctl As MsForms.Control
     
     For Each ctl In frm.Controls
         If ctl.Parent Is frm Then
@@ -47,9 +46,9 @@ Public Property Get FrameContentWidth( _
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
     
-    Dim ctl As MSForms.Control
-    Dim frm As MSForms.Frame
-    Dim frm_ctl As MSForms.Control
+    Dim ctl As MsForms.Control
+    Dim frm As MsForms.Frame
+    Dim frm_ctl As MsForms.Control
     
     If TypeName(v) = "Frame" Then Set frm_ctl = v Else Stop
     For Each ctl In frm_ctl.Controls
@@ -65,7 +64,7 @@ Public Property Get FrameContentWidth( _
 End Property
 
 Public Property Let FrameHeight( _
-                 Optional ByRef frm As MSForms.Frame, _
+                 Optional ByRef frm As MsForms.Frame, _
                           ByVal frm_height As Single)
 ' ------------------------------------------------------------------------------
 ' Mimics a frame's height change event. When the height of the frame (frm) is
@@ -98,7 +97,7 @@ Public Property Let FrameHeight( _
 End Property
 
 Public Property Let FrameWidth( _
-                 Optional ByRef frm As MSForms.Frame, _
+                 Optional ByRef frm As MsForms.Frame, _
                           ByVal frm_width As Single)
 ' ------------------------------------------------------------------------------
 ' Mimics a frame's width change event. When the width of the frame (frm) is
@@ -127,7 +126,7 @@ Public Property Let FrameWidth( _
     
 End Property
 
-Private Function ScrollHorizontalApplied(ByRef frm As MSForms.Frame) As Boolean
+Private Function ScrollHorizontalApplied(ByRef frm As MsForms.Frame) As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns True when the frame (frm) has already a horizontal scrollbar applied.
 ' ------------------------------------------------------------------------------
@@ -137,7 +136,7 @@ Private Function ScrollHorizontalApplied(ByRef frm As MSForms.Frame) As Boolean
 End Function
 
 Private Sub ScrollHorizontalApply( _
-                            ByRef scroll_frame As MSForms.Frame, _
+                            ByRef scroll_frame As MsForms.Frame, _
                             ByVal scrolled_width As Single, _
                    Optional ByVal x_action As fmScrollAction = fmScrollActionBegin)
 ' ------------------------------------------------------------------------------
@@ -189,7 +188,7 @@ eh: ErrMsg ErrSrc(PROC)
 #End If
 End Sub
 
-Private Function ScrollVerticalApplied(ByRef frm As MSForms.Frame) As Boolean
+Private Function ScrollVerticalApplied(ByRef frm As MsForms.Frame) As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns True when the frame (frm) has already a vertical scrollbar applied.
 ' ------------------------------------------------------------------------------
@@ -199,7 +198,7 @@ Private Function ScrollVerticalApplied(ByRef frm As MSForms.Frame) As Boolean
 End Function
 
 Private Sub ScrollVerticalApply( _
-                          ByRef scroll_frame As MSForms.Frame, _
+                          ByRef scroll_frame As MsForms.Frame, _
                           ByVal scrolled_height As Single, _
                  Optional ByVal y_action As fmScrollAction = fmScrollActionBegin)
 ' ------------------------------------------------------------------------------
@@ -284,4 +283,51 @@ Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "fMsg." & sProc
 End Function
 
+Public Sub SizeWidthAndHeight( _
+                        ByRef as_tbx As MsForms.TextBox, _
+                        ByVal as_text As String, _
+               Optional ByVal as_width As Single = 0, _
+               Optional ByVal as_height As Single = 0, _
+               Optional ByVal as_append As Boolean = False)
+' ------------------------------------------------------------------------------
+' Determines the width and height of the TextBox (tbx).
+' - When a width is provided (as_width > 0) the width is regarded a fixed
+'   maximum and thus the height is auto-sized by means of WordWrap = True. When
+'   the width is exceeded a horizontal scrollbar becomes applicable for the
+'   parent frame.
+' - When no width is provided the width of the TextBox is determined by the
+'   longest line and consequently WordWrap = False
+' - When a height is provided (as_min_height > 0) the height is regarded fixed.
+'   I.e. when it is exceeded a vertical scrollbar becomes applicable for the
+'   parent frame.
+' ------------------------------------------------------------------------------
+    
+    With as_tbx
+        .MultiLine = True
+        If as_width > 0 Then .WordWrap = True Else .WordWrap = False ' the means to limit the width
+        If as_width > 0 Then .AutoSize = False Else .AutoSize = True
+        
+        If as_width > 0 Then .Width = as_width
+        
+        If Not as_append Then
+            .Value = as_text
+        Else
+            If .Value = vbNullString Then
+                .Value = as_text
+            Else
+                .Value = .Value & vbLf & as_text
+            End If
+        End If
+        If as_width > 0 Then
+            .Width = as_width
+            .AutoSize = True
+        End If
+        If as_height > 0 And .Height < as_height Then .Height = as_height
+        
+    End With
+End Sub
 
+Public Property Get VspaceFrame(Optional frm As MsForms.Frame) As Single
+    If frm.Caption = vbNullString Then VspaceFrame = 4 Else VspaceFrame = 8
+
+End Property

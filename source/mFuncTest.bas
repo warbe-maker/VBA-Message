@@ -1,4 +1,4 @@
-Attribute VB_Name = "mTest"
+Attribute VB_Name = "mFuncTest"
 Option Explicit
 Option Compare Text
 ' -----------------------------------------------------
@@ -44,7 +44,7 @@ Public Property Get BTTN_TERMINATE() As String ' composed constant
     BTTN_TERMINATE = "Terminate" & vbLf & "Regression"
 End Property
 
-Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mTest." & s:  End Property
+Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mFuncTest." & s:  End Property
 
 Private Sub ClearVBEImmediateWindow()
     Dim v   As Variant
@@ -63,78 +63,78 @@ End Sub
 Public Sub cmdTest01_Click()
 '    wsTest.RegressionTest = False
     wsTest.TestNumber = 1
-    mTest.Test_01_WidthDeterminedByMinimumWidth
+    mFuncTest.Test_01_WidthDeterminedByMinimumWidth
 End Sub
 
 Public Sub cmdTest02_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 2
-    mTest.Test_02_WidthDeterminedByTitle
+    mFuncTest.Test_02_WidthDeterminedByTitle
 End Sub
 
 Public Sub cmdTest03_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 3
-    mTest.Test_03_WidthDeterminedByMonoSpacedMessageSection
+    mFuncTest.Test_03_WidthDeterminedByMonoSpacedMessageSection
 End Sub
 
 Public Sub cmdTest04_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 4
-    mTest.Test_04_WidthDeterminedByReplyButtons
+    mFuncTest.Test_04_WidthDeterminedByReplyButtons
 End Sub
 
 Public Sub cmdTest05_Click()
     wsTest.RegressionTest = False
-    mTest.Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth
+    mFuncTest.Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth
 End Sub
 
 Public Sub cmdTest06_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 6
-    mTest.Test_06_MonoSpacedMessageSectionExceedsMaxHeight
+    mFuncTest.Test_06_MonoSpacedMessageSectionExceedsMaxHeight
 End Sub
 
 Public Sub cmdTest07_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 7
-    mTest.Test_07_OnlyButtons
+    mFuncTest.Test_07_OnlyButtons
 End Sub
 
 Public Sub cmdTest08_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 8
-    mTest.Test_08_ButtonsMatrix
+    mFuncTest.Test_08_ButtonsMatrix
 End Sub
 
 Public Sub cmdTest09_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 9
-    mTest.Test_09_ButtonScrollBarVertical
+    mFuncTest.Test_09_ButtonScrollBarVertical
 End Sub
 
 Public Sub cmdTest10_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 10
-    mTest.Test_10_ButtonScrollBarHorizontal
+    mFuncTest.Test_10_ButtonScrollBarHorizontal
 End Sub
 
 Public Sub cmdTest11_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 11
-    mTest.Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar
+    mFuncTest.Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar
 End Sub
 
 Public Sub cmdTest30_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 30
-    mTest.Test_30_Progress_FollowUp
+    mFuncTest.Test_30_Progress_FollowUp
 End Sub
 
 Public Sub cmdTest90_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 90
-    mTest.Test_90_All_in_one_Demonstration
+    mFuncTest.Test_90_All_in_one_Demonstration
 End Sub
 
 Private Sub ErrMsg( _
@@ -300,7 +300,7 @@ Private Sub MessageInit()
             .Text.FontColor = rgbBlack
         End With
     Next i
-    If bRegressionTest Then mTest.RegressionTest = True Else mTest.RegressionTest = False
+    If bRegressionTest Then mFuncTest.RegressionTest = True Else mFuncTest.RegressionTest = False
 End Sub
 
 ' Convert a string (s) into a readable form by replacing all underscores
@@ -380,23 +380,6 @@ End Function
 
 Public Sub RepeatTest()
     Debug.Print RepeatString(10, "a", True, False, vbLf)
-End Sub
-
-Public Sub Test_00_AutoSizeHeight()
-    With fMsg
-        .AutoSizeHeight .tbMsgSection1Text, 300, "This text is a bit longer than the specified with and thus should result in a corresponding height"
-        Debug.Print .tbMsgSection1Text.Height
-        .AutoSizeHeight .tbMsgSection1Text, 250, "This text is a bit longer than the specified with and thus should result in a corresponding height"
-        Debug.Print .tbMsgSection1Text.Height
-        .AutoSizeHeight .tbMsgSection1Text, 200, "This text is a bit longer than the specified with and thus should result in a corresponding height"
-        Debug.Print .tbMsgSection1Text.Height
-        .AutoSizeHeight .tbMsgSection1Text, 150, "This text is a bit longer than the specified with and thus should result in a corresponding height"
-        Debug.Print .tbMsgSection1Text.Height
-        .AutoSizeHeight .tbMsgSection1Text, 100, "This text is a bit longer than the specified with and thus should result in a corresponding height"
-        Debug.Print .tbMsgSection1Text.Height
-        .AutoSizeHeight .tbMsgSection1Text, 50, "This text is a bit longer than the specified with and thus should result in a corresponding height"
-        Debug.Print .tbMsgSection1Text.Height
-    End With
 End Sub
 
 Public Function Test_00_The_Buttons_Service_1() As Variant
