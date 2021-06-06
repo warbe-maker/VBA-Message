@@ -98,15 +98,14 @@ Syntax: `FrameContentHeight(frame_object)`
 codePublic Sub AutoSizeHeight( _
                     ByRef as_ctl As Variant, _
                     ByVal as_text As String, _
-           Optional ByVal as_width As Single = 0, _
+           Optional ByVal as_width_limit As Single = 0, _
            Optional ByVal as_height As Single = 0, _
            Optional ByVal as_append As Boolean = False)
 ' ------------------------------------------------------------------------------
-' Autosizes the control (ctl) a TextBoxe or Label. When a width (as_width)
-' is provided, the width is maintained and the height varies.
-' When a height (as_height) is provided, the height is maintained and
-' the width varies
-' Note: A provided height is ignored when a width is provided!.
+' Autosizes the control (ctl) a TextBoxe or Label. When the width is limited 
+' (as_width_limit > 0) the height is auto-sized and a minimum height is ignored.
+' When a minimum height is provided (as_min_height > 0) is provided, the height
+' is maintained disregarding the height required for the text.
 ' ------------------------------------------------------------------------------
     Dim tbx As My forms.TextBox
     Dim lbl As My forms.Label
@@ -116,10 +115,11 @@ codePublic Sub AutoSizeHeight( _
             Set tbx = ctl
             With as_tbx
                 .MultiLine = True
-                .WordWrap = True
+                If as_width_limit > 0 _
+                Then .WordWrap = True ' the means to limit the width
                 .AutoSize = False
-                If as_width > 0 Then
-                    .Width = as_width
+                If as_width_limit > 0 Then
+                    .Width = as_width_limit
                 Else if as_height > 0 Then
                     .Height = as_height
                 End If
