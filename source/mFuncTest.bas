@@ -36,15 +36,16 @@ Dim vButton6                    As Variant
 Dim vButton7                    As Variant
 Dim vbuttons                    As Variant
 
-Public Property Let RegressionTest(ByVal b As Boolean)
-    bRegressionTest = b
-    If b Then sBttnTerminate = "Terminate" & vbLf & "Regression" Else sBttnTerminate = vbNullString
-End Property
 Public Property Get BTTN_TERMINATE() As String ' composed constant
     BTTN_TERMINATE = "Terminate" & vbLf & "Regression"
 End Property
 
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mFuncTest." & s:  End Property
+
+Public Property Let RegressionTest(ByVal b As Boolean)
+    bRegressionTest = b
+    If b Then sBttnTerminate = "Terminate" & vbLf & "Regression" Else sBttnTerminate = vbNullString
+End Property
 
 Private Sub ClearVBEImmediateWindow()
     Dim v   As Variant
@@ -98,7 +99,7 @@ End Sub
 Public Sub cmdTest07_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 7
-    mFuncTest.Test_07_OnlyButtons
+    mFuncTest.Test_07_ButtonsOnly
 End Sub
 
 Public Sub cmdTest08_Click()
@@ -813,8 +814,8 @@ eh: ErrMsg ErrSrc(PROC)
 #End If
 End Function
 
-Public Function Test_07_OnlyButtons() As Variant
-    Const PROC              As String = "Test_07_OnlyButtons"
+Public Function Test_07_ButtonsOnly() As Variant
+    Const PROC              As String = "Test_07_ButtonsOnly"
     
     On Error GoTo eh
     Dim i                       As Long
@@ -828,7 +829,8 @@ Public Function Test_07_OnlyButtons() As Variant
     wsTest.TestNumber = 7
     sMsgTitle = Readable(PROC) & ": No message, just buttons (finish with " & BTTN_PASSED & " or " & BTTN_FAILED & ")"
     Unload fMsg                     ' Ensures a message starts from scratch
-       
+    MessageInit
+    
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
     '~~ for this test  from the Test Worksheet
     With wsTest
@@ -845,8 +847,10 @@ Public Function Test_07_OnlyButtons() As Variant
     cllStory.Add BTTN_PASSED
     cllStory.Add vbLf
     cllStory.Add BTTN_FAILED
-    cllStory.Add vbLf
-    cllStory.Add sBttnTerminate
+    If sBttnTerminate <> vbNullString Then
+        cllStory.Add vbLf
+        cllStory.Add sBttnTerminate
+    End If
     Do
         '~~ Obtain initial test values from the Test Worksheet
         With fMsg
@@ -857,13 +861,13 @@ Public Function Test_07_OnlyButtons() As Variant
             .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
         End With
                          
-        Test_07_OnlyButtons = _
+        Test_07_ButtonsOnly = _
         mMsg.Dsply(dsply_title:=sMsgTitle _
                  , dsply_msg:=Message _
                  , dsply_buttons:=cllStory _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                   )
-        Select Case Test_07_OnlyButtons
+        Select Case Test_07_ButtonsOnly
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
             Case BTTN_FAILED:       wsTest.Failed = True:                   Exit Do
             Case "Ok":                                                      Exit Do ' The very last item in the collection is the "Finished" button
@@ -923,7 +927,7 @@ Public Function Test_08_ButtonsMatrix() As Variant
         '~~ Obtain initial test values from the Test Worksheet
         With fMsg
             .MinButtonWidth = 40
-            .MsgWidthMaxSpecInPt = TestMsgWidthMinSpecInPt
+            .MsgWidthMinSpecInPt = TestMsgWidthMinSpecInPt
             .MsgWidthMaxSpecAsPoSS = TestMsgWidthMaxSpecAsPoSS    ' for this demo to enforce a vertical scrollbar
             .MsgHeightMaxSpecAsPoSS = TestMsgHeightMaxSpecAsPoSS  ' for this demo to enbforce a vertical scrollbar for the message section
             .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
@@ -1121,7 +1125,7 @@ Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
         TestMsgHeightMaxSpecAsPoSS = .MsgHeightMaxSpecAsPoSS: lChangeHeightPcntg = .MsgHeightIncrDecr
     End With
     
-    sTitle = "Buttons only! With a vertical and a horizontal scrollbar! Finish with ""Ok"" (the default button)"
+    sTitle = "Buttons only! With a vertical and a horizontal scrollbar! Finish with " & BTTN_PASSED & " or " & BTTN_FAILED
     MessageInit ' set test-global message specifications
 '    Message.Section(1).Text.Text = "Some can play around with button matrix of 7 by 7 buttons"
     '~~ Assemble the matrix of buttons as collection for  the argument buttons
@@ -1153,7 +1157,7 @@ Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
         mMsg.Dsply(dsply_title:=sTitle _
                  , dsply_msg:=Message _
                  , dsply_buttons:=cllMatrix _
-                 , dsply_reply_with_index:=True _
+                 , dsply_reply_with_index:=False _
                  , dsply_button_default:=BTTN_PASSED _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                   )

@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} fProcTest 
    Caption         =   "Test-Msg-Form"
-   ClientHeight    =   3015
+   ClientHeight    =   6300
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   4560
+   ClientWidth     =   11565
    OleObjectBlob   =   "fProcTest.frx":0000
 End
 Attribute VB_Name = "fProcTest"
@@ -18,13 +18,13 @@ Const VSCROLLBAR_WIDTH              As Single = 18              ' Additional hor
 Const HSCROLLBAR_HEIGHT             As Single = 18              ' Additional vertical space required for a frame with a horizontal scroll barr
 
 Public Property Get FrameContentHeight( _
-                                 ByRef frm As MsForms.Frame, _
+                                 ByRef frm As MSForms.Frame, _
                         Optional ByVal applied As Boolean = False) As Single
 ' ------------------------------------------------------------------------------
-' Returns the height of the Frames (frm) content by considering only
+' Returns the height of the frame's (frm) content by considering only
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
-    Dim ctl As MsForms.Control
+    Dim ctl As MSForms.Control
     
     For Each ctl In frm.Controls
         If ctl.Parent Is frm Then
@@ -46,9 +46,9 @@ Public Property Get FrameContentWidth( _
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
     
-    Dim ctl As MsForms.Control
-    Dim frm As MsForms.Frame
-    Dim frm_ctl As MsForms.Control
+    Dim ctl As MSForms.Control
+    Dim frm As MSForms.Frame
+    Dim frm_ctl As MSForms.Control
     
     If TypeName(v) = "Frame" Then Set frm_ctl = v Else Stop
     For Each ctl In frm_ctl.Controls
@@ -64,7 +64,7 @@ Public Property Get FrameContentWidth( _
 End Property
 
 Public Property Let FrameHeight( _
-                 Optional ByRef frm As MsForms.Frame, _
+                 Optional ByRef frm As MSForms.Frame, _
                           ByVal frm_height As Single)
 ' ------------------------------------------------------------------------------
 ' Mimics a frame's height change event. When the height of the frame (frm) is
@@ -97,7 +97,7 @@ Public Property Let FrameHeight( _
 End Property
 
 Public Property Let FrameWidth( _
-                 Optional ByRef frm As MsForms.Frame, _
+                 Optional ByRef frm As MSForms.Frame, _
                           ByVal frm_width As Single)
 ' ------------------------------------------------------------------------------
 ' Mimics a frame's width change event. When the width of the frame (frm) is
@@ -126,7 +126,142 @@ Public Property Let FrameWidth( _
     
 End Property
 
-Private Function ScrollHorizontalApplied(ByRef frm As MsForms.Frame) As Boolean
+Private Property Get ScrollBarHeight(Optional ByVal frm As MSForms.Frame) As Single
+    If frm.ScrollBars = fmScrollBarsBoth Or frm.ScrollBars = fmScrollBarsHorizontal Then ScrollBarHeight = 14
+End Property
+
+Private Property Get ScrollBarWidth(Optional ByVal frm As MSForms.Frame) As Single
+    If frm.ScrollBars = fmScrollBarsBoth Or frm.ScrollBars = fmScrollBarsVertical Then ScrollBarWidth = 12
+End Property
+
+Public Property Get VspaceFrame(Optional frm As MSForms.Frame) As Single
+    If frm.Caption = vbNullString Then VspaceFrame = 4 Else VspaceFrame = 8
+
+End Property
+
+Public Sub AutoSizeTextBox( _
+                     ByRef as_tbx As MSForms.TextBox, _
+                     ByVal as_text As String, _
+            Optional ByVal as_width_limit As Single = 0, _
+            Optional ByVal as_width_min As Single = 0, _
+            Optional ByVal as_height_min As Single = 0, _
+            Optional ByVal as_width_max As Single = 0, _
+            Optional ByVal as_height_max As Single = 0, _
+            Optional ByVal as_append As Boolean = False, _
+            Optional ByVal as_append_margin As String = vbNullString)
+' ------------------------------------------------------------------------------
+' Common AutoSize service for an MsForms.TextBox providing a width and height
+' for the TextBox (as_tbx) by considering:
+' - When a width limit is provided (as_width_limit > 0) the width is regarded a
+'   fixed maximum and thus the height is auto-sized by means of WordWrap=True.
+' - When no width limit is provided (the default) WordWrap=False and thus the
+'   width of the TextBox is determined by the longest line.
+' - When a maximum width is provided (as_width_max > 0) and the parent of the
+'   TextBox is a frame a horizontal scrollbar is applied for the parent frame.
+' - When a maximum height is provided (as_heightmax > 0) and the parent of the
+'   TextBox is a frame a vertical scrollbar is applied for the parent frame.
+' - When a minimum width (as_width_min > 0) or a minimum height (as_height_min
+'   > 0) is provided the size of the textbox is set correspondingly. This
+'   option is specifically usefull when text is appended to avoid much flicker.
+'
+' Uses: FrameWidth, FrameContentWidth, ScrollHorizontalApply,
+'       FrameHeight, FrameContentHeight, ScrollVerticalApply
+'
+' W. Rauschenberger Berlin June 2021
+' ------------------------------------------------------------------------------
+    
+    With as_tbx
+        .MultiLine = True
+        If as_width_limit > 0 Then
+            '~~ AutoSize the height of the TextBox considering the limited width
+            .WordWrap = True
+            .AutoSize = False
+            .Width = as_width_limit - 7 ' the readability space is added later
+            If Not as_append Then
+                .Value = as_text
+            Else
+                If .Value = vbNullString Then
+                    .Value = as_text
+                Else
+                    .Value = .Value & as_append_margin & vbLf & as_text
+                End If
+            End If
+            .AutoSize = True
+        Else
+            .MultiLine = True
+            .WordWrap = False ' the means to limit the width
+            .AutoSize = True
+            If Not as_append Then
+                .Value = as_text
+            Else
+                If .Value = vbNullString Then
+                    .Value = as_text
+                Else
+                    .Value = .Value & vbLf & as_text
+                End If
+            End If
+        End If
+        .Width = .Width + 7   ' readability space
+        .Height = .Height + 7 ' redability space
+        If as_width_min > 0 And .Width < as_width_min Then .Width = as_width_min
+        If as_height_min > 0 And .Height < as_height_min Then .Height = as_height_min
+        .Parent.Height = .Top + .Height + 2
+        .Parent.Width = .Left + .Width + 2
+    End With
+    
+    '~~ When the parent of the TextBox is a frame scrollbars may have become applicable
+    '~~ provided a mximimum with and/or height has been provided
+    If TypeName(tbx.Parent) = "Frame" Then
+        '~~ When a max width is provided and exceeded a horizontal scrollbar is applied
+        If as_width_max > 0 Then
+            FrameWidth(as_tbx.Parent) = Min(as_width_max, tbx.Width + 2 + ScrollBarWidth(as_tbx.Parent))
+        End If
+        '~~ When a max height is provided and exceeded a vertical scrollbar is applied
+        If as_height_max > 0 Then
+            FrameHeight(as_tbx.Parent) = Min(as_height_max, tbx.Height + ScrollBarHeight(as_tbx.Parent))
+        End If
+    End If
+    
+xt: Exit Sub
+
+End Sub
+
+Private Sub ErrMsg( _
+             ByVal err_source As String, _
+    Optional ByVal err_no As Long = 0, _
+    Optional ByVal err_dscrptn As String = vbNullString, _
+    Optional ByVal err_line As Long = 0)
+' ------------------------------------------------------------------------------
+' This 'Common VBA Component' uses only a kind of minimum error handling!
+' ------------------------------------------------------------------------------
+    Dim ErrNo   As Long
+    Dim ErrDesc As String
+    Dim ErrType As String
+    Dim errline As Long
+    Dim AtLine  As String
+    
+    If err_no = 0 Then err_no = Err.Number
+    If err_no < 0 Then
+        ErrNo = AppErr(err_no)
+        ErrType = "Applicatin error "
+    Else
+        ErrNo = err_no
+        ErrType = "Runtime error "
+    End If
+    If err_dscrptn = vbNullString Then ErrDesc = Err.Description Else ErrDesc = err_dscrptn
+    If err_line = 0 Then errline = Erl
+    If err_line <> 0 Then AtLine = " at line " & err_line
+    MsgBox Title:=ErrType & ErrNo & " in " & err_source _
+         , Prompt:="Error : " & ErrDesc & vbLf & _
+                   "Source: " & err_source & AtLine _
+         , Buttons:=vbCritical
+End Sub
+
+Private Function ErrSrc(ByVal sProc As String) As String
+    ErrSrc = "fMsg." & sProc
+End Function
+
+Private Function ScrollHorizontalApplied(ByRef frm As MSForms.Frame) As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns True when the frame (frm) has already a horizontal scrollbar applied.
 ' ------------------------------------------------------------------------------
@@ -136,7 +271,7 @@ Private Function ScrollHorizontalApplied(ByRef frm As MsForms.Frame) As Boolean
 End Function
 
 Private Sub ScrollHorizontalApply( _
-                            ByRef scroll_frame As MsForms.Frame, _
+                            ByRef scroll_frame As MSForms.Frame, _
                             ByVal scrolled_width As Single, _
                    Optional ByVal x_action As fmScrollAction = fmScrollActionBegin)
 ' ------------------------------------------------------------------------------
@@ -188,7 +323,7 @@ eh: ErrMsg ErrSrc(PROC)
 #End If
 End Sub
 
-Private Function ScrollVerticalApplied(ByRef frm As MsForms.Frame) As Boolean
+Private Function ScrollVerticalApplied(ByRef frm As MSForms.Frame) As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns True when the frame (frm) has already a vertical scrollbar applied.
 ' ------------------------------------------------------------------------------
@@ -198,7 +333,7 @@ Private Function ScrollVerticalApplied(ByRef frm As MsForms.Frame) As Boolean
 End Function
 
 Private Sub ScrollVerticalApply( _
-                          ByRef scroll_frame As MsForms.Frame, _
+                          ByRef scroll_frame As MSForms.Frame, _
                           ByVal scrolled_height As Single, _
                  Optional ByVal y_action As fmScrollAction = fmScrollActionBegin)
 ' ------------------------------------------------------------------------------
@@ -248,86 +383,59 @@ eh: ErrMsg ErrSrc(PROC)
 #End If
 End Sub
 
-Private Sub ErrMsg( _
-             ByVal err_source As String, _
-    Optional ByVal err_no As Long = 0, _
-    Optional ByVal err_dscrptn As String = vbNullString, _
-    Optional ByVal err_line As Long = 0)
+Public Sub Setup1_Title( _
+                ByVal setup_title As String, _
+                ByVal setup_min_width As Single, _
+                ByVal setup_max_width As Single)
 ' ------------------------------------------------------------------------------
-' This 'Common VBA Component' uses only a kind of minimum error handling!
+' Setup the message form for the provided title (setup_title) optimized with the
+' provided minimum width (setup_width_min) and the provided maximum width
+' (setup_max_width) by using a certain factor (setup_factor) for the calculation
+' of the width required to display an untruncated title - as long as the maximum
+' widht is not exeeded.
 ' ------------------------------------------------------------------------------
-    Dim ErrNo   As Long
-    Dim ErrDesc As String
-    Dim ErrType As String
-    Dim errline As Long
-    Dim AtLine  As String
+    Const PROC = "Setup1_Title"
+    Const FACTOR = 1.45
     
-    If err_no = 0 Then err_no = Err.Number
-    If err_no < 0 Then
-        ErrNo = AppErr(err_no)
-        ErrType = "Applicatin error "
-    Else
-        ErrNo = err_no
-        ErrType = "Runtime error "
-    End If
-    If err_dscrptn = vbNullString Then ErrDesc = Err.Description Else ErrDesc = err_dscrptn
-    If err_line = 0 Then errline = Erl
-    If err_line <> 0 Then AtLine = " at line " & err_line
-    MsgBox Title:=ErrType & ErrNo & " in " & err_source _
-         , Prompt:="Error : " & ErrDesc & vbLf & _
-                   "Source: " & err_source & AtLine _
-         , Buttons:=vbCritical
-End Sub
-
-Private Function ErrSrc(ByVal sProc As String) As String
-    ErrSrc = "fMsg." & sProc
-End Function
-
-Public Sub SizeWidthAndHeight( _
-                        ByRef as_tbx As MsForms.TextBox, _
-                        ByVal as_text As String, _
-               Optional ByVal as_width As Single = 0, _
-               Optional ByVal as_height As Single = 0, _
-               Optional ByVal as_append As Boolean = False)
-' ------------------------------------------------------------------------------
-' Determines the width and height of the TextBox (tbx).
-' - When a width is provided (as_width > 0) the width is regarded a fixed
-'   maximum and thus the height is auto-sized by means of WordWrap = True. When
-'   the width is exceeded a horizontal scrollbar becomes applicable for the
-'   parent frame.
-' - When no width is provided the width of the TextBox is determined by the
-'   longest line and consequently WordWrap = False
-' - When a height is provided (as_min_height > 0) the height is regarded fixed.
-'   I.e. when it is exceeded a vertical scrollbar becomes applicable for the
-'   parent frame.
-' ------------------------------------------------------------------------------
+    On Error GoTo eh
+    Dim Correction    As Single
     
-    With as_tbx
-        .MultiLine = True
-        If as_width > 0 Then .WordWrap = True Else .WordWrap = False ' the means to limit the width
-        If as_width > 0 Then .AutoSize = False Else .AutoSize = True
-        
-        If as_width > 0 Then .Width = as_width
-        
-        If Not as_append Then
-            .Value = as_text
-        Else
-            If .Value = vbNullString Then
-                .Value = as_text
-            Else
-                .Value = .Value & vbLf & as_text
-            End If
-        End If
-        If as_width > 0 Then
-            .Width = as_width
+    With Me
+        .Width = setup_min_width
+        '~~ The extra title label is only used to adjust the form width and remains hidden
+        With .laMsgTitle
+            With .Font
+                .Bold = False
+                .Name = Me.Font.Name
+                .Size = 8    ' Value which comes to a length close to the length required
+            End With
+            .Caption = vbNullString
             .AutoSize = True
-        End If
-        If as_height > 0 And .Height < as_height Then .Height = as_height
-        
+            .Caption = " " & setup_title    ' some left margin
+        End With
+        .Caption = setup_title
+        Correction = (CInt(.laMsgTitle.Width)) / 1700
+'        Debug.Print ".laMsgTitle.Width: " & .laMsgTitle.Width, "Factor: " & FACTOR, "FactorCorrection: " & FactorCorrection
+        .Width = Min(setup_max_width, .laMsgTitle.Width * (FACTOR - Correction))
     End With
+   
+xt: Exit Sub
+    
+eh: ErrMsg ErrSrc(PROC)
+#If Test Then
+    Stop: Resume
+#End If
 End Sub
 
-Public Property Get VspaceFrame(Optional frm As MsForms.Frame) As Single
-    If frm.Caption = vbNullString Then VspaceFrame = 4 Else VspaceFrame = 8
-
-End Property
+Private Sub cbSetupTitle_Click()
+    Dim FACTOR As Single
+    Dim MinWidth    As Single
+    Dim MaxWidth    As Single
+    
+    MinWidth = 100
+    MaxWidth = 1500
+    FACTOR = 1.1
+    Setup1_Title setup_title:=Me.tbxTestTitle & " " & Format(FACTOR, "0.000") _
+               , setup_min_width:=MinWidth _
+               , setup_max_width:=MaxWidth
+End Sub

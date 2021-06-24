@@ -160,7 +160,7 @@ Public Function Progress( _
             .DsplyFrmsWthCptnTestOnly = False
             .MsgHeightMaxSpecAsPoSS = prgrs_max_height ' percentage of screen height
             .MsgWidthMaxSpecAsPoSS = prgrs_max_width   ' percentage of screen width
-            .MsgWidthMaxSpecInPt = prgrs_min_width                  ' defaults to 300 pt. the absolute minimum is 200 pt
+            .MsgWidthMaxSpecInPt = prgrs_min_width     ' defaults to 300 pt. the absolute minimum is 200 pt
             .MsgTitle = prgrs_title
             .MsgLabel(1) = Msg.Section(1).Label
             .MsgText(1) = Msg.Section(1).Text
@@ -488,6 +488,8 @@ Public Function Dsply(ByVal dsply_title As String, _
         If dsply_modeless Then
             DisplayDone = False
             .Show vbModeless
+            .Top = 1
+            .Left = 1
         Else
             .Show vbModal
         End If
