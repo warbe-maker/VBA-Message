@@ -166,6 +166,7 @@ Public Function Progress( _
             .MsgText(1) = Msg.Section(1).Text
             .MsgText(2) = Msg.Section(2).Text
             .MsgButtons = prgrs_buttons
+            .ProgressFollowUp = True
 
             '+------------------------------------------------------------------------+
             '|| Setup prior showing the form improves the performance significantly  ||

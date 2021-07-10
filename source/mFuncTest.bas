@@ -1,22 +1,25 @@
 Attribute VB_Name = "mFuncTest"
 Option Explicit
 Option Compare Text
-' -----------------------------------------------------
+' -------------------------------------------------------------------------------
 ' Standard Module mTest
-'          All tests for a complete regression test.
-'          Obligatory performed after any modification.
-'          Ammended when new features or functions are
+'          All tests for a complete regression test. Obligatory performed after
+'          any modification. Ammended when new features or functions are
 '          implemented.
 '
-' Please note:
-' Errors raised by the tested procedures cannot be
-' asserted since they are not passed on to the calling
-' /entry procedure. This would require the Common
-' Standard Module mErrHndlr which intentionally is not
-' used by this module.
+' Note:    Errors raised by the tested procedures cannot be asserted since they
+'          are not passed on to the calling/entry procedure. This would require
+'          the Common Standard Error Handling Module mErH which intentionally is
+'          not used by this module.
 '
 ' W. Rauschenberger, Berlin June 2020
-' -----------------------------------------------------
+' -------------------------------------------------------------------------------
+#If VBA7 Then
+    Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As LongPtr)
+#Else
+    Public Declare Sub Sleep Lib "kernel32" (ByVal ms As Long)
+#End If
+
 Public Const BTTN_FINISH    As String = "Test Done"
 Public Const BTTN_PASSED    As String = "Passed"
 Public Const BTTN_FAILED    As String = "Failed"
@@ -533,6 +536,7 @@ Public Function Test_02_WidthDeterminedByTitle() As Variant
     mMsg.Dsply(dsply_title:=sMsgTitle _
              , dsply_msg:=Message _
              , dsply_buttons:=vbuttons _
+             , dsply_max_width:=wsTest.MsgWidthMaxSpecAsPoSS _
              , dsply_modeless:=wsTest.TestOptionDisplayModeless _
               )
     Select Case Test_02_WidthDeterminedByTitle
@@ -866,6 +870,7 @@ Public Function Test_07_ButtonsOnly() As Variant
                  , dsply_msg:=Message _
                  , dsply_buttons:=cllStory _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+                 , dsply_button_default:=BTTN_PASSED _
                   )
         Select Case Test_07_ButtonsOnly
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
@@ -905,7 +910,7 @@ Public Function Test_08_ButtonsMatrix() As Variant
         TestMsgHeightMaxSpecAsPoSS = .MsgHeightMaxSpecAsPoSS: lChangeHeightPcntg = .MsgHeightIncrDecr
     End With
     
-    sTitle = "Just to demonstrate what's theoretically possible: Buttons only! Finish with ""Ok"" (the default button)"
+    sTitle = "Just to demonstrate what's theoretically possible: Buttons only! Finish with " & BTTN_PASSED & " (default) or " & BTTN_FAILED
     MessageInit ' set test-global message specifications
 '    Message.Section(1).Text.Text = "Some can play around with button matrix of 7 by 7 buttons"
     '~~ Assemble the matrix of buttons as collection for  the argument buttons
@@ -980,6 +985,7 @@ Public Function Test_09_ButtonScrollBarVertical() As Variant
     '~~ Obtain initial test values from the Test Worksheet
     With fMsg
         .MsgWidthMaxSpecInPt = wsTest.MsgWidthMinSpecInPt
+        .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
         .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     End With
@@ -1055,13 +1061,14 @@ Public Function Test_10_ButtonScrollBarHorizontal() As Variant
         MessageInit ' set test-global message specifications
         With Message.Section(1)
             .Label.Text = "Test description:"
-            .Text.Text = "The width, number, amd order of the displayed reply buttons exceeds " & _
-                         "the specified maximum forms width, which for this test is limited to " & _
+            .Text.Text = "The button's width (determined by the longest buttons caption text line), " & _
+                         "their number, and the button's order (all in one row) exceeds the form's " & _
+                         "maximum width, explicitely specified for this test as " & _
                          fMsg.MsgWidthMaxSpecAsPoSS & "% of the screen width."
         End With
         With Message.Section(2)
             .Label.Text = "Expected result:"
-            .Text.Text = "When the maximum form width is enlarged the message will be displayed without a scrollbar."
+            .Text.Text = "The buttons are dsiplayed with a horizontal scroll bar to meet the specified maximimum form width."
         End With
         With Message.Section(3)
             .Label.Text = "Finish test:"
@@ -1084,6 +1091,7 @@ Public Function Test_10_ButtonScrollBarHorizontal() As Variant
                  , dsply_msg:=Message _
                  , dsply_buttons:=mMsg.Buttons(Bttn10Plus, Bttn10Minus, BTTN_PASSED, BTTN_FAILED) _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+                 , dsply_button_default:=BTTN_PASSED _
                   )
         Select Case Test_10_ButtonScrollBarHorizontal
             Case Bttn10Minus:   WidthMax = WidthMax - CHANGE_WIDTH
@@ -1383,19 +1391,24 @@ Public Function Test_30_Progress_FollowUp() As Variant
     Const PROC = "Test_30_Progress_FollowUp"
     
     On Error GoTo eh
-    Dim i As Long
-    Dim PrgrsHeader As String: PrgrsHeader = " No. Status   Step"
+    Dim i           As Long
+    Dim PrgrsHeader As String
     Dim PrgrsMsg    As String
-    Dim iLoops      As Long: iLoops = 25
-        
+    Dim iLoops      As Long
+    Dim lWait       As Long
+    
+    PrgrsHeader = " No. Status   Step"
+    iLoops = 20
+    
     wsTest.TestNumber = 30
     sMsgTitle = Readable(PROC)
     Unload mMsg.Form(sMsgTitle)                     ' Ensures a message starts from scratch
     
     mMsg.Form(sMsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
+    PrgrsMsg = vbNullString
     
     For i = 1 To iLoops
-        PrgrsMsg = mBasic.Align(i, 4, AlignRight, " ") & mBasic.Align("Passed", 8, AlignCentered, " ") & Repeat(repeat_n_times:=(Int((i / 10)) + 1) + 1, repeat_string:="  " & mBasic.Align(i, 2, AlignRight) & ".  Follow-Up line")
+        PrgrsMsg = mBasic.Align(i, 4, AlignRight, " ") & mBasic.Align("Passed", 8, AlignCentered, " ") & Repeat(repeat_n_times:=Int(((i - 1) / 10)) + 1, repeat_string:="  " & mBasic.Align(i, 2, AlignRight) & ".  Follow-Up line after " & Format(lWait, "0000") & " Milliseconds.")
         If i < iLoops Then
 '            Debug.Print i & ". Line"
             mMsg.Progress prgrs_title:=sMsgTitle _
@@ -1404,7 +1417,10 @@ Public Function Test_30_Progress_FollowUp() As Variant
                         , prgrs_header:=" No. Status  Step" _
                         , prgrs_max_height:=50 _
                         , prgrs_max_width:=50 _
-                        , prgrs_buttons:=vbOKOnly
+                        , prgrs_buttons:=vbNullString
+            lWait = 100 * i
+            DoEvents
+            Sleep 100
         Else
             mMsg.Progress prgrs_title:=sMsgTitle _
                         , prgrs_msg:=PrgrsMsg _
@@ -1436,8 +1452,8 @@ Public Function Test_90_All_in_one_Demonstration() As Variant
 ' Demo as test of as many features as possible at once.
 ' ------------------------------------------------------------------------------
     Const PROC              As String = "Test_90_All_in_one_Demonstration"
-    Const TEST_MAX_WIDTH    As Long = 55
-    Const TEST_MAX_HEIGHT   As Long = 65
+    Dim TestMaxWidth        As Long
+    Dim TestMaxHeight       As Long
 
     On Error GoTo eh
     Dim cll                 As New Collection
@@ -1447,6 +1463,8 @@ Public Function Test_90_All_in_one_Demonstration() As Variant
     wsTest.TestNumber = 90
     sMsgTitle = Readable(PROC)
     Unload fMsg                     ' Ensures a message starts from scratch
+    TestMaxHeight = wsTest.MsgHeightMaxSpecAsPoSS
+    TestMaxWidth = wsTest.MsgWidthMaxSpecAsPoSS
     
     With Message.Section(1)
         .Label.Text = "Displayed message summary "
@@ -1462,7 +1480,7 @@ Public Function Test_90_All_in_one_Demonstration() As Variant
         .Label.FontColor = rgbBlue
         .Label.FontBold = True
         .Text.Text = "This section's text is mono-spaced and thus not word-wrapped. I.e. the longest line determines the messag width." & vbLf _
-                   & "Because the maximimum width for this demo has been specified " & TEST_MAX_WIDTH & "% of the screen width (defaults to 80%)" & vbLf _
+                   & "Because the maximimum width for this demo has been specified " & TestMaxWidth & "% of the screen width (defaults to 80%)" & vbLf _
                    & "the text is displayed with a horizontal scrollbar. The size limit for a section's text is only limited by VBA" & vbLf _
                    & "which as about 1GB! (see also unlimited message height below)"
         .Text.MonoSpaced = True
@@ -1472,7 +1490,7 @@ Public Function Test_90_All_in_one_Demonstration() As Variant
         .Label.Text = "Unlimited message height"
         .Label.FontColor = rgbBlue
         .Label.FontBold = True
-        .Text.Text = "All the message sections together ecxeed the maximum height, specified for this demo " & TEST_MAX_HEIGHT & "% " _
+        .Text.Text = "All the message sections together ecxeed the maximum height, specified for this demo " & TestMaxHeight & "% " _
                    & "of the screen height (defaults to 70%). Thus the message area is displayed with a vertical scrollbar. I. e. no matter " _
                    & "how much text is displayed, it is never truncated. The only limit is VBA's limit for a text " _
                    & "string which is abut 1GB! With 4 strings, each in one section the limit is thus about 4GB !!!!"
@@ -1496,7 +1514,11 @@ Public Function Test_90_All_in_one_Demonstration() As Variant
     Next j
     cll.Add BTTN_PASSED
     cll.Add BTTN_FAILED
-    fMsg.DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
+    
+    With fMsg
+        .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
+    End With
     
     Do
         Test_90_All_in_one_Demonstration = _
@@ -1504,8 +1526,8 @@ Public Function Test_90_All_in_one_Demonstration() As Variant
                  , dsply_msg:=Message _
                  , dsply_buttons:=cll _
                  , dsply_button_default:=BTTN_PASSED _
-                 , dsply_max_height:=TEST_MAX_HEIGHT _
-                 , dsply_max_width:=TEST_MAX_WIDTH _
+                 , dsply_max_height:=TestMaxHeight _
+                 , dsply_max_width:=TestMaxWidth _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                   )
         Select Case Test_90_All_in_one_Demonstration
@@ -1515,6 +1537,57 @@ Public Function Test_90_All_in_one_Demonstration() As Variant
         End Select
     Loop
     
+xt: Exit Function
+
+eh: ErrMsg ErrSrc(PROC)
+#If Debugging Then
+    Stop: Resume
+#End If
+End Function
+
+Public Function Test_91_MinimumMessage() As Variant
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
+    Const PROC      As String = "Test_91_MinimumMessage"
+    
+    On Error GoTo eh
+    
+    wsTest.TestNumber = 1
+    sMsgTitle = Readable(PROC)
+    Unload fMsg
+    MessageInit ' set test-global message specifications
+    
+    '~~ Obtain initial test values from the Test Worksheet
+    With fMsg
+        .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
+        .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
+        .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
+        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
+    End With
+    TestMsgWidthIncrDecr = wsTest.MsgWidthIncrDecr
+    TestMsgHeightIncrDecr = wsTest.MsgHeightIncrDecr
+    
+    With Message.Section(1)
+        .Label.Text = "Test description:"
+        .Text.Text = wsTest.TestDescription
+    End With
+    With Message.Section(2)
+        .Label.Text = "Expected test result:"
+        .Text.Text = "The width of all message sections is adjusted either to the specified minimum form width (" & fMsg.MsgWidthMinSpecInPt & " pt) or " _
+                   & "to the width determined by the reply buttons."
+    End With
+    With Message.Section(3)
+        .Label.Text = "Please also note:"
+        .Text.Text = "The message form height is adjusted to the required height up to the specified " & _
+                     "maximum heigth which is " & fMsg.MsgHeightMaxSpecAsPoSS & "% and not exceeded."
+        .Text.FontColor = rgbRed
+    End With
+                                                                                              
+    mMsg.Dsply dsply_title:=sMsgTitle _
+             , dsply_msg:=Message _
+             , dsply_modeless:=wsTest.TestOptionDisplayModeless
+             
 xt: Exit Function
 
 eh: ErrMsg ErrSrc(PROC)

@@ -1,8 +1,8 @@
 Attribute VB_Name = "mProcTest"
 Option Explicit
-
 ' ------------------------------------------------------------------------------
-' Standard Module mProcTest: Test of procedures - rather than fMsg/mMsg services
+' Standard Module mProcTest
+'          Test of procedures - rather than fMsg/mMsg services/functions.
 '
 ' ------------------------------------------------------------------------------
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mFuncTest." & s:  End Property
