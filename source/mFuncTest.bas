@@ -506,12 +506,7 @@ Public Function Test_02_WidthDeterminedByTitle() As Variant
     
     '~~ Obtain initial test values from the Test Worksheet
     TestMsgWidthIncrDecr = wsTest.MsgWidthIncrDecr
-    With fMsg
-        .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
-        .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
-        .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
-        .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
-    End With
+    fMsg.DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     
     MessageInit ' set test-global message specifications
     With Message.Section(1)
@@ -537,6 +532,8 @@ Public Function Test_02_WidthDeterminedByTitle() As Variant
              , dsply_msg:=Message _
              , dsply_buttons:=vbuttons _
              , dsply_max_width:=wsTest.MsgWidthMaxSpecAsPoSS _
+             , dsply_min_width:=wsTest.MsgWidthMinSpecInPt _
+             , dsply_max_height:=wsTest.MsgHeightMaxSpecAsPoSS _
              , dsply_modeless:=wsTest.TestOptionDisplayModeless _
               )
     Select Case Test_02_WidthDeterminedByTitle
@@ -1110,15 +1107,12 @@ eh: ErrMsg ErrSrc(PROC)
 End Function
 
 Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() As Variant
-    Const PROC              As String = "Test_11_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar"
+    Const PROC = "Test_11_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar"
     
     On Error GoTo eh
     Dim i, j                        As Long
     Dim sTitle                      As String
     Dim cllMatrix                   As Collection
-    Dim lChangeHeightPcntg          As Long
-    Dim lChangeWidthPcntg           As Long
-    Dim lChangeMinWidthPt           As Long
     Dim bMonospaced                 As Boolean: bMonospaced = True ' initial test value
     Dim TestMsgWidthMinSpecInPt     As Long
     Dim TestMsgWidthMaxSpecInPt     As Long
@@ -1128,14 +1122,13 @@ Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
     '~~ for this test  from the Test Worksheet
     With wsTest
-        TestMsgWidthMinSpecInPt = .MsgWidthMinSpecInPt:   lChangeMinWidthPt = .MsgWidthIncrDecr
-        TestMsgWidthMaxSpecAsPoSS = .MsgWidthMaxSpecAsPoSS:   lChangeWidthPcntg = .MsgWidthIncrDecr
-        TestMsgHeightMaxSpecAsPoSS = .MsgHeightMaxSpecAsPoSS: lChangeHeightPcntg = .MsgHeightIncrDecr
+        TestMsgWidthMinSpecInPt = .MsgWidthMinSpecInPt
+        TestMsgWidthMaxSpecAsPoSS = .MsgWidthMaxSpecAsPoSS
+        TestMsgHeightMaxSpecAsPoSS = .MsgHeightMaxSpecAsPoSS
     End With
     
     sTitle = "Buttons only! With a vertical and a horizontal scrollbar! Finish with " & BTTN_PASSED & " or " & BTTN_FAILED
     MessageInit ' set test-global message specifications
-'    Message.Section(1).Text.Text = "Some can play around with button matrix of 7 by 7 buttons"
     '~~ Assemble the matrix of buttons as collection for  the argument buttons
     Set cllMatrix = New Collection
     For i = 1 To 7 ' rows
@@ -1155,8 +1148,8 @@ Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
         '~~ Obtain initial test values from the Test Worksheet
         With fMsg
             .MinButtonWidth = 40
-            .MsgWidthMaxSpecInPt = TestMsgWidthMaxSpecInPt
-            .MsgWidthMaxSpecAsPoSS = TestMsgWidthMaxSpecInPt    ' for this demo to enforce a vertical scrollbar
+            .MsgWidthMinSpecInPt = TestMsgWidthMinSpecInPt
+            .MsgWidthMaxSpecAsPoSS = TestMsgWidthMaxSpecAsPoSS    ' for this demo to enforce a vertical scrollbar
             .MsgHeightMaxSpecAsPoSS = TestMsgHeightMaxSpecAsPoSS  ' for this demo to enbforce a vertical scrollbar for the message section
             .DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
         End With
@@ -1398,7 +1391,7 @@ Public Function Test_30_Progress_FollowUp() As Variant
     Dim lWait       As Long
     
     PrgrsHeader = " No. Status   Step"
-    iLoops = 20
+    iLoops = 12
     
     wsTest.TestNumber = 30
     sMsgTitle = Readable(PROC)
@@ -1415,18 +1408,17 @@ Public Function Test_30_Progress_FollowUp() As Variant
                         , prgrs_msg:=PrgrsMsg _
                         , prgrs_msg_monospaced:=True _
                         , prgrs_header:=" No. Status  Step" _
-                        , prgrs_max_height:=50 _
-                        , prgrs_max_width:=50 _
-                        , prgrs_buttons:=vbNullString
+                        , prgrs_max_height:=wsTest.MsgHeightMaxSpecAsPoSS _
+                        , prgrs_max_width:=wsTest.MsgWidthMinSpecInPt
+                        
             lWait = 100 * i
             DoEvents
-            Sleep 100
+            Sleep 200
         Else
             mMsg.Progress prgrs_title:=sMsgTitle _
                         , prgrs_msg:=PrgrsMsg _
                         , prgrs_header:=" No. Status  Step" _
-                        , prgrs_footer:="Process finished! Press ""Ok"" to terminate the display." _
-                        , prgrs_buttons:=vbOKOnly
+                        , prgrs_footer:="Process finished! Close this window"
         End If
     Next i
     

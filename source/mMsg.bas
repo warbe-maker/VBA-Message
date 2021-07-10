@@ -114,7 +114,6 @@ Public Function Progress( _
                    ByRef prgrs_msg As String, _
           Optional ByVal prgrs_header As String = vbNullString, _
           Optional ByVal prgrs_footer As String = "Process in progress! Please wait.", _
-          Optional ByVal prgrs_buttons As Variant = vbOKOnly, _
           Optional ByVal prgrs_msg_append As Boolean = True, _
           Optional ByVal prgrs_msg_monospaced As Boolean = False, _
           Optional ByVal prgrs_min_width As Long = 400, _
@@ -165,7 +164,7 @@ Public Function Progress( _
             .MsgLabel(1) = Msg.Section(1).Label
             .MsgText(1) = Msg.Section(1).Text
             .MsgText(2) = Msg.Section(2).Text
-            .MsgButtons = prgrs_buttons
+            .MsgButtons = vbNullString
             .ProgressFollowUp = True
 
             '+------------------------------------------------------------------------+
@@ -469,7 +468,7 @@ Public Function Dsply(ByVal dsply_title As String, _
         .ReplyWithIndex = dsply_reply_with_index
         If dsply_max_height > 0 Then .MsgHeightMaxSpecAsPoSS = dsply_max_height ' percentage of screen height
         If dsply_max_width > 0 Then .MsgWidthMaxSpecAsPoSS = dsply_max_width   ' percentage of screen width
-        If dsply_min_width > 0 Then .MsgWidthMaxSpecInPt = dsply_min_width                     ' defaults to 300 pt. the absolute minimum is 200 pt
+        If dsply_min_width > 0 Then .MsgWidthMinSpecInPt = dsply_min_width                     ' defaults to 300 pt. the absolute minimum is 200 pt
         If dsply_min_button_width > 0 Then .MinButtonWidth = dsply_min_button_width
         .MsgTitle = dsply_title
         For i = 1 To fMsg.NoOfDesignedMsgSects

@@ -37,8 +37,8 @@ Const DFLT_LBL_MONOSPACED_FONT_NAME As String = "Courier New"   ' Default monosp
 Const DFLT_LBL_MONOSPACED_FONT_SIZE As Single = 9               ' Default monospaced font size
 Const DFLT_LBL_PROPSPACED_FONT_NAME As String = "Calibri"       ' Default proportional spaced font name
 Const DFLT_LBL_PROPSPACED_FONT_SIZE As Single = 9               ' Default proportional spaced font size
-Const DFLT_MSG_HEIGHT_MAX_POSS       As Long = 70                ' Max form height as a Percentage-Of-Screen-Size
-Const DFLT_MSG_WIDTH_MAX_POSS        As Long = 85                ' Max form width as a percentage of the screen width
+Const DFLT_MSG_HEIGHT_MAX_POSS      As Long = 70                ' Max form height as a Percentage-Of-Screen-Size
+Const DFLT_MSG_WIDTH_MAX_POSS       As Long = 85                ' Max form width as a percentage of the screen width
 Const DFLT_MSG_WIDTH_MIN_PTS        As Single = 400             ' Default minimum message form width
 Const DFLT_TXT_MONOSPACED_FONT_NAME As String = "Courier New"   ' Default monospaced font name
 Const DFLT_TXT_MONOSPACED_FONT_SIZE As Single = 10              ' Default monospaced font size
@@ -116,7 +116,6 @@ Private dctSectsLabel                   As Dictionary   ' Sect specific label ei
 Private dctSectsMonoSpaced              As Dictionary   ' Sect specific monospace option either provided via properties MsgMonospaced or Msg
 Private dctSectsText                    As Dictionary   ' Sect specific text either provided via properties MsgText or Msg
 Private lMsgWidthMaxSpecAsPoSS          As Long         ' Maximum % of the screen width
-Private lMsgHeightMinPoSS               As Long         ' Minimum % of the screen width - calculated when min form width in pt is assigend
 Private lMsgHeightMaxSpecAsPoSS         As Long         ' Maximum % of the screen height
 Private lMsgWidthMinSpecAsPoSS          As Long         ' Minimum % of the screen width - calculated when min form width in pt is assigend
 Private lSetupRowButtons                As Long         ' number of buttons setup in a row
@@ -137,7 +136,7 @@ Private sMonoSpacedLabelDefaultFontName As String
 Private sMonoSpacedLabelDefaultFontSize As Single
 Private sMonoSpacedTextDefaultFontName  As String
 Private sMonoSpacedTextDefaultFontSize  As Single
-Private sTitle                          As String
+Private sMsgTitle                          As String
 Private sTitleFontName                  As String
 Private sTitleFontSize                  As String       ' Ignored when sTitleFontName is not provided
 Private TitleWidth                      As Single
@@ -337,12 +336,12 @@ Private Property Let FormWidth(ByVal considered_width As Single)
 ' ------------------------------------------------------------------------------
 ' The FormWidth property ensures
 ' - it is not less than the minimum specified width
-' - it does not exceed the specified or the default value
+' - it does not exceed the specified or the default maximum value
 ' - it may expand up to the maximum but never shrink
 ' ------------------------------------------------------------------------------
     Dim new_width As Single
     new_width = Max(Me.Width, TitleWidth, siMsgWidthMinSpecInPt, considered_width + 15)
-    Me.Width = Min(new_width, siMsgWidthMaxSpecInPt + ScrollVerticalWidth(DsgnMsgArea))
+    Me.Width = Min(new_width, siMsgWidthMaxSpecInPt + Max(ScrollVerticalWidth(DsgnMsgArea), ScrollVerticalWidth(DsgnBttnsArea)))
 End Property
 
 Private Property Get FormWidthMaxUsable()
@@ -658,7 +657,7 @@ End Property
 
 Public Property Get MsgTitle() As String:                                                   MsgTitle = Me.Caption:                                              End Property
 
-Public Property Let MsgTitle(ByVal s As String):                                            sTitle = s:                                                         End Property
+Public Property Let MsgTitle(ByVal s As String):                                            sMsgTitle = s:                                                      End Property
 
 Public Property Get MsgWidthMaxSpecAsPoSS() As Long:                                        MsgWidthMaxSpecAsPoSS = lMsgWidthMaxSpecAsPoSS:                     End Property
 
@@ -684,10 +683,7 @@ Public Property Let MsgWidthMaxSpecInPt(ByVal si As Single)
 ' The maximum message width must not become less than the minimum.
 ' ----------------------------------------------------------------
     siMsgWidthMaxSpecInPt = Max(si, 200) ' cannot be specified less
-    If siMsgWidthMaxSpecInPt < siMsgWidthMinSpecInPt Then
-       siMsgWidthMaxSpecInPt = siMsgWidthMinSpecInPt
-    End If
-    lMsgHeightMinPoSS = CInt((siMsgWidthMaxSpecInPt / VirtualScreenWidthPts) * 100)
+    siMsgWidthMaxSpecInPt = Max(siMsgWidthMaxSpecInPt, siMsgWidthMinSpecInPt)
 End Property
 
 Public Property Let MsgWidthMinSpecAsPoSS(ByVal l As Long)
@@ -695,7 +691,7 @@ Public Property Let MsgWidthMinSpecAsPoSS(ByVal l As Long)
     siMsgWidthMinSpecInPt = VirtualScreenWidthPts * (Max(l, 20) / 100) ' min width cannot be less than 20% of display screen width
     '~~ The maximum is now recalculated considering the specified min width
     lMsgWidthMaxSpecAsPoSS = Max(lMsgWidthMinSpecAsPoSS, lMsgWidthMaxSpecAsPoSS)
-    MsgWidthMaxSpecInPt = VirtualScreenWidthPts * (Min(lMsgWidthMaxSpecAsPoSS, 99) / 100)
+    siMsgWidthMaxSpecInPt = VirtualScreenWidthPts * (Min(lMsgWidthMaxSpecAsPoSS, 99) / 100)
 
 End Property
 
@@ -1789,7 +1785,7 @@ Public Sub Setup()
     
     '~~ Setup of the title, the first element which potentially effects the final message width
     If Not bDoneTitle _
-    Then Setup1_Title setup_title:=sTitle _
+    Then Setup1_Title setup_title:=sMsgTitle _
                     , setup_min_width:=siMsgWidthMinSpecInPt _
                     , setup_max_width:=siMsgWidthMaxSpecInPt
     
@@ -1804,7 +1800,7 @@ Public Sub Setup()
     SizeAndPosition2Bttns1
     SizeAndPosition2Bttns2Rows
     SizeAndPosition2Bttns3Frame
-    SizeAndPosition2BttnsArea
+    SizeAndPosition2Bttns4Area
     
     ' -----------------------------------------------------------------------------------------------
     ' At this point the form has reached its final width (all proportionally spaced message sections
@@ -1814,8 +1810,7 @@ Public Sub Setup()
     ' -----------------------------------------------------------------------------------------------
     Setup4_MsgSectsPropSpaced
         
-    If IsApplied(DsgnMsgArea) _
-    Then SizeAndPosition1MsgSects
+    If IsApplied(DsgnMsgArea) Then SizeAndPosition1MsgSects
     SizeAndPosition3Areas
             
     ' -----------------------------------------------------------------------------------------------
@@ -1825,8 +1820,8 @@ Public Sub Setup()
     ' both will get a vertical scrollbar, else only the one which uses 60% or more of the height.
     ' -----------------------------------------------------------------------------------------------
     ScrollVerticalWhereApplicable
-    SizeAndPosition1MsgSects
-    SizeAndPosition2BttnsArea
+    If IsApplied(DsgnMsgArea) Then SizeAndPosition1MsgSects
+    SizeAndPosition2Bttns4Area
     SizeAndPosition3Areas
     
     '~~ Final form width adjustment
@@ -1835,7 +1830,10 @@ Public Sub Setup()
     '~~ message form width. In order not to interfere again with the width of all content
     '~~ the message form width is extended (over the specified maximum) in order to have
     '~~ the vertical scrollbar visible
-    FormWidth = FormContentWidth + ScrollVerticalWidth(DsgnMsgArea)
+    FormWidth = Me.FormContentWidth + ScrollVerticalWidth(DsgnMsgArea)
+    Debug.Print "Me.FormContentWidth             : " & Me.FormContentWidth
+    Debug.Print "ScrollVerticalWidth(DsgnMsgArea): " & ScrollVerticalWidth(DsgnMsgArea)
+    Debug.Print "Me.Width                        : " & Me.Width
     PositionMessageOnScreen
     SetUpDone = True ' To indicate for the Activate event that the setup had already be done beforehand
     
@@ -1878,8 +1876,9 @@ Public Sub Setup1_Title( _
             .Caption = " " & setup_title    ' some left margin
         End With
         .Caption = setup_title
-        Correction = (CInt(.laMsgTitle.Width)) / 2200
+        Correction = (CInt(.laMsgTitle.Width)) / 2800
         .Width = Min(setup_max_width, .laMsgTitle.Width * (FACTOR - Correction))
+        .Width = Max(.Width, setup_min_width)
         TitleWidth = .Width
     End With
     bDoneTitle = True
@@ -2471,7 +2470,6 @@ Private Sub SizeAndPosition2Bttns3Frame()
             .Top = 0
             BttnsFrame.Height = ContentHeight
             BttnsFrame.Width = ContentWidth
-'            FrameWidth(BttnsFrame) = Min(ContentWidth, siMsgWidthMaxSpecInPt - 15)
             '~~ Center all button rows within the buttons frame
             For Each v In DsgnBttnRows
                 If IsApplied(v) Then
@@ -2490,12 +2488,11 @@ eh: ErrMsg ErrSrc(PROC)
 #End If
 End Sub
 
-Private Sub SizeAndPosition2BttnsArea()
-' ----------------------------------------------------
-' Adjust buttons frame to max button row width and the
-' surrounding area's width and heigth is adjusted
-' ----------------------------------------------------
-    Const PROC = "SizeAndPosition2BttnsArea"
+Private Sub SizeAndPosition2Bttns4Area()
+' ------------------------------------------------------------------------------
+' Adjust the buttons area frame in accordance with the buttons frame.
+' ------------------------------------------------------------------------------
+    Const PROC = "SizeAndPosition2Bttns4Area"
     
     On Error GoTo eh
     Dim BttnsArea       As MSForms.Frame:   Set BttnsArea = DsgnBttnsArea
@@ -2506,14 +2503,12 @@ Private Sub SizeAndPosition2BttnsArea()
     ContentHeight = FrameContentHeight(BttnsArea)
     ContentWidth = FrameContentWidth(BttnsArea)
             
-    If Not ScrollVerticalApplied(BttnsArea) Then
-        FrameWidth(BttnsArea) = Min(ContentWidth, siMsgWidthMaxSpecInPt)
-    End If
+    FrameWidth(BttnsArea) = Min(ContentWidth, siMsgWidthMaxSpecInPt)
     
-    If Not ScrollVerticalApplied(BttnsArea) Then
-        If Not ScrollHorizontalApplied(BttnsArea) Then
+    If Not ScrollHorizontalApplied(BttnsArea) Then
+'        If Not ScrollHorizontalApplied(BttnsArea) Then
             BttnsArea.Width = BttnsFrame.Left + BttnsFrame.Width + ScrollVerticalWidth(BttnsArea)
-        End If
+'        End If
     End If
     
     If Not ScrollHorizontalApplied(BttnsArea) Then
@@ -2522,12 +2517,12 @@ Private Sub SizeAndPosition2BttnsArea()
         End If
     End If
     
-    FrameCenterHorizontal center_frame:=BttnsArea, left_margin:=10
-    With BttnsArea
-        FormWidth = .Left + .Width
-    End With
-    
     FormWidth = BttnsArea.Width + ScrollVerticalWidth(BttnsArea)
+    
+    FrameCenterHorizontal center_frame:=BttnsArea, left_margin:=10
+'    With BttnsArea
+'        FormWidth = .Left + .Width
+'    End With
     
 xt: Exit Sub
     
@@ -2544,10 +2539,10 @@ Private Sub SizeAndPosition3Areas()
     Const PROC = "SizeAndPosition3Areas"
     
     On Error GoTo eh
-    Dim TopNextArea     As Single
-    Dim AreaFrame       As MSForms.Frame
-    Dim AreaFrameMsg    As MSForms.Frame: Set MsgArea = DsgnMsgArea
-    Dim AreaFrameBttns  As MSForms.Frame: Set AreaFrameBttns = DsgnBttnsArea
+    Dim TopNextArea As Single
+    Dim AreaFrame   As MSForms.Frame
+    Dim MsgArea     As MSForms.Frame: Set MsgArea = DsgnMsgArea
+    Dim BttnsArea   As MSForms.Frame: Set BttnsArea = DsgnBttnsArea
     
     TopNextArea = siVmarginFrames
     If IsApplied(MsgArea) Then
@@ -2560,12 +2555,12 @@ Private Sub SizeAndPosition3Areas()
         TopNextArea = 15
     End If
     
-    If IsApplied(AreaFrameBttns) Then
-        With AreaFrameBttns
+    If IsApplied(BttnsArea) Then
+        With BttnsArea
             .Top = TopNextArea
             TopNextArea = VgridPos(.Top + .Height + VSPACE_AREAS)
         End With
-        Set AreaFrame = AreaFrameBttns
+        Set AreaFrame = BttnsArea
     End If
     
     '~~ Adjust the final height of the message form
