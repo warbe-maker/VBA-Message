@@ -3,8 +3,8 @@ Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} fProcTest
    Caption         =   "Test-Msg-Form"
    ClientHeight    =   6300
    ClientLeft      =   120
-   ClientTop       =   465
-   ClientWidth     =   11565
+   ClientTop       =   468
+   ClientWidth     =   11568
    OleObjectBlob   =   "fProcTest.frx":0000
 End
 Attribute VB_Name = "fProcTest"
