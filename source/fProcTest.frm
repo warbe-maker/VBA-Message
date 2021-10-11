@@ -3,8 +3,8 @@ Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} fProcTest
    Caption         =   "Test-Msg-Form"
    ClientHeight    =   6300
    ClientLeft      =   120
-   ClientTop       =   468
-   ClientWidth     =   11568
+   ClientTop       =   465
+   ClientWidth     =   11565
    OleObjectBlob   =   "fProcTest.frx":0000
 End
 Attribute VB_Name = "fProcTest"
@@ -225,6 +225,17 @@ Public Sub AutoSizeTextBox( _
 xt: Exit Sub
 
 End Sub
+
+Private Function AppErr(ByVal app_err_no As Long) As Long
+' ------------------------------------------------------------------------------
+' Ensures that a programmed (i.e. an application) error numbers never conflicts
+' with the number of a VB runtime error. Thr function returns a given positive
+' number (app_err_no) with the vbObjectError added - which turns it into a
+' negative value. When the provided number is negative it returns the original
+' positive "application" error number e.g. for being used with an error message.
+' ------------------------------------------------------------------------------
+    AppErr = IIf(app_err_no < 0, app_err_no - vbObjectError, vbObjectError - app_err_no)
+End Function
 
 Private Sub ErrMsg( _
              ByVal err_source As String, _
