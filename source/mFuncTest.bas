@@ -1,7 +1,7 @@
 Attribute VB_Name = "mFuncTest"
 Option Explicit
 Option Compare Text
-' -------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
 ' Standard Module mTest
 '          All tests for a complete regression test. Obligatory performed after
 '          any modification. Ammended when new features or functions are
@@ -17,12 +17,12 @@ Option Compare Text
 #If VBA7 Then
     Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As LongPtr)
 #Else
-    Public Declare Sub Sleep Lib "kernel32" (ByVal ms As Long)
+    Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
 #End If
 
-Public Const BTTN_FINISH    As String = "Test Done"
-Public Const BTTN_PASSED    As String = "Passed"
-Public Const BTTN_FAILED    As String = "Failed"
+Public Const BTTN_FINISH        As String = "Test Done"
+Public Const BTTN_PASSED        As String = "Passed"
+Public Const BTTN_FAILED        As String = "Failed"
 
 Dim TestMsgWidthMaxSpecAsPoSS   As Long
 Dim TestMsgHeightMaxSpecAsPoSS  As Long
@@ -73,9 +73,10 @@ Private Sub ClearVBEImmediateWindow()
     Next v
 End Sub
 
-' -------------------------------------------------------------------------------------------------
-' Procedures for test start via Command Buttons on Test Worksheet
 Public Sub cmdTest01_Click()
+' ------------------------------------------------------------------------------
+' Procedures for test start via Command Buttons on Test Worksheet
+' ------------------------------------------------------------------------------
 '    wsTest.RegressionTest = False
     wsTest.TestNumber = 1
     mFuncTest.Test_01_WidthDeterminedByMinimumWidth
@@ -152,19 +153,28 @@ Public Sub cmdTest90_Click()
     mFuncTest.Test_90_All_in_one_Demonstration
 End Sub
 
-Private Sub ErrMsg( _
-             ByVal err_source As String, _
-    Optional ByVal err_no As Long = 0, _
-    Optional ByVal err_dscrptn As String = vbNullString, _
-    Optional ByVal err_line As Long = 0)
+Public Function ErrMsg(ByVal err_source As String, _
+          Optional ByVal err_no As Long = 0, _
+          Optional ByVal err_dscrptn As String = vbNullString, _
+         Optional ByVal err_line As Long = 0) As Variant
 ' ------------------------------------------------------------------------------
-' This 'Common VBA Component' uses only a kind of minimum error handling!
+' Common, minimum VBA error handling providing the means to resume the error
+' line when the Conditional Compile Argument Debugging=1.
+' Usage: When this procedure is copied into any desired module the statement
+'        If ErrMsg(ErrSrc(PROC) = vbYes Then: Stop: Resume
+'        is appropriate
+'        The caller provides the source of the error through ErrSrc(PROC) where
+'        ErrSrc is a procedure available in the module using this ErrMsg and
+'        PROC is the constant identifying the procedure
+' Uses: AppErr to translate a negative programmed application error into its
+'              original positive number
 ' ------------------------------------------------------------------------------
     Dim ErrNo   As Long
     Dim ErrDesc As String
     Dim ErrType As String
     Dim errline As Long
     Dim AtLine  As String
+    Dim Buttons As Long
     
     If err_no = 0 Then err_no = Err.Number
     If err_no < 0 Then
@@ -174,14 +184,26 @@ Private Sub ErrMsg( _
         ErrNo = err_no
         ErrType = "Runtime error "
     End If
-    If err_dscrptn = vbNullString Then ErrDesc = Err.Description Else ErrDesc = err_dscrptn
+    
     If err_line = 0 Then errline = Erl
     If err_line <> 0 Then AtLine = " at line " & err_line
-    MsgBox Title:=ErrType & ErrNo & " in " & err_source _
-         , Prompt:="Error : " & ErrDesc & vbLf & _
-                   "Source: " & err_source & AtLine _
-         , Buttons:=vbCritical
-End Sub
+    
+    If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
+    If err_dscrptn = vbNullString Then err_dscrptn = "--- No error message available ---"
+    ErrDesc = "Error: " & vbLf & err_dscrptn & vbLf & vbLf & "Source: " & vbLf & err_source & AtLine
+
+    
+#If Debugging Then
+    Buttons = vbYesNo
+    ErrDesc = ErrDesc & vbLf & vbLf & "Debugging: Yes=Resume error line, No=Continue"
+#Else
+    Buttons = vbCritical
+#End If
+    
+    ErrMsg = MsgBox(Title:=ErrType & ErrNo & " in " & err_source _
+                  , Prompt:=ErrDesc _
+                  , Buttons:=Buttons)
+End Function
 
 Public Sub Explore(ByVal ctl As Variant, _
           Optional ByVal applied As Boolean = True)
@@ -298,11 +320,11 @@ Function IsUcase(ByVal s As String) As Boolean
 End Function
 
 Private Sub MessageInit()
-' ------------------------------------------------------
+' ------------------------------------------------------------------------------
 ' Initializes the all message sections with the defaults
 ' throughout this test module which uses a module global
 ' declared Message for a consistent layout.
-' ------------------------------------------------------
+' ------------------------------------------------------------------------------
     Dim i   As Long
     For i = 1 To fMsg.NoOfDesignedMsgSects
         With Message.Section(i)
@@ -316,13 +338,15 @@ Private Sub MessageInit()
         End With
     Next i
     If bRegressionTest Then mFuncTest.RegressionTest = True Else mFuncTest.RegressionTest = False
+
 End Sub
 
+Private Function Readable(ByVal s As String) As String
+' ------------------------------------------------------------------------------
 ' Convert a string (s) into a readable form by replacing all underscores
 ' with a whitespace and all characters immediately following an underscore
 ' to a lowercase letter.
-' ---------------------------------------------------------------------
-Private Function Readable(ByVal s As String) As String
+' ------------------------------------------------------------------------------
     Dim i       As Long
     Dim sResult As String
     
@@ -827,7 +851,7 @@ eh: ErrMsg ErrSrc(PROC)
 End Function
 
 Public Function Test_07_ButtonsOnly() As Variant
-    Const PROC              As String = "Test_07_ButtonsOnly"
+    Const PROC = "Test_07_ButtonsOnly"
     
     On Error GoTo eh
     Dim i                       As Long
@@ -898,7 +922,7 @@ eh: ErrMsg ErrSrc(PROC)
 End Function
 
 Public Function Test_08_ButtonsMatrix() As Variant
-    Const PROC              As String = "Test_08_ButtonsMatrix"
+    Const PROC = "Test_08_ButtonsMatrix"
     
     On Error GoTo eh
     Dim bMonospaced         As Boolean: bMonospaced = True ' initial test value
@@ -1263,10 +1287,7 @@ Public Function Test_17_MessageAsString() As Variant
 
 xt: Exit Function
 
-eh: ErrMsg ErrSrc(PROC)
-#If Debugging Then
-    Stop: Resume
-#End If
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function Test_20_ButtonByValue()
@@ -1303,10 +1324,7 @@ Public Function Test_20_ButtonByValue()
             
 xt: Exit Function
 
-eh: ErrMsg ErrSrc(PROC)
-#If Debugging Then
-    Stop: Resume
-#End If
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function Test_21_ButtonByString()
@@ -1342,10 +1360,7 @@ Public Function Test_21_ButtonByString()
 
 xt: Exit Function
 
-eh: ErrMsg ErrSrc(PROC)
-#If Debugging Then
-    Stop: Resume
-#End If
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function Test_22_ButtonByCollection()
@@ -1385,10 +1400,7 @@ Public Function Test_22_ButtonByCollection()
 
 xt: Exit Function
 
-eh: ErrMsg ErrSrc(PROC)
-#If Debugging Then
-    Stop: Resume
-#End If
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function Test_30_Progress_FollowUp() As Variant
@@ -1444,10 +1456,7 @@ Public Function Test_30_Progress_FollowUp() As Variant
 
 xt: Exit Function
 
-eh: ErrMsg ErrSrc(PROC)
-#If Debugging Then
-    Stop: Resume
-#End If
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function Test_90_All_in_one_Demonstration() As Variant
@@ -1542,10 +1551,7 @@ Public Function Test_90_All_in_one_Demonstration() As Variant
     
 xt: Exit Function
 
-eh: ErrMsg ErrSrc(PROC)
-#If Debugging Then
-    Stop: Resume
-#End If
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function Test_91_MinimumMessage() As Variant
@@ -1593,10 +1599,7 @@ Public Function Test_91_MinimumMessage() As Variant
              
 xt: Exit Function
 
-eh: ErrMsg ErrSrc(PROC)
-#If Debugging Then
-    Stop: Resume
-#End If
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
 Public Sub Test_99_Individual()
@@ -1638,9 +1641,6 @@ Public Sub Test_99_Individual()
     
 xt: Exit Sub
 
-eh: ErrMsg ErrSrc(PROC)
-#If Debugging Then
-    Stop: Resume
-#End If
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
