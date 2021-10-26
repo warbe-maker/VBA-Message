@@ -515,8 +515,8 @@ End Property
 Public Property Let MsgButtons(ByVal v As Variant)
         
     Select Case VarType(v)
-        Case VarType(v) = vbLong, vbString:  vbuttons = v
-        Case VarType(v) = vbEmpty:          vbuttons = vbOKOnly
+        Case vbLong, vbString:  vbuttons = v
+        Case vbEmpty:           vbuttons = vbOKOnly
         Case Else
             If IsArray(v) Then
                 vbuttons = v
@@ -2011,6 +2011,8 @@ Private Sub SetupBttnsFromCollection(ByVal cllButtons As Collection)
             Case vbOKCancel, vbYesNo, vbRetryCancel
                 SetupBttnsFromValue v
             Case vbYesNoCancel, vbAbortRetryIgnore
+                SetupBttnsFromValue v
+            Case vbYesNo
                 SetupBttnsFromValue v
             Case Else
                 If v <> vbNullString Then
