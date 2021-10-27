@@ -5,7 +5,7 @@
 [Why an alternative MsgBox](#why-an-alternative-msgbox)<br>[Installation](#installation)<br>[Properties of the _fMsg_ UserForm](#properties-of-the-fmsg-userform)<br>[Usage](#usage)<br>[Interfaces](#interfaces)
 
 ### Abstract
-Displays a message in a dialog box, waits for the user to click a button, and returns a variant indicating which button the user clicked.
+A flexible and powerful VBA MsgBox alternative coming in four flavors. **[Dsply](#the-dsply-service)** is for any common message, **[ErrMsg](#the-errmsg-service)** provides a comprehensive error message, **[Box](#the-box-service)** is a very much VBA MsgBox like service and **[Progress](#the-progress-service)** is a service to display the progress of a process.
 
 ### Why an alternative MsgBox?
 The alternative implementation addresses many of the MsgBox's deficiencies - without re-implementing it to 100%.
@@ -74,11 +74,30 @@ With Message.Section(n)
 ```
 Going with the defaults the minimum message text assignment (without a label) would be `Message.Section(1).Text.Text = "......"`
 
+### The ErrMsg service
+Provides the display of a well designed error message by integrating a debugging option which supports the Resume of the code line which caused the error.
+
+#### Using the _mMsg.ErrMsg_ service
+
+The following is a coding example which my personal standard. It uses an ErrSrc function which is module specific and returns '\<modulename>.\<procedurename>'.
+```VB
+Private Sub Test
+    Const PROC = "Test"
+    
+    On Error Goto ex
+    ' any code
+    
+xt: Exit Sub
+
+eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+```
+Only when the Conditional Compile Argument 'Debugging = 1' the ErrMsg is displayed with Yes/No buttons and thus may return vbYes which means that the line which caused the error may be resumed by F8, F8.
+
 
 ### The Box service
 The _Box_ service mimicks the VBA.MsgBox. In contrast to the _Dsply_ service the messsage text is a simple string expression just like the VBA.MsgBoc _Prompt_ argument. All other arguments are identical with the _Dsply_ service - just prefixed with box_ instead of dsply_.
 
-### Usage
 #### Using the _mMsg.Box_ service
 ```
 Public Sub Test_Box()
