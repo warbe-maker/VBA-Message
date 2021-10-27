@@ -153,60 +153,8 @@ Public Sub cmdTest90_Click()
     mFuncTest.Test_90_All_in_one_Demonstration
 End Sub
 
-'Public Function ErrMsg(ByVal err_source As String, _
-'          Optional ByVal err_no As Long = 0, _
-'          Optional ByVal err_dscrptn As String = vbNullString, _
-'         Optional ByVal err_line As Long = 0) As Variant
-'' ------------------------------------------------------------------------------
-'' Common, minimum VBA error handling providing the means to resume the error
-'' line when the Conditional Compile Argument Debugging=1.
-'' Usage: When this procedure is copied into any desired module the statement
-''        If mMsg.ErrMsg(ErrSrc(PROC) = vbYes Then: Stop: Resume
-''        is appropriate
-''        The caller provides the source of the error through ErrSrc(PROC) where
-''        ErrSrc is a procedure available in the module using this ErrMsg and
-''        PROC is the constant identifying the procedure
-'' Uses: AppErr to translate a negative programmed application error into its
-''              original positive number
-'' ------------------------------------------------------------------------------
-'    Dim ErrNo   As Long
-'    Dim ErrDesc As String
-'    Dim ErrType As String
-'    Dim errline As Long
-'    Dim AtLine  As String
-'    Dim Buttons As Long
-'
-'    If err_no = 0 Then err_no = Err.Number
-'    If err_no < 0 Then
-'        ErrNo = AppErr(err_no)
-'        ErrType = "Applicatin error "
-'    Else
-'        ErrNo = err_no
-'        ErrType = "Runtime error "
-'    End If
-'
-'    If err_line = 0 Then errline = Erl
-'    If err_line <> 0 Then AtLine = " at line " & err_line
-'
-'    If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
-'    If err_dscrptn = vbNullString Then err_dscrptn = "--- No error message available ---"
-'    ErrDesc = "Error: " & vbLf & err_dscrptn & vbLf & vbLf & "Source: " & vbLf & err_source & AtLine
-'
-'
-'#If Debugging Then
-'    Buttons = vbYesNo
-'    ErrDesc = ErrDesc & vbLf & vbLf & "Debugging: Yes=Resume error line, No=Continue"
-'#Else
-'    Buttons = vbCritical
-'#End If
-'
-'    ErrMsg = MsgBox(Title:=ErrType & ErrNo & " in " & err_source _
-'                  , Prompt:=ErrDesc _
-'                  , Buttons:=Buttons)
-'End Function
-
-Public Sub Test_ErrMsg()
-    Const PROC = "Test_ErrMsg"
+Public Sub Test40_Dsiplay_ErrMsg()
+    Const PROC = "Test40_Display_ErrMsg"
     
     On Error GoTo eh
     Dim i As Long
@@ -1402,14 +1350,14 @@ Public Function Test_30_Progress_FollowUp() As Variant
     For i = 1 To iLoops
         PrgrsMsg = mBasic.Align(i, 4, AlignRight, " ") & mBasic.Align("Passed", 8, AlignCentered, " ") & Repeat(repeat_n_times:=Int(((i - 1) / 10)) + 1, repeat_string:="  " & mBasic.Align(i, 2, AlignRight) & ".  Follow-Up line after " & Format(lWait, "0000") & " Milliseconds.")
         If i < iLoops Then
-'            Debug.Print i & ". Line"
             mMsg.Progress prgrs_title:=sMsgTitle _
                         , prgrs_msg:=PrgrsMsg _
+                        , prgrs_msg_append:=True _
                         , prgrs_msg_monospaced:=True _
                         , prgrs_header:=" No. Status  Step" _
                         , prgrs_max_height:=wsTest.MsgHeightMaxSpecAsPoSS _
                         , prgrs_max_width:=wsTest.MsgWidthMinSpecInPt
-                        
+            '~~ Simmulation of a process
             lWait = 100 * i
             DoEvents
             Sleep 200
