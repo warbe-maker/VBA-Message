@@ -81,17 +81,22 @@ Provides the display of a well designed error message by integrating a debugging
 
 The following is a coding example which my personal standard. It uses an ErrSrc function which is module specific and returns '\<modulename>.\<procedurename>'.
 ```VB
-Private Sub Test
-    Const PROC = "Test"
+Public Sub Test_ErrMsg_Service()
+    Const PROC = "Test_ErrMsg_Service"
     
-    On Error Goto ex
-    ' any code
+    On Error GoTo eh
+    Dim i As Long
+    i = i / 0
     
 xt: Exit Sub
 
 eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 ```
+
+Displays:
+![](images/ErrorMessage.png)
+
 Only when the Conditional Compile Argument 'Debugging = 1' the ErrMsg is displayed with Yes/No buttons and thus may return vbYes which means that the line which caused the error may be resumed by F8, F8.
 
 
@@ -121,8 +126,6 @@ Public Sub Test_Box()
 
 End Sub
 ```
-
-
 
 #### Using the mMsg.Dsply_ service
 The following is a demonstration of how to use many of the features.
