@@ -219,7 +219,7 @@ Public Sub Explore(ByVal ctl As Variant, _
         If fMsg.IsApplied(ctl) Then Appl = "Yes " Else Appl = " No "
         l = Align(Format(ctl.Left, "000.0"), 7, AlignCentered, " ")
         W = Align(Format(ctl.Width, "000.0"), 7, AlignCentered, " ")
-        T = Align(Format(ctl.Top, "000.0"), 7, AlignCentered, " ")
+        T = Align(Format(ctl.top, "000.0"), 7, AlignCentered, " ")
         H = Align(Format(ctl.Height, "000.0"), 7, AlignCentered, " ")
         FH = Align(Format(fMsg.InsideHeight, "000.0"), 7, AlignCentered, " ")
         FW = Align(Format(fMsg.InsideWidth, "000.0"), 7, AlignCentered, " ")
@@ -1352,7 +1352,6 @@ Public Function Test_30_Progress_FollowUp() As Variant
         If i < iLoops Then
             mMsg.Progress prgrs_title:=sMsgTitle _
                         , prgrs_msg:=PrgrsMsg _
-                        , prgrs_msg_append:=True _
                         , prgrs_msg_monospaced:=True _
                         , prgrs_header:=" No. Status  Step" _
                         , prgrs_max_height:=wsTest.MsgHeightMaxSpecAsPoSS _
