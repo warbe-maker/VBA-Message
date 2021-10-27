@@ -141,6 +141,12 @@ Public Sub cmdTest11_Click()
     mFuncTest.Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar
 End Sub
 
+Public Sub cmdTest17_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 17
+    mFuncTest.Test_17_MessageAsString
+End Sub
+
 Public Sub cmdTest30_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 30
@@ -153,8 +159,8 @@ Public Sub cmdTest90_Click()
     mFuncTest.Test_90_All_in_one_Demonstration
 End Sub
 
-Public Sub Test40_Dsiplay_ErrMsg()
-    Const PROC = "Test40_Display_ErrMsg"
+Public Sub Test_40_Dsiplay_ErrMsg()
+    Const PROC = "Test_40_Display_ErrMsg"
     
     On Error GoTo eh
     Dim i As Long
@@ -1208,6 +1214,11 @@ Public Function Test_17_MessageAsString() As Variant
            , box_msg:="This is a message provided as a simple string argument!" _
            , box_buttons:=vbuttons _
             )
+    Select Case Test_17_MessageAsString
+        Case BTTN_PASSED:       wsTest.Passed = True
+        Case BTTN_FAILED:       wsTest.Failed = True
+        Case sBttnTerminate:    wsTest.TerminateRegressionTest = True
+    End Select
 
 xt: Exit Function
 
