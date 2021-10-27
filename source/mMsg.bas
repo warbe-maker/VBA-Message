@@ -152,8 +152,9 @@ Public Function Progress( _
     Msg.Section(1).Label.Text = prgrs_header
     Msg.Section(1).Label.MonoSpaced = prgrs_msg_monospaced
     Msg.Section(1).Label.FontBold = True
-    Msg.Section(1).Label.Text = prgrs_msg
-    Msg.Section(1).Label.MonoSpaced = prgrs_msg_monospaced
+    Msg.Section(1).Text.Text = prgrs_msg
+    Msg.Section(1).Text.MonoSpaced = prgrs_msg_monospaced
+    
     Msg.Section(2).Label.Text = prgrs_footer
     Msg.Section(2).Label.FontColor = rgbBlue
     Msg.Section(2).Label.FontSize = 8
@@ -169,6 +170,7 @@ Public Function Progress( _
             .MsgTitle = prgrs_title
             .MsgLabel(1) = Msg.Section(1).Label
             .MsgText(1) = Msg.Section(1).Text
+            .MsgLabel(2) = Msg.Section(2).Label
             .MsgText(2) = Msg.Section(2).Text
             .MsgButtons = vbNullString
             .ProgressFollowUp = True
@@ -505,7 +507,7 @@ Public Function Dsply(ByVal dsply_title As String, _
         If dsply_modeless Then
             DisplayDone = False
             .show vbModeless
-            .Top = 1
+            .top = 1
             .Left = 1
         Else
             .show vbModal
