@@ -150,7 +150,7 @@ End Sub
 Public Sub cmdTest30_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 30
-    mFuncTest.Test_30_Progress_FollowUp
+    mFuncTest.Test_30_Monitor
 End Sub
 
 Public Sub cmdTest90_Click()
@@ -1338,8 +1338,8 @@ xt: Exit Function
 eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Test_30_Progress_FollowUp() As Variant
-    Const PROC = "Test_30_Progress_FollowUp"
+Public Function Test_30_Monitor() As Variant
+    Const PROC = "Test_30_Monitor"
     
     On Error GoTo eh
     Dim i           As Long
@@ -1361,21 +1361,21 @@ Public Function Test_30_Progress_FollowUp() As Variant
     For i = 1 To iLoops
         PrgrsMsg = mBasic.Align(i, 4, AlignRight, " ") & mBasic.Align("Passed", 8, AlignCentered, " ") & Repeat(repeat_n_times:=Int(((i - 1) / 10)) + 1, repeat_string:="  " & mBasic.Align(i, 2, AlignRight) & ".  Follow-Up line after " & Format(lWait, "0000") & " Milliseconds.")
         If i < iLoops Then
-            mMsg.Progress prgrs_title:=sMsgTitle _
-                        , prgrs_msg:=PrgrsMsg _
-                        , prgrs_msg_monospaced:=True _
-                        , prgrs_header:=" No. Status  Step" _
-                        , prgrs_max_height:=wsTest.MsgHeightMaxSpecAsPoSS _
-                        , prgrs_max_width:=wsTest.MsgWidthMinSpecInPt
+            mMsg.Monitor prgrs_title:=sMsgTitle _
+                       , prgrs_msg:=PrgrsMsg _
+                       , prgrs_msg_monospaced:=True _
+                       , prgrs_header:=" No. Status  Step" _
+                       , prgrs_max_height:=wsTest.MsgHeightMaxSpecAsPoSS _
+                       , prgrs_max_width:=wsTest.MsgWidthMinSpecInPt
             '~~ Simmulation of a process
             lWait = 100 * i
             DoEvents
             Sleep 200
         Else
-            mMsg.Progress prgrs_title:=sMsgTitle _
-                        , prgrs_msg:=PrgrsMsg _
-                        , prgrs_header:=" No. Status  Step" _
-                        , prgrs_footer:="Process finished! Close this window"
+            mMsg.Monitor prgrs_title:=sMsgTitle _
+                       , prgrs_msg:=PrgrsMsg _
+                       , prgrs_header:=" No. Status  Step" _
+                       , prgrs_footer:="Process finished! Close this window"
         End If
     Next i
     

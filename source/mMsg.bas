@@ -1,21 +1,27 @@
 Attribute VB_Name = "mMsg"
 Option Explicit
-' ----------------------------------------------------------------------------------
-' Standard Module mMsg  Interface for the Common VBA Message Service (fMsg UserForm)
+' ------------------------------------------------------------------------------
+' Standard Module mMsg
+'               Message display services using the fMsg form.
 '
 ' Public services:
-' - Dsply               Exposes all properties and methods for the display of any
-'                       kind of message
-' - Box                 In analogy to the MsgBox, provides a simple message but with
-'                       all the fexibility for the display of up to 49 reply buttons
-' - Buttons             Supports the specification of the design buttons displayed
-'                       in 7 rows by 7 buttons each
+' ------------------------------------------------------------------------------
+' - Box         In analogy to the MsgBox, provides a simple message but with all
+'               the fexibility for the display of up to 49 reply buttons.
+' - Buttons     Supports the specification of the design buttons displayed in 7
+'               rows by 7 buttons each
+' - Dsply       Exposes all properties and methods for the display of any kind
+'               of message
+' - Monitor     Uses modeless instances of the fMsg form - any instance is
+'               identified by the window title - to display the progress of a
+'               process or monitor intermediate results.
 '
-' See details at to:
+' See details at:
 ' https://warbe-maker.github.io/warbe-maker.github.io/vba/common/2020/11/17/Common-VBA-Message-Services.html
+' https://github.com/warbe-maker/Common-VBA-Message-Service
 '
 ' W. Rauschenberger, Berlin Jan 2021 (last revision)
-' ----------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
 Public Const END_OF_PROGRESS As String = "EndOfProgress"
 
 Public ProgressText As String
@@ -109,7 +115,7 @@ Private Function Max(ParamArray va() As Variant) As Variant
     
 End Function
 
-Public Function Progress( _
+Public Function Monitor( _
                    ByVal prgrs_title As String, _
                    ByRef prgrs_msg As String, _
           Optional ByVal prgrs_header As String = vbNullString, _
@@ -142,7 +148,7 @@ Public Function Progress( _
 '
 ' W. Rauschenberger, Berlin, May 2021
 ' -------------------------------------------------------------------------------------
-    Const PROC = "Progress"
+    Const PROC = "Monitor"
    
     On Error GoTo eh
     Dim Msg     As TypeMsg
@@ -186,9 +192,9 @@ Public Function Progress( _
     Else
         '~~ Another progress message with the same title is appended or relpaces the message in the provided section
         Application.ScreenUpdating = False
-        MsgForm.Progress prgrs_text:=prgrs_msg _
-                   , prgrs_append:=prgrs_msg_append _
-                   , prgrs_footer:=Msg.Section(2).Text.Text
+        MsgForm.Monitor prgrs_text:=prgrs_msg _
+                      , prgrs_append:=prgrs_msg_append _
+                      , prgrs_footer:=Msg.Section(2).Text.Text
     End If
       
 xt: Exit Function
