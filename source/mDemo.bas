@@ -1,13 +1,19 @@
 Attribute VB_Name = "mDemo"
 Option Explicit
 
+#If VBA7 Then
+    Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As LongPtr)
+#Else
+    Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
+#End If
+
 Public Sub Demos()
     DemoMsgDsplyService_1
     DemoMsgDsplyService_2
 End Sub
 
 Public Sub DemoMsgDsplyService_1()
-    Const MAX_WIDTH     As Long = 50
+    Const max_width     As Long = 50
     Const MAX_HEIGHT    As Long = 60
 
     Dim sTitle          As String
@@ -29,10 +35,10 @@ Public Sub DemoMsgDsplyService_1()
         .Label.Text = "Unlimited message width!:"
         .Label.FontColor = rgbBlue
         .Text.Text = "Because this section's text is mono-spaced (which is not word-wrapped) and the maximimum message form width" & vbLf _
-                   & "for this demo has been specified " & MAX_WIDTH & "% of the screen width (the default would be 80%)" & vbLf _
+                   & "for this demo has been specified " & max_width & "% of the screen width (the default would be 80%)" & vbLf _
                    & "the text is displayed with a horizontal scrollbar. There is no message size limit for the display despite the" & vbLf & vbLf _
                    & "limit of VBA for text strings  which is about 1GB!"
-        .Text.Monospaced = True
+        .Text.MonoSpaced = True
     End With
     With Message.Section(3)
         .Label.Text = "Unlimited message height!:"
@@ -67,7 +73,7 @@ Public Sub DemoMsgDsplyService_1()
                    , dsply_msg:=Message _
                    , dsply_buttons:=cll _
                    , dsply_max_height:=MAX_HEIGHT _
-                   , dsply_max_width:=MAX_WIDTH _
+                   , dsply_max_width:=max_width _
                     ) <> vbOK
     Wend
     
@@ -106,7 +112,7 @@ Public Sub DemoMsgDsplyService_2()
             .FontBold = True
             .FontItalic = True
             .FontColor = rgbRed
-            .Monospaced = True ' Just to demonstrate
+            .MonoSpaced = True ' Just to demonstrate
             .FontSize = 10
         End With
     End With
@@ -121,4 +127,88 @@ Public Sub DemoMsgDsplyService_2()
    MsgBox "Button """ & mMsg.ReplyString(vReturn) & """ had been clicked"
    
 End Sub
+
+Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mDemo." & s:  End Property
+
+Public Sub Demo_Monitor_Service()
+' ------------------------------------------------------------------------------
+'
+ ' ------------------------------------------------------------------------------
+    Const PROC              As String = "Demo_Monitor_Service"
+    Const MONITOR_HEADER    As String = " No. Status   Step"
+    Const MONITOR_FOOTER    As String = "Process finished! Close this window"
+    Const PROCESS_STEPS     As Long = 12
+    
+    On Error GoTo eh
+    Dim i               As Long
+    Dim lWait           As Long
+    Dim MonitorTitle    As String
+    Dim ProgressStep    As String
+    
+    MonitorTitle = "Demonstration of the monitoring of a process step by step"
+    mMsg.Form MonitorTitle, frm_unload:=True ' Ensure there is no process monitoring with this title still displayed
+        
+    For i = 1 To PROCESS_STEPS
+        '~~ Preparing a process step message string
+        ProgressStep = mBasic.Align(i, 4, AlignRight, " ") & _
+                   mBasic.Align("Passed", 8, AlignCentered, " ") & _
+                   Repeat(repeat_n_times:=Int(((i - 1) / 10)) + 1, repeat_string:="  " & _
+                   mBasic.Align(i, 2, AlignRight) & _
+                   ".  Follow-Up line after " & _
+                   Format(lWait, "0000") & _
+                   " Milliseconds.")
+        
+        If i < PROCESS_STEPS Then
+            '~~ Steps 1 to n - 1
+            mMsg.Monitor prgrs_title:=MonitorTitle _
+                       , prgrs_msg:=ProgressStep _
+                       , prgrs_msg_monospaced:=True _
+                       , prgrs_header:=MONITOR_HEADER _
+                       , prgrs_max_height:=wsTest.MsgHeightMaxSpecAsPoSS _
+                       , prgrs_max_width:=wsTest.MsgWidthMinSpecInPt
+            
+            '~~ Simmulation of a process
+            lWait = 100 * i
+            DoEvents
+            Sleep 200
+        
+        Else
+            '~~ The last step, separated in order to display the footer along with it
+            mMsg.Monitor prgrs_title:=MonitorTitle _
+                       , prgrs_msg:=ProgressStep _
+                       , prgrs_header:=MONITOR_HEADER _
+                       , prgrs_footer:=MONITOR_FOOTER
+        End If
+    Next i
+    
+'    Select Case mMsg.Box(box_title:="Test result of " & Readable(PROC) _
+'                       , box_msg:=vbNullString _
+'                       , box_buttons:=mMsg.Buttons(BTTN_PASSED, BTTN_FAILED) _
+'                        )
+'        Case BTTN_PASSED:       wsTest.Passed = True
+'        Case BTTN_FAILED:       wsTest.Failed = True
+'        Case sBttnTerminate:    wsTest.TerminateRegressionTest = True
+'    End Select
+
+xt: Exit Sub
+
+eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Private Function Repeat(repeat_string As String, repeat_n_times As Long)
+    Dim s As String
+    Dim C As Long
+    Dim l As Long
+    Dim i As Long
+
+    l = Len(repeat_string)
+    C = l * repeat_n_times
+    s = Space$(C)
+
+    For i = 1 To C Step l
+        Mid(s, i, l) = repeat_string
+    Next
+
+    Repeat = s
+End Function
 

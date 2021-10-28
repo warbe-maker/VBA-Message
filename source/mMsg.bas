@@ -57,39 +57,63 @@ End Type
 Private bModeless       As Boolean
 Public DisplayDone      As Boolean
 Public RepliedWith      As Variant
-Private MsgForms        As Dictionary   ' Collection of active form instances with their caption as the key
 
-Public Function Form(Optional ByVal frm_caption As String) As fMsg
+Public Function Form(ByVal frm_caption As String, _
+            Optional ByVal frm_unload As Boolean = False) As fMsg
 ' -------------------------------------------------------------------------
-' When an fMsg instance, identified by the caption (frm_caption), exists in
-' the MsgForms Dictionary and this instance still exists it is returned,
-' else the no longer existing instance is removed from the dictionary, a
-' new one is created, added, and returned.
+' Returns an instance of the fMsg UserForm which is uniquely identified by
+' by the caption (frm_caption). When the instance is already collected in
+' the MsgForms Dictionary and it effectively exists this instance is
+' returned. Else the no longer existing instance is removed from the
+' dictionary and a new instance is created, stored in the Dictionary and
+' returned.
 ' -------------------------------------------------------------------------
     Const PROC = "Form"
     
     On Error GoTo eh
-    Dim MsgForm As fMsg
+    Static MsgForms As Dictionary   ' Collection of active form instances with their caption as the key
+    Dim MsgForm     As fMsg
 
     If MsgForms Is Nothing Then Set MsgForms = New Dictionary
+    
+    If frm_unload Then
+        If MsgForms.Exists(frm_caption) Then
+            On Error Resume Next
+            Unload MsgForm(frm_caption)
+            MsgForms.Remove frm_caption
+        End If
+        Exit Function
+    End If
+    
     If Not MsgForms.Exists(frm_caption) Then
+        '~~ There is no evidence of an already existing fMsg instance
         Set MsgForm = New fMsg
+        Debug.Print "fMsg instance >" & frm_caption & "< new created"
         MsgForms.Add frm_caption, MsgForm
+        Debug.Print "fMsg instance >" & frm_caption & "< saved to Dictionary"
     Else
+        '~~ An fMsg instance exists in the Dictionary, it may however no longer exist in the system
         On Error Resume Next
         Set MsgForm = MsgForms(frm_caption)
         Select Case Err.Number
             Case 0
+                Debug.Print "fMsg instance >" & frm_caption & "< existing returned"
             Case 13
                 '~~ The fMsg instance no longer exists
-                MsgForms.Remove frm_caption
+                If MsgForms.Exists(frm_caption) Then
+                    MsgForms.Remove frm_caption
+                    Debug.Print "fMsg instance >" & frm_caption & "< removed from Dictionary"
+                End If
                 Set MsgForm = New fMsg
+                Debug.Print "fMsg instance >" & frm_caption & "< created"
                 MsgForms.Add frm_caption, MsgForm
+                Debug.Print "fMsg instance >" & frm_caption & "< saved to Dictionary"
             Case Else
                 '~~ Unknown error!
+                Debug.Print "Unexpectd error number " & Err.Number & "!"
                 Err.Raise AppErr(1), ErrSrc(PROC), "Unknown/unrecognized error!"
         End Select
-        On Error Resume Next
+        On Error GoTo -1
         
     End If
 
@@ -240,11 +264,14 @@ Public Function Box(ByVal box_title As String, _
 ' W. Rauschenberger, Berlin, Nov 2020
 ' -------------------------------------------------------------------------------------
     Dim Message As TypeMsgText
+    Dim MsgForm As fMsg
     
     Message.Text = box_msg
     Message.MonoSpaced = box_monospaced
+
+    Set MsgForm = Form(box_title)
     
-    With fMsg
+    With MsgForm
         .MsgHeightMaxSpecAsPoSS = box_max_height    ' percentage of screen height
         .MsgWidthMaxSpecAsPoSS = box_max_width      ' percentage of screen width
         .MsgWidthMaxSpecInPt = box_min_width        ' defaults to 300 pt. the absolute minimum is 200 pt
@@ -487,8 +514,11 @@ Public Function Dsply(ByVal dsply_title As String, _
     
     On Error GoTo eh
     Dim i       As Long
+    Dim MsgForm As fMsg
+
+    Set MsgForm = Form(dsply_title)
     
-    With fMsg
+    With MsgForm
         .ReplyWithIndex = dsply_reply_with_index
         If dsply_max_height > 0 Then .MsgHeightMaxSpecAsPoSS = dsply_max_height ' percentage of screen height
         If dsply_max_width > 0 Then .MsgWidthMaxSpecAsPoSS = dsply_max_width    ' percentage of screen width
