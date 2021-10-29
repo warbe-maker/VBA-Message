@@ -95,7 +95,6 @@ End Sub
 ```
 
 Displays:
-
 ![](images/ErrorMessage.jpg)
 
 Only when the Conditional Compile Argument 'Debugging = 1' the ErrMsg is displayed with Yes/No buttons and thus may return vbYes which means that the line which caused the error may be resumed by F8, F8.
