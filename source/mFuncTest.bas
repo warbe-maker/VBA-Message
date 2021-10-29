@@ -429,14 +429,16 @@ Public Function Test_01_WidthDeterminedByMinimumWidth() As Variant
     Const PROC      As String = "Test_01_WidthDeterminedByMinimumWidth"
     
     On Error GoTo eh
+    Dim MsgForm As fMsg
     
     wsTest.TestNumber = 1
     sMsgTitle = Readable(PROC)
-    Unload fMsg
+    Unload mMsg.Form(sMsgTitle) ' Ensure there is no process monitoring with this title still displayed
+    Set MsgForm = mMsg.Form(sMsgTitle)
     MessageInit ' set test-global message specifications
     
     '~~ Obtain initial test values from the Test Worksheet
-    With fMsg
+    With MsgForm
         .MsgWidthMinSpecInPt = wsTest.MsgWidthMinSpecInPt
         .MsgWidthMaxSpecAsPoSS = wsTest.MsgWidthMaxSpecAsPoSS
         .MsgHeightMaxSpecAsPoSS = wsTest.MsgHeightMaxSpecAsPoSS
@@ -1353,7 +1355,7 @@ Public Function Test_30_Monitor() As Variant
     
     wsTest.TestNumber = 30
     sMsgTitle = Readable(PROC)
-    Unload mMsg.Form(sMsgTitle)                     ' Ensures a message starts from scratch
+    mMsg.Form frm_caption:=sMsgTitle, frm_unload:=True                    ' Ensures a message starts from scratch
     
     mMsg.Form(sMsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     PrgrsMsg = vbNullString

@@ -1832,9 +1832,9 @@ Public Sub Setup()
     '~~ the message form width is extended (over the specified maximum) in order to have
     '~~ the vertical scrollbar visible
     FormWidth = Me.FormContentWidth + ScrollVerticalWidth(DsgnMsgArea)
-    Debug.Print "Me.FormContentWidth             : " & Me.FormContentWidth
-    Debug.Print "ScrollVerticalWidth(DsgnMsgArea): " & ScrollVerticalWidth(DsgnMsgArea)
-    Debug.Print "Me.Width                        : " & Me.Width
+'    Debug.Print "Me.FormContentWidth             : " & Me.FormContentWidth
+'    Debug.Print "ScrollVerticalWidth(DsgnMsgArea): " & ScrollVerticalWidth(DsgnMsgArea)
+'    Debug.Print "Me.Width                        : " & Me.Width
     PositionMessageOnScreen
     SetUpDone = True ' To indicate for the Activate event that the setup had already be done beforehand
     
