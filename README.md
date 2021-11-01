@@ -259,6 +259,56 @@ The _Monitor_ service has the following named arguments
 #### Usage of the _Monitor_ service
 The below code example
 ```vb
+Public Sub Demo_Monitor_Service()
+    Const PROC              As String = "Demo_Monitor_Service"
+    Const MONITOR_HEADER    As String = " No. Status   Step"
+    Const MONITOR_FOOTER    As String = "Process finished! Close this window"
+    Const PROCESS_STEPS     As Long = 12
+    
+    On Error GoTo eh
+    Dim i               As Long
+    Dim lWait           As Long
+    Dim MonitorTitle    As String
+    Dim ProgressStep    As String
+    
+    MonitorTitle = "Demonstration of the monitoring of a process step by step"
+    mMsg.Form MonitorTitle, frm_unload:=True ' Ensure there is no process monitoring with this title still displayed
+        
+    For i = 1 To PROCESS_STEPS
+        '~~ Preparing a process step message string
+        ProgressStep = mBasic.Align(i, 4, AlignRight, " ") & _
+                   mBasic.Align("Passed", 8, AlignCentered, " ") & _
+                   Repeat(repeat_n_times:=Int(((i - 1) / 10)) + 1, repeat_string:="  " & _
+                   mBasic.Align(i, 2, AlignRight) & _
+                   ".  Follow-Up line after " & _
+                   Format(lWait, "0000") & _
+                   " Milliseconds.")
+        
+        If i < PROCESS_STEPS Then
+            '~~ Steps 1 to n - 1
+            mMsg.Monitor mntr_title:=MonitorTitle _
+                       , mntr_msg:=ProgressStep _
+                       , mntr_msg_monospaced:=True _
+                       , mntr_header:=MONITOR_HEADER
+            
+            '~~ Simmulation of a process
+            lWait = 100 * i
+            DoEvents
+            Sleep 200
+        
+        Else
+            '~~ The last step, separated in order to display the footer along with it
+            mMsg.Monitor mntr_title:=MonitorTitle _
+                       , mntr_msg:=ProgressStep _
+                       , mntr_header:=MONITOR_HEADER _
+                       , mntr_footer:=MONITOR_FOOTER
+        End If
+    Next i
+    
+xt: Exit Sub
+
+eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
 ```
 displays:<br>
 ![](images/Demo-Monitor-Service.gif)
