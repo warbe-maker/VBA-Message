@@ -244,13 +244,14 @@ which displays:
 ### The _Monitor_ service
 
 The _Monitor_ service has the following named arguments
+
 | Part                    | Description             |
 |-------------------------|-------------------------|
 | _mntr\_title_           | String expression, displayed as title of the message window. |
 | _mntr\_msg_             | String expression, displayed as the message/information. |
 | _mntr\_header_          | String expression, defaults to vbNullString, string displayed above _mntr\_msg_ |
-| _mntr\_footer_          | String expression, defaults to "Process in progress! Please wait.", displayed below _mntr\_msg_ 
-| _\mntr\_msg\__ |append_ | As Boolean = True, |
+| _mntr\_footer_          | String expression, defaults to "Process in progress! Please wait.", displayed below _mntr\_msg_ |
+| _mntr\_msg\_append_     | _Boolean_ expression, defaults to True. Appends the _mntr_msg_ to the current displayed message string. |
 | _mntr\_msg\_monospaced_ | _Boolean_ expression, defaults to False. When True the message string is displayed with a monospaced font. |
 | _mntr\_width\_min_      | _Long_ expression, defaults to 400, which interpreted as pt. |
 | _mntr\_width\_max_      | _Long_ expression, defaults to 80, which is interpreted as % of the screen's width. |
