@@ -15,12 +15,20 @@ Private Function AppErr(ByVal app_err_no As Long) As Long
 ' negative value. When the provided number is negative it returns the original
 ' positive "application" error number e.g. for being used with an error message.
 ' ------------------------------------------------------------------------------
-    AppErr = IIf(app_err_no < 0, app_err_no - vbObjectError, vbObjectError - app_err_no)
+    If app_err_no > 0 Then AppErr = app_err_no + vbObjectError Else AppErr = app_err_no - vbObjectError
 End Function
 
 Public Sub Test_DisplayWithWithoutFrames()
-
-    fMsg.DsplyFrmsWthBrdrsTestOnly = True
+    Const PROC = "Test_DisplayWithWithoutFrames"
+    
+    Dim MsgForm     As fMsg
+    Dim MsgTitle    As String
+    
+    MsgTitle = "With frames test"
+    Set MsgForm = mMsg.Form(frm_caption:=MsgTitle, frm_caller:=ErrSrc(PROC))
+    
+    MsgForm.DsplyFrmsWthBrdrsTestOnly = True
+    
     mMsg.Box box_title:="With frames test" _
            , box_msg:="Message should be displayed with visible frames"
 
@@ -54,7 +62,7 @@ Public Sub Test_AutoSizeTextBox_Width_Limited()
     
 again:
     With fProcTest
-        .Top = 0
+        .top = 0
         .Left = 0
         .show False
         
@@ -65,7 +73,7 @@ again:
             .frm.Left = 5
             .Width = .frm.Left + .frm.Width + (.Width - .InsideWidth) + 5
             .tbx.Left = 0
-            .tbx.Top = 0
+            .tbx.top = 0
             .tbx.ForeColor = rgbBlue
 
             .AutoSizeTextBox as_tbx:=.tbx _
@@ -86,7 +94,7 @@ again:
                     .Name = "Courier New"
                     .Size = 8
                 End With
-                .Top = 5
+                .top = 5
                 .AutoSize = True
             End With
             .tbxTestAndResult.Value = "Provided arguments:" & vbLf & _
@@ -102,10 +110,10 @@ again:
                                       "tbx.Height     = " & .tbx.Height & vbLf & _
                                       "TestHeightMin  = " & TestHeightMin
                        
-            .frm.Top = .tbxTestAndResult.Top + .tbxTestAndResult.Height + 5
+            .frm.top = .tbxTestAndResult.top + .tbxTestAndResult.Height + 5
             
             '~~ The UserForm's height is adjusted to the resulting frame size
-            fProcTest.Height = .frm.Top + .frm.Height + (fProcTest.Height - fProcTest.InsideHeight) + 5
+            fProcTest.Height = .frm.top + .frm.Height + (fProcTest.Height - fProcTest.InsideHeight) + 5
             fProcTest.Width = .frm.Left + .frm.Width + (fProcTest.Width - fProcTest.InsideWidth) + 5
             
             If TestWidthLimit <> iTo Then
@@ -149,13 +157,13 @@ Public Sub Test_AutoSizeTextBox_Width_Unlimited()
 again:
     With fProcTest
         .show False
-        .Top = 0
+        .top = 0
         .Left = 0
         For i = iFrom To iTo Step iStep
             .Caption = PROC
             .frm.Left = 5
             .tbx.Left = 0
-            .tbx.Top = 0
+            .tbx.top = 0
             .tbx.ForeColor = rgbBlue
             
             .AutoSizeTextBox as_tbx:=.tbx _
@@ -173,7 +181,7 @@ again:
                     .Name = "Courier New"
                     .Size = 8
                 End With
-                .Top = 5
+                .top = 5
                 .AutoSize = True
             End With
             .tbxTestAndResult.Value = "Provided arguments:" & vbLf & _
@@ -187,9 +195,9 @@ again:
                                       "tbx.Height     = " & .tbx.Height & vbLf & _
                                       "TestHeightMin  = " & TestHeightMin
             
-            .frm.Top = .tbxTestAndResult.Top + .tbxTestAndResult.Height + 5
+            .frm.top = .tbxTestAndResult.top + .tbxTestAndResult.Height + 5
             .Width = .frm.Left + .frm.Width + (.Width - .InsideWidth) + 5
-            .Height = .frm.Top + .frm.Height + (.Height - .InsideHeight) + 5
+            .Height = .frm.top + .frm.Height + (.Height - .InsideHeight) + 5
             
             If TestWidthLimit <> iTo Then
                 Select Case MsgBox(Title:="Continue? > Yes, Finish > No, Terminate? > Abbrechen", Buttons:=vbYesNoCancel, Prompt:=vbNullString)
@@ -215,3 +223,64 @@ Public Sub Test_SetupTitle()
     fProcTest.show False
 End Sub
 
+Public Sub Test_AssertWidthAndHeight()
+' ------------------------------------------------------------------------------
+' - All values are returned as pt
+' - All values are within their limit
+' - Any min value above its max values is set equal to the max value
+' ------------------------------------------------------------------------------
+
+    Dim WidthMin    As Long
+    Dim WidthMax    As Long
+    Dim HeightMin   As Long
+    Dim HeightMax   As Long
+    
+    '~~ Test 1: All values conform with their min/max limit
+    WidthMin = MSG_WIDTH_MIN_LIMIT_PERCENTAGE
+    WidthMax = MSG_WIDTH_MAX_LIMIT_PERCENTAGE
+    HeightMin = MSG_HEIGHT_MIN_LIMIT_PERCENTAGE
+    HeightMax = MSG_HEIGHT_MAX_LIMIT_PERCENTAGE
+    
+    mMsg.AssertWidthAndHeight WidthMin, WidthMax, HeightMin, HeightMax
+    Debug.Assert WidthMin = Pnts(MSG_WIDTH_MIN_LIMIT_PERCENTAGE, "w")
+    Debug.Assert WidthMax = Pnts(MSG_WIDTH_MAX_LIMIT_PERCENTAGE, "w")
+    Debug.Assert HeightMin = Pnts(MSG_HEIGHT_MIN_LIMIT_PERCENTAGE, "h")
+    Debug.Assert HeightMax = Pnts(MSG_HEIGHT_MAX_LIMIT_PERCENTAGE, "h")
+    
+    '~~ Test 2         : Min width > width max and height min > height max
+    '~~ Expected result: The min values are set equal with their corresponding max value
+    WidthMin = 41
+    WidthMax = 40
+    HeightMin = 31
+    HeightMax = 30
+    mMsg.AssertWidthAndHeight WidthMin, WidthMax, HeightMin, HeightMax
+    Debug.Assert WidthMin = Pnts(40, "w")
+    Debug.Assert WidthMax = Pnts(40, "w")
+    Debug.Assert HeightMin = Pnts(30, "h")
+    Debug.Assert HeightMax = Pnts(30, "h")
+    
+    '~~ Test 3          : Min values are less than their limit, max values are greater than their limit
+    '~~ Expected results: All values are reset to their corresponding limit
+    WidthMin = MSG_WIDTH_MIN_LIMIT_PERCENTAGE - 1
+    WidthMax = MSG_WIDTH_MAX_LIMIT_PERCENTAGE + 1
+    HeightMin = MSG_HEIGHT_MIN_LIMIT_PERCENTAGE - 1
+    HeightMax = MSG_HEIGHT_MAX_LIMIT_PERCENTAGE + 1
+    mMsg.AssertWidthAndHeight WidthMin, WidthMax, HeightMin, HeightMax
+    Debug.Assert WidthMin = Pnts(MSG_WIDTH_MIN_LIMIT_PERCENTAGE, "w")
+    Debug.Assert WidthMax = Pnts(MSG_WIDTH_MAX_LIMIT_PERCENTAGE, "w")
+    Debug.Assert HeightMin = Pnts(MSG_HEIGHT_MIN_LIMIT_PERCENTAGE, "h")
+    Debug.Assert HeightMax = Pnts(MSG_HEIGHT_MAX_LIMIT_PERCENTAGE, "h")
+        
+    '~~ Test 4         : All values are 0
+    '~~ Expected result: All values are set to their corresponding limit
+    WidthMin = 0
+    WidthMax = 0
+    HeightMin = 0
+    HeightMax = 0
+    mMsg.AssertWidthAndHeight WidthMin, WidthMax, HeightMin, HeightMax
+    Debug.Assert WidthMin = Pnts(MSG_WIDTH_MIN_LIMIT_PERCENTAGE, "w")
+    Debug.Assert WidthMax = Pnts(MSG_WIDTH_MAX_LIMIT_PERCENTAGE, "w")
+    Debug.Assert HeightMin = Pnts(MSG_HEIGHT_MIN_LIMIT_PERCENTAGE, "h")
+    Debug.Assert HeightMax = Pnts(MSG_HEIGHT_MAX_LIMIT_PERCENTAGE, "h")
+
+End Sub

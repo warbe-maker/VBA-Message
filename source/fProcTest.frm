@@ -29,7 +29,7 @@ Public Property Get FrameContentHeight( _
     For Each ctl In frm.Controls
         If ctl.Parent Is frm Then
 '            If applied And IsApplied(ctl) Then
-                FrameContentHeight = Max(FrameContentHeight, ctl.Top + ctl.Height)
+                FrameContentHeight = Max(FrameContentHeight, ctl.top + ctl.Height)
 '            Else
 '                FrameContentHeight = Max(FrameContentHeight, ctl.Top + ctl.Height)
 '            End If
@@ -205,7 +205,7 @@ Public Sub AutoSizeTextBox( _
         .Height = .Height + 7 ' redability space
         If as_width_min > 0 And .Width < as_width_min Then .Width = as_width_min
         If as_height_min > 0 And .Height < as_height_min Then .Height = as_height_min
-        .Parent.Height = .Top + .Height + 2
+        .Parent.Height = .top + .Height + 2
         .Parent.Width = .Left + .Width + 2
     End With
     
@@ -269,7 +269,7 @@ Private Sub ErrMsg( _
 End Sub
 
 Private Function ErrSrc(ByVal sProc As String) As String
-    ErrSrc = "fMsg." & sProc
+    ErrSrc = "fProcTest." & sProc
 End Function
 
 Private Function ScrollHorizontalApplied(ByRef frm As MSForms.Frame) As Boolean
@@ -396,12 +396,12 @@ End Sub
 
 Public Sub Setup1_Title( _
                 ByVal setup_title As String, _
-                ByVal setup_min_width As Single, _
-                ByVal setup_max_width As Single)
+                ByVal setup_width_min As Single, _
+                ByVal setup_width_max As Single)
 ' ------------------------------------------------------------------------------
 ' Setup the message form for the provided title (setup_title) optimized with the
 ' provided minimum width (setup_width_min) and the provided maximum width
-' (setup_max_width) by using a certain factor (setup_factor) for the calculation
+' (setup_width_max) by using a certain factor (setup_factor) for the calculation
 ' of the width required to display an untruncated title - as long as the maximum
 ' widht is not exeeded.
 ' ------------------------------------------------------------------------------
@@ -412,7 +412,7 @@ Public Sub Setup1_Title( _
     Dim Correction    As Single
     
     With Me
-        .Width = setup_min_width
+        .Width = setup_width_min
         '~~ The extra title label is only used to adjust the form width and remains hidden
         With .laMsgTitle
             With .Font
@@ -427,7 +427,7 @@ Public Sub Setup1_Title( _
         .Caption = setup_title
         Correction = (CInt(.laMsgTitle.Width)) / 1700
 '        Debug.Print ".laMsgTitle.Width: " & .laMsgTitle.Width, "Factor: " & FACTOR, "FactorCorrection: " & FactorCorrection
-        .Width = Min(setup_max_width, .laMsgTitle.Width * (FACTOR - Correction))
+        .Width = Min(setup_width_max, .laMsgTitle.Width * (FACTOR - Correction))
     End With
    
 xt: Exit Sub
@@ -447,6 +447,6 @@ Private Sub cbSetupTitle_Click()
     MaxWidth = 1500
     FACTOR = 1.1
     Setup1_Title setup_title:=Me.tbxTestTitle & " " & Format(FACTOR, "0.000") _
-               , setup_min_width:=MinWidth _
-               , setup_max_width:=MaxWidth
+               , setup_width_min:=MinWidth _
+               , setup_width_max:=MaxWidth
 End Sub

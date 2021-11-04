@@ -7,13 +7,56 @@ Option Explicit
     Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
 #End If
 
+Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mDemo." & s:  End Property
+
 Public Sub Demos()
-    DemoMsgDsplyService_1
-    DemoMsgDsplyService_2
+    Demo_Dsply_Service_1
+    Demo_Dsply_Service_2
 End Sub
 
-Public Sub DemoMsgDsplyService_1()
-    Const max_width     As Long = 50
+Public Sub Demo_Box_Service()
+    Const PROC          As String = "Demo_Box_service"
+    Const BTTN_1        As String = "Button-1 caption"
+    Const BTTN_2        As String = "Button-2 caption"
+    Const BTTN_3        As String = "Button-3 caption"
+    Const BTTN_4        As String = "Button-4 caption"
+    Const DEMO_TITLE    As String = "Demonstration of the Box service"
+    
+    On Error GoTo eh
+    Dim DemoMessage     As String
+    
+    DemoMessage = "The message : The ""Box"" service displays one string just like the VBA MsgBox. However, the monospaced" & vbLf & _
+                  "              option allows a better layout for an indented text like this one for example. It should also be noted" & vbLf & _
+                  "              that there is in fact no message width limit." & vbLf & _
+                  "The buttons : 7 buttons in 7 rows are possible each with any caption string or a VBA MsgBox value. The latter may" & vbLf & _
+                  "              result in more than one button, e.g. vbYesNoCancel." & vbLf & _
+                  "The window  : When the message exceeds the specified maximum width a horizontal scroll-bar, when it exceeds" & vbLf & _
+                  "              the specified maximum height a vertical scroll.bar is displayed  the message is displayed with a horizontal scroll-bar." & vbLf
+    
+    Select Case mMsg.Box( _
+             box_title:=DEMO_TITLE _
+           , box_msg:=DemoMessage _
+           , box_monospaced:=True _
+           , box_width_max:=50 _
+           , box_buttons:=mMsg.Buttons(BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel) _
+           , box_button_default:=5 _
+            )
+        Case BTTN_1:    MsgBox """" & BTTN_1 & """ pressed"
+        Case BTTN_2:    MsgBox """" & BTTN_2 & """ pressed"
+        Case BTTN_3:    MsgBox """" & BTTN_3 & """ pressed"
+        Case BTTN_4:    MsgBox """" & BTTN_4 & """ pressed"
+        Case vbYes:     MsgBox """ Yes"" pressed"
+        Case vbNo:      MsgBox """No"" pressed"
+        Case vbCancel:  MsgBox """Cancel"" pressed"
+    End Select
+
+xt: Exit Sub
+
+eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Public Sub Demo_Dsply_Service_1()
+    Const width_max     As Long = 50
     Const MAX_HEIGHT    As Long = 60
 
     Dim sTitle          As String
@@ -35,7 +78,7 @@ Public Sub DemoMsgDsplyService_1()
         .Label.Text = "Unlimited message width!:"
         .Label.FontColor = rgbBlue
         .Text.Text = "Because this section's text is mono-spaced (which is not word-wrapped) and the maximimum message form width" & vbLf _
-                   & "for this demo has been specified " & max_width & "% of the screen width (the default would be 80%)" & vbLf _
+                   & "for this demo has been specified " & width_max & "% of the screen width (the default would be 80%)" & vbLf _
                    & "the text is displayed with a horizontal scrollbar. There is no message size limit for the display despite the" & vbLf & vbLf _
                    & "limit of VBA for text strings  which is about 1GB!"
         .Text.MonoSpaced = True
@@ -72,14 +115,14 @@ Public Sub DemoMsgDsplyService_1()
     While mMsg.Dsply(dsply_title:=sTitle _
                    , dsply_msg:=Message _
                    , dsply_buttons:=cll _
-                   , dsply_max_height:=MAX_HEIGHT _
-                   , dsply_max_width:=max_width _
+                   , dsply_height_max:=MAX_HEIGHT _
+                   , dsply_width_max:=width_max _
                     ) <> vbOK
     Wend
     
 End Sub
 
-Public Sub DemoMsgDsplyService_2()
+Public Sub Demo_Dsply_Service_2()
 ' ---------------------------------------------------------
 ' Displays a message with 3 sections, each with a label and
 ' 7 reply buttons ordered in rows 3-3-1
@@ -128,12 +171,19 @@ Public Sub DemoMsgDsplyService_2()
    
 End Sub
 
-Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mDemo." & s:  End Property
+Public Sub Demo_ErrMsg_Service()
+    Const PROC = "Demo_ErrMsg_Service"
+    
+    On Error GoTo eh
+    Dim i As Long
+    i = i / 0
+    
+xt: Exit Sub
+
+eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
 
 Public Sub Demo_Monitor_Service()
-' ------------------------------------------------------------------------------
-'
- ' ------------------------------------------------------------------------------
     Const PROC              As String = "Demo_Monitor_Service"
     Const MONITOR_HEADER    As String = " No. Status   Step"
     Const MONITOR_FOOTER    As String = "Process finished! Close this window"
@@ -160,12 +210,10 @@ Public Sub Demo_Monitor_Service()
         
         If i < PROCESS_STEPS Then
             '~~ Steps 1 to n - 1
-            mMsg.Monitor prgrs_title:=MonitorTitle _
-                       , prgrs_msg:=ProgressStep _
-                       , prgrs_msg_monospaced:=True _
-                       , prgrs_header:=MONITOR_HEADER _
-                       , prgrs_max_height:=wsTest.MsgHeightMaxSpecAsPoSS _
-                       , prgrs_max_width:=wsTest.MsgWidthMinSpecInPt
+            mMsg.Monitor mntr_title:=MonitorTitle _
+                       , mntr_msg:=ProgressStep _
+                       , mntr_msg_monospaced:=True _
+                       , mntr_header:=MONITOR_HEADER
             
             '~~ Simmulation of a process
             lWait = 100 * i
@@ -174,22 +222,13 @@ Public Sub Demo_Monitor_Service()
         
         Else
             '~~ The last step, separated in order to display the footer along with it
-            mMsg.Monitor prgrs_title:=MonitorTitle _
-                       , prgrs_msg:=ProgressStep _
-                       , prgrs_header:=MONITOR_HEADER _
-                       , prgrs_footer:=MONITOR_FOOTER
+            mMsg.Monitor mntr_title:=MonitorTitle _
+                       , mntr_msg:=ProgressStep _
+                       , mntr_header:=MONITOR_HEADER _
+                       , mntr_footer:=MONITOR_FOOTER
         End If
     Next i
     
-'    Select Case mMsg.Box(box_title:="Test result of " & Readable(PROC) _
-'                       , box_msg:=vbNullString _
-'                       , box_buttons:=mMsg.Buttons(BTTN_PASSED, BTTN_FAILED) _
-'                        )
-'        Case BTTN_PASSED:       wsTest.Passed = True
-'        Case BTTN_FAILED:       wsTest.Failed = True
-'        Case sBttnTerminate:    wsTest.TerminateRegressionTest = True
-'    End Select
-
 xt: Exit Sub
 
 eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
