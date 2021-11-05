@@ -176,7 +176,7 @@ Public Function ErrMsg(ByVal err_source As String, _
     Dim ErrNo   As Long
     Dim ErrDesc As String
     Dim ErrType As String
-    Dim errline As Long
+    Dim ErrLine As Long
     Dim AtLine  As String
     Dim Buttons As Long
     
@@ -189,7 +189,7 @@ Public Function ErrMsg(ByVal err_source As String, _
         ErrType = "Runtime error "
     End If
     
-    If err_line = 0 Then errline = Erl
+    If err_line = 0 Then ErrLine = Erl
     If err_line <> 0 Then AtLine = " at line " & err_line
     
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
@@ -325,7 +325,7 @@ Private Function AppErr(ByVal app_err_no As Long) As Long
 ' negative value. When the provided number is negative it returns the original
 ' positive "application" error number e.g. for being used with an error message.
 ' ------------------------------------------------------------------------------
-    AppErr = IIf(app_err_no < 0, app_err_no - vbObjectError, vbObjectError - app_err_no)
+    If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
 End Function
 
 Public Function ComponentExists(ByVal vWb As Variant, _
@@ -598,7 +598,7 @@ Public Function OpenWbs() As Dictionary
 #Else
     Dim hWndMain As Long
 #End If
-    Dim n       As Long
+    Dim N       As Long
     Dim wbk     As Workbook
     Dim aApps() As Application
     Dim app     As Variant
@@ -606,21 +606,21 @@ Public Function OpenWbs() As Dictionary
     Dim i       As Long
     
     hWndMain = FindWindowEx(0&, 0&, "XLMAIN", vbNullString)
-    n = 0
+    N = 0
 
     '~~ Collect all runing Excel instances as Application
     '~~ in the array aApps
     Do While hWndMain <> 0
         Set app = GetExcelObjectFromHwnd(hWndMain)
         If Not (app Is Nothing) Then
-            If n = 0 Then
-                n = 1
+            If N = 0 Then
+                N = 1
                 ReDim aApps(1 To 1)
-                Set aApps(n) = app
+                Set aApps(N) = app
             ElseIf checkHwnds(aApps, app.hWnd) Then
-                n = n + 1
-                ReDim Preserve aApps(1 To n)
-                Set aApps(n) = app
+                N = N + 1
+                ReDim Preserve aApps(1 To N)
+                Set aApps(N) = app
             End If
         End If
         hWndMain = FindWindowEx(0&, hWndMain, "XLMAIN", vbNullString)

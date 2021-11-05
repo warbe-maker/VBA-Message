@@ -234,7 +234,7 @@ Private Function AppErr(ByVal app_err_no As Long) As Long
 ' negative value. When the provided number is negative it returns the original
 ' positive "application" error number e.g. for being used with an error message.
 ' ------------------------------------------------------------------------------
-    AppErr = IIf(app_err_no < 0, app_err_no - vbObjectError, vbObjectError - app_err_no)
+    If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
 End Function
 
 Private Sub ErrMsg( _
@@ -248,7 +248,7 @@ Private Sub ErrMsg( _
     Dim ErrNo   As Long
     Dim ErrDesc As String
     Dim ErrType As String
-    Dim errline As Long
+    Dim ErrLine As Long
     Dim AtLine  As String
     
     If err_no = 0 Then err_no = Err.Number
@@ -260,7 +260,7 @@ Private Sub ErrMsg( _
         ErrType = "Runtime error "
     End If
     If err_dscrptn = vbNullString Then ErrDesc = Err.Description Else ErrDesc = err_dscrptn
-    If err_line = 0 Then errline = Erl
+    If err_line = 0 Then ErrLine = Erl
     If err_line <> 0 Then AtLine = " at line " & err_line
     MsgBox Title:=ErrType & ErrNo & " in " & err_source _
          , Prompt:="Error : " & ErrDesc & vbLf & _

@@ -54,7 +54,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     Dim ErrNo   As Long
     Dim ErrDesc As String
     Dim ErrType As String
-    Dim errline As Long
+    Dim ErrLine As Long
     Dim AtLine  As String
     Dim Buttons As Long
     Dim msg     As TypeMsg
@@ -68,7 +68,7 @@ Private Function ErrMsg(ByVal err_source As String, _
         ErrType = "Runtime error "
     End If
     
-    If err_line = 0 Then errline = Erl
+    If err_line = 0 Then ErrLine = Erl
     If err_line <> 0 Then AtLine = " at line " & err_line
     
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
@@ -121,7 +121,7 @@ Private Function AppErr(ByVal app_err_no As Long) As Long
 ' negative value. When the provided number is negative it returns the original
 ' positive "application" error number e.g. for being used with an error message.
 ' ------------------------------------------------------------------------------
-    If app_err_no > 0 Then AppErr = app_err_no + vbObjectError Else AppErr = app_err_no - vbObjectError
+    If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
 End Function
 
 Public Sub Test_Regression()
@@ -272,7 +272,10 @@ Public Sub Test_00_ErrMsg()
     
 xt: Exit Sub
 
-eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case mMsg.ErrMsg(ErrSrc(PROC))
+        Case vbYes: Stop: Resume
+        Case vbNo:  Stop: Resume Next
+    End Select
 
     Select Case mMsg.Box(box_title:="Test result of " & Readable(PROC) _
                        , box_msg:=vbNullString _
