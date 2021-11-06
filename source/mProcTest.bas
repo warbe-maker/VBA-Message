@@ -25,7 +25,7 @@ Public Sub Test_DisplayWithWithoutFrames()
     Dim MsgTitle    As String
     
     MsgTitle = "With frames test"
-    Set MsgForm = mMsg.Form(frm_caption:=MsgTitle, frm_caller:=ErrSrc(PROC))
+    Set MsgForm = mMsg.Form(frm_title:=MsgTitle, frm_caller:=ErrSrc(PROC))
     
     MsgForm.DsplyFrmsWthBrdrsTestOnly = True
     
