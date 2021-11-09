@@ -196,7 +196,7 @@ Public Sub Demo_Monitor_Service()
     Dim ProgressStep    As String
     
     MonitorTitle = "Demonstration of the monitoring of a process step by step"
-    mMsg.Form MonitorTitle, frm_unload:=True ' Ensure there is no process monitoring with this title still displayed
+    mMsg.MsgInstance MonitorTitle, fi_unload:=True ' Ensure there is no process monitoring with this title still displayed
         
     For i = 1 To PROCESS_STEPS
         '~~ Preparing a process step message string

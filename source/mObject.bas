@@ -114,7 +114,7 @@ Public Function ProcedureExists(ByVal v As Variant, _
 ' ------------------------------------------------------------------------------
 ' Returns TRUE when the Procedure named (sName) exists in the CodeModule (vbcm).
 ' ------------------------------------------------------------------------------
-    Const PROC = "ProcedureExists"
+    Const Proc = "ProcedureExists"
 
     On Error GoTo eh
     Dim vbcm        As CodeModule
@@ -149,11 +149,11 @@ Public Function ProcedureExists(ByVal v As Variant, _
             End With
         End If
     End If
-    Err.Raise AppErr(1), ErrSrc(PROC), ERR_EXISTS_PRC01
+    Err.Raise AppErr(1), ErrSrc(Proc), ERR_EXISTS_PRC01
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 
@@ -223,7 +223,7 @@ Public Function FileExists(ByVal vFile As Variant) As Boolean
 ' Returns TRUE when the file (vFile) - which may be a file object or a file's
 ' full name - exists.
 ' ------------------------------------------------------------------------------
-    Const PROC = "FileExists"
+    Const Proc = "FileExists"
     
     On Error GoTo eh
     Dim sTest   As String
@@ -245,11 +245,11 @@ Public Function FileExists(ByVal vFile As Variant) As Boolean
             End With
         End If
     End If
-    Err.Raise AppErr(1), ErrSrc(PROC), ERR_EXISTS_FLE01
+    Err.Raise AppErr(1), ErrSrc(Proc), ERR_EXISTS_FLE01
 
 xt: Exit Function
     
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function WorksheetExists(ByVal vWb As Variant, _
@@ -258,7 +258,7 @@ Public Function WorksheetExists(ByVal vWb As Variant, _
 ' Returns TRUE when the Worksheet (vWs) - which may be a Worksheet object or a
 ' Worksheet's name - exists in the Workbook (vWb).
 ' ------------------------------------------------------------------------------
-    Const PROC = "WorksheetExists"
+    Const Proc = "WorksheetExists"
     
     On Error GoTo eh
     Dim sTest   As String
@@ -288,11 +288,11 @@ Public Function WorksheetExists(ByVal vWb As Variant, _
             GoTo xt
         End If
     End If
-    Err.Raise AppErr(1), ErrSrc(PROC), ERR_EXISTS_WSH01
+    Err.Raise AppErr(1), ErrSrc(Proc), ERR_EXISTS_WSH01
         
 xt: Exit Function
     
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function WsShapeExists(ByVal wse_ws As Worksheet, _
@@ -300,7 +300,7 @@ Public Function WsShapeExists(ByVal wse_ws As Worksheet, _
 ' ------------------------------------------------------------------------------
 ' Returns TRUE when a shape named (wse_shape_name) exist in Worksheet wse_ws.
 ' ------------------------------------------------------------------------------
-    Const PROC = "WsShapeExists"
+    Const Proc = "WsShapeExists"
     
     On Error GoTo eh
     Dim shp As Shape
@@ -314,7 +314,7 @@ Public Function WsShapeExists(ByVal wse_ws As Worksheet, _
     
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 Private Function AppErr(ByVal app_err_no As Long) As Long
@@ -336,7 +336,7 @@ Public Function ComponentExists(ByVal vWb As Variant, _
 ' Workbook (vWb) - which may be a Workbook object or a Workbook's name or
 ' fullname of an open Workbook.
 ' ------------------------------------------------------------------------------
-    Const PROC = "ComponentExists"
+    Const Proc = "ComponentExists"
 
     On Error GoTo eh
     Dim wb      As Workbook
@@ -363,11 +363,11 @@ Public Function ComponentExists(ByVal vWb As Variant, _
             GoTo xt
         End If
     End If
-    Err.Raise AppErr(1), ErrSrc(PROC), ERR_EXISTS_CMP01
+    Err.Raise AppErr(1), ErrSrc(Proc), ERR_EXISTS_CMP01
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function CustomViewExists(ByVal vWb As Variant, _
@@ -377,7 +377,7 @@ Public Function CustomViewExists(ByVal vWb As Variant, _
 ' CustoView's name - exists in Workbook (wb). If vCv is provided as CustomView
 ' object, only its name is used to check the existence in Workbook (wb).
 ' ------------------------------------------------------------------------------
-    Const PROC = "CustomViewExists"
+    Const Proc = "CustomViewExists"
     
     On Error GoTo eh
     Dim wb      As Workbook
@@ -399,11 +399,11 @@ Public Function CustomViewExists(ByVal vWb As Variant, _
         CustomViewExists = Err.Number = 0
         GoTo xt
     End If
-    Err.Raise AppErr(1), ErrSrc(PROC), ERR_EXISTS_CVW01
+    Err.Raise AppErr(1), ErrSrc(Proc), ERR_EXISTS_CVW01
         
 xt: Exit Function
     
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function WorkbookIsOpen(ByRef vWb As Variant) As Boolean
@@ -414,7 +414,7 @@ Public Function WorkbookIsOpen(ByRef vWb As Variant) As Boolean
 ' does not exist but is open from another location, the Workbook is regarded as
 ' having been moved to the other location and thus retunred as oben object.
 ' ------------------------------------------------------------------------------
-    Const PROC = "WorkbookIsOpen"
+    Const Proc = "WorkbookIsOpen"
 
     On Error GoTo eh
     
@@ -431,11 +431,11 @@ Public Function WorkbookIsOpen(ByRef vWb As Variant) As Boolean
             GoTo xt
         End If
     End If
-    Err.Raise AppErr(1), ErrSrc(PROC), ERR_EXISTS_WBK01
+    Err.Raise AppErr(1), ErrSrc(Proc), ERR_EXISTS_WBK01
     
 xt: Exit Function
     
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function ReferenceExists(ByVal vWb As Variant, _
@@ -446,7 +446,7 @@ Public Function ReferenceExists(ByVal vWb As Variant, _
 ' be a Workbook object or a Workbook's name or fullname. When vRef is provided
 ' as object, only its GUID is used for the existence check in Workbook (vWb).
 ' ------------------------------------------------------------------------------
-    Const PROC = "ReferenceExists"
+    Const Proc = "ReferenceExists"
 
     On Error GoTo eh
     Dim ref     As Reference
@@ -478,11 +478,11 @@ Public Function ReferenceExists(ByVal vWb As Variant, _
             End If
         End If
     End If
-    Err.Raise AppErr(1), ErrSrc(PROC), ERR_EXISTS_REF01
+    Err.Raise AppErr(1), ErrSrc(Proc), ERR_EXISTS_REF01
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function RangeExists(ByVal vWb As Variant, _
@@ -492,7 +492,7 @@ Public Function RangeExists(ByVal vWb As Variant, _
 ' Returns TRUE when the Range (vRange) - which may be range object or a range's
 ' name - exists in the Worksheet (ws) of the Workbook (wb).
 ' ------------------------------------------------------------------------------
-    Const PROC = "RangeExists"
+    Const Proc = "RangeExists"
 
     On Error GoTo eh
     Dim sTest   As String
@@ -518,15 +518,15 @@ Public Function RangeExists(ByVal vWb As Variant, _
                 RangeExists = Err.Number = 0
                 GoTo xt
             Else
-                Err.Raise AppErr(1), ErrSrc(PROC), ERR_EXISTS_RNG01
+                Err.Raise AppErr(1), ErrSrc(Proc), ERR_EXISTS_RNG01
             End If
         End If
     End If
-    Err.Raise AppErr(2), ErrSrc(PROC), ERR_EXISTS_RNG02
+    Err.Raise AppErr(2), ErrSrc(Proc), ERR_EXISTS_RNG02
             
 xt: Exit Function
     
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function OpenWb(ByVal vWb As Variant) As Workbook
@@ -538,7 +538,7 @@ Public Function OpenWb(ByVal vWb As Variant) As Workbook
 ' returned when also the fullname is identical. A specific error is raised when
 ' the name is equal but the path is different.
 ' ------------------------------------------------------------------------------
-    Const PROC = "OpenWb"
+    Const Proc = "OpenWb"
     
     On Error GoTo eh
     Dim i       As Long
@@ -558,7 +558,7 @@ Public Function OpenWb(ByVal vWb As Variant) As Workbook
             sName = wb.Name
             If Err.Number <> 0 Then
                 On Error GoTo eh
-                Err.Raise AppErr(1), ErrSrc(PROC), ERR_EXISTS_OWB01
+                Err.Raise AppErr(1), ErrSrc(Proc), ERR_EXISTS_OWB01
             End If
             With OpenWbs
                 If .Exists(sName) Then
@@ -573,16 +573,16 @@ Public Function OpenWb(ByVal vWb As Variant) As Workbook
                     Set OpenWb = .Item(sName)
                     GoTo xt
                 Else
-                    Err.Raise AppErr(2), ErrSrc(PROC), Replace$(ERR_EXISTS_OWB02, "<>", CStr(vWb))
+                    Err.Raise AppErr(2), ErrSrc(Proc), Replace$(ERR_EXISTS_OWB02, "<>", CStr(vWb))
                 End If
             End With ' OpenWbs
         End If
     End If
-    Err.Raise AppErr(3), ErrSrc(PROC), ERR_EXISTS_OWB03
+    Err.Raise AppErr(3), ErrSrc(Proc), ERR_EXISTS_OWB03
     
 xt: Exit Function
     
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function OpenWbs() As Dictionary
@@ -590,7 +590,7 @@ Public Function OpenWbs() As Dictionary
 ' Returns a Dictionary of all Workbooks open in any running excel instance with
 ' the Workbook's name as the key and the Workbook object as item.
 ' ------------------------------------------------------------------------------
-    Const PROC = "OpenWbs"
+    Const Proc = "OpenWbs"
 
     On Error GoTo eh
 #If Win64 Then
@@ -640,7 +640,7 @@ Public Function OpenWbs() As Dictionary
 
 xt: Exit Function
     
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 #If Win64 Then
@@ -695,7 +695,7 @@ End Function
 ' -----------------------------------------------------------------------------------------
 '
 ' -----------------------------------------------------------------------------------------
-    Const PROC = "checkHwnds"
+    Const Proc = "checkHwnds"
 
     On Error GoTo eh
     Dim i       As Long
@@ -713,7 +713,7 @@ End Function
     
 xt: Exit Function
     
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 Public Function GetOpenWorkbook(ByVal vWb As Variant) As Workbook
@@ -722,7 +722,7 @@ Public Function GetOpenWorkbook(ByVal vWb As Variant) As Workbook
 ' name, the file exists but is not open it is opened. A desired ReadOnly mode
 ' has to be set by the caller.
 ' ------------------------------------------------------------------------------
-    Const PROC = "GetOpenWorkbook"
+    Const Proc = "GetOpenWorkbook"
 
     On Error GoTo eh
     Dim sTest   As String
@@ -740,7 +740,7 @@ Public Function GetOpenWorkbook(ByVal vWb As Variant) As Workbook
                 Set GetOpenWorkbook = vWb
             Else
                 On Error GoTo eh
-                Err.Raise AppErr(1), ErrSrc(PROC), ERR_EXISTS_GOW04
+                Err.Raise AppErr(1), ErrSrc(Proc), ERR_EXISTS_GOW04
             End If
             On Error GoTo eh
         ElseIf VarType(vWb) = vbString Then
@@ -756,7 +756,7 @@ Public Function GetOpenWorkbook(ByVal vWb As Variant) As Workbook
                             '~~ The open Workook with the same name is from a different location
                             If FileExists(vWb) Then
                                 '~~ The file still exists on the provided location
-                                Err.Raise AppErr(2), ErrSrc(PROC), Replace(Replace$(ERR_EXISTS_GOW02, "<>1", wb.Path), "<>2", sPath)
+                                Err.Raise AppErr(2), ErrSrc(Proc), Replace(Replace$(ERR_EXISTS_GOW02, "<>1", wb.Path), "<>2", sPath)
                             Else
                                 '~~ The Workbook file does not/no longer exists at the provivded location.
                                 '~~ The open one is apparenty the ment Workbook just moved to the new location.
@@ -771,7 +771,7 @@ Public Function GetOpenWorkbook(ByVal vWb As Variant) As Workbook
                         If FileExists(vWb) Then
                             Set GetOpenWorkbook = Workbooks.Open(vWb)
                         Else
-                            Err.Raise AppErr(3), ErrSrc(PROC), Replace(ERR_EXISTS_GOW06, "<>", CStr(vWb))
+                            Err.Raise AppErr(3), ErrSrc(Proc), Replace(ERR_EXISTS_GOW06, "<>", CStr(vWb))
                         End If
                     End If
                 End With
@@ -781,21 +781,21 @@ Public Function GetOpenWorkbook(ByVal vWb As Variant) As Workbook
                     If .Exists(vWb) Then
                         Set GetOpenWorkbook = .Item(vWb)
                     Else
-                        Err.Raise AppErr(4), ErrSrc(PROC), Replace$(ERR_EXISTS_GOW03, "<>", vWb)
+                        Err.Raise AppErr(4), ErrSrc(Proc), Replace$(ERR_EXISTS_GOW03, "<>", vWb)
                     End If
                 End With
             End If
         Else
             '~~ Parameter vWb is neither a Workbook object nor a string (name or full name)
-            Err.Raise AppErr(5), ErrSrc(PROC), ERR_EXISTS_GOW05
+            Err.Raise AppErr(5), ErrSrc(Proc), ERR_EXISTS_GOW05
         End If
     Else
-        Err.Raise AppErr(6), ErrSrc(PROC), ERR_EXISTS_GOW05
+        Err.Raise AppErr(6), ErrSrc(Proc), ERR_EXISTS_GOW05
     End If
     
 xt: Exit Function
     
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(Proc)) = vbYes Then: Stop: Resume
 End Function
 
 Private Function TestSheet(ByVal wb As Workbook, _
@@ -811,4 +811,4 @@ Private Function TestSheet(ByVal wb As Workbook, _
         Set TestSheet = vWs
     End If
 End Function
-
+ 

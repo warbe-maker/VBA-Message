@@ -48,65 +48,117 @@ Private Function ErrMsg(ByVal err_source As String, _
                Optional ByVal err_dscrptn As String = vbNullString, _
                Optional ByVal err_line As Long = 0) As Variant
 ' ------------------------------------------------------------------------------
-' Displays a proper designe error message providing the option to resume the
-' error line when the Conditional Compile Argument Debugging = 1.
+' This is a kind of universal error message which includes a debugging option.
+' It may be copied into any module as a Private Function. When the/my Common
+' VBA Error Handling Component (ErH) is installed and the Conditional Compile
+' Argument 'CommErHComp = 1' indicates this the error message will be displayed
+' by means of the Common VBA Message Component (fMsg, mMsg) which is part of it.
+'
+' Usage: Example of using this function in any procedure. With the Conditional
+'        Compile Argument 'Debugging = 1' the debugging option will be available
+'        as follows - want do anything if not.
+'
+'            Const PROC = "procedure-name"
+'            On Error Goto eh
+'        '   ....
+'        xt: Exit Sub/Function/Property
+'
+'        eh: Select Case ErrMsg(ErrSrc(PROC)
+'               Case vbYes: Stop: Resume
+'               Case vbNo:  Resume Next
+'               Case Else:  Goto xt
+'            End Select
+'        End Sub/Function/Property
+'
+'        The above may appear a lot of code lines but for sure will be recognised as
+'        a godsend in case of an error!
+'
+' Uses:  - AppErr for programmed application errors (Err.Raise AppErr(n), ....).
+'          AppErr turns a positive number into a negative one thereby avoiding any
+'          conflict with VB Runtime Error. The error message in return will regard a
+'          negative error number as an 'Application Error' and will use AppErr to
+'          turn it back in its original positive number.
+'        - ErrSrc is used to identify the source of an error.
 ' ------------------------------------------------------------------------------
-    Dim ErrNo   As Long
-    Dim ErrDesc As String
-    Dim ErrType As String
-    Dim ErrLine As Long
-    Dim AtLine  As String
-    Dim Buttons As Long
-    Dim msg     As TypeMsg
+    Dim ErrBttns    As Variant
+    Dim ErrAtLine   As String
+    Dim ErrDesc     As String
+    Dim ErrLine     As Long
+    Dim ErrNo       As Long
+    Dim ErrSrc      As String
+    Dim ErrText     As String
+    Dim ErrTitle    As String
+    Dim ErrType     As String
     
+    '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
-    If err_no < 0 Then
-        ErrNo = AppErr(err_no)
-        ErrType = "Application error "
-    Else
-        ErrNo = err_no
-        ErrType = "Runtime error "
-    End If
-    
     If err_line = 0 Then ErrLine = Erl
-    If err_line <> 0 Then AtLine = " at line " & err_line
-    
+    If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
-    If err_dscrptn = vbNullString Then err_dscrptn = "--- No error message available ---"
-    With msg.Section(1)
-        .Label.Text = "Error:"
-        .Label.FontColor = rgbBlue
-        .Text.Text = err_dscrptn
-    End With
-    With msg.Section(2)
-        .Label.Text = "Source:"
-        .Label.FontColor = rgbBlue
-        .Text.Text = err_source & AtLine
-    End With
-
-#If Debugging Then
-    Buttons = vbYesNo
-    With msg.Section(3)
-        .Label.Text = "Debugging: (Conditional Compile Argument 'Debugging = 1')"
-        .Label.FontColor = rgbBlue
-        .Text.Text = "Yes = Resume error line, No = Continue"
-    End With
-    With msg.Section(4)
-        .Label.Text = "About debugging:"
-        .Label.FontColor = rgbBlue
-        .Text.Text = "To make use of the debugging option have an error handling line" & vbLf & _
-                     "eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume"
-    End With
+    If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
+    
+    '~~ Determine the type of error
+    Select Case err_no
+        Case Is < 0
+            ErrNo = AppErr(err_no)
+            ErrType = "Application Error "
+        Case Else
+            ErrNo = err_no
+            If (InStr(1, err_dscrptn, "DAO") <> 0 _
+            Or InStr(1, err_dscrptn, "ODBC Teradata Driver") <> 0 _
+            Or InStr(1, err_dscrptn, "ODBC") <> 0 _
+            Or InStr(1, err_dscrptn, "Oracle") <> 0) _
+            Then ErrType = "Database Error " _
+            Else ErrType = "VB Runtime Error "
+    End Select
+    
+    If err_source <> vbNullString Then ErrSrc = " in: """ & err_source & """"   ' assemble ErrSrc from available information"
+    If err_line <> 0 Then ErrAtLine = " at line " & err_line                    ' assemble ErrAtLine from available information
+    ErrTitle = Replace(ErrType & ErrNo & ErrSrc & ErrAtLine, "  ", " ")         ' assemble ErrTitle from available information
+       
+    ErrText = "Error: " & vbLf & _
+              err_dscrptn & vbLf & vbLf & _
+              "Source: " & vbLf & _
+              err_source & ErrAtLine
+    
+#If Debugging = 1 Then
+    ErrBttns = vbYesNoCancel
+    ErrText = ErrText & vbLf & vbLf & _
+              "Debugging:" & vbLf & _
+              "Yes    = Resume error line" & vbLf & _
+              "No     = Resume Next (skip error line)" & vbLf & _
+              "Cancel = Terminate"
 #Else
-    Buttons = vbCritical
+    ErrBttns = vbCritical
 #End If
     
-    ErrMsg = Dsply(dsply_title:=ErrType & ErrNo & " in " & err_source & AtLine _
-                 , dsply_msg:=msg _
-                 , dsply_buttons:=Buttons)
+#If CommErHComp = 1 Then
+    '~~ When the Common VBA Error Handling Component (ErH) is installed/used by in the VB-Project
+    ErrMsg = mErH.ErrMsg(err_source:=err_source, err_number:=err_no, err_dscrptn:=err_dscrptn, err_line:=err_line)
+    '~~ Translate back the elaborated reply buttons mErrH.ErrMsg displays and returns to the simple yes/No/Cancel
+    '~~ replies with the VBA MsgBox.
+    Select Case ErrMsg
+        Case mErH.DebugOptResumeErrorLine:  ErrMsg = vbYes
+        Case mErH.DebugOptResumeNext:       ErrMsg = vbNo
+        Case Else:                          ErrMsg = vbCancel
+    End Select
+#Else
+    '~~ When the Common VBA Error Handling Component (ErH) is not used/installed there might still be the
+    '~~ Common VBA Message Component (Msg) be installed/used
+#If CommMsgComp = 1 Then
+    ErrMsg = mMsg.ErrMsg(err_source:=err_source)
+#Else
+    '~~ None of the Common Components is installed/used
+    ErrMsg = MsgBox(Title:=ErrTitle _
+                  , Prompt:=ErrText _
+                  , Buttons:=ErrBttns)
+#End If
+#End If
 End Function
 
-Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mFuncTest." & s:  End Property
+Private Function ErrSrc(ByVal sProc As String) As String
+    ErrSrc = "mFuncTest." & sProc
+End Function
 
 Public Property Let RegressionTest(ByVal b As Boolean)
     bRegressionTest = b
@@ -314,11 +366,11 @@ Public Sub Explore(ByVal ctl As Variant, _
     Dim i           As Long
     Dim Item        As String
     Dim j           As String
-    Dim frm         As MSForms.Frame
+    Dim frm         As Msforms.Frame
     
     MsgTitle = "Explore"
-    Unload mMsg.Form(MsgTitle) ' Ensure there is no process monitoring with this title still displayed
-    Set MsgForm = mMsg.Form(frm_title:=MsgTitle, frm_caller:=ErrSrc(PROC))
+    Unload mMsg.MsgInstance(MsgTitle) ' Ensure there is no process monitoring with this title still displayed
+    Set MsgForm = mMsg.MsgInstance(MsgTitle)
     
     If TypeName(ctl) <> "Frame" And TypeName(ctl) <> "fMsg" Then Exit Sub
     
@@ -353,7 +405,7 @@ Public Sub Explore(ByVal ctl As Variant, _
         If MsgForm.IsApplied(ctl) Then Appl = "Yes " Else Appl = " No "
         l = Align(Format(ctl.Left, "000.0"), 7, AlignCentered, " ")
         W = Align(Format(ctl.Width, "000.0"), 7, AlignCentered, " ")
-        T = Align(Format(ctl.top, "000.0"), 7, AlignCentered, " ")
+        T = Align(Format(ctl.Top, "000.0"), 7, AlignCentered, " ")
         H = Align(Format(ctl.Height, "000.0"), 7, AlignCentered, " ")
         FH = Align(Format(MsgForm.InsideHeight, "000.0"), 7, AlignCentered, " ")
         FW = Align(Format(MsgForm.InsideWidth, "000.0"), 7, AlignCentered, " ")
@@ -421,10 +473,10 @@ Private Sub MessageInit(ByRef msg_form As fMsg, _
 ' Initializes the all message sections with the defaults throughout this test
 ' module which uses a module global declared Message for a consistent layout.
 ' ------------------------------------------------------------------------------
-    Dim i           As Long
+    Dim i As Long
     
-    mMsg.Form frm_title:=msg_title, frm_unload:=True                    ' Ensures a message starts from scratch
-    Set msg_form = mMsg.Form(frm_title:=msg_title, frm_caller:=caller)
+    mMsg.MsgInstance fi_key:=msg_title, fi_unload:=True                    ' Ensures a message starts from scratch
+    Set msg_form = mMsg.MsgInstance(msg_title)
     
     For i = 1 To msg_form.NoOfDesignedMsgSects
         With Message.Section(i)
@@ -580,8 +632,8 @@ Public Function Test_01_WidthDeterminedByMinimumWidth() As Variant
     TestMsgWidthIncrDecr = wsTest.MsgWidthIncrDecr
     If TestMsgWidthIncrDecr = 0 Then Err.Raise AppErr(1), ErrSrc(PROC), "Width increment/decrement must not be 0 for this test!"
     
-    vButton4 = "Repeat with minimum width" & vbLf & "+ " & TestMsgWidthIncrDecr
-    vButton5 = "Repeat with minimum width" & vbLf & "- " & TestMsgWidthIncrDecr
+    vButton4 = "Repeat with minimum width" & vbLf & "+ " & PrcPnt(TestMsgWidthIncrDecr, "w")
+    vButton5 = "Repeat with minimum width" & vbLf & "- " & PrcPnt(TestMsgWidthIncrDecr, "w")
     Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, vButton4, vButton5)
     
     Do
@@ -753,7 +805,7 @@ Public Function Test_03_WidthDeterminedByMonoSpacedMessageSection() As Variant
         End With
             
         '~~ Assign test values from the Test Worksheet
-        mMsg.Form(frm_title:=MsgTitle, frm_caller:=ErrSrc(PROC)).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
+        mMsg.MsgInstance(MsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
                 
         Test_03_WidthDeterminedByMonoSpacedMessageSection = _
         mMsg.Dsply(dsply_title:=MsgTitle _
@@ -947,6 +999,9 @@ Public Function Test_06_MonoSpacedMessageSectionExceedsMaxHeight() As Variant
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
              , dsply_buttons:=vbuttons _
+             , dsply_width_min:=TestMsgWidthMin _
+             , dsply_width_max:=TestMsgWidthMax _
+             , dsply_height_max:=TestMsgHeightMax _
              , dsply_modeless:=wsTest.TestOptionDisplayModeless _
               )
     Select Case Test_06_MonoSpacedMessageSectionExceedsMaxHeight
@@ -1002,7 +1057,7 @@ Public Function Test_07_ButtonsOnly() As Variant
     End If
     
     Do
-        mMsg.Form(frm_title:=MsgTitle, frm_caller:=ErrSrc(PROC)).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
+        mMsg.MsgInstance(MsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
         '~~ Obtain initial test values from the Test Worksheet
                          
         Test_07_ButtonsOnly = _
@@ -1074,7 +1129,7 @@ Public Function Test_08_ButtonsMatrix() As Variant
     
     Do
         '~~ Obtain initial test values from the Test Worksheet
-        mMsg.Form(frm_title:=MsgTitle, frm_caller:=ErrSrc(PROC)).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
+        mMsg.MsgInstance(MsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
                              
         Test_08_ButtonsMatrix = _
         mMsg.Dsply(dsply_title:=MsgTitle _
@@ -1199,7 +1254,7 @@ Public Function Test_10_ButtonScrollBarHorizontal() As Variant
     End With
 
     Do
-        mMsg.Form(frm_title:=MsgTitle, frm_caller:=ErrSrc(PROC)).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
+        mMsg.MsgInstance(MsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
         
         With Message.Section(1)
             .Label.Text = "Test description:"
@@ -1286,7 +1341,7 @@ Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
     
     Do
         '~~ Obtain initial test values from the Test Worksheet
-        mMsg.Form(frm_title:=MsgTitle, frm_caller:=ErrSrc(PROC)).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
+        mMsg.MsgInstance(MsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
                              
         Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar = _
         mMsg.Dsply(dsply_title:=MsgTitle _
