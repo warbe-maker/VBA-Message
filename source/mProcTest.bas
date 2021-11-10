@@ -60,7 +60,7 @@ Private Function ErrMsg(ByVal err_source As String, _
         .Text.Text = err_source & AtLine
     End With
 
-#If Debugging Then
+#If Debugging = 1 Then
     Buttons = vbYesNo
     With msg.Section(3)
         .Label.Text = "Debugging: (Conditional Compile Argument 'Debugging = 1')"

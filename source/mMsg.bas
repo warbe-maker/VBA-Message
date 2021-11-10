@@ -566,7 +566,7 @@ Public Function ErrMsg(ByVal err_source As String, _
         .Text.Text = err_source & ErrAtLine
     End With
 
-#If Debugging Then
+#If Debugging = 1 Then
     ErrBttns = vbYesNoCancel
     With ErrMsgText.Section(3)
         .Label.Text = "Debugging: (Conditional Compile Argument 'Debugging = 1')"
