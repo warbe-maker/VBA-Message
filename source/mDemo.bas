@@ -52,7 +52,7 @@ Public Sub Demo_Box_Service()
 
 xt: Exit Sub
 
-eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
 Public Sub Demo_Dsply_Service_1()
@@ -180,7 +180,7 @@ Public Sub Demo_ErrMsg_Service()
     
 xt: Exit Sub
 
-eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
 Public Sub Demo_Monitor_Service()
@@ -231,7 +231,7 @@ Public Sub Demo_Monitor_Service()
     
 xt: Exit Sub
 
-eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
 Private Function Repeat(repeat_string As String, repeat_n_times As Long)
