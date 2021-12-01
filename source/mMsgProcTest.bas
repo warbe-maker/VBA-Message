@@ -1,4 +1,4 @@
-Attribute VB_Name = "mProcTest"
+Attribute VB_Name = "mMsgProcTest"
 Option Explicit
 
 ' ------------------------------------------------------------------------------

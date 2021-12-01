@@ -1,4 +1,4 @@
-Attribute VB_Name = "mFuncTest"
+Attribute VB_Name = "mMsgFuncTest"
 Option Explicit
 Option Compare Text
 ' ------------------------------------------------------------------------------
