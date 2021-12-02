@@ -7,6 +7,151 @@ Option Explicit
     Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
 #End If
 
+Private Function ErrMsg(ByVal err_source As String, _
+               Optional ByVal err_no As Long = 0, _
+               Optional ByVal err_dscrptn As String = vbNullString, _
+               Optional ByVal err_line As Long = 0) As Variant
+' ------------------------------------------------------------------------------
+' Universal error message display service including a debugging option
+' (Conditional Compile Argument 'Debugging = 1') and an optional additional
+' "about the error" information which may be connected to an error message by
+' two vertical bars (||).
+'
+' A copy of this function is used in each procedure with an error handling
+' (On error Goto eh).
+'
+' The function considers the Common VBA Error Handling Component (ErH) which
+' may be installed (Conditional Compile Argument 'ErHComp = 1') and/or the
+' Common VBA Message Display Component (mMsg) installed (Conditional Compile
+' Argument 'MsgComp = 1'). Only when none of the two is installed the error
+' message is displayed by means of the VBA.MsgBox.
+'
+' Usage: Example with the Conditional Compile Argument 'Debugging = 1'
+'
+'        Private/Public <procedure-name>
+'            Const PROC = "<procedure-name>"
+'
+'            On Error Goto eh
+'            ....
+'        xt: Exit Sub/Function/Property
+'
+'        eh: Select Case ErrMsg(ErrSrc(PROC)
+'               Case vbYes: Stop: Resume    ' go back to the error line
+'               Case vbNo:  Resume Next     ' continue with line below the error line
+'               Case Else:  Goto xt         ' clean exit (equivalent to Ok )
+'            End Select
+'        End Sub/Function/Property
+'
+'        The above may appear a lot of code lines but will be a godsend in case
+'        of an error!
+'
+' Uses:  - For programmed application errors (Err.Raise AppErr(n), ....) the
+'          function AppErr will be used which turns the positive number into a
+'          negative one. The error message will regard a negative error number
+'          as an 'Application Error' and will use AppErr to turn it back for
+'          the message into its original positive number. Together with the
+'          ErrSrc there will be no need to maintain numerous different error
+'          numbers for a VB-Project.
+'        - The caller provides the source of the error through the module
+'          specific function ErrSrc(PROC) which adds the module name to the
+'          procedure name.
+'
+' W. Rauschenberger Berlin, Nov 2021
+' ------------------------------------------------------------------------------
+#If ErHComp = 1 Then
+    '~~ When the Common VBA Error Handling Component (ErH) is installed/used by in the VB-Project
+    '~~ which also includes the installation of the mMsg component for the display of the error message.
+    ErrMsg = mErH.ErrMsg(err_source:=err_source, err_number:=err_no, err_dscrptn:=err_dscrptn, err_line:=err_line)
+    '~~ Translate back the elaborated reply buttons mErrH.ErrMsg displays and returns to the simple yes/No/Cancel
+    '~~ replies with the VBA MsgBox.
+    Select Case ErrMsg
+        Case mErH.DebugOptResumeErrorLine:  ErrMsg = vbYes
+        Case mErH.DebugOptResumeNext:       ErrMsg = vbNo
+        Case Else:                          ErrMsg = vbCancel
+    End Select
+    GoTo xt
+#Else
+#If MsgComp = 1 Then
+    ErrMsg = mMsg.ErrMsg(err_source:=err_source)
+    GoTo xt
+#End If
+#End If
+
+    '~~ -------------------------------------------------------------------
+    '~~ Neither the Common mMsg not the Commen mErH Component is installed.
+    '~~ The error message is prepared for the VBA.MsgBox
+    '~~ -------------------------------------------------------------------
+    Dim ErrBttns    As Variant
+    Dim ErrAtLine   As String
+    Dim ErrDesc     As String
+    Dim ErrLine     As Long
+    Dim ErrNo       As Long
+    Dim ErrSrc      As String
+    Dim ErrText     As String
+    Dim ErrTitle    As String
+    Dim ErrType     As String
+    Dim ErrAbout    As String
+        
+    '~~ Obtain error information from the Err object for any argument not provided
+    If err_no = 0 Then err_no = Err.Number
+    If err_line = 0 Then ErrLine = Erl
+    If err_source = vbNullString Then err_source = Err.Source
+    If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
+    If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
+    
+    If InStr(err_dscrptn, "||") <> 0 Then
+        ErrDesc = Split(err_dscrptn, "||")(0)
+        ErrAbout = Split(err_dscrptn, "||")(1)
+    Else
+        ErrDesc = err_dscrptn
+    End If
+    
+    '~~ Determine the type of error
+    Select Case err_no
+        Case Is < 0
+            ErrNo = AppErr(err_no)
+            ErrType = "Application Error "
+        Case Else
+            ErrNo = err_no
+            If (InStr(1, err_dscrptn, "DAO") <> 0 _
+            Or InStr(1, err_dscrptn, "ODBC Teradata Driver") <> 0 _
+            Or InStr(1, err_dscrptn, "ODBC") <> 0 _
+            Or InStr(1, err_dscrptn, "Oracle") <> 0) _
+            Then ErrType = "Database Error " _
+            Else ErrType = "VB Runtime Error "
+    End Select
+    
+    If err_source <> vbNullString Then ErrSrc = " in: """ & err_source & """"   ' assemble ErrSrc from available information"
+    If err_line <> 0 Then ErrAtLine = " at line " & err_line                    ' assemble ErrAtLine from available information
+    ErrTitle = Replace(ErrType & ErrNo & ErrSrc & ErrAtLine, "  ", " ")         ' assemble ErrTitle from available information
+       
+    ErrText = "Error: " & vbLf & _
+              ErrDesc & vbLf & vbLf & _
+              "Source: " & vbLf & _
+              err_source & ErrAtLine
+    If ErrAbout <> vbNullString _
+    Then ErrText = ErrText & vbLf & vbLf & _
+                  "About: " & vbLf & _
+                  ErrAbout
+    
+#If Debugging Then
+    ErrBttns = vbYesNoCancel
+    ErrText = ErrText & vbLf & vbLf & _
+              "Debugging:" & vbLf & _
+              "Yes    = Resume error line" & vbLf & _
+              "No     = Resume Next (skip error line)" & vbLf & _
+              "Cancel = Terminate"
+#Else
+    ErrBttns = vbCritical
+#End If
+    
+    ErrMsg = MsgBox(Title:=ErrTitle _
+                  , Prompt:=ErrText _
+                  , Buttons:=ErrBttns)
+xt: Exit Function
+
+End Function
+
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mDemo." & s:  End Property
 
 Public Sub Demos()
