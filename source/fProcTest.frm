@@ -3,8 +3,8 @@ Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} fProcTest
    Caption         =   "Test-Msg-Form"
    ClientHeight    =   6300
    ClientLeft      =   120
-   ClientTop       =   465
-   ClientWidth     =   11565
+   ClientTop       =   468
+   ClientWidth     =   11568
    OleObjectBlob   =   "fProcTest.frx":0000
 End
 Attribute VB_Name = "fProcTest"
@@ -281,7 +281,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     Dim ErrBttns    As Variant
     Dim ErrAtLine   As String
     Dim ErrDesc     As String
-    Dim ErrLine     As Long
+    Dim errline     As Long
     Dim ErrNo       As Long
     Dim ErrSrc      As String
     Dim ErrText     As String
@@ -291,7 +291,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
-    If err_line = 0 Then ErrLine = Erl
+    If err_line = 0 Then errline = Erl
     If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"

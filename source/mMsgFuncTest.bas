@@ -37,11 +37,131 @@ Dim vButton4                As Variant
 Dim vButton5                As Variant
 Dim vButton6                As Variant
 Dim vButton7                As Variant
-Dim vbuttons                As Variant
+Dim vButtons                As Collection
 
 Public Property Get BTTN_TERMINATE() As String ' composed constant
     BTTN_TERMINATE = "Terminate" & vbLf & "Regression"
 End Property
+
+Public Property Let RegressionTest(ByVal b As Boolean)
+    bRegressionTest = b
+    If b Then sBttnTerminate = "Terminate" & vbLf & "Regression" Else sBttnTerminate = vbNullString
+End Property
+
+Private Function AppErr(ByVal app_err_no As Long) As Long
+' ------------------------------------------------------------------------------
+' Ensures that a programmed (i.e. an application) error numbers never conflicts
+' with the number of a VB runtime error. Thr function returns a given positive
+' number (app_err_no) with the vbObjectError added - which turns it into a
+' negative value. When the provided number is negative it returns the original
+' positive "application" error number e.g. for being used with an error message.
+' ------------------------------------------------------------------------------
+    If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
+End Function
+
+Private Sub ClearVBEImmediateWindow()
+    Dim v   As Variant
+    For Each v In Application.VBE.Windows
+        If v.Caption = "Direktbereich" Then
+            v.SetFocus
+            Application.SendKeys "^g ^a {DEL}"
+            DoEvents
+            Exit Sub
+        End If
+    Next v
+End Sub
+
+Public Sub cmdTest00_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 0
+    mMsgFuncTest.Test_01_ErrMsg
+End Sub
+
+Public Sub cmdTest01_Click()
+' ------------------------------------------------------------------------------
+' Procedures for test start via Command Buttons on Test Worksheet
+' ------------------------------------------------------------------------------
+'    wsTest.RegressionTest = False
+    wsTest.TestNumber = 1
+    mMsgFuncTest.Test_02_WidthDeterminedByMinimumWidth
+End Sub
+
+Public Sub cmdTest02_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 2
+    mMsgFuncTest.Test_03_WidthDeterminedByTitle
+End Sub
+
+Public Sub cmdTest03_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 3
+    mMsgFuncTest.Test_04_WidthDeterminedByMonoSpacedMessageSection
+End Sub
+
+Public Sub cmdTest04_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 4
+    mMsgFuncTest.Test_05_WidthDeterminedByReplyButtons
+End Sub
+
+Public Sub cmdTest05_Click()
+    wsTest.RegressionTest = False
+    mMsgFuncTest.Test_06_MonoSpacedSectionWidthExceedsMaxMsgWidth
+End Sub
+
+Public Sub cmdTest06_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 6
+    mMsgFuncTest.Test_07_MonoSpacedMessageSectionExceedsMaxHeight
+End Sub
+
+Public Sub cmdTest07_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 7
+    mMsgFuncTest.Test_08_ButtonsOnly
+End Sub
+
+Public Sub cmdTest08_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 8
+    mMsgFuncTest.Test_09_ButtonsMatrix
+End Sub
+
+Public Sub cmdTest09_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 9
+    mMsgFuncTest.Test_10_ButtonScrollBarVertical
+End Sub
+
+Public Sub cmdTest10_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 10
+    mMsgFuncTest.Test_11_ButtonScrollBarHorizontal
+End Sub
+
+Public Sub cmdTest11_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 11
+    mMsgFuncTest.Test_12_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar
+End Sub
+
+Public Sub cmdTest17_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 17
+    mMsgFuncTest.Test_17_MessageAsString
+End Sub
+
+Public Sub cmdTest30_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 30
+    mMsgFuncTest.Test_30_Monitor
+End Sub
+
+Public Sub cmdTest90_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 90
+    mMsgFuncTest.Test_90_All_in_one_Demonstration
+End Sub
 
 Private Function ErrMsg(ByVal err_source As String, _
                Optional ByVal err_no As Long = 0, _
@@ -120,7 +240,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     Dim ErrBttns    As Variant
     Dim ErrAtLine   As String
     Dim ErrDesc     As String
-    Dim ErrLine     As Long
+    Dim errline     As Long
     Dim ErrNo       As Long
     Dim ErrSrc      As String
     Dim ErrText     As String
@@ -130,7 +250,7 @@ Private Function ErrMsg(ByVal err_source As String, _
         
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
-    If err_line = 0 Then ErrLine = Erl
+    If err_line = 0 Then errline = Erl
     If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
@@ -191,200 +311,6 @@ End Function
 Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "mMsgFuncTest." & sProc
 End Function
-
-Public Property Let RegressionTest(ByVal b As Boolean)
-    bRegressionTest = b
-    If b Then sBttnTerminate = "Terminate" & vbLf & "Regression" Else sBttnTerminate = vbNullString
-End Property
-
-Private Function AppErr(ByVal app_err_no As Long) As Long
-' ------------------------------------------------------------------------------
-' Ensures that a programmed (i.e. an application) error numbers never conflicts
-' with the number of a VB runtime error. Thr function returns a given positive
-' number (app_err_no) with the vbObjectError added - which turns it into a
-' negative value. When the provided number is negative it returns the original
-' positive "application" error number e.g. for being used with an error message.
-' ------------------------------------------------------------------------------
-    If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
-End Function
-
-Public Sub Test_Regression()
-' --------------------------------------------------------------------------------------
-' Regression testing makes use of all available design means - by the way testing them.
-' Note: Each test procedure is completely independant and thus may be executed directly.
-' --------------------------------------------------------------------------------------
-    Const PROC = "Test_Regression"
-    
-    On Error GoTo eh
-    Dim rng     As Range
-    Dim sTest   As String
-    Dim sMakro  As String
-    
-    ThisWorkbook.Save
-    Unload fMsg
-    wsTest.RegressionTest = True
-    mMsgFuncTest.RegressionTest = True
-    
-    For Each rng In wsTest.RegressionTests
-        If rng.Value = "R" Then
-            sTest = Format(rng.Offset(, -2), "00")
-            sMakro = "cmdTest" & sTest & "_Click"
-            wsTest.TerminateRegressionTest = False
-            Application.Run "Msg.xlsb!" & sMakro
-            If wsTest.TerminateRegressionTest Then Exit For
-        End If
-    Next rng
-
-xt: Exit Sub
-
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
-End Sub
-
-Private Sub ClearVBEImmediateWindow()
-    Dim v   As Variant
-    For Each v In Application.VBE.Windows
-        If v.Caption = "Direktbereich" Then
-            v.SetFocus
-            Application.SendKeys "^g ^a {DEL}"
-            DoEvents
-            Exit Sub
-        End If
-    Next v
-End Sub
-
-Public Sub cmdTest00_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 0
-    mMsgFuncTest.Test_00_ErrMsg
-End Sub
-
-Public Sub cmdTest01_Click()
-' ------------------------------------------------------------------------------
-' Procedures for test start via Command Buttons on Test Worksheet
-' ------------------------------------------------------------------------------
-'    wsTest.RegressionTest = False
-    wsTest.TestNumber = 1
-    mMsgFuncTest.Test_01_WidthDeterminedByMinimumWidth
-End Sub
-
-Public Sub cmdTest02_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 2
-    mMsgFuncTest.Test_02_WidthDeterminedByTitle
-End Sub
-
-Public Sub cmdTest03_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 3
-    mMsgFuncTest.Test_03_WidthDeterminedByMonoSpacedMessageSection
-End Sub
-
-Public Sub cmdTest04_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 4
-    mMsgFuncTest.Test_04_WidthDeterminedByReplyButtons
-End Sub
-
-Public Sub cmdTest05_Click()
-    wsTest.RegressionTest = False
-    mMsgFuncTest.Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth
-End Sub
-
-Public Sub cmdTest06_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 6
-    mMsgFuncTest.Test_06_MonoSpacedMessageSectionExceedsMaxHeight
-End Sub
-
-Public Sub cmdTest07_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 7
-    mMsgFuncTest.Test_07_ButtonsOnly
-End Sub
-
-Public Sub cmdTest08_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 8
-    mMsgFuncTest.Test_08_ButtonsMatrix
-End Sub
-
-Public Sub cmdTest09_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 9
-    mMsgFuncTest.Test_09_ButtonScrollBarVertical
-End Sub
-
-Public Sub cmdTest10_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 10
-    mMsgFuncTest.Test_10_ButtonScrollBarHorizontal
-End Sub
-
-Public Sub cmdTest11_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 11
-    mMsgFuncTest.Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar
-End Sub
-
-Public Sub cmdTest17_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 17
-    mMsgFuncTest.Test_17_MessageAsString
-End Sub
-
-Public Sub cmdTest30_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 30
-    mMsgFuncTest.Test_30_Monitor
-End Sub
-
-Public Sub cmdTest90_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 90
-    mMsgFuncTest.Test_90_All_in_one_Demonstration
-End Sub
-
-Public Sub Test_00_ErrMsg()
-' ------------------------------------------------------------------------------
-' Test of the "universal error message display which includes a debugging
-'              option (Conditional Compile Argument 'Debugging = 1') and an
-'              optional additional "about the error" information which may be
-'              connected to an error message by two vertical bars (||)".
-' The test displays an "Application Error" with an Error Description which
-' includes an "About the Error" information.
-' The test uses the private ErrMsg function in this module. This private
-' (universal error message display) function passes on the requested display
-' either to the mErH.ErrMsg when installed or the mMsg.ErrMsg when installed.
-' This means that testing has to be performed with the following three
-' Conditional Compile Argument variants:
-' ErHComp = 1               > display of the error message by mErH.ErrMsg
-' ErHComp = 0 : MsgComp = 1 > display of the error message by mMsg.ErrMsg
-' ErHComp = 0 : MsgComp = 0 > display of the error message by VBA.MsgBox
-' Note: Only for this testing the mErH component is installed!
-' ------------------------------------------------------------------------------
-    Const PROC = "Test_00_ErrMsg"
-    
-    On Error GoTo eh
-    Err.Raise Number:=AppErr(5), Source:=ErrSrc(PROC), _
-              Description:="This is a test error description!||This is a test about the error text."" "
-        
-xt: Exit Sub
-
-eh: Select Case ErrMsg(ErrSrc(PROC))
-        Case vbYes: Stop: Resume
-        Case vbNo:  Stop: Resume Next
-    End Select
-
-    Select Case mMsg.Box(box_title:="Test result of " & Readable(PROC) _
-                       , box_msg:=vbNullString _
-                       , box_buttons:=mMsg.Buttons(BTTN_PASSED, BTTN_FAILED) _
-                        )
-        Case BTTN_PASSED:       wsTest.Passed = True
-        Case BTTN_FAILED:       wsTest.Failed = True
-        Case sBttnTerminate:    wsTest.TerminateRegressionTest = True
-    End Select
-
-End Sub
 
 Public Sub Explore(ByVal ctl As Variant, _
           Optional ByVal applied As Boolean = True)
@@ -539,6 +465,11 @@ Private Sub MessageInit(ByRef msg_form As fMsg, _
 
 End Sub
 
+Private Function PrcPnt(ByVal pp_value As Single, _
+                        ByVal pp_dimension As String) As String
+    PrcPnt = mMsg.Prcnt(pp_value, pp_dimension) & "% (" & mMsg.Pnts(pp_value, "w") & "pt)"
+End Function
+
 Private Function Readable(ByVal s As String) As String
 ' ------------------------------------------------------------------------------
 ' Convert a string (s) into a readable form by replacing all underscores
@@ -619,50 +550,129 @@ Public Sub RepeatTest()
     Debug.Print RepeatString(10, "a", True, False, vbLf)
 End Sub
 
-Public Function Test_00_The_Buttons_Service_1() As Variant
+Public Sub Test_00_Regression()
+' --------------------------------------------------------------------------------------
+' Regression testing makes use of all available design means - by the way testing them.
+' Note: Each test procedure is completely independant and thus may be executed directly.
+' --------------------------------------------------------------------------------------
+    Const PROC = "Test_00_Regression"
+    
+    On Error GoTo eh
+    Dim rng     As Range
+    Dim sTest   As String
+    Dim sMakro  As String
+    
+    ThisWorkbook.Save
+    Unload fMsg
+    wsTest.RegressionTest = True
+    mMsgFuncTest.RegressionTest = True
+    
+    For Each rng In wsTest.RegressionTests
+        If rng.Value = "R" Then
+            sTest = Format(rng.Offset(, -2), "00")
+            sMakro = "cmdTest" & sTest & "_Click"
+            wsTest.TerminateRegressionTest = False
+            Application.Run "Msg.xlsb!" & sMakro
+            If wsTest.TerminateRegressionTest Then Exit For
+        End If
+    Next rng
+
+xt: Exit Sub
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Public Sub Test_01_ErrMsg()
+' ------------------------------------------------------------------------------
+' Test of the "universal error message display which includes a debugging
+'              option (Conditional Compile Argument 'Debugging = 1') and an
+'              optional additional "about the error" information which may be
+'              connected to an error message by two vertical bars (||)".
+' The test displays an "Application Error" with an Error Description which
+' includes an "About the Error" information.
+' The test uses the private ErrMsg function in this module. This private
+' (universal error message display) function passes on the requested display
+' either to the mErH.ErrMsg when installed or the mMsg.ErrMsg when installed.
+' This means that testing has to be performed with the following three
+' Conditional Compile Argument variants:
+' ErHComp = 1               > display of the error message by mErH.ErrMsg
+' ErHComp = 0 : MsgComp = 1 > display of the error message by mMsg.ErrMsg
+' ErHComp = 0 : MsgComp = 0 > display of the error message by VBA.MsgBox
+' Note: Only for this testing the mErH component is installed!
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_01_ErrMsg"
+    
+    On Error GoTo eh
+    
+    Err.Raise Number:=AppErr(5), Source:=ErrSrc(PROC), _
+              Description:="This is a test error description!||This is a test about the error text."" "
+        
+xt: mMsg.Buttons vButtons, False, BTTN_PASSED, BTTN_FAILED
+    Select Case mMsg.Box(box_title:="Test result of " & Readable(PROC) _
+                       , box_msg:=vbNullString _
+                       , box_buttons:=vButtons _
+                        )
+        Case BTTN_PASSED:       wsTest.Passed = True
+        Case BTTN_FAILED:       wsTest.Failed = True
+        Case sBttnTerminate:    wsTest.TerminateRegressionTest = True
+    End Select
+    Exit Sub
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:      Stop: Resume
+        Case vbResumeNext:  Stop: Resume Next
+        Case Else:          GoTo xt             ' clean exit
+    End Select
+End Sub
+
+Public Function Test_01_The_Buttons_Service_1() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
     Dim cll As Collection
     
-    Set cll = mMsg.Buttons("B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29", "B30", "B31", "B32", "B33", "B34", "B35", "B36", "B37", "B38", "B39", "B40", "B41", "B42", "B43", "B44", "B45", "B46", "B47", "B48", "B49", "B50")
-    Test_00_The_Buttons_Service_1 = _
+    mMsg.Buttons cll, False, "B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29", "B30", "B31", "B32", "B33", "B34", "B35", "B36", "B37", "B38", "B39", "B40", "B41", "B42", "B43", "B44", "B45", "B46", "B47", "B48", "B49", "B50"
+    Test_01_The_Buttons_Service_1 = _
     mMsg.Box(box_title:="49 buttons ordered in 7 rows, row breaks are inserted by the Buttons service, excessive 50th button ignored)", _
              box_buttons:=cll)
 
 End Function
 
-Public Function Test_00_The_Buttons_Service_2() As Variant
+Public Function Test_01_The_Buttons_Service_2() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
     Dim cll As Collection
     
-    Set cll = mMsg.Buttons(2843, "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29", "B30", "B31", "B32", "B33", "B34", "B35", "B36", "B37", "B38", "B39", "B40", "B41", "B42", "B43", "B44", "B45", "B46", "B47", "B48", "B49", "B50")
-    Test_00_The_Buttons_Service_2 = _
+    mMsg.Buttons cll, False, 2843, "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29", "B30", "B31", "B32", "B33", "B34", "B35", "B36", "B37", "B38", "B39", "B40", "B41", "B42", "B43", "B44", "B45", "B46", "B47", "B48", "B49", "B50"
+    Test_01_The_Buttons_Service_2 = _
     mMsg.Box(box_title:="49 buttons ordered in 7 rows, row breaks are inserted by the Buttons service, excessive 50th button ignored)", _
              box_buttons:=cll)
 
 End Function
 
-Public Function Test_00_The_Buttons_Service_3() As Variant
+Public Function Test_01_The_Buttons_Service_3() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Test_00_The_Buttons_Service_3 = _
+    Dim cll As Collection
+    
+    mMsg.Buttons cll, False, "B01,B02,B03,B04,B05"
+    Test_01_The_Buttons_Service_3 = _
     mMsg.Box(box_title:="49 buttons ordered in 7 rows, row breaks are inserted by the Buttons service, excessive 50th button ignored)", _
-             box_buttons:=mMsg.Buttons("B01,B02,B03,B04,B05"))
+             box_buttons:=cll)
 End Function
 
-Public Function Test_01_WidthDeterminedByMinimumWidth() As Variant
+Public Function Test_02_WidthDeterminedByMinimumWidth() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC      As String = "Test_01_WidthDeterminedByMinimumWidth"
+    Const PROC      As String = "Test_02_WidthDeterminedByMinimumWidth"
     
     On Error GoTo eh
     Dim MsgForm         As fMsg
     Dim MsgTitle        As String
+    Dim cll             As Collection
     
     wsTest.TestNumber = 1
     MsgTitle = Readable(PROC)
@@ -680,7 +690,8 @@ Public Function Test_01_WidthDeterminedByMinimumWidth() As Variant
     
     vButton4 = "Repeat with minimum width" & vbLf & "+ " & PrcPnt(TestMsgWidthIncrDecr, "w")
     vButton5 = "Repeat with minimum width" & vbLf & "- " & PrcPnt(TestMsgWidthIncrDecr, "w")
-    Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, vButton4, vButton5)
+    
+    mMsg.Buttons cll, False, sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, vButton4, vButton5
     
     Do
         With Message.Section(1)
@@ -700,22 +711,22 @@ Public Function Test_01_WidthDeterminedByMinimumWidth() As Variant
             .Text.FontColor = rgbRed
         End With
                                                                                                   
-        Test_01_WidthDeterminedByMinimumWidth = _
+        Test_02_WidthDeterminedByMinimumWidth = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_buttons:=vbuttons _
+                 , dsply_buttons:=vButtons _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                  , dsply_width_min:=TestMsgWidthMin _
                  , dsply_width_max:=TestMsgWidthMax _
                  , dsply_height_max:=TestMsgHeightMax _
                   )
-        Select Case Test_01_WidthDeterminedByMinimumWidth
+        Select Case Test_02_WidthDeterminedByMinimumWidth
             Case vButton5
                 TestMsgWidthMin = Max(TestMsgWidthMin - TestMsgWidthIncrDecr, 20)
-                Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, vButton4, vButton5)
+                mMsg.Buttons vButtons, False, sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, vButton4, vButton5
             Case vButton4
                 TestMsgWidthMin = Min(TestMsgWidthMin + TestMsgWidthIncrDecr, 99)
-                Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, vButton4, vButton5)
+                mMsg.Buttons vButtons, False, sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, vButton4, vButton5
             Case BTTN_PASSED:       wsTest.Passed = True:   Exit Do
             Case BTTN_FAILED:       wsTest.Failed = True:   Exit Do
             Case sBttnTerminate:    wsTest.TerminateRegressionTest = True:  Exit Do
@@ -729,11 +740,11 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Test_02_WidthDeterminedByTitle() As Variant
+Public Function Test_03_WidthDeterminedByTitle() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC          As String = "Test_02_WidthDeterminedByTitle"
+    Const PROC          As String = "Test_03_WidthDeterminedByTitle"
     
     On Error GoTo eh
     Dim MsgForm     As fMsg
@@ -763,18 +774,18 @@ Public Function Test_02_WidthDeterminedByTitle() As Variant
                      "maximum heigth based on the screen height which for this test is " & _
                      PrcPnt(TestMsgHeightMax, "h") & "."
     End With
-    Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED)
+    mMsg.Buttons vButtons, False, sBttnTerminate, BTTN_PASSED, BTTN_FAILED
     
-    Test_02_WidthDeterminedByTitle = _
+    Test_03_WidthDeterminedByTitle = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_buttons:=vbuttons _
+             , dsply_buttons:=vButtons _
              , dsply_width_max:=wsTest.MsgWidthMax _
              , dsply_width_min:=wsTest.MsgWidthMin _
              , dsply_height_max:=wsTest.MsgHeightMax _
              , dsply_modeless:=wsTest.TestOptionDisplayModeless _
               )
-    Select Case Test_02_WidthDeterminedByTitle
+    Select Case Test_03_WidthDeterminedByTitle
         Case BTTN_PASSED:       wsTest.Passed = True
         Case BTTN_FAILED:       wsTest.Failed = True
         Case sBttnTerminate:    wsTest.TerminateRegressionTest = True
@@ -784,11 +795,11 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Test_03_WidthDeterminedByMonoSpacedMessageSection() As Variant
+Public Function Test_04_WidthDeterminedByMonoSpacedMessageSection() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC          As String = "Test_03_WidthDeterminedByMonoSpacedMessageSection"
+    Const PROC          As String = "Test_04_WidthDeterminedByMonoSpacedMessageSection"
         
     On Error GoTo eh
     Dim MsgForm                         As fMsg
@@ -818,7 +829,7 @@ Public Function Test_03_WidthDeterminedByMonoSpacedMessageSection() As Variant
     BttnRepeatMaxHeightIncreased = "Repeat with" & vbLf & "maximum height" & vbLf & "+ " & PrcPnt(TestMsgHeightIncrDecr, "h")
     BttnRepeatMaxHeightDecreased = "Repeat with" & vbLf & "maximum height" & vbLf & "- " & PrcPnt(TestMsgHeightIncrDecr, "h")
     
-    Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, BttnRepeatMaxWidthIncreased, BttnRepeatMaxWidthDecreased)
+    mMsg.Buttons vButtons, False, sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, BttnRepeatMaxWidthIncreased, BttnRepeatMaxWidthDecreased
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
     
     Do
@@ -853,23 +864,23 @@ Public Function Test_03_WidthDeterminedByMonoSpacedMessageSection() As Variant
         '~~ Assign test values from the Test Worksheet
         mMsg.MsgInstance(MsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
                 
-        Test_03_WidthDeterminedByMonoSpacedMessageSection = _
+        Test_04_WidthDeterminedByMonoSpacedMessageSection = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_buttons:=vbuttons _
+                 , dsply_buttons:=vButtons _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                  , dsply_width_min:=TestMsgWidthMin _
                  , dsply_width_max:=TestMsgWidthMax _
                  , dsply_height_min:=TestMsgHeightMin _
                  , dsply_height_max:=TestMsgHeightMax _
                   )
-        Select Case Test_03_WidthDeterminedByMonoSpacedMessageSection
+        Select Case Test_04_WidthDeterminedByMonoSpacedMessageSection
             Case BttnRepeatMaxWidthDecreased
                 TestMsgWidthMax = TestMsgWidthMax - TestMsgWidthIncrDecr
-                Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, BttnRepeatMaxWidthIncreased, BttnRepeatMaxWidthDecreased)
+                mMsg.Buttons vButtons, False, sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, BttnRepeatMaxWidthIncreased, BttnRepeatMaxWidthDecreased
             Case BttnRepeatMaxWidthIncreased
                 TestMsgWidthMax = TestMsgWidthMax + TestMsgWidthIncrDecr
-                Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, BttnRepeatMaxWidthIncreased, BttnRepeatMaxWidthDecreased)
+                mMsg.Buttons vButtons, False, sBttnTerminate, BTTN_PASSED, BTTN_FAILED, vbLf, BttnRepeatMaxWidthIncreased, BttnRepeatMaxWidthDecreased
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
             Case BTTN_FAILED:       wsTest.Failed = True:                   Exit Do ' Stop, Previous, and Next are passed on to the caller
             Case sBttnTerminate:    wsTest.TerminateRegressionTest = True:  Exit Do
@@ -882,11 +893,11 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Test_04_WidthDeterminedByReplyButtons() As Variant
+Public Function Test_05_WidthDeterminedByReplyButtons() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC      As String = "Test_04_WidthDeterminedByReplyButtons"
+    Const PROC      As String = "Test_05_WidthDeterminedByReplyButtons"
     
     On Error GoTo eh
     Dim MsgForm     As fMsg
@@ -917,21 +928,21 @@ Public Function Test_04_WidthDeterminedByReplyButtons() As Variant
     vButton5 = "Repeat with 4 buttons"
     vButton6 = "Dummy button"
     
-    Set vbuttons = mMsg.Buttons(sBttnTerminate, vButton4, vButton5, vButton6, vbLf, BTTN_PASSED, BTTN_FAILED)
+    mMsg.Buttons vButtons, False, sBttnTerminate, vButton4, vButton5, vButton6, vbLf, BTTN_PASSED, BTTN_FAILED
     
     Do
-        Test_04_WidthDeterminedByReplyButtons = _
+        Test_05_WidthDeterminedByReplyButtons = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_buttons:=vbuttons _
+                 , dsply_buttons:=vButtons _
                  , dsply_width_max:=TestMsgWidthMax _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                   )
-        Select Case Test_04_WidthDeterminedByReplyButtons
+        Select Case Test_05_WidthDeterminedByReplyButtons
             Case vButton4
-                Set vbuttons = mMsg.Buttons(sBttnTerminate, vButton4, vButton5, vButton6, vbLf, BTTN_PASSED, BTTN_FAILED)
+                mMsg.Buttons vButtons, False, sBttnTerminate, vButton4, vButton5, vButton6, vbLf, BTTN_PASSED, BTTN_FAILED
             Case vButton5
-                Set vbuttons = mMsg.Buttons(sBttnTerminate, vButton4, vButton5, vbLf, BTTN_PASSED, BTTN_FAILED)
+                mMsg.Buttons vButtons, False, sBttnTerminate, vButton4, vButton5, vbLf, BTTN_PASSED, BTTN_FAILED
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
             Case BTTN_FAILED:       wsTest.Failed = True:                   Exit Do
             Case sBttnTerminate:    wsTest.TerminateRegressionTest = True:  Exit Do
@@ -944,11 +955,11 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth() As Variant
+Public Function Test_06_MonoSpacedSectionWidthExceedsMaxMsgWidth() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC = "Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth"
+    Const PROC = "Test_06_MonoSpacedSectionWidthExceedsMaxMsgWidth"
     
     On Error GoTo eh
     Dim MsgForm     As fMsg
@@ -980,18 +991,18 @@ Public Function Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth() As Variant
         .Text.Text = "This (single line!) monspaced message section exceeds the specified maximum form width which for this test is " & PrcPnt(TestMsgWidthMax, "w") & "."
         .Text.MonoSpaced = True
     End With
-    Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED)
+    mMsg.Buttons vButtons, False, sBttnTerminate, BTTN_PASSED, BTTN_FAILED
     
-    Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth = _
+    Test_06_MonoSpacedSectionWidthExceedsMaxMsgWidth = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_buttons:=vbuttons _
+             , dsply_buttons:=vButtons _
              , dsply_width_min:=TestMsgWidthMin _
              , dsply_width_max:=TestMsgWidthMax _
              , dsply_height_max:=TestMsgHeightMax _
              , dsply_modeless:=wsTest.TestOptionDisplayModeless _
               )
-    Select Case Test_05_MonoSpacedSectionWidthExceedsMaxMsgWidth
+    Select Case Test_06_MonoSpacedSectionWidthExceedsMaxMsgWidth
         Case BTTN_PASSED:       wsTest.Passed = True
         Case BTTN_FAILED:       wsTest.Failed = True
         Case sBttnTerminate:    wsTest.TerminateRegressionTest = True
@@ -1002,11 +1013,11 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Test_06_MonoSpacedMessageSectionExceedsMaxHeight() As Variant
+Public Function Test_07_MonoSpacedMessageSectionExceedsMaxHeight() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC = "Test_06_MonoSpacedMessageSectionExceedsMaxHeight"
+    Const PROC = "Test_07_MonoSpacedMessageSectionExceedsMaxHeight"
     
     On Error GoTo eh
     Dim MsgForm     As fMsg
@@ -1039,18 +1050,18 @@ Public Function Test_06_MonoSpacedMessageSectionExceedsMaxHeight() As Variant
         .Text.Text = RepeatString(25, "This monospaced message comes with a vertical scrollbar." & vbLf, True)
         .Text.MonoSpaced = True
     End With
-    Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED)
+    mMsg.Buttons vButtons, False, sBttnTerminate, BTTN_PASSED, BTTN_FAILED
     
-    Test_06_MonoSpacedMessageSectionExceedsMaxHeight = _
+    Test_07_MonoSpacedMessageSectionExceedsMaxHeight = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_buttons:=vbuttons _
+             , dsply_buttons:=vButtons _
              , dsply_width_min:=TestMsgWidthMin _
              , dsply_width_max:=TestMsgWidthMax _
              , dsply_height_max:=TestMsgHeightMax _
              , dsply_modeless:=wsTest.TestOptionDisplayModeless _
               )
-    Select Case Test_06_MonoSpacedMessageSectionExceedsMaxHeight
+    Select Case Test_07_MonoSpacedMessageSectionExceedsMaxHeight
         Case BTTN_PASSED:       wsTest.Passed = True
         Case BTTN_FAILED:       wsTest.Failed = True
         Case sBttnTerminate:    wsTest.TerminateRegressionTest = True
@@ -1061,8 +1072,8 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Test_07_ButtonsOnly() As Variant
-    Const PROC = "Test_07_ButtonsOnly"
+Public Function Test_08_ButtonsOnly() As Variant
+    Const PROC = "Test_08_ButtonsOnly"
     
     On Error GoTo eh
     Dim MsgForm             As fMsg
@@ -1106,7 +1117,7 @@ Public Function Test_07_ButtonsOnly() As Variant
         mMsg.MsgInstance(MsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
         '~~ Obtain initial test values from the Test Worksheet
                          
-        Test_07_ButtonsOnly = _
+        Test_08_ButtonsOnly = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
                  , dsply_buttons:=cllStory _
@@ -1117,7 +1128,7 @@ Public Function Test_07_ButtonsOnly() As Variant
                  , dsply_width_max:=TestMsgWidthMax _
                  , dsply_height_max:=TestMsgHeightMax _
                   )
-        Select Case Test_07_ButtonsOnly
+        Select Case Test_08_ButtonsOnly
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
             Case BTTN_FAILED:       wsTest.Failed = True:                   Exit Do
             Case "Ok":                                                      Exit Do ' The very last item in the collection is the "Finished" button
@@ -1131,8 +1142,8 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Test_08_ButtonsMatrix() As Variant
-    Const PROC = "Test_08_ButtonsMatrix"
+Public Function Test_09_ButtonsMatrix() As Variant
+    Const PROC = "Test_09_ButtonsMatrix"
     
     On Error GoTo eh
     Dim MsgForm             As fMsg
@@ -1177,7 +1188,7 @@ Public Function Test_08_ButtonsMatrix() As Variant
         '~~ Obtain initial test values from the Test Worksheet
         mMsg.MsgInstance(MsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
                              
-        Test_08_ButtonsMatrix = _
+        Test_09_ButtonsMatrix = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
                  , dsply_buttons:=cllMatrix _
@@ -1190,7 +1201,7 @@ Public Function Test_08_ButtonsMatrix() As Variant
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                   )
             
-        Select Case Test_08_ButtonsMatrix
+        Select Case Test_09_ButtonsMatrix
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
             Case BTTN_FAILED:       wsTest.Failed = True:                   Exit Do
             Case sBttnTerminate:    wsTest.TerminateRegressionTest = True:  Exit Do
@@ -1202,8 +1213,8 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Test_09_ButtonScrollBarVertical() As Variant
-    Const PROC = "Test_09_ButtonScrollBarVertical"
+Public Function Test_10_ButtonScrollBarVertical() As Variant
+    Const PROC = "Test_10_ButtonScrollBarVertical"
     
     On Error GoTo eh
     Dim MsgForm             As fMsg
@@ -1255,7 +1266,7 @@ Public Function Test_09_ButtonScrollBarVertical() As Variant
     cll.Add BTTN_FAILED
     
     Do
-        Test_09_ButtonScrollBarVertical = _
+        Test_10_ButtonScrollBarVertical = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
                  , dsply_buttons:=cll _
@@ -1264,7 +1275,7 @@ Public Function Test_09_ButtonScrollBarVertical() As Variant
                  , dsply_height_max:=TestMsgHeightMax _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                   )
-        Select Case Test_09_ButtonScrollBarVertical
+        Select Case Test_10_ButtonScrollBarVertical
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
             Case BTTN_FAILED:       wsTest.Failed = True:                   Exit Do
             Case sBttnTerminate:    wsTest.TerminateRegressionTest = True:  Exit Do
@@ -1277,9 +1288,9 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Test_10_ButtonScrollBarHorizontal() As Variant
+Public Function Test_11_ButtonScrollBarHorizontal() As Variant
 
-    Const PROC = "Test_10_ButtonScrollBarHorizontal"
+    Const PROC = "Test_11_ButtonScrollBarHorizontal"
     Const INIT_WIDTH = 40
     Const CHANGE_WIDTH = 10
     
@@ -1323,16 +1334,17 @@ Public Function Test_10_ButtonScrollBarHorizontal() As Variant
             
         '~~ Obtain initial test values from the Test Worksheet
     
-        Test_10_ButtonScrollBarHorizontal = _
+        mMsg.Buttons vButtons, False, Bttn10Plus, Bttn10Minus, BTTN_PASSED, BTTN_FAILED
+        Test_11_ButtonScrollBarHorizontal = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_buttons:=mMsg.Buttons(Bttn10Plus, Bttn10Minus, BTTN_PASSED, BTTN_FAILED) _
+                 , dsply_buttons:=vButtons _
                  , dsply_width_min:=TestMsgWidthMin _
                  , dsply_width_max:=TestMsgWidthMax _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                  , dsply_button_default:=BTTN_PASSED _
                   )
-        Select Case Test_10_ButtonScrollBarHorizontal
+        Select Case Test_11_ButtonScrollBarHorizontal
             Case Bttn10Minus:       TestMsgWidthMax = TestMsgWidthMax - CHANGE_WIDTH
             Case Bttn10Plus:        TestMsgWidthMax = TestMsgWidthMax + CHANGE_WIDTH
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
@@ -1345,8 +1357,8 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() As Variant
-    Const PROC = "Test_11_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar"
+Public Function Test_12_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() As Variant
+    Const PROC = "Test_12_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar"
     
     On Error GoTo eh
     Dim MsgForm                     As fMsg
@@ -1389,7 +1401,7 @@ Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
         '~~ Obtain initial test values from the Test Worksheet
         mMsg.MsgInstance(MsgTitle).DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
                              
-        Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar = _
+        Test_12_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
                  , dsply_buttons:=cllMatrix _
@@ -1401,7 +1413,7 @@ Public Function Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
                  , dsply_height_max:=TestMsgHeightMax _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                   )
-        Select Case Test_11_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar
+        Select Case Test_12_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar
             Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
             Case BTTN_FAILED:       wsTest.Failed = True:                   Exit Do
             Case sBttnTerminate:    wsTest.TerminateRegressionTest = True:  Exit Do
@@ -1485,13 +1497,13 @@ Public Function Test_17_MessageAsString() As Variant
     End With
     MsgForm.DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
     
-    Set vbuttons = mMsg.Buttons(sBttnTerminate, BTTN_PASSED, BTTN_FAILED)
+    mMsg.Buttons vButtons, False, sBttnTerminate, BTTN_PASSED, BTTN_FAILED
         
     Test_17_MessageAsString = _
     mMsg.Box( _
              box_title:=MsgTitle _
            , box_msg:="This is a message provided as a simple string argument!" _
-           , box_buttons:=vbuttons _
+           , box_buttons:=vButtons _
            , box_width_min:=TestMsgWidthMin _
            , box_width_max:=TestMsgWidthMax _
            , box_height_max:=TestMsgHeightMax _
@@ -1684,9 +1696,10 @@ Public Function Test_30_Monitor() As Variant
         End If
     Next i
     
+    mMsg.Buttons vButtons, False, BTTN_PASSED, BTTN_FAILED
     Select Case mMsg.Box(box_title:="Test result of " & Readable(PROC) _
                        , box_msg:=vbNullString _
-                       , box_buttons:=mMsg.Buttons(BTTN_PASSED, BTTN_FAILED) _
+                       , box_buttons:=vButtons _
                         )
         Case BTTN_PASSED:       wsTest.Passed = True
         Case BTTN_FAILED:       wsTest.Failed = True
@@ -1883,9 +1896,10 @@ Public Sub Test_99_Individual()
         .Label.Text = "Test label extra long for this specific test:"
         .Text.Text = "A short message text"
     End With
+    mMsg.Buttons vButtons, False, "Button-1", "Button-2"
     mMsg.Dsply dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_buttons:=mMsg.Buttons("Button-1", "Button-2") _
+             , dsply_buttons:=vButtons _
              , dsply_button_default:="Button-1" _
              , dsply_width_min:=30 _
              , dsply_width_max:=TestMsgWidthMax
@@ -1895,7 +1909,3 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Function PrcPnt(ByVal pp_value As Single, _
-                        ByVal pp_dimension As String) As String
-    PrcPnt = mMsg.Prcnt(pp_value, pp_dimension) & "% (" & mMsg.Pnts(pp_value, "w") & "pt)"
-End Function

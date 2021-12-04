@@ -151,7 +151,7 @@ Private sTitleFontName                  As String
 Private sTitleFontSize                  As String       ' Ignored when sTitleFontName is not provided
 Private TitleWidth                      As Single
 Private UsageType                       As enMsgFormUsage
-Private vbuttons                        As Variant
+Private vButtons                        As Variant
 Private VirtualScreenHeightPts          As Single
 Private VirtualScreenLeftPts            As Single
 Private VirtualScreenTopPts             As Single
@@ -527,13 +527,13 @@ End Property
 Public Property Let MsgButtons(ByVal v As Variant)
         
     Select Case VarType(v)
-        Case vbLong, vbString:  vbuttons = v
-        Case vbEmpty:           vbuttons = vbOKOnly
+        Case vbLong, vbString:  vButtons = v
+        Case vbEmpty:           vButtons = vbOKOnly
         Case Else
             If IsArray(v) Then
-                vbuttons = v
+                vButtons = v
             ElseIf TypeName(v) = "Collection" Or TypeName(v) = "Dictionary" Then
-                Set vbuttons = v
+                Set vButtons = v
             End If
     End Select
 End Property
@@ -1187,7 +1187,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     Dim ErrBttns    As Variant
     Dim ErrAtLine   As String
     Dim ErrDesc     As String
-    Dim ErrLine     As Long
+    Dim errline     As Long
     Dim ErrNo       As Long
     Dim ErrSrc      As String
     Dim ErrText     As String
@@ -1197,7 +1197,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
-    If err_line = 0 Then ErrLine = Erl
+    If err_line = 0 Then errline = Erl
     If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
@@ -1708,7 +1708,7 @@ Public Sub Setup()
     
     '~~ Setup the reply buttons, the third element which potentially effects the final message width.
     '~~ In case the widest buttons row exceeds the maximum width specified a horizontal scrollbar is applied.
-    Setup3_Bttns vbuttons
+    Setup3_Bttns vButtons
     
     SizeAndPosition2Bttns1
     SizeAndPosition2Bttns2Rows
@@ -1818,7 +1818,7 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Sub Setup3_Bttns(ByVal vbuttons As Variant)
+Private Sub Setup3_Bttns(ByVal vButtons As Variant)
 ' --------------------------------------------------------------------------------------
 ' Setup and position the applied reply buttons and calculate the max reply button width.
 ' Note: When the provided vButtons argument is a string it wil be converted into a
@@ -1834,11 +1834,11 @@ Private Sub Setup3_Bttns(ByVal vbuttons As Variant)
     lSetupRows = 1
     
     '~~ Setup all reply button by calculatig their maximum width and height
-    Select Case TypeName(vbuttons)
-        Case "Long":        SetupBttnsFromValue vbuttons ' buttons are specified by one single VBA.MsgBox button value only
-        Case "String":      SetupBttnsFromString vbuttons
-        Case "Collection":  SetupBttnsFromCollection vbuttons
-        Case "Dictionary":  SetupBttnsFromCollection vbuttons
+    Select Case TypeName(vButtons)
+        Case "Long":        SetupBttnsFromValue vButtons ' buttons are specified by one single VBA.MsgBox button value only
+        Case "String":      SetupBttnsFromString vButtons
+        Case "Collection":  SetupBttnsFromCollection vButtons
+        Case "Dictionary":  SetupBttnsFromCollection vButtons
         Case Else
             '~~ Because vbuttons is not provided by a known/accepted format
             '~~ the message will be setup with an Ok only button", vbExclamation
@@ -1908,6 +1908,8 @@ Private Sub SetupBttnsFromCollection(ByVal cllButtons As Collection)
             Case vbYesNoCancel, vbAbortRetryIgnore
                 SetupBttnsFromValue v
             Case vbYesNo
+                SetupBttnsFromValue v
+            Case vbResumeResumeNextOk
                 SetupBttnsFromValue v
             Case Else
                 If v <> vbNullString Then
@@ -1993,6 +1995,14 @@ Private Sub SetupBttnsFromValue(ByVal lButtons As Long)
             SetupButton ButtonRow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Retry", buttonreturnvalue:=vbRetry
             lSetupRowButtons = lSetupRowButtons + 1
             SetupButton ButtonRow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Ignore", buttonreturnvalue:=vbIgnore
+        Case vbResumeResumeNextOk
+            lSetupRowButtons = lSetupRowButtons + 1
+            SetupButton ButtonRow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Resume" & vbLf & "Error Line", buttonreturnvalue:=vbResume
+            lSetupRowButtons = lSetupRowButtons + 1
+            SetupButton ButtonRow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Resume" & vbLf & "Next", buttonreturnvalue:=vbResumeNext
+            lSetupRowButtons = lSetupRowButtons + 1
+            SetupButton ButtonRow:=lSetupRows, buttonindex:=lSetupRowButtons, buttoncaption:="Ok", buttonreturnvalue:=vbOK
+    
         Case Else
             MsgBox "The value provided for the ""buttons"" argument is not a known VB MsgBox value"
     End Select

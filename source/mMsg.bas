@@ -24,24 +24,29 @@ Option Explicit
 ' ------------------------------------------------------------------------------
 ' ------------------------------------------------------------
 ' Means to get and calculate the display devices DPI in points
-Const SM_XVIRTUALSCREEN                 As Long = &H4C&
-Const SM_YVIRTUALSCREEN                 As Long = &H4D&
-Const SM_CXVIRTUALSCREEN                As Long = &H4E&
-Const SM_CYVIRTUALSCREEN                As Long = &H4F&
-Const LOGPIXELSX                        As Long = 88
-Const LOGPIXELSY                        As Long = 90
-Const TWIPSPERINCH                      As Long = 1440
+Const SM_XVIRTUALSCREEN                         As Long = &H4C&
+Const SM_YVIRTUALSCREEN                         As Long = &H4D&
+Const SM_CXVIRTUALSCREEN                        As Long = &H4E&
+Const SM_CYVIRTUALSCREEN                        As Long = &H4F&
+Const LOGPIXELSX                                As Long = 88
+Const LOGPIXELSY                                As Long = 90
+Const TWIPSPERINCH                              As Long = 1440
 Private Declare PtrSafe Function GetSystemMetrics32 Lib "user32" Alias "GetSystemMetrics" (ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare PtrSafe Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long) As Long
 ' ------------------------------------------------------------
-Public Const MSG_WIDTH_MIN_LIMIT_PERCENTAGE    As Long = 25
-Public Const MSG_WIDTH_MAX_LIMIT_PERCENTAGE    As Long = 98
-Public Const MSG_HEIGHT_MIN_LIMIT_PERCENTAGE   As Long = 20
-Public Const MSG_HEIGHT_MAX_LIMIT_PERCENTAGE   As Long = 95
+Public Const MSG_WIDTH_MIN_LIMIT_PERCENTAGE     As Long = 25
+Public Const MSG_WIDTH_MAX_LIMIT_PERCENTAGE     As Long = 98
+Public Const MSG_HEIGHT_MIN_LIMIT_PERCENTAGE    As Long = 20
+Public Const MSG_HEIGHT_MAX_LIMIT_PERCENTAGE    As Long = 95
 
-Public Const END_OF_PROGRESS As String = "EndOfProgress"
+Public Const END_OF_PROGRESS                    As String = "EndOfProgress"
+
+ 
+Public Const vbResumeResumeNextOk               As Long = 6
+Public Const vbResume                           As Long = 6                ' equates to vbYes
+Public Const vbResumeNext                       As Long = 7           ' equates to vbNo
 
 Public ProgressText As String
 
@@ -203,7 +208,7 @@ Public Function Box(ByVal box_title As String, _
         '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
         .Setup '                                                                 ||
         '+------------------------------------------------------------------------+
-        .Show
+        .show
     End With
     Box = RepliedWith
 
@@ -212,16 +217,18 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function Buttons(ParamArray msg_buttons() As Variant) As Collection
+Public Sub Buttons(ByRef bttns_collection As Collection, _
+                   ByVal bttns_add As Boolean, _
+                   ParamArray bttns() As Variant)
 ' --------------------------------------------------------------------------
-' Returns a collection of the items provided (msg_buttons). When more
-' than 7 items are provided the function adds a button row break.
-' The function considers a possible kind of mistake when the ParamArray
-' contains only one item which is a comma delimited string.
-' So instead of 3 argument "A", "B", "C" only one "A,B,C" is provided.
+' Returns the collection (bttns_collection) with the provided items (bttns)
+' - added when bttns_add = TRUE. When the collection is Nothing a new is
+' created. When more than 7 items are provided without an vbLf item such an
+' item is inserted. The provided array of items (bttns) considers also just
+' one singe tem as a comma delimited string of items. I.e. "A", "B" is
+' equivalent to "A,B".
 ' --------------------------------------------------------------------------
     
-    Dim cll     As New Collection
     Dim i       As Long
     Dim j       As Long         ' buttons in a row counter
     Dim k       As Long: k = 1  ' button rows counter
@@ -230,23 +237,26 @@ Public Function Buttons(ParamArray msg_buttons() As Variant) As Collection
     Dim va2()   As Variant      ' array of button captions either from va1 or from msg_butttons
     Dim s       As String
     
+    If Not bttns_add Then Set bttns_collection = Nothing
+    If bttns_collection Is Nothing Then Set bttns_collection = New Collection
+    
     On Error Resume Next
-    i = LBound(msg_buttons)
+    i = LBound(bttns)
     If Err.Number <> 0 Then GoTo xt
     
     '~~ Transpose the the buttons argument into an array considering that
     '~~  the ParaArray may contain only one comma delimited string.
-    If LBound(msg_buttons) = UBound(msg_buttons) Then
-        s = msg_buttons(LBound(msg_buttons))
+    If LBound(bttns) = UBound(bttns) Then
+        s = bttns(LBound(bttns))
         va1 = Split(s, ",")
         ReDim va2(UBound(va1))
         For i = LBound(va1) To UBound(va1)
             va2(i) = va1(i)
         Next i
     Else
-        ReDim va2(UBound(msg_buttons))
-        For i = LBound(msg_buttons) To UBound(msg_buttons)
-            va2(i) = msg_buttons(i)
+        ReDim va2(UBound(bttns))
+        For i = LBound(bttns) To UBound(bttns)
+            va2(i) = bttns(i)
         Next i
     End If
     
@@ -256,36 +266,36 @@ Public Function Buttons(ParamArray msg_buttons() As Variant) As Collection
         If (k = 7 And j = 7) Or l = 49 Then GoTo xt
         Select Case va2(i)
             Case vbLf, vbCrLf, vbCr
-                cll.Add va2(i)
+                bttns_collection.Add va2(i)
                 j = 0
                 k = k + 1
             Case vbOKOnly, vbOKCancel, vbAbortRetryIgnore, vbYesNoCancel, vbYesNo, vbRetryCancel
                 If j = 7 Then
-                    cll.Add vbLf
+                    bttns_collection.Add vbLf
                     j = 0
                     k = k + 1
                 End If
-                cll.Add va2(i)
+                bttns_collection.Add va2(i)
                 j = j + 1
                 l = l + 1
             Case Else
                 If TypeName(va2(i)) = "String" Then
                     ' Any invalid buttons value will be ignored without notice
                     If j = 7 Then
-                        cll.Add vbLf
+                        bttns_collection.Add vbLf
                         j = 0
                         k = k + 1
                     End If
-                    cll.Add va2(i)
+                    bttns_collection.Add va2(i)
                     j = j + 1
                     l = l + 1
                 End If
         End Select
 nxt: Next i
     
-xt: Set Buttons = cll
+xt: Exit Sub
 
-End Function
+End Sub
 
 Public Sub ButtonsAdd(ByVal msg_buttons As Variant, _
                       ByRef to_collection As Collection)
@@ -362,6 +372,94 @@ Public Function ButtonsArray(ByVal msg_buttons As Variant) As Variant
 
 End Function
 
+Private Sub ButtonsNumeric(ByRef bn_buttons_displayed As Collection, _
+                           ByVal bn_num_buttons As Long)
+' -------------------------------------------------------------------------------------
+' The Common VBA Message Service fully mimics the VBA.MsgBox handling of the Buttons
+' as follows
+' -------------------------------------------------------------------------------------
+    Const PROC = "ButtonsNumeric"
+    
+    On Error GoTo eh
+    If bn_buttons_displayed Is Nothing Then Set bn_buttons_displayed = New Collection
+    
+    If bn_num_buttons = 0 Then
+        '~~ Buttons = Ok only
+        '~~ Default Button = 1
+        '~~ Display Application Modal
+        GoTo xt
+    End If
+    
+    Do
+        Select Case bn_num_buttons
+            '~~ VBA.MsgBox Display options
+            Case Is >= vbMsgBoxRtlReading                ' 1048576
+                bn_num_buttons = bn_num_buttons - vbMsgBoxRtlReading
+    
+            Case Is >= vbMsgBoxRight                     ' 524288
+                bn_num_buttons = bn_num_buttons - vbMsgBoxRight
+    
+            Case Is >= vbMsgBoxSetForeground             ' 65536
+                bn_num_buttons = bn_num_buttons - vbMsgBoxSetForeground
+            
+            '~~ Display of a Help button
+            Case Is >= vbMsgBoxHelpButton                ' 16384
+                bn_num_buttons = bn_num_buttons - vbMsgBoxHelpButton
+    
+            Case Is >= vbSystemModal                     ' 4096
+                bn_num_buttons = bn_num_buttons - vbSystemModal
+    
+            Case Is >= vbDefaultButton4                  ' 768
+                bn_num_buttons = bn_num_buttons - vbDefaultButton4
+            
+            Case Is >= vbDefaultButton3                  ' 512
+                bn_num_buttons = bn_num_buttons - vbDefaultButton3
+            
+            Case Is >= vbDefaultButton2                  ' 256
+                bn_num_buttons = bn_num_buttons - vbDefaultButton2
+                
+            Case Is >= vbInformation                      ' 64
+                bn_num_buttons = bn_num_buttons - vbInformation
+            
+            Case Is >= vbExclamation                    ' 48
+                bn_num_buttons = bn_num_buttons - vbExclamation
+            
+            Case Is >= vbQuestion                        ' 32
+                bn_num_buttons = bn_num_buttons - vbQuestion
+    
+            Case Is >= vbCritical                        ' 16
+                bn_num_buttons = bn_num_buttons - vbCritical
+    
+            '~~ Displayed buttons
+            Case Is >= vbResumeResumeNextOk              ' 6
+                mMsg.Buttons bn_buttons_displayed, False, False, "Resume" & vbLf & "Error Line", "Resume" & vbLf & "Next", "Ok"
+                bn_num_buttons = bn_num_buttons - vbResumeResumeNextOk
+           
+            Case Is >= vbRetryCancel                     ' 5
+                mMsg.Buttons bn_buttons_displayed, False, "Retry", "Cancel"
+                bn_num_buttons = bn_num_buttons - vbRetryCancel
+    
+            Case Is >= vbYesNo                           ' 4
+                bn_num_buttons = bn_num_buttons - vbYesNo
+    
+            Case Is >= vbYesNoCancel                     ' 3
+                bn_num_buttons = bn_num_buttons - vbYesNoCancel
+    
+            Case Is >= vbAbortRetryIgnore                ' 2
+                bn_num_buttons = bn_num_buttons - vbYesNoCancel
+    
+            Case Is >= vbOKCancel                        ' 1
+                bn_num_buttons = bn_num_buttons - vbOKCancel
+                
+            Case Else: Exit Do
+        End Select
+    Loop
+
+xt: Exit Sub
+
+eh:
+End Sub
+
 Public Function ButtonsString(ByVal msg_buttons As Variant) As String
 ' ------------------------------------------------------------------------------
 ' Returns the button captions (msg_buttons) which may be provided as komma
@@ -426,6 +524,7 @@ Private Sub ConvertPixelsToPoints(Optional ByVal x_dpi As Single, _
 '        If Not y_pts = 0 Then Debug.Print y_dpi & " dpi = " & y_pts & " pt"
     End If
 End Sub
+
                                     
 Public Function Dsply(ByVal dsply_title As String, _
                       ByRef dsply_msg As TypeMsg, _
@@ -499,11 +598,11 @@ Public Function Dsply(ByVal dsply_title As String, _
         .Setup '                                                                 ||
         If dsply_modeless Then
             DisplayDone = False
-            .Show vbModeless
+            .show vbModeless
             .Top = 1
             .Left = 1
         Else
-            .Show vbModal
+            .show vbModal
         End If
     End With
     Dsply = RepliedWith
@@ -526,7 +625,7 @@ Public Function ErrMsg(ByVal err_source As String, _
     Dim ErrNo       As Long
     Dim ErrDesc     As String
     Dim ErrType     As String
-    Dim ErrLine     As Long
+    Dim errline     As Long
     Dim ErrAtLine   As String
     Dim ErrBttns    As Long
     Dim ErrMsgText  As TypeMsg
@@ -572,9 +671,9 @@ Public Function ErrMsg(ByVal err_source As String, _
     
     '~~ Prepare the Error Reply Buttons
 #If Debugging = 1 Then
-    Set ErrButtons = mMsg.Buttons(vbYesNoCancel)
+    mMsg.Buttons ErrButtons, False, vbResumeResumeNextOk
 #Else
-    Set ErrButtons = mMsg.Buttons(vbOK)
+    mMsg.Buttons ErrButtons, False, vbOK
 #End If
     
     '~~ Display the error message by means of the mMsg's Dsply function
@@ -624,67 +723,6 @@ End Function
 
 Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "mMsg." & sProc
-End Function
-
-Public Function MsgInstance(ByVal fi_key As String, _
-                   Optional ByVal fi_unload As Boolean = False) As fMsg
-' -------------------------------------------------------------------------
-' Returns an instance of the UserForm fMsg which is definitely
-' identified by anything uniqe for the instance (fi_key). This may be what
-' becomes the title (property Caption) or even an object such like a
-' Worksheet (if the instance is Worksheet specific). An already existing or
-' new created instance is maintained in a static Dictionary with fi_key as
-' the key and returned to the caller. When fi_unload is true only a possibly
-' already existing Userform identified by fi_key is unloaded.
-'
-' Requires: Reference to the "Microsoft Scripting Runtime".
-' Usage   : The fMsg has to be replaced by the name of the desired
-'           UserForm
-' -------------------------------------------------------------------------
-    Const PROC = "MsgInstance"
-    
-    On Error GoTo eh
-    Static Instances As Dictionary    ' Collection of (possibly still)  active form instances
-    
-    If Instances Is Nothing Then Set Instances = New Dictionary
-    
-    If fi_unload Then
-        If Instances.Exists(fi_key) Then
-            On Error Resume Next
-            Unload Instances(fi_key) ' The instance may be already unloaded
-            Instances.Remove fi_key
-        End If
-        Exit Function
-    End If
-    
-    If Not Instances.Exists(fi_key) Then
-        '~~ There is no evidence of an already existing instance
-        Set MsgInstance = New fMsg
-        Instances.Add fi_key, MsgInstance
-    Else
-        '~~ An instance identified by fi_key exists in the Dictionary.
-        '~~ It may however have already been unloaded.
-        On Error Resume Next
-        Set MsgInstance = Instances(fi_key)
-        Select Case Err.Number
-            Case 0
-            Case 13
-                If Instances.Exists(fi_key) Then
-                    '~~ The apparently no longer existing instance is removed from the Dictionarys
-                    Instances.Remove fi_key
-                End If
-                Set MsgInstance = New fMsg
-                Instances.Add fi_key, MsgInstance
-            Case Else
-                '~~ Unknown error!
-                Err.Raise 1 + vbObjectError, ErrSrc(PROC), "Unknown/unrecognized error!"
-        End Select
-        On Error GoTo -1
-    End If
-
-xt: Exit Function
-
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
 Private Function Max(ParamArray va() As Variant) As Variant
@@ -779,7 +817,7 @@ Public Function Monitor( _
             '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
             .Setup '                                                                 ||
             '+------------------------------------------------------------------------+
-            .Show vbModeless
+            .show vbModeless
             GoTo xt
         End With
     Else
@@ -790,6 +828,67 @@ Public Function Monitor( _
                       , mntr_footer:=msg.Section(2).Text.Text
     End If
       
+xt: Exit Function
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Function
+
+Public Function MsgInstance(ByVal fi_key As String, _
+                   Optional ByVal fi_unload As Boolean = False) As fMsg
+' -------------------------------------------------------------------------
+' Returns an instance of the UserForm fMsg which is definitely
+' identified by anything uniqe for the instance (fi_key). This may be what
+' becomes the title (property Caption) or even an object such like a
+' Worksheet (if the instance is Worksheet specific). An already existing or
+' new created instance is maintained in a static Dictionary with fi_key as
+' the key and returned to the caller. When fi_unload is true only a possibly
+' already existing Userform identified by fi_key is unloaded.
+'
+' Requires: Reference to the "Microsoft Scripting Runtime".
+' Usage   : The fMsg has to be replaced by the name of the desired
+'           UserForm
+' -------------------------------------------------------------------------
+    Const PROC = "MsgInstance"
+    
+    On Error GoTo eh
+    Static Instances As Dictionary    ' Collection of (possibly still)  active form instances
+    
+    If Instances Is Nothing Then Set Instances = New Dictionary
+    
+    If fi_unload Then
+        If Instances.Exists(fi_key) Then
+            On Error Resume Next
+            Unload Instances(fi_key) ' The instance may be already unloaded
+            Instances.Remove fi_key
+        End If
+        Exit Function
+    End If
+    
+    If Not Instances.Exists(fi_key) Then
+        '~~ There is no evidence of an already existing instance
+        Set MsgInstance = New fMsg
+        Instances.Add fi_key, MsgInstance
+    Else
+        '~~ An instance identified by fi_key exists in the Dictionary.
+        '~~ It may however have already been unloaded.
+        On Error Resume Next
+        Set MsgInstance = Instances(fi_key)
+        Select Case Err.Number
+            Case 0
+            Case 13
+                If Instances.Exists(fi_key) Then
+                    '~~ The apparently no longer existing instance is removed from the Dictionarys
+                    Instances.Remove fi_key
+                End If
+                Set MsgInstance = New fMsg
+                Instances.Add fi_key, MsgInstance
+            Case Else
+                '~~ Unknown error!
+                Err.Raise 1 + vbObjectError, ErrSrc(PROC), "Unknown/unrecognized error!"
+        End Select
+        On Error GoTo -1
+    End If
+
 xt: Exit Function
 
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume

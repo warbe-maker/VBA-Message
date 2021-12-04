@@ -7,6 +7,8 @@ Option Explicit
     Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
 #End If
 
+Private vButtons As Collection
+
 Private Function ErrMsg(ByVal err_source As String, _
                Optional ByVal err_no As Long = 0, _
                Optional ByVal err_dscrptn As String = vbNullString, _
@@ -84,7 +86,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     Dim ErrBttns    As Variant
     Dim ErrAtLine   As String
     Dim ErrDesc     As String
-    Dim ErrLine     As Long
+    Dim errline     As Long
     Dim ErrNo       As Long
     Dim ErrSrc      As String
     Dim ErrText     As String
@@ -94,7 +96,7 @@ Private Function ErrMsg(ByVal err_source As String, _
         
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
-    If err_line = 0 Then ErrLine = Erl
+    If err_line = 0 Then errline = Erl
     If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
@@ -178,12 +180,14 @@ Public Sub Demo_Box_Service()
                   "The window  : When the message exceeds the specified maximum width a horizontal scroll-bar, when it exceeds" & vbLf & _
                   "              the specified maximum height a vertical scroll.bar is displayed  the message is displayed with a horizontal scroll-bar." & vbLf
     
+    
+    mMsg.Buttons vButtons, False, BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel
     Select Case mMsg.Box( _
              box_title:=DEMO_TITLE _
            , box_msg:=DemoMessage _
            , box_monospaced:=True _
            , box_width_max:=50 _
-           , box_buttons:=mMsg.Buttons(BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel) _
+           , box_buttons:=vButtons _
            , box_button_default:=5 _
             )
         Case BTTN_1:    MsgBox """" & BTTN_1 & """ pressed"
@@ -197,7 +201,11 @@ Public Sub Demo_Box_Service()
 
 xt: Exit Sub
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:      Stop: Resume
+        Case vbResumeNext:  Stop: Resume Next
+        Case Else:          GoTo xt
+    End Select
 End Sub
 
 Public Sub Demo_Dsply_Service_1()
@@ -308,9 +316,10 @@ Public Sub Demo_Dsply_Service_2()
         .Text.Text = "Any section-3 text (without a label)"
    End With
        
+   mMsg.Buttons vButtons, False, vbAbortRetryIgnore, vbLf, B1, B2, B3, vbLf, B4, B5, B6, vbLf, B7
    vReturn = Dsply(dsply_title:="Any title", _
                    dsply_msg:=Message, _
-                   dsply_buttons:=mMsg.Buttons(vbAbortRetryIgnore, vbLf, B1, B2, B3, vbLf, B4, B5, B6, vbLf, B7) _
+                   dsply_buttons:=vButtons _
                   )
    MsgBox "Button """ & mMsg.ReplyString(vReturn) & """ had been clicked"
    
@@ -325,7 +334,11 @@ Public Sub Demo_ErrMsg_Service()
     
 xt: Exit Sub
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:      Stop: Resume
+        Case vbResumeNext:  Stop: Resume Next
+        Case Else:          GoTo xt
+    End Select
 End Sub
 
 Public Sub Demo_Monitor_Service()
@@ -376,7 +389,11 @@ Public Sub Demo_Monitor_Service()
     
 xt: Exit Sub
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:      Stop: Resume
+        Case vbResumeNext:  Stop: Resume Next
+        Case Else:          GoTo xt
+    End Select
 End Sub
 
 Private Function Repeat(repeat_string As String, repeat_n_times As Long)
