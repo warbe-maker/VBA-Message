@@ -8,6 +8,7 @@
 &nbsp;&nbsp;&nbsp;[The _Dsply_ service](#the-dsply-service)<br>
 &nbsp;&nbsp;&nbsp;[The _ErrMsg_ service](#the-errmsg-service)<br>
 &nbsp;&nbsp;&nbsp;[The _Monitor_ service](#the-monitor-service)<br>
+&nbsp;&nbsp;&nbsp;[The _Buttons_ service](#the-buttons-service)<br>
 
 ## Abstract
 A flexible and powerful VBA MsgBox alternative coming in four flavors. **[Dsply](#the-dsply-service)** is for any common message, **[ErrMsg](#the-errmsg-service)** provides a comprehensive error message, **[Box](#the-box-service)** is a very much VBA MsgBox like service and **[Monitor](#the-monitor-service)** is a service to display the progress of a process.
@@ -34,11 +35,10 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 Note: The
 
 ## Usage
-### The Box service
+### The _Box_ service
 The _Box_ service mimics the _VBA.MsgBox_ by displaying a single message string like the _VBA.MsgBox Prompt_ argument. However, due to the use of the _fMsg_ form there is no limit in the length of the message string but the systems limit which is about 1GB. With the exception of the box_msg argument all other arguments are identical w\ith the __Dsply_ service - just prefixed with box_ instead of dsply_.
 
 The _Box_ service has these named arguments:
-
 
 | Argument                   | Meaning                                              |
 |----------------------------|------------------------------------------------------|
@@ -53,7 +53,7 @@ The _Box_ service has these named arguments:
 | _box\_height\_max_          | Optional, numeric expression, defaults to 70, specifies the maximum message window height of the screen size. A value < 100 is interpreted as % of the screen size, a value > 100 as pt
 | _box\_buttons\_width\_min_ | Optional, numeric expression, defaults to 70, specifies the minimum button width in pt
 
-#### Using the _mMsg.Box_ service
+#### Using the _Box_ service
 ```
 Public Sub Demo_Box_Service()
     Const PROC          As String = "Demo_Box_service"
@@ -167,7 +167,6 @@ Displays:<br>
 ![](images/Demo-ErrMsg-Service.jpg)
 
 Only when the Conditional Compile Argument 'Debugging = 1' the ErrMsg is displayed with Yes/No buttons and thus may return vbYes which means that the line which caused the error may be resumed by F8, F8.
-
 
 #### Using the _Dsply_ service
 The below code demonstrates most of the available features and message window properties.
@@ -314,6 +313,17 @@ End Sub
 displays:<br>
 ![](images/Demo-Monitor-Service.gif)
 
+### The _Buttons_ service
+Eases the provision of any number of buttons by allowing to specify them through a ParamArray of strings and numeric values whereby the numeric value may be any of the values known with the VBA.MsgBox. The service comes in two flavors: One simply specifies a  number of buttons and the second adds buttons to an already existing collection of buttons. The service ensures a maximum of 7 buttons in 7 rows by ignoring any exceeding button without notice. When no row breaks (vbLf, vbCrLf, or vbCr) are included the service includes such a break after each 7 buttons in a row.  
+```
+Dim cll As Collection
+mMsg.Buttons cll, "A", "B", vbOkOnly ' returns the 3 buttons in cll
+```
+```
+Dim cll As Collection
+mMsg.Buttons cll, "A", "B", vbOkOnly ' returns the 3 buttons in cll
+Set cll = mMsg.Buttons(cll, "C", "D") ' returns the buttons "C", "D" added to the buttons "A", "B", vbOkOnly
+```
 #### Proportional versus Mono-spaced
 ##### _Monospaced_ = True
 

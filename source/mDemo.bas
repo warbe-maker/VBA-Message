@@ -181,7 +181,7 @@ Public Sub Demo_Box_Service()
                   "              the specified maximum height a vertical scroll.bar is displayed  the message is displayed with a horizontal scroll-bar." & vbLf
     
     
-    mMsg.Buttons vButtons, False, BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel
+    mMsg.Buttons vButtons, BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel
     Select Case mMsg.Box( _
              box_title:=DEMO_TITLE _
            , box_msg:=DemoMessage _
@@ -316,7 +316,7 @@ Public Sub Demo_Dsply_Service_2()
         .Text.Text = "Any section-3 text (without a label)"
    End With
        
-   mMsg.Buttons vButtons, False, vbAbortRetryIgnore, vbLf, B1, B2, B3, vbLf, B4, B5, B6, vbLf, B7
+   mMsg.Buttons vButtons, vbAbortRetryIgnore, vbLf, B1, B2, B3, vbLf, B4, B5, B6, vbLf, B7
    vReturn = Dsply(dsply_title:="Any title", _
                    dsply_msg:=Message, _
                    dsply_buttons:=vButtons _
