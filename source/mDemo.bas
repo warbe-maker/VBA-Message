@@ -37,10 +37,10 @@ Private Function ErrMsg(ByVal err_source As String, _
 '            ....
 '        xt: Exit Sub/Function/Property
 '
-'        eh: Select Case ErrMsg(ErrSrc(PROC)
-'               Case vbYes: Stop: Resume    ' go back to the error line
-'               Case vbNo:  Resume Next     ' continue with line below the error line
-'               Case Else:  Goto xt         ' clean exit (equivalent to Ok )
+'        eh: Select Case ErrMsg(ErrSrc(PROC))
+'               Case vbResume:  Stop: Resume
+'               Case vbPassOn:  Err.Raise Err.Number, ErrSrc(PROC), Err.Description
+'               Case Else:      GoTo xt
 '            End Select
 '        End Sub/Function/Property
 '
@@ -61,32 +61,31 @@ Private Function ErrMsg(ByVal err_source As String, _
 ' W. Rauschenberger Berlin, Nov 2021
 ' ------------------------------------------------------------------------------
 #If ErHComp = 1 Then
-    '~~ When the Common VBA Error Handling Component (ErH) is installed/used by in the VB-Project
-    '~~ which also includes the installation of the mMsg component for the display of the error message.
-    ErrMsg = mErH.ErrMsg(err_source:=err_source, err_number:=err_no, err_dscrptn:=err_dscrptn, err_line:=err_line)
-    '~~ Translate back the elaborated reply buttons mErrH.ErrMsg displays and returns to the simple yes/No/Cancel
-    '~~ replies with the VBA MsgBox.
-    Select Case ErrMsg
-        Case mErH.DebugOptResumeErrorLine:  ErrMsg = vbYes
-        Case mErH.DebugOptResumeNext:       ErrMsg = vbNo
-        Case Else:                          ErrMsg = vbCancel
-    End Select
+    '~~ ------------------------------------------------------------------------
+    '~~ When the Common VBA Error Handling Component (mErH) is installed in the
+    '~~ VB-Project (which includes the mMsg component) the mErh.ErrMsg service
+    '~~ is preferred since it provides some enhanced features like a path to the
+    '~~ error.
+    '~~ ------------------------------------------------------------------------
+    ErrMsg = mErH.ErrMsg(err_source, err_no, err_dscrptn, err_line)
     GoTo xt
-#Else
-#If MsgComp = 1 Then
-    ErrMsg = mMsg.ErrMsg(err_source:=err_source)
+#ElseIf MsgComp = 1 Then
+    '~~ ------------------------------------------------------------------------
+    '~~ When only the Common Message Services Component (mMsg) is installed but
+    '~~ not the mErH component the mMsg.ErrMsg service is preferred since it
+    '~~ provides an enhanced layout and other features.
+    '~~ ------------------------------------------------------------------------
+    ErrMsg = mMsg.ErrMsg(err_source, err_no, err_dscrptn, err_line)
     GoTo xt
 #End If
-#End If
-
     '~~ -------------------------------------------------------------------
-    '~~ Neither the Common mMsg not the Commen mErH Component is installed.
-    '~~ The error message is prepared for the VBA.MsgBox
+    '~~ When neither the mMsg nor the mErH component is installed the error
+    '~~ message is displayed by means of the VBA.MsgBox
     '~~ -------------------------------------------------------------------
     Dim ErrBttns    As Variant
     Dim ErrAtLine   As String
     Dim ErrDesc     As String
-    Dim errline     As Long
+    Dim ErrLine     As Long
     Dim ErrNo       As Long
     Dim ErrSrc      As String
     Dim ErrText     As String
@@ -96,7 +95,7 @@ Private Function ErrMsg(ByVal err_source As String, _
         
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
-    If err_line = 0 Then errline = Erl
+    If err_line = 0 Then ErrLine = Erl
     If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
@@ -137,12 +136,11 @@ Private Function ErrMsg(ByVal err_source As String, _
                   ErrAbout
     
 #If Debugging Then
-    ErrBttns = vbYesNoCancel
+    ErrBttns = vbYesNo
     ErrText = ErrText & vbLf & vbLf & _
               "Debugging:" & vbLf & _
-              "Yes    = Resume error line" & vbLf & _
-              "No     = Resume Next (skip error line)" & vbLf & _
-              "Cancel = Terminate"
+              "Yes    = Resume Error Line" & vbLf & _
+              "No     = Terminate"
 #Else
     ErrBttns = vbCritical
 #End If
@@ -321,7 +319,7 @@ Public Sub Demo_Dsply_Service_2()
                    dsply_msg:=Message, _
                    dsply_buttons:=vButtons _
                   )
-   MsgBox "Button """ & mMsg.ReplyString(vReturn) & """ had been clicked"
+   MsgBox "Button """ & ReplyString(vReturn) & """ had been clicked"
    
 End Sub
 
@@ -411,5 +409,28 @@ Private Function Repeat(repeat_string As String, repeat_n_times As Long)
     Next
 
     Repeat = s
+End Function
+
+Private Function ReplyString(ByVal vReply As Variant) As String
+' ------------------------------------------------------------------------------
+' Returns the Dsply or Box return value as string. An invalid value is ignored.
+' Only used with these demonstation examples.
+' ------------------------------------------------------------------------------
+
+    If VarType(vReply) = vbString Then
+        ReplyString = vReply
+    Else
+        Select Case vReply
+            Case vbAbort:       ReplyString = "Abort"
+            Case vbCancel:      ReplyString = "Cancel"
+            Case vbIgnore:      ReplyString = "Ignore"
+            Case vbNo:          ReplyString = "No"
+            Case vbOK:          ReplyString = "Ok"
+            Case vbRetry:       ReplyString = "Retry"
+            Case vbYes:         ReplyString = "Yes"
+            Case vbResume:      ReplyString = "Resume Error Line"
+        End Select
+    End If
+    
 End Function
 

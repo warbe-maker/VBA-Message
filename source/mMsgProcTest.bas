@@ -47,10 +47,10 @@ Private Function ErrMsg(ByVal err_source As String, _
 '            ....
 '        xt: Exit Sub/Function/Property
 '
-'        eh: Select Case ErrMsg(ErrSrc(PROC)
-'               Case vbYes: Stop: Resume    ' go back to the error line
-'               Case vbNo:  Resume Next     ' continue with line below the error line
-'               Case Else:  Goto xt         ' clean exit (equivalent to Ok )
+'        eh: Select Case ErrMsg(ErrSrc(PROC))
+'               Case vbResume:  Stop: Resume
+'               Case vbPassOn:  Err.Raise Err.Number, ErrSrc(PROC), Err.Description
+'               Case Else:      GoTo xt
 '            End Select
 '        End Sub/Function/Property
 '
@@ -71,27 +71,26 @@ Private Function ErrMsg(ByVal err_source As String, _
 ' W. Rauschenberger Berlin, Nov 2021
 ' ------------------------------------------------------------------------------
 #If ErHComp = 1 Then
-    '~~ When the Common VBA Error Handling Component (ErH) is installed/used by in the VB-Project
-    '~~ which also includes the installation of the mMsg component for the display of the error message.
-    ErrMsg = mErH.ErrMsg(err_source:=err_source, err_number:=err_no, err_dscrptn:=err_dscrptn, err_line:=err_line)
-    '~~ Translate back the elaborated reply buttons mErrH.ErrMsg displays and returns to the simple yes/No/Cancel
-    '~~ replies with the VBA MsgBox.
-    Select Case ErrMsg
-        Case mErH.DebugOptResumeErrorLine:  ErrMsg = vbYes
-        Case mErH.DebugOptResumeNext:       ErrMsg = vbNo
-        Case Else:                          ErrMsg = vbCancel
-    End Select
+    '~~ ------------------------------------------------------------------------
+    '~~ When the Common VBA Error Handling Component (mErH) is installed in the
+    '~~ VB-Project (which includes the mMsg component) the mErh.ErrMsg service
+    '~~ is preferred since it provides some enhanced features like a path to the
+    '~~ error.
+    '~~ ------------------------------------------------------------------------
+    ErrMsg = mErH.ErrMsg(err_source, err_no, err_dscrptn, err_line)
     GoTo xt
-#Else
-#If MsgComp = 1 Then
-    ErrMsg = mMsg.ErrMsg(err_source:=err_source)
+#ElseIf MsgComp = 1 Then
+    '~~ ------------------------------------------------------------------------
+    '~~ When only the Common Message Services Component (mMsg) is installed but
+    '~~ not the mErH component the mMsg.ErrMsg service is preferred since it
+    '~~ provides an enhanced layout and other features.
+    '~~ ------------------------------------------------------------------------
+    ErrMsg = mMsg.ErrMsg(err_source, err_no, err_dscrpt, err_line)
     GoTo xt
 #End If
-#End If
-
     '~~ -------------------------------------------------------------------
-    '~~ Neither the Common mMsg not the Commen mErH Component is installed.
-    '~~ The error message is prepared for the VBA.MsgBox
+    '~~ When neither the mMsg nor the mErH component is installed the error
+    '~~ message is displayed by means of the VBA.MsgBox
     '~~ -------------------------------------------------------------------
     Dim ErrBttns    As Variant
     Dim ErrAtLine   As String
@@ -147,12 +146,11 @@ Private Function ErrMsg(ByVal err_source As String, _
                   ErrAbout
     
 #If Debugging Then
-    ErrBttns = vbYesNoCancel
+    ErrBttns = vbYesNo
     ErrText = ErrText & vbLf & vbLf & _
               "Debugging:" & vbLf & _
-              "Yes    = Resume error line" & vbLf & _
-              "No     = Resume Next (skip error line)" & vbLf & _
-              "Cancel = Terminate"
+              "Yes    = Resume Error Line" & vbLf & _
+              "No     = Terminate"
 #Else
     ErrBttns = vbCritical
 #End If
@@ -247,7 +245,10 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Private Sub FormRemove(ByVal wb As Workbook, _
@@ -272,13 +273,16 @@ Private Sub FormRemove(ByVal wb As Workbook, _
 
 xt: Exit Sub
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Sub
 
 Private Function TestInstance(ByVal fi_key As String, _
-                     Optional ByVal fi_unload As Boolean = False) As fProcTest
+                     Optional ByVal fi_unload As Boolean = False) As fMsgProcTest
 ' -------------------------------------------------------------------------
-' Returns an instance of the UserForm fProcTest which is definitely
+' Returns an instance of the UserForm fMsgProcTest which is definitely
 ' identified by anything uniqe for the instance (fi_key). This may be what
 ' becomes the title (property Caption) or even an object such like a
 ' Worksheet (if the instance is Worksheet specific). An already existing or
@@ -287,7 +291,7 @@ Private Function TestInstance(ByVal fi_key As String, _
 ' already existing Userform identified by fi_key is unloaded.
 '
 ' Requires: Reference to the "Microsoft Scripting Runtime".
-' Usage   : The fProcTest has to be replaced by the name of the desired
+' Usage   : The fMsgProcTest has to be replaced by the name of the desired
 '           UserForm
 ' -------------------------------------------------------------------------
     Const PROC = "TestInstance"
@@ -308,7 +312,7 @@ Private Function TestInstance(ByVal fi_key As String, _
     
     If Not Instances.Exists(fi_key) Then
         '~~ There is no evidence of an already existing instance
-        Set TestInstance = New fProcTest
+        Set TestInstance = New fMsgProcTest
         Instances.Add fi_key, TestInstance
     Else
         '~~ An instance identified by fi_key exists in the Dictionary.
@@ -322,7 +326,7 @@ Private Function TestInstance(ByVal fi_key As String, _
                     '~~ The apparently no longer existing instance is removed from the Dictionarys
                     Instances.Remove fi_key
                 End If
-                Set TestInstance = New fProcTest
+                Set TestInstance = New fMsgProcTest
                 Instances.Add fi_key, TestInstance
             Case Else
                 '~~ Unknown error!
@@ -333,7 +337,10 @@ Private Function TestInstance(ByVal fi_key As String, _
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Sub Test_AssertWidthAndHeight()
@@ -423,7 +430,7 @@ Public Sub Test_AutoSizeTextBox_Width_Limited()
     TestWidthMax = 310
     
 again:
-    With fProcTest
+    With fMsgProcTest
         .Top = 0
         .Left = 0
         .Show False
@@ -475,19 +482,19 @@ again:
             .frm.Top = .tbxTestAndResult.Top + .tbxTestAndResult.Height + 5
             
             '~~ The UserForm's height is adjusted to the resulting frame size
-            fProcTest.Height = .frm.Top + .frm.Height + (fProcTest.Height - fProcTest.InsideHeight) + 5
-            fProcTest.Width = .frm.Left + .frm.Width + (fProcTest.Width - fProcTest.InsideWidth) + 5
+            fMsgProcTest.Height = .frm.Top + .frm.Height + (fMsgProcTest.Height - fMsgProcTest.InsideHeight) + 5
+            fMsgProcTest.Width = .frm.Left + .frm.Width + (fMsgProcTest.Width - fMsgProcTest.InsideWidth) + 5
             
             If TestWidthLimit <> iTo Then
                 Select Case MsgBox(Title:="Continue? > Yes, Finish > No, Terminate? > Cancel", Buttons:=vbYesNoCancel, Prompt:=vbNullString)
                     Case vbYes
                     Case vbNo:                          Exit Sub
-                    Case vbCancel: Unload fProcTest: Exit Sub
+                    Case vbCancel: Unload fMsgProcTest: Exit Sub
                 End Select
             Else
                 Select Case MsgBox(Title:="Done? > Abort, Repeat? > Retry, Finish > Innore", Buttons:=vbAbortRetryIgnore, Prompt:=vbNullString)
-                    Case vbAbort:   Unload fProcTest:   Exit Sub
-                    Case vbRetry:   Unload fProcTest:   GoTo again
+                    Case vbAbort:   Unload fMsgProcTest:   Exit Sub
+                    Case vbRetry:   Unload fMsgProcTest:   GoTo again
                     Case vbIgnore:  Exit Sub
                 End Select
             End If
@@ -517,7 +524,7 @@ Public Sub Test_AutoSizeTextBox_Width_Unlimited()
     TestWidthLimit = 0
 
 again:
-    With fProcTest
+    With fMsgProcTest
         .Show False
         .Top = 0
         .Left = 0
@@ -565,12 +572,12 @@ again:
                 Select Case MsgBox(Title:="Continue? > Yes, Finish > No, Terminate? > Abbrechen", Buttons:=vbYesNoCancel, Prompt:=vbNullString)
                     Case vbYes
                     Case vbNo:                          Exit Sub
-                    Case vbCancel: Unload fProcTest: Exit Sub
+                    Case vbCancel: Unload fMsgProcTest: Exit Sub
                 End Select
             Else
                 Select Case MsgBox(Title:="Done? > Abort, Repeat? > Retry, Finish > Ignore", Buttons:=vbAbortRetryIgnore, Prompt:=vbNullString)
-                    Case vbAbort:   Unload fProcTest:   Exit Sub
-                    Case vbRetry:   Unload fProcTest:   GoTo again
+                    Case vbAbort:   Unload fMsgProcTest:   Exit Sub
+                    Case vbRetry:   Unload fMsgProcTest:   GoTo again
                     Case vbIgnore:  Exit Sub
                 End Select
             End If
@@ -601,12 +608,12 @@ Public Sub Test_DisplayWithWithoutFrames()
 End Sub
 
 Public Sub Test_SetupTitle()
-    fProcTest.Show False
+    fMsgProcTest.Show False
 End Sub
 
 Public Sub Test_TestInstance()
 ' ------------------------------------------------------------------------------
-' Creates a number of instance of the UserForm named fProcTest and unloads them
+' Creates a number of instance of the UserForm named fMsgProcTest and unloads them
 ' in the revers order. Application.Wait is used to allow the observation of the
 ' process.
 ' Note: The test shows that is not required to have a variable for the instance

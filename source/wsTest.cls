@@ -137,6 +137,7 @@ End Property
 
 Private Property Get TestPassedFailedNote() As Range
     Set TestPassedFailedNote = Intersect(RowTest(lTestNumber).EntireRow, Range("colTestPassedFailedNote").EntireColumn)
+    TestPassedFailedNote.Worksheet.Activate ' just in case it is yet not active
 End Property
 
 Public Property Let TestResultNote(ByVal s As String)

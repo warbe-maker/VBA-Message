@@ -44,9 +44,9 @@ Public Const MSG_HEIGHT_MAX_LIMIT_PERCENTAGE    As Long = 95
 Public Const END_OF_PROGRESS                    As String = "EndOfProgress"
 
 ' Extension of the VBA.MsgBox constants for the Debugging option of the ErrMsg service
-Public Const vbResumeResumeNextOk               As Long = 6 ' Buttons value
+' to display additional debugging buttons
+Public Const vbResumeOk                         As Long = 7 ' Buttons value in mMsg.ErrMsg (pass on not supported)
 Public Const vbResume                           As Long = 6 ' return value (equates to vbYes)
-Public Const vbResumeNext                       As Long = 7 ' return value (equates to vbNo)
 
 Public ProgressText As String
 
@@ -208,7 +208,7 @@ Public Function Box(ByVal box_title As String, _
         '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
         .Setup '                                                                 ||
         '+------------------------------------------------------------------------+
-        .show
+        .Show
     End With
     Box = RepliedWith
 
@@ -230,8 +230,6 @@ Public Function Buttons(ByRef bttns_collection As Collection, _
 ' --------------------------------------------------------------------------
     
     Dim i               As Long
-    Dim va1             As Variant              ' array of button captions from a comma delimeted string
-    Dim va2()           As Variant              ' array of button captions either from va1 or from msg_butttons
     Dim s               As String
     Dim cllOnly         As New Collection
     Dim lOnlyBttnsInRow As Long                 ' buttons in a row counter
@@ -241,85 +239,84 @@ Public Function Buttons(ByRef bttns_collection As Collection, _
     Dim lAddBttnsInRow  As Long                 ' buttons in a row counter (excludes break items)
     Dim lAddBttns       As Long                 ' total buttons in cllAdd
     Dim lAddRows        As Long: lAddRows = 1   ' button rows counter
-    Dim v               As Variant
+    Dim v1              As Variant
+    Dim v2              As Variant
+    Dim cllBttns        As New Collection
     
     If bttns_collection Is Nothing Then
         Set bttns_collection = New Collection
+        Set cllAdd = New Collection
     Else
         Set cllAdd = bttns_collection
         '~~ Count the buttons already specified in cllAdd
-        For Each v In cllAdd
-            If v = vbLf Or v = vbCrLf Or v = vbCr Then
+        For Each v1 In cllAdd
+            If v1 = vbLf Or v1 = vbCrLf Or v1 = vbCr Then
                 lAddBttnsInRow = 0
             Else
                 lAddBttnsInRow = lAddBttnsInRow + 1
                 lAddRows = lAddRows + 1
                 lAddBttns = lAddBttns + 1
             End If
-        Next v
+        Next v1
     End If
     
     On Error Resume Next
     i = LBound(bttns)
     If Err.Number <> 0 Then GoTo xt
     
-    '~~ Transpose the the buttons argument into an array considering that
-    '~~  the ParaArray may contain only one comma delimited string.
-    If LBound(bttns) = UBound(bttns) Then
-        '~~ The button items are provided as a comma delimited string
-        s = bttns(LBound(bttns))
-        va1 = Split(s, ",")
-        ReDim va2(UBound(va1))
-        For i = LBound(va1) To UBound(va1)
-            va2(i) = va1(i)
-        Next i
-    Else
-        ReDim va2(UBound(bttns))
-        For i = LBound(bttns) To UBound(bttns)
-            va2(i) = bttns(i)
-        Next i
-    End If
+    '~~ Transpose the the buttons argument (bttns) into a collection considering
+    '~~ that an item may be one with sub-items in a comma delimited string.
+    For Each v1 In bttns
+        If InStr(v1, ",") <> 0 Then
+            '~~ Comma deliomited string
+            For Each v2 In Split(v1, ",")
+                cllBttns.Add v2
+            Next v2
+        Else
+            cllBttns.Add v1
+        End If
+    Next v1
     
     '~~ Prepare the cllAdd and the cllOnly Collection
-    For i = LBound(va2) To UBound(va2)
-        If VarType(va2(i)) = vbEmpty Then GoTo nxt  ' skip empty items
+    For Each v1 In cllBttns
+        If VarType(v1) = vbEmpty Then GoTo nx  ' skip empty items
         If (lOnlyRows = 7 And lOnlyBttnsInRow = 7) Or lAddBttns = 49 Then GoTo xt ' max possible buttons reached
-        Select Case va2(i)
+        Select Case v1
             
             Case vbLf, vbCrLf, vbCr
-                cllOnly.Add va2(i): lOnlyBttnsInRow = 0
-                cllAdd.Add va2(i):  lAddBttnsInRow = 0
+                cllOnly.Add v1: lOnlyBttnsInRow = 0
+                cllAdd.Add v1:  lAddBttnsInRow = 0
             
-            Case vbOKOnly, vbOKCancel, vbYesNo, vbRetryCancel
+            Case vbOKOnly, vbOKCancel, vbYesNo, vbRetryCancel, vbResumeOk
                 '~~ Two more buttons
-                If lOnlyBttnsInRow = 7 Then
+                If lOnlyBttnsInRow = 6 Then
                     cllOnly.Add vbLf
                     lOnlyBttnsInRow = 0
                 End If
-                If lAddBttnsInRow = 7 Then
+                If lAddBttnsInRow = 6 Then
                     cllAdd.Add vbLf
                     lAddBttnsInRow = 0
                 End If
-                cllOnly.Add va2(i): lOnlyBttnsInRow = lOnlyBttnsInRow + 2
-                cllAdd.Add va2(i):  lAddBttnsInRow = lAddBttnsInRow + 2
+                cllOnly.Add v1: lOnlyBttnsInRow = lOnlyBttnsInRow + 2
+                cllAdd.Add v1:  lAddBttnsInRow = lAddBttnsInRow + 2
                 lAddBttns = lAddBttns + 2
             
-            Case vbAbortRetryIgnore, vbYesNoCancel, vbResumeResumeNextOk
+            Case vbAbortRetryIgnore, vbYesNoCancel
                 '~~ Three more buttons
-                If lOnlyBttnsInRow = 7 Then
+                If lOnlyBttnsInRow = 5 Then
                     cllOnly.Add vbLf
                     lOnlyBttnsInRow = 0
                 End If
-                If lAddBttnsInRow = 7 Then
+                If lAddBttnsInRow = 5 Then
                     cllAdd.Add vbLf
                     lAddBttnsInRow = 0
                 End If
-                cllOnly.Add va2(i): lOnlyBttnsInRow = lOnlyBttnsInRow + 2
-                cllAdd.Add va2(i):  lAddBttnsInRow = lAddBttnsInRow + 3
+                cllOnly.Add v1: lOnlyBttnsInRow = lOnlyBttnsInRow + 2
+                cllAdd.Add v1:  lAddBttnsInRow = lAddBttnsInRow + 3
                 lAddBttns = lAddBttns + 3
             
             Case Else
-                If TypeName(va2(i)) = "String" Then
+                If TypeName(v1) = "String" Then
                     ' Any invalid buttons value will be ignored without notice
                     If lOnlyBttnsInRow = 7 Then
                         cllOnly.Add vbLf
@@ -329,11 +326,11 @@ Public Function Buttons(ByRef bttns_collection As Collection, _
                         cllAdd.Add vbLf
                         lAddBttnsInRow = 0
                     End If
-                    cllOnly.Add va2(i): lOnlyBttnsInRow = lOnlyBttnsInRow + 1:  lOnlyBttns = lOnlyBttns + 1
-                    cllAdd.Add va2(i):  lAddBttnsInRow = lAddBttnsInRow + 1:    lAddBttns = lAddBttns + 1
+                    cllOnly.Add v1: lOnlyBttnsInRow = lOnlyBttnsInRow + 1:  lOnlyBttns = lOnlyBttns + 1
+                    cllAdd.Add v1:  lAddBttnsInRow = lAddBttnsInRow + 1:    lAddBttns = lAddBttns + 1
                 End If
         End Select
-nxt: Next i
+nx: Next v1
     
 xt: Set Buttons = cllAdd
     Set bttns_collection = cllOnly
@@ -377,41 +374,33 @@ End Function
 '
 'End Function
 
-Private Sub ButtonsNumeric(ByRef bn_buttons_displayed As Collection, _
-                           ByVal bn_num_buttons As Long)
+Public Function ButtonsNumeric(ByVal bn_num_buttons As Long) As Long
 ' -------------------------------------------------------------------------------------
-' The Common VBA Message Service fully mimics the VBA.MsgBox handling of the Buttons
-' as follows
+' Returns the Buttons argument (bn_num_buttons) with additional options removed.
+' In order to mimic the Buttons argument of the VBA.MsgBox any values added for other
+' options but the display of the buttons are unstripped (i.e. the values are deducted).
 ' -------------------------------------------------------------------------------------
     Const PROC = "ButtonsNumeric"
     
     On Error GoTo eh
-    If bn_buttons_displayed Is Nothing Then Set bn_buttons_displayed = New Collection
-    
-    If bn_num_buttons = 0 Then
-        '~~ Buttons = Ok only
-        '~~ Default Button = 1
-        '~~ Display Application Modal
-        GoTo xt
-    End If
-    
-    Do
+        
+    While bn_num_buttons >= vbCritical                  ' 16
         Select Case bn_num_buttons
             '~~ VBA.MsgBox Display options
-            Case Is >= vbMsgBoxRtlReading                ' 1048576
+            Case Is >= vbMsgBoxRtlReading                ' 1048576  not implemented
                 bn_num_buttons = bn_num_buttons - vbMsgBoxRtlReading
     
-            Case Is >= vbMsgBoxRight                     ' 524288
+            Case Is >= vbMsgBoxRight                     ' 524288   not implemented
                 bn_num_buttons = bn_num_buttons - vbMsgBoxRight
     
-            Case Is >= vbMsgBoxSetForeground             ' 65536
+            Case Is >= vbMsgBoxSetForeground             ' 65536    not implemented
                 bn_num_buttons = bn_num_buttons - vbMsgBoxSetForeground
             
             '~~ Display of a Help button
-            Case Is >= vbMsgBoxHelpButton                ' 16384
+            Case Is >= vbMsgBoxHelpButton                ' 16384    not implemented
                 bn_num_buttons = bn_num_buttons - vbMsgBoxHelpButton
     
-            Case Is >= vbSystemModal                     ' 4096
+            Case Is >= vbSystemModal                     ' 4096     not implemented
                 bn_num_buttons = bn_num_buttons - vbSystemModal
     
             Case Is >= vbDefaultButton4                  ' 768
@@ -429,41 +418,20 @@ Private Sub ButtonsNumeric(ByRef bn_buttons_displayed As Collection, _
             Case Is >= vbExclamation                    ' 48
                 bn_num_buttons = bn_num_buttons - vbExclamation
             
-            Case Is >= vbQuestion                        ' 32
+            Case Is >= vbQuestion                       ' 32
                 bn_num_buttons = bn_num_buttons - vbQuestion
     
-            Case Is >= vbCritical                        ' 16
+            Case Is >= vbCritical                       ' 16
                 bn_num_buttons = bn_num_buttons - vbCritical
     
-            '~~ Displayed buttons
-            Case Is >= vbResumeResumeNextOk              ' 6
-                mMsg.Buttons bn_buttons_displayed, "Resume" & vbLf & "Error Line", "Resume" & vbLf & "Next", "Ok"
-                bn_num_buttons = bn_num_buttons - vbResumeResumeNextOk
-           
-            Case Is >= vbRetryCancel                     ' 5
-                mMsg.Buttons bn_buttons_displayed, "Retry", "Cancel"
-                bn_num_buttons = bn_num_buttons - vbRetryCancel
-    
-            Case Is >= vbYesNo                           ' 4
-                bn_num_buttons = bn_num_buttons - vbYesNo
-    
-            Case Is >= vbYesNoCancel                     ' 3
-                bn_num_buttons = bn_num_buttons - vbYesNoCancel
-    
-            Case Is >= vbAbortRetryIgnore                ' 2
-                bn_num_buttons = bn_num_buttons - vbYesNoCancel
-    
-            Case Is >= vbOKCancel                        ' 1
-                bn_num_buttons = bn_num_buttons - vbOKCancel
-                
-            Case Else: Exit Do
         End Select
-    Loop
+    Wend
+    ButtonsNumeric = bn_num_buttons
 
-xt: Exit Sub
+xt: Exit Function
 
 eh:
-End Sub
+End Function
 
 'Public Function ButtonsString(ByVal msg_buttons As Variant) As String
 '' ------------------------------------------------------------------------------
@@ -603,11 +571,11 @@ Public Function Dsply(ByVal dsply_title As String, _
         .Setup '                                                                 ||
         If dsply_modeless Then
             DisplayDone = False
-            .show vbModeless
+            .Show vbModeless
             .Top = 1
             .Left = 1
         Else
-            .show vbModal
+            .Show vbModal
         End If
     End With
     Dsply = RepliedWith
@@ -620,7 +588,8 @@ End Function
 Public Function ErrMsg(ByVal err_source As String, _
               Optional ByVal err_number As Long = 0, _
               Optional ByVal err_dscrptn As String = vbNullString, _
-              Optional ByVal err_line As Long = 0) As Variant
+              Optional ByVal err_line As Long = 0, _
+              Optional ByVal err_buttons As Variant = vbOKOnly) As Variant
 ' ------------------------------------------------------------------------------
 ' Displays an error message.
 '
@@ -630,7 +599,7 @@ Public Function ErrMsg(ByVal err_source As String, _
     Dim ErrNo       As Long
     Dim ErrDesc     As String
     Dim ErrType     As String
-    Dim errline     As Long
+    Dim ErrLine     As Long
     Dim ErrAtLine   As String
     Dim ErrBttns    As Long
     Dim ErrMsgText  As TypeMsg
@@ -644,7 +613,7 @@ Public Function ErrMsg(ByVal err_source As String, _
     If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
-    
+        
     '~~ Determine type of error
     Select Case err_number
         Case Is < 0
@@ -672,15 +641,15 @@ Public Function ErrMsg(ByVal err_source As String, _
     End If
     
     '~~ Prepare Error Title
-    ErrTitle = ErrType & " in: '" & err_source & "'" & ErrAtLine
+    ErrTitle = ErrType & " " & ErrNo & " in: '" & err_source & "'" & ErrAtLine
     
     '~~ Prepare the Error Reply Buttons
 #If Debugging = 1 Then
-    mMsg.Buttons ErrButtons, vbResumeResumeNextOk
+    mMsg.Buttons ErrButtons, vbResumeOk
 #Else
-    mMsg.Buttons ErrButtons, vbOK
+    mMsg.Buttons ErrButtons, err_buttons
 #End If
-    
+        
     '~~ Display the error message by means of the mMsg's Dsply function
     With ErrMsgText.Section(1)
         With .Label
@@ -712,7 +681,7 @@ Public Function ErrMsg(ByVal err_source As String, _
             .Text = "About Debugging:"
             .FontColor = rgbBlue
         End With
-        .Text.Text = "The two extra debugging option buttons are displayed because the " & _
+        .Text.Text = "The additional debugging option button is displayed because the " & _
                      "Conditional Compile Argument 'Debugging = 1'."
         .Text.FontSize = 8
     End With
@@ -720,7 +689,6 @@ Public Function ErrMsg(ByVal err_source As String, _
     mMsg.Dsply dsply_title:=ErrTitle _
              , dsply_msg:=ErrMsgText _
              , dsply_buttons:=ErrButtons
-    
     ErrMsg = mMsg.RepliedWith
     
 End Function
@@ -821,7 +789,7 @@ Public Function Monitor( _
             '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
             .Setup '                                                                 ||
             '+------------------------------------------------------------------------+
-            .show vbModeless
+            .Show vbModeless
             GoTo xt
         End With
     Else
@@ -928,33 +896,58 @@ Public Function Prcnt(ByVal pc_value As Long, _
     End If
 End Function
 
-Public Function ReplyString(ByVal vReply As Variant) As String
-' ------------------------------------------------------------------------------
-' Returns the Dsply or Box return value as string. An invalid value is ignored.
-' ------------------------------------------------------------------------------
-
-    If VarType(vReply) = vbString Then
-        ReplyString = vReply
-    Else
-        Select Case vReply
-            Case vbAbort:       ReplyString = "Abort"
-            Case vbCancel:      ReplyString = "Cancel"
-            Case vbIgnore:      ReplyString = "Ignore"
-            Case vbNo:          ReplyString = "No"
-            Case vbOK:          ReplyString = "Ok"
-            Case vbRetry:       ReplyString = "Retry"
-            Case vbYes:         ReplyString = "Yes"
-            Case vbResume:      ReplyString = "Resume Error Line"
-            Case vbResumeNext:  ReplyString = "Resume Next"
-        End Select
-    End If
-    
-End Function
-
 Public Function RoundUp(ByVal v As Variant) As Variant
 ' -------------------------------------------------------------------------------------
 ' Returns (v) rounded up to the next integer. Note: to round down omit the "+ 0.5").
 ' -------------------------------------------------------------------------------------
     RoundUp = Int(v) + (v - Int(v) + 0.5) \ 1
 End Function
+
+Public Function StackIsEmpty(ByVal stck As Collection) As Boolean
+' ----------------------------------------------------------------------------
+' Returns TRUE when the stack (stck) is empty.
+' ----------------------------------------------------------------------------
+    If stck Is Nothing _
+    Then StackIsEmpty = True _
+    Else StackIsEmpty = stck.Count = 0
+End Function
+
+Public Function StackPop(ByVal stck As Collection) As Variant
+' ----------------------------------------------------------------------------
+' Common Stack Pop service. Returns the last item pushed on the stack (stck)
+' and removes the item from the stack. When the stack (stck) is empty a
+' vbNullString is returned.
+' ----------------------------------------------------------------------------
+    Const PROC = "StckPop"
+    
+    On Error GoTo eh
+    If StackIsEmpty(stck) Then GoTo xt
+    
+    On Error Resume Next
+    Set StackPop = stck(stck.Count)
+    If Err.Number <> 0 _
+    Then StackPop = stck(stck.Count)
+    stck.Remove stck.Count
+
+xt: Exit Function
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Function
+
+Public Sub StackPush(ByRef stck As Collection, _
+                     ByVal stck_item As Variant)
+' ----------------------------------------------------------------------------
+' Common Stack Push service. Pushes (adds) an item (stck_item) to the stack
+' (stck). When the provided stack (stck) is Nothing the stack is created.
+' ----------------------------------------------------------------------------
+    Const PROC = "StckPush"
+    
+    On Error GoTo eh
+    If stck Is Nothing Then Set stck = New Collection
+    stck.Add stck_item
+
+xt: Exit Sub
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
 

@@ -2,15 +2,14 @@ Attribute VB_Name = "mMsgFuncTest"
 Option Explicit
 Option Compare Text
 ' ------------------------------------------------------------------------------
-' Standard Module mTest
-'          All tests for a complete regression test. Obligatory performed after
-'          any modification. Ammended when new features or functions are
-'          implemented.
+' Standard Module mMsgFuncTest
+' All tests obligatory for a complete regression test performed after any code
+' modification. Tests are to be extended when new features or functions are
+' implemented.
 '
-' Note:    Errors raised by the tested procedures cannot be asserted since they
-'          are not passed on to the calling/entry procedure. This would require
-'          the Common Standard Error Handling Module mErH which intentionally is
-'          not used by this module.
+' Note:    Test which explicitely raise an errors are only correctly asserted
+'          when the error is passed on to the calling/entry procedure - which
+'          requires the Conditional Compile Argument 'Debugging = 1'.
 '
 ' W. Rauschenberger, Berlin June 2020
 ' -------------------------------------------------------------------------------
@@ -39,13 +38,13 @@ Dim vButton6                As Variant
 Dim vButton7                As Variant
 Dim vButtons                As Collection
 
-Public Property Get BTTN_TERMINATE() As String ' composed constant
-    BTTN_TERMINATE = "Terminate" & vbLf & "Regression"
+Private Property Get BTTN_TERMINATE() As String ' composed constant
+    BTTN_TERMINATE = "Terminate" & vbLf & "Regression" & vbLf & "Test"
 End Property
 
 Public Property Let RegressionTest(ByVal b As Boolean)
     bRegressionTest = b
-    If b Then sBttnTerminate = "Terminate" & vbLf & "Regression" Else sBttnTerminate = vbNullString
+    If b Then sBttnTerminate = "Terminate" & vbLf & "Regression" & vbLf & "Test" Else sBttnTerminate = vbNullString
 End Property
 
 Private Function AppErr(ByVal app_err_no As Long) As Long
@@ -71,77 +70,78 @@ Private Sub ClearVBEImmediateWindow()
     Next v
 End Sub
 
-Public Sub cmdTest00_Click()
+Public Sub cmdTest01_Click()
     wsTest.RegressionTest = False
-    wsTest.TestNumber = 0
+    wsTest.TestNumber = 1
     mMsgFuncTest.Test_01_ErrMsg
 End Sub
 
-Public Sub cmdTest01_Click()
+Public Sub cmdTest03_Click()
 ' ------------------------------------------------------------------------------
 ' Procedures for test start via Command Buttons on Test Worksheet
 ' ------------------------------------------------------------------------------
 '    wsTest.RegressionTest = False
-    wsTest.TestNumber = 1
-    mMsgFuncTest.Test_03_WidthDeterminedByMinimumWidth
-End Sub
-
-Public Sub cmdTest02_Click()
-    wsTest.RegressionTest = False
-    wsTest.TestNumber = 2
-    mMsgFuncTest.Test_04_WidthDeterminedByTitle
-End Sub
-
-Public Sub cmdTest03_Click()
-    wsTest.RegressionTest = False
     wsTest.TestNumber = 3
-    mMsgFuncTest.Test_05_WidthDeterminedByMonoSpacedMessageSection
+    mMsgFuncTest.Test_03_WidthDeterminedByMinimumWidth
 End Sub
 
 Public Sub cmdTest04_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 4
-    mMsgFuncTest.Test_06_WidthDeterminedByReplyButtons
+    mMsgFuncTest.Test_04_WidthDeterminedByTitle
 End Sub
 
 Public Sub cmdTest05_Click()
     wsTest.RegressionTest = False
-    mMsgFuncTest.Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth
+    wsTest.TestNumber = 5
+    mMsgFuncTest.Test_05_WidthDeterminedByMonoSpacedMessageSection
 End Sub
 
 Public Sub cmdTest06_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 6
-    mMsgFuncTest.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
+    mMsgFuncTest.Test_06_WidthDeterminedByReplyButtons
 End Sub
 
 Public Sub cmdTest07_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 7
-    mMsgFuncTest.Test_09_ButtonsOnly
+    mMsgFuncTest.Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth
 End Sub
 
 Public Sub cmdTest08_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 8
-    mMsgFuncTest.Test_10_ButtonsMatrix
+    mMsgFuncTest.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
 End Sub
 
 Public Sub cmdTest09_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 9
-    mMsgFuncTest.Test_11_ButtonScrollBarVertical
+    mMsgFuncTest.Test_09_ButtonsOnly
 End Sub
 
 Public Sub cmdTest10_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 10
-    mMsgFuncTest.Test_12_ButtonScrollBarHorizontal
+    mMsgFuncTest.Test_10_ButtonsMatrix
 End Sub
 
 Public Sub cmdTest11_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 11
+    mMsgFuncTest.Test_11_ButtonScrollBarVertical
+End Sub
+
+Public Sub cmdTest12_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 12
+    mMsgFuncTest.Test_12_ButtonScrollBarHorizontal
+End Sub
+
+Public Sub cmdTest13_Click()
+    wsTest.RegressionTest = False
+    wsTest.TestNumber = 13
     mMsgFuncTest.Test_13_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar
 End Sub
 
@@ -191,10 +191,10 @@ Private Function ErrMsg(ByVal err_source As String, _
 '            ....
 '        xt: Exit Sub/Function/Property
 '
-'        eh: Select Case ErrMsg(ErrSrc(PROC)
-'               Case vbYes: Stop: Resume    ' go back to the error line
-'               Case vbNo:  Resume Next     ' continue with line below the error line
-'               Case Else:  Goto xt         ' clean exit (equivalent to Ok )
+'        eh: Select Case ErrMsg(ErrSrc(PROC))
+'               Case vbResume:  Stop: Resume
+'               Case vbPassOn:  Err.Raise Err.Number, ErrSrc(PROC), Err.Description
+'               Case Else:      GoTo xt
 '            End Select
 '        End Sub/Function/Property
 '
@@ -215,32 +215,31 @@ Private Function ErrMsg(ByVal err_source As String, _
 ' W. Rauschenberger Berlin, Nov 2021
 ' ------------------------------------------------------------------------------
 #If ErHComp = 1 Then
-    '~~ When the Common VBA Error Handling Component (ErH) is installed/used by in the VB-Project
-    '~~ which also includes the installation of the mMsg component for the display of the error message.
-    ErrMsg = mErH.ErrMsg(err_source:=err_source, err_number:=err_no, err_dscrptn:=err_dscrptn, err_line:=err_line)
-    '~~ Translate back the elaborated reply buttons mErrH.ErrMsg displays and returns to the simple yes/No/Cancel
-    '~~ replies with the VBA MsgBox.
-    Select Case ErrMsg
-        Case mErH.DebugOptResumeErrorLine:  ErrMsg = vbYes
-        Case mErH.DebugOptResumeNext:       ErrMsg = vbNo
-        Case Else:                          ErrMsg = vbCancel
-    End Select
+    '~~ ------------------------------------------------------------------------
+    '~~ When the Common VBA Error Handling Component (mErH) is installed in the
+    '~~ VB-Project (which includes the mMsg component) the mErh.ErrMsg service
+    '~~ is preferred since it provides some enhanced features like a path to the
+    '~~ error.
+    '~~ ------------------------------------------------------------------------
+    ErrMsg = mErH.ErrMsg(err_source, err_no, err_dscrptn, err_line)
     GoTo xt
-#Else
-#If MsgComp = 1 Then
-    ErrMsg = mMsg.ErrMsg(err_source:=err_source)
+#ElseIf MsgComp = 1 Then
+    '~~ ------------------------------------------------------------------------
+    '~~ When only the Common Message Services Component (mMsg) is installed but
+    '~~ not the mErH component the mMsg.ErrMsg service is preferred since it
+    '~~ provides an enhanced layout and other features.
+    '~~ ------------------------------------------------------------------------
+    ErrMsg = mMsg.ErrMsg(err_source, err_no, err_dscrpt, err_line)
     GoTo xt
 #End If
-#End If
-
     '~~ -------------------------------------------------------------------
-    '~~ Neither the Common mMsg not the Commen mErH Component is installed.
-    '~~ The error message is prepared for the VBA.MsgBox
+    '~~ When neither the mMsg nor the mErH component is installed the error
+    '~~ message is displayed by means of the VBA.MsgBox
     '~~ -------------------------------------------------------------------
     Dim ErrBttns    As Variant
     Dim ErrAtLine   As String
     Dim ErrDesc     As String
-    Dim errline     As Long
+    Dim ErrLine     As Long
     Dim ErrNo       As Long
     Dim ErrSrc      As String
     Dim ErrText     As String
@@ -250,7 +249,7 @@ Private Function ErrMsg(ByVal err_source As String, _
         
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
-    If err_line = 0 Then errline = Erl
+    If err_line = 0 Then ErrLine = Erl
     If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
@@ -291,12 +290,11 @@ Private Function ErrMsg(ByVal err_source As String, _
                   ErrAbout
     
 #If Debugging Then
-    ErrBttns = vbYesNoCancel
+    ErrBttns = vbYesNo
     ErrText = ErrText & vbLf & vbLf & _
               "Debugging:" & vbLf & _
-              "Yes    = Resume error line" & vbLf & _
-              "No     = Resume Next (skip error line)" & vbLf & _
-              "Cancel = Terminate"
+              "Yes    = Resume Error Line" & vbLf & _
+              "No     = Terminate"
 #Else
     ErrBttns = vbCritical
 #End If
@@ -418,7 +416,10 @@ Public Sub Explore(ByVal ctl As Variant, _
 
 xt: Set dct = Nothing
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Sub
 
 Function IsUcase(ByVal s As String) As Boolean
@@ -562,6 +563,12 @@ Public Sub Test_00_Regression()
     Dim sTest   As String
     Dim sMakro  As String
     
+    BoP ErrSrc(PROC)
+    
+    '~~ Indicating 'regression testing mode' in which asserted errors are not displayed
+    '~~ in order not to interrupt an otherwise self asserting regression testing procedure.
+    mErH.Regression = True
+    
     ThisWorkbook.Save
     Unload fMsg
     wsTest.RegressionTest = True
@@ -577,37 +584,52 @@ Public Sub Test_00_Regression()
         End If
     Next rng
 
-xt: Exit Sub
+xt: EoP ErrSrc(PROC)
+    mErH.Regression = False
+    Exit Sub
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Sub
 
 Public Sub Test_01_ErrMsg()
 ' ------------------------------------------------------------------------------
-' Test of the "universal error message display which includes a debugging
-'              option (Conditional Compile Argument 'Debugging = 1') and an
-'              optional additional "about the error" information which may be
-'              connected to an error message by two vertical bars (||)".
-' The test displays an "Application Error" with an Error Description which
-' includes an "About the Error" information.
-' The test uses the private ErrMsg function in this module. This private
-' (universal error message display) function passes on the requested display
-' either to the mErH.ErrMsg when installed or the mMsg.ErrMsg when installed.
-' This means that testing has to be performed with the following three
-' Conditional Compile Argument variants:
-' ErHComp = 1               > display of the error message by mErH.ErrMsg
-' ErHComp = 0 : MsgComp = 1 > display of the error message by mMsg.ErrMsg
+' Test of the "universal error message display which includes
+' - the 'Debugging Option' activated by the Conditional Compile Argument
+'   'Debugging = 1')
+' - an optional additional "about the error" information which may be
+'   concatenated with an error message by two vertical bars (||)".
+' All tests primarily use the 'Private Function ErrMsg' which passes on the
+' display of the error message to the ErrMsg function of the mMsg module when
+' the Conditional Compile Argument 'CompMsg = 1' or passes on the function to
+' the ErrMsg function of the mErH module when the Conditional Compile Argument
+' 'CompErH = 1'.
+' Summarized all this means that testing has to be performed with the following
+' three Conditional Compile Argument variants:
 ' ErHComp = 0 : MsgComp = 0 > display of the error message by VBA.MsgBox
-' Note: Only for this testing the mErH component is installed!
+' ErHComp = 0 : MsgComp = 1 > display of the error message by mMsg.ErrMsg
+' ErHComp = 1               > display of the error message by mErH.ErrMsg
+' For the last testing variant the mErH component is installed!
 ' ------------------------------------------------------------------------------
     Const PROC = "Test_01_ErrMsg"
     
     On Error GoTo eh
     
+    '~~ An 'Application Error 5 is regarded an asserted error number and when the
+    '~~ Regression property is set to TRUE the display of the error message is suppressed
+    BoTP ErrSrc(PROC), AppErr(5)
+    
+    wsTest.TestNumber = 1
+    
     Err.Raise Number:=AppErr(5), Source:=ErrSrc(PROC), _
-              Description:="This is a test error description!||This is a test about the error text."" "
+              Description:="This is a test error description!||This is part of the error description, " & _
+                           "concatenated by a double vertical bar and therefore displayed as an additional 'About the error' section " & _
+                           "- one of the specific features of the mMsg.ErrMsg service."
         
-xt: mMsg.Buttons vButtons, BTTN_PASSED, BTTN_FAILED
+xt: EoP ErrSrc(PROC)
+    mMsg.Buttons vButtons, BTTN_PASSED, BTTN_FAILED
     Select Case mMsg.Box(box_title:="Test result of " & Readable(PROC) _
                        , box_msg:=vbNullString _
                        , box_buttons:=vButtons _
@@ -619,9 +641,8 @@ xt: mMsg.Buttons vButtons, BTTN_PASSED, BTTN_FAILED
     Exit Sub
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
-        Case vbResume:      Stop: Resume
-        Case vbResumeNext:  Stop: Resume Next
-        Case Else:          GoTo xt             ' clean exit
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
     End Select
 End Sub
 
@@ -630,8 +651,10 @@ Public Function Test_02_Buttons_7_By_7() As Variant
 '
 ' ------------------------------------------------------------------------------
     Dim cll As Collection
-    
-    mMsg.Buttons cll, "B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B09", "B10", "B11", "B12", "B13", "B14", "B15", "B16", "B17", "B18", "B19", "B20", "B21", "B22", "B23", "B24", "B25", "B26", "B27", "B28", "B29", "B30", "B31", "B32", "B33", "B34", "B35", "B36", "B37", "B38", "B39", "B40", "B41", "B42", "B43", "B44", "B45", "B46", "B47", "B48", "B49", "B50"
+    Dim i As Long
+    For i = 1 To 50
+        Set cll = mMsg.Buttons(cll, "B" & Format(i, "00"))
+    Next i
     Debug.Assert cll.Count = 55
     Debug.Assert cll(8) = vbLf
     Debug.Assert cll(16) = vbLf
@@ -640,7 +663,7 @@ Public Function Test_02_Buttons_7_By_7() As Variant
     Debug.Assert cll(40) = vbLf
     Debug.Assert cll(48) = vbLf
     Test_02_Buttons_7_By_7 = _
-    mMsg.Box(box_title:="49 buttons ordered in 7 rows, row breaks inserted by the Buttons service, excessive 50th button ignored)", _
+    mMsg.Box(box_title:="49 buttons ordered in 7 rows, row breaks inserted by the Buttons service, an excessive 50th button is ignored without notice", _
              box_buttons:=cll)
 
 End Function
@@ -651,13 +674,13 @@ Public Function Test_02_Buttons_Added() As Variant
 ' ------------------------------------------------------------------------------
     Dim cll As Collection
     
-    mMsg.Buttons cll, "B01,B02,B03,B04,B05"
+    mMsg.Buttons cll, "B01,B02,B03,B04,B05"             ' initially specified buttons
     Debug.Assert cll.Count = 5
-    Set cll = mMsg.Buttons(cll, "B06,B07,B08,B09,B10")
+    Set cll = mMsg.Buttons(cll, "B06,B07,B08,B09,B10")  ' secondary added buttons
     Debug.Assert cll.Count = 11
     Debug.Assert cll(8) = vbLf
     Test_02_Buttons_Added = _
-    mMsg.Box(box_title:="49 buttons ordered in 7 rows, row breaks are inserted by the Buttons service, excessive 50th button ignored)", _
+    mMsg.Box(box_title:="7 buttons oin first and 3 buttons in second row (row break after 7 buttons inserted by service)", _
              box_buttons:=cll)
 End Function
 
@@ -667,10 +690,10 @@ Public Function Test_02_Buttons_Numeric() As Variant
 ' ------------------------------------------------------------------------------
     Dim cll As Collection
     
-    mMsg.Buttons cll, vbResumeResumeNextOk
+    mMsg.Buttons cll, vbResumeOk
     Debug.Assert cll.Count = 1
     Test_02_Buttons_Numeric = _
-    mMsg.Box(box_title:="Buttons Resume Error Line, Resume Next, Ok", _
+    mMsg.Box(box_title:="Buttons 'Resume Error Line', 'Ok'", _
              box_buttons:=cll)
 End Function
 
@@ -685,7 +708,7 @@ Public Function Test_03_WidthDeterminedByMinimumWidth() As Variant
     Dim MsgTitle        As String
     Dim cll             As Collection
     
-    wsTest.TestNumber = 1
+    wsTest.TestNumber = 3
     MsgTitle = Readable(PROC)
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
     
@@ -748,7 +771,10 @@ Public Function Test_03_WidthDeterminedByMinimumWidth() As Variant
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_04_WidthDeterminedByTitle() As Variant
@@ -761,7 +787,7 @@ Public Function Test_04_WidthDeterminedByTitle() As Variant
     Dim MsgForm     As fMsg
     Dim MsgTitle    As String
     
-    wsTest.TestNumber = 2
+    wsTest.TestNumber = 4
     MsgTitle = Readable(PROC) & "  (This title uses more space than the minimum specified message form width and thus the width is determined by the title)"
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
     
@@ -803,7 +829,10 @@ Public Function Test_04_WidthDeterminedByTitle() As Variant
     End Select
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_05_WidthDeterminedByMonoSpacedMessageSection() As Variant
@@ -820,7 +849,7 @@ Public Function Test_05_WidthDeterminedByMonoSpacedMessageSection() As Variant
     Dim BttnRepeatMaxHeightIncreased    As String
     Dim BttnRepeatMaxHeightDecreased    As String
     
-    wsTest.TestNumber = 3
+    wsTest.TestNumber = 5
     MsgTitle = Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
@@ -901,7 +930,10 @@ Public Function Test_05_WidthDeterminedByMonoSpacedMessageSection() As Variant
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_06_WidthDeterminedByReplyButtons() As Variant
@@ -914,7 +946,7 @@ Public Function Test_06_WidthDeterminedByReplyButtons() As Variant
     Dim MsgForm     As fMsg
     Dim MsgTitle    As String
     
-    wsTest.TestNumber = 4
+    wsTest.TestNumber = 6
     MsgTitle = Readable(PROC)
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
     
@@ -963,7 +995,10 @@ Public Function Test_06_WidthDeterminedByReplyButtons() As Variant
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth() As Variant
@@ -976,7 +1011,7 @@ Public Function Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth() As Variant
     Dim MsgForm     As fMsg
     Dim MsgTitle    As String
     
-    wsTest.TestNumber = 5
+    wsTest.TestNumber = 7
     MsgTitle = Readable(PROC)
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
     
@@ -1021,7 +1056,10 @@ Public Function Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth() As Variant
     
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_08_MonoSpacedMessageSectionExceedsMaxHeight() As Variant
@@ -1034,7 +1072,7 @@ Public Function Test_08_MonoSpacedMessageSectionExceedsMaxHeight() As Variant
     Dim MsgForm     As fMsg
     Dim MsgTitle    As String
     
-    wsTest.TestNumber = 6
+    wsTest.TestNumber = 8
     MsgTitle = Readable(PROC)
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
     
@@ -1080,7 +1118,10 @@ Public Function Test_08_MonoSpacedMessageSectionExceedsMaxHeight() As Variant
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_09_ButtonsOnly() As Variant
@@ -1092,21 +1133,18 @@ Public Function Test_09_ButtonsOnly() As Variant
     Dim i                   As Long
     Dim cllStory            As New Collection
     Dim vReply              As Variant
-    Dim lChangeHeightPcntg  As Long
-    Dim lChangeWidthPcntg   As Long
-    Dim lChangeMinWidthPt   As Long
     Dim bMonospaced         As Boolean: bMonospaced = True ' initial test value
     
-    wsTest.TestNumber = 7
+    wsTest.TestNumber = 9
     MsgTitle = Readable(PROC) & ": No message, just buttons (finish with " & BTTN_PASSED & " or " & BTTN_FAILED & ")"
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC)
     
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
     '~~ for this test  from the Test Worksheet
     With wsTest
-        TestMsgWidthMax = .MsgWidthMax:     lChangeMinWidthPt = .MsgWidthIncrDecr
-        TestMsgWidthMin = .MsgWidthMin:     lChangeWidthPcntg = .MsgWidthIncrDecr
-        TestMsgHeightMax = .MsgHeightMax:   lChangeHeightPcntg = .MsgHeightIncrDecr
+        TestMsgWidthMax = .MsgWidthMax:     TestMsgWidthIncrDecr = .MsgWidthIncrDecr
+        TestMsgWidthMin = .MsgWidthMin:     TestMsgHeightIncrDecr = .MsgWidthIncrDecr
+        TestMsgHeightMax = .MsgHeightMax
     End With
     If TestMsgWidthIncrDecr = 0 Then Err.Raise AppErr(1), ErrSrc(PROC), "Width increment/decrement must not be 0 for this test!"
     If TestMsgHeightIncrDecr = 0 Then Err.Raise AppErr(1), ErrSrc(PROC), "Height increment/decrement must not be 0 for this test!"
@@ -1150,7 +1188,10 @@ Public Function Test_09_ButtonsOnly() As Variant
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_10_ButtonsMatrix() As Variant
@@ -1166,7 +1207,7 @@ Public Function Test_10_ButtonsMatrix() As Variant
     Dim lChangeWidthPcntg   As Long
     Dim lChangeMinWidthPt   As Long
         
-    wsTest.TestNumber = 8
+    wsTest.TestNumber = 10
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
     '~~ for this test  from the Test Worksheet
     With wsTest
@@ -1221,7 +1262,10 @@ Public Function Test_10_ButtonsMatrix() As Variant
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_11_ButtonScrollBarVertical() As Variant
@@ -1236,7 +1280,7 @@ Public Function Test_11_ButtonScrollBarVertical() As Variant
     Dim lChangeWidthPcntg   As Long
     Dim lChangeMinWidthPt   As Long
     
-    wsTest.TestNumber = 9
+    wsTest.TestNumber = 11
     MsgTitle = Readable(PROC)
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
     
@@ -1296,7 +1340,10 @@ Public Function Test_11_ButtonScrollBarVertical() As Variant
     
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_12_ButtonScrollBarHorizontal() As Variant
@@ -1311,7 +1358,7 @@ Public Function Test_12_ButtonScrollBarHorizontal() As Variant
     Dim Bttn10Plus  As String
     Dim Bttn10Minus As String
     
-    wsTest.TestNumber = 10
+    wsTest.TestNumber = 12
     MsgTitle = Readable(PROC)
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
     
@@ -1340,8 +1387,8 @@ Public Function Test_12_ButtonScrollBarHorizontal() As Variant
             .Text.Text = "This test is repeated with any button clicked other than the ""Ok"" button"
         End With
         
-        Bttn10Plus = "Repeat with maximum form width" & vbLf & "extended by " & PrcPnt(CHANGE_WIDTH, "w") & " to " & PrcPnt(TestMsgWidthMax, "w") + PrcPnt(CHANGE_WIDTH, "w")
-        Bttn10Minus = "Repeat with maximum form width" & vbLf & "reduced by " & PrcPnt(CHANGE_WIDTH, "w") & " to " & PrcPnt(TestMsgWidthMax, "w") - PrcPnt(CHANGE_WIDTH, "w")
+        Bttn10Plus = "Repeat with maximum form width" & vbLf & "extended by " & PrcPnt(CHANGE_WIDTH, "w") & " to " & PrcPnt(TestMsgWidthMax, "w")
+        Bttn10Minus = "Repeat with maximum form width" & vbLf & "reduced by " & PrcPnt(CHANGE_WIDTH, "w") & " to " & PrcPnt(TestMsgWidthMax, "w")
             
         '~~ Obtain initial test values from the Test Worksheet
     
@@ -1365,23 +1412,26 @@ Public Function Test_12_ButtonScrollBarHorizontal() As Variant
     Loop
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_13_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() As Variant
     Const PROC = "Test_13_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar"
     
     On Error GoTo eh
-    Dim MsgForm                     As fMsg
-    Dim i, j                        As Long
-    Dim MsgTitle                      As String
-    Dim cllMatrix                   As Collection
-    Dim bMonospaced                 As Boolean: bMonospaced = True ' initial test value
-    Dim TestMsgWidthMin     As Long
-    Dim TestMsgWidthMaxSpecInPt     As Long
-    Dim TestMsgHeightMax  As Long
+    Dim MsgForm                 As fMsg
+    Dim i, j                    As Long
+    Dim MsgTitle                As String
+    Dim cllMatrix               As Collection
+    Dim bMonospaced             As Boolean: bMonospaced = True ' initial test value
+    Dim TestMsgWidthMin         As Long
+    Dim TestMsgWidthMaxSpecInPt As Long
+    Dim TestMsgHeightMax        As Long
     
-    wsTest.TestNumber = 11
+    wsTest.TestNumber = 13
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
     '~~ for this test  from the Test Worksheet
     With wsTest
@@ -1433,7 +1483,10 @@ Public Function Test_13_ButtonsMatrix_with_horizomtal_and_vertical_scrollbar() A
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_16_ButtonByDictionary()
@@ -1483,7 +1536,10 @@ Public Function Test_16_ButtonByDictionary()
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_17_MessageAsString() As Variant
@@ -1527,7 +1583,10 @@ Public Function Test_17_MessageAsString() As Variant
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_20_ButtonByValue()
@@ -1571,7 +1630,10 @@ Public Function Test_20_ButtonByValue()
             
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_21_ButtonByString()
@@ -1615,7 +1677,10 @@ Public Function Test_21_ButtonByString()
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_22_ButtonByCollection()
@@ -1663,7 +1728,10 @@ Public Function Test_22_ButtonByCollection()
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_30_Monitor() As Variant
@@ -1719,7 +1787,10 @@ Public Function Test_30_Monitor() As Variant
 
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_90_All_in_one_Demonstration() As Variant
@@ -1814,7 +1885,10 @@ Public Function Test_90_All_in_one_Demonstration() As Variant
     
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Function Test_91_MinimumMessage() As Variant
@@ -1869,12 +1943,15 @@ Public Function Test_91_MinimumMessage() As Variant
              
 xt: Exit Function
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
 Public Sub Test_99_Individual()
 ' ---------------------------------------------------------------------------------
-' Test 1 (optional arguments are used in conjunction with the Regression test only)
+' Individual test
 ' ---------------------------------------------------------------------------------
     Const PROC = "Test_99_Individual"
     
@@ -1917,6 +1994,43 @@ Public Sub Test_99_Individual()
     
 xt: Exit Sub
 
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Sub
+
+Private Sub BoP(ByVal b_proc As String, _
+           ParamArray b_arguments() As Variant)
+' ------------------------------------------------------------------------------
+' Begin of Procedure stub. The service is handed over to the corresponding
+' procedures in the Common mTrc Component (Execution Trace) or the Common mErH
+' Component (Error Handler) provided the components are installed which is
+' indicated by the corresponding Conditional Compile Arguments ErHComp = 1 and
+' TrcComp = 1.
+' ------------------------------------------------------------------------------
+    Dim s As String
+    If UBound(b_arguments) >= 0 Then s = Join(b_arguments, ",")
+#If ErHComp = 1 Then
+    mErH.BoP b_proc, s
+#ElseIf ExecTrace = 1 And TrcComp = 1 Then
+    mTrc.BoP b_proc, s
+#End If
+End Sub
+
+Private Sub EoP(ByVal e_proc As String, _
+       Optional ByVal e_inf As String = vbNullString)
+' ------------------------------------------------------------------------------
+' End of Procedure stub. Handed over to the corresponding procedures in the
+' Common Component mTrc (Execution Trace) or mErH (Error Handler) provided the
+' components are installed which is indicated by the corresponding Conditional
+' Compile Arguments.
+' ------------------------------------------------------------------------------
+#If ErHComp = 1 Then
+    mErH.EoP e_proc
+#ElseIf ExecTrace = 1 And TrcComp = 1 Then
+    mTrc.EoP e_proc, e_inf
+#End If
+End Sub
+
 
