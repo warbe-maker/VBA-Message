@@ -495,20 +495,22 @@ xt: Exit Function
 eh: ErrMsg ErrSrc(PROC)
 End Function
 
-Private Sub BoP(ByVal b_proc As String, _
-           ParamArray b_arguments() As Variant)
+Public Sub BoP(ByVal b_proc As String, _
+          ParamArray b_arguments() As Variant)
 ' ------------------------------------------------------------------------------
-' When neither the Common Execution Trace Component (mTrc) nor the Common Error
-' Handling Component (mErH) is installed - indicatede by the Conditional Compile
-' Argument 'ExecTrace = ! ' or the Conditional Compile Argument 'ErHComp = 1'
-' this procedure does nothing. Else the service is handed over to the correspon-
-' ding procedures.
+' Common 'Begin of Procedure' service. When neither the Common Execution Trace
+' Component (mTrc) nor the Common Error Handling Component (mErH) is installed
+' (indicated by the Conditional Compile Arguments 'ExecTrace = 1' and/or the
+' Conditional Compile Argument 'ErHComp = 1') this procedure does nothing.
+' Else the service is handed over to the corresponding procedures.
+' May be copied as Private Sub into any module or directly used when mBasic is
+' installed.
 ' ------------------------------------------------------------------------------
     Dim s As String
     If UBound(b_arguments) >= 0 Then s = Join(b_arguments, ",")
 #If ErHComp = 1 Then
     '~~ The error handling also hands over to the mTrc component when 'ExecTrace = 1'
-    '~~ so the Else is only for the case the mTrc is installed but the merH is not.
+    '~~ so the Else is only for the case only the mTrc is installed but not the merH.
     mErH.BoP b_proc, s
 #ElseIf ExecTrace = 1 Then
     mTrc.BoP b_proc, s
@@ -565,14 +567,16 @@ Public Function ElementOfIndex(ByVal a As Variant, _
     
 End Function
 
-Private Sub EoP(ByVal e_proc As String, _
-       Optional ByVal e_inf As String = vbNullString)
+Public Sub EoP(ByVal e_proc As String, _
+      Optional ByVal e_inf As String = vbNullString)
 ' ------------------------------------------------------------------------------
-' When neither the Common Execution Trace Component (mTrc) nor the Common Error
-' Handling Component (mErH) is installed - indicatede by the Conditional Compile
-' Argument 'ExecTrace = ! ' or the Conditional Compile Argument 'ErHComp = 1'
-' this procedure does nothing. Else the service is handed over to the correspon-
-' ding procedures.
+' Common 'End of Procedure' service. When neither the Common Execution Trace
+' Component (mTrc) nor the Common Error Handling Component (mErH) is installed
+' (indicated by the Conditional Compile Arguments 'ExecTrace = 1' and/or the
+' Conditional Compile Argument 'ErHComp = 1') this procedure does nothing.
+' Else the service is handed over to the corresponding procedures.
+' May be copied as Private Sub into any module or directly used when mBasic is
+' installed.
 ' ------------------------------------------------------------------------------
 #If ErHComp = 1 Then
     '~~ The error handling also hands over to the mTrc component when 'ExecTrace = 1'
@@ -583,15 +587,15 @@ Private Sub EoP(ByVal e_proc As String, _
 #End If
 End Sub
 
-Private Function ErrMsg(ByVal err_source As String, _
-               Optional ByVal err_no As Long = 0, _
-               Optional ByVal err_dscrptn As String = vbNullString, _
-               Optional ByVal err_line As Long = 0) As Variant
+Public Function ErrMsg(ByVal err_source As String, _
+              Optional ByVal err_no As Long = 0, _
+              Optional ByVal err_dscrptn As String = vbNullString, _
+              Optional ByVal err_line As Long = 0) As Variant
 ' ------------------------------------------------------------------------------
-' Universal error message display service including a debugging option
-' (Conditional Compile Argument 'Debugging = 1') and an optional additional
-' "about the error" information which may be connected to an error message by
-' two vertical bars (||).
+' Universal error message display service including a debugging option active
+' when the Conditional Compile Argument 'Debugging = 1' and an optional
+' additional "About the error:" section displaying text connected to an error
+' message by two vertical bars (||).
 '
 ' A copy of this function is used in each procedure with an error handling
 ' (On error Goto eh).
