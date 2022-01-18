@@ -201,7 +201,6 @@ xt: Exit Sub
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
         Case vbResume:      Stop: Resume
-        Case vbResumeNext:  Stop: Resume Next
         Case Else:          GoTo xt
     End Select
 End Sub
@@ -334,7 +333,6 @@ xt: Exit Sub
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
         Case vbResume:      Stop: Resume
-        Case vbResumeNext:  Stop: Resume Next
         Case Else:          GoTo xt
     End Select
 End Sub
@@ -389,7 +387,6 @@ xt: Exit Sub
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
         Case vbResume:      Stop: Resume
-        Case vbResumeNext:  Stop: Resume Next
         Case Else:          GoTo xt
     End Select
 End Sub
