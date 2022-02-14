@@ -339,7 +339,23 @@ Private Function ErrSrc(ByVal proc_name As String) As String
 End Function
 ```
 
+### Personal and public use of (my) _Common Components_
+I do not like the idea maintaining different code versions of _Common Components_, one which I use in my VB-Projects and another 'public' version. On the other hand I do not want to urge users of my _Common Components_ to also use the other _Common Components_ which have become a de facto standard for me.
+
+#### Managing the splits
+The primary goal is to provide _Common Components_ which are as autonomous as possible by allowing to optionally use them in a more sophisticated environment. This is achieved by a couple of procedures which only optionally use other _Common Components_ when also installed which is indicated by the use of a couple of _Conditional Compile Arguments_:
+
+| Conditional<br>Compile&nbsp;Argument | Purpose |
+| ------------------------------------ | ------- |
+| _Debugging_                          | Indicates that error messages should be displayed with a debugging option allowing to resume the error line |
+| _ExecTrace_                          | Indicates that the _[mTrc][4]_ module is installed
+| _MsgComp_                            | indicates that the _[mMsg][3]_, _[fMsg.frm][1]_, and _[fMsg.frx][2]_ are installed |
+| _ErHComp_                            | Indicates that the _[mErH][6]_ is installed |
+
+By these means other users are no bothered by my personal preferences - or are only as little as possible :-).
+
 [1]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frm
 [2]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frx
 [3]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/mMsg.bas
 [4]:https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function
+[6]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Error-Services/master/source/mErH.bas
