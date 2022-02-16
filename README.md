@@ -32,18 +32,19 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 1. Download [fMsg.frm][1], [fMsg.frx][2], and [mMsg.bas][3] .
 2. Import _fMsg.frm_ and _mMsg.bas_ to your VB-Project
 4. In the VBE add a Reference to _Microsoft Scripting Runtime_
-Note: The
 
 ## Usage
+> This _Common Component_ is prepared to function completely autonomously ( download mMsg/fMsg, import, use) but at the same time to integrate with my personal 'standard' VB-Project design. See [Conflicts with personal and public _Common Components_][7] for more details.
+
 ### The _Box_ service
-The _Box_ service mimics the _VBA.MsgBox_ by displaying a single message string like the _VBA.MsgBox Prompt_ argument. However, due to the use of the _fMsg_ form there is no limit in the length of the message string but the systems limit which is about 1GB. With the exception of the box_msg argument all other arguments are identical w\ith the __Dsply_ service - just prefixed with box_ instead of dsply_.
+Display - VBA.MsgBox like - a single message string. However, due to the use of the _fMsg_ form there is no other limit in the length of the message string but the systems limit which is about 1GB. With the exception of the box_msg argument all other arguments are identical w\ith the __Dsply_ service - just prefixed with box_ instead of dsply_.
 
 The _Box_ service has these named arguments:
 
 | Argument                   | Meaning                                              |
 |----------------------------|------------------------------------------------------|
-| _box_title_                | String expression displayed in the window handle bar |
-| _box\_msg_                 | String expression displayed
+| _box_title_                | String expression, optional, defaults to "Common VBA Message (mMsg.Box) Service" when none is provided, is displayed in the window handle bar |
+| _box\_msg_                 | String expression, optional, defaults to<br>_This message is displayed by the Common VBA Message Service 'mMsg.Box' as the default for a non provided message string (argument box_msg)_ when none is provided|.
 | _box\_monospaced_          | Boolean expression, defaults to False, displays the _box\_msg_ with a monospaced font
 | _box\_buttons_             | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, or a Dictionary, with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row.
 | _box\_button\_default_      | Optional, numeric expression, defaults to 1, identifies the default button, i.e. the button which has the focus
@@ -339,23 +340,9 @@ Private Function ErrSrc(ByVal proc_name As String) As String
 End Function
 ```
 
-### Personal and public use of (my) _Common Components_
-I do not like the idea maintaining different code versions of _Common Components_, one which I use in my VB-Projects and another 'public' version. On the other hand I do not want to urge users of my _Common Components_ to also use the other _Common Components_ which have become a de facto standard for me.
-
-#### Managing the splits
-The primary goal is to provide _Common Components_ which are as autonomous as possible by allowing to optionally use them in a more sophisticated environment. This is achieved by a couple of procedures which only optionally use other _Common Components_ when also installed which is indicated by the use of a couple of _Conditional Compile Arguments_:
-
-| Conditional<br>Compile&nbsp;Argument | Purpose |
-| ------------------------------------ | ------- |
-| _Debugging_                          | Indicates that error messages should be displayed with a debugging option allowing to resume the error line |
-| _ExecTrace_                          | Indicates that the _[mTrc][4]_ module is installed
-| _MsgComp_                            | indicates that the _[mMsg][3]_, _[fMsg.frm][1]_, and _[fMsg.frx][2]_ are installed |
-| _ErHComp_                            | Indicates that the _[mErH][6]_ is installed |
-
-By these means other users are no bothered by my personal preferences - or are only as little as possible :-).
-
 [1]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frm
 [2]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frx
 [3]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/mMsg.bas
 [4]:https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function
 [6]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Error-Services/master/source/mErH.bas
+[7]:https://warbe-maker.github.io/vba/common/2022/02/15/Personal-and-public-Common-Components.html
