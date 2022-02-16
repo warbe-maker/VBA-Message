@@ -263,7 +263,7 @@ Private Sub AddAscByKey(ByRef add_dct As Dictionary, _
 '
 ' W. Rauschenberger, Berlin Jan 2022
 ' ------------------------------------------------------------------------------------
-    Const PROC = "DAddAscByKey"
+    Const PROC = "AddAscByKey"
     
     On Error GoTo eh
     Dim bDone           As Boolean
@@ -478,7 +478,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
     If err_line = 0 Then ErrLine = Erl
-    If err_source = vbNullString Then err_source = Err.source
+    If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
     
@@ -532,34 +532,6 @@ Private Function ErrMsg(ByVal err_source As String, _
                   , Buttons:=ErrBttns)
 xt: Exit Function
 
-End Function
-
-Private Function ErrMsgErrLine(ByVal ErrLine As Long) As String
-    If ErrLine <> 0 _
-    Then ErrMsgErrLine = " (at line " & ErrLine & ")" _
-    Else ErrMsgErrLine = vbNullString
-End Function
-
-Private Function ErrMsgErrDscrptn(ByVal s As String) As String
-' -------------------------------------------------------------------
-' Return the string before a "||" in the error description. May only
-' be the case when the error has been raised by means of err.Raise
-' which means when it is an "Application Error".
-' -------------------------------------------------------------------
-    If InStr(s, DCONCAT) <> 0 _
-    Then ErrMsgErrDscrptn = Split(s, DCONCAT)(0) _
-    Else ErrMsgErrDscrptn = s
-End Function
-
-Private Function ErrMsgInfo(ByVal s As String) As String
-' -------------------------------------------------------------------
-' Return the string after a "||" in the error description. May only
-' be the case when the error has been raised by means of err.Raise
-' which means when it is an "Application Error".
-' -------------------------------------------------------------------
-    If InStr(s, DCONCAT) <> 0 _
-    Then ErrMsgInfo = Split(s, DCONCAT)(1) _
-    Else ErrMsgInfo = vbNullString
 End Function
 
 Private Function DctAddOrderValue(ByVal dctkey As Variant, _
@@ -674,7 +646,7 @@ Private Function DctAddItemExists( _
 End Function
 
 Private Function ErrSrc(ByVal sProc As String) As String
-    ErrSrc = ThisWorkbook.Name & " mDct." & sProc
+    ErrSrc = "mDct." & sProc
 End Function
 
 
