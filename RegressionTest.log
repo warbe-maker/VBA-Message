@@ -1,34 +1,32 @@
-22-02-16 09:33:22                 >> Regression test module mMsg
-22-02-16 09:33:22 00,0000         |  >> mMsgFuncTest.Test_00_Regression
-22-02-16 09:33:22 00,0045         |  |  >> mMsgFuncTest.Test_01_ErrMsg
-22-02-16 09:33:22 00,0063 00,0018 |  |  << mMsgFuncTest.Test_01_ErrMsg !!! Application Error 5  !!! 
-22-02-16 09:33:25 03,1781         |  |  >> mMsgFuncTest.Test_03_WidthDeterminedByMinimumWidth
-22-02-16 09:33:28 06,3259 03,1479 |  |  << mMsgFuncTest.Test_03_WidthDeterminedByMinimumWidth
-22-02-16 09:33:28 06,3273         |  |  >> mMsgFuncTest.Test_04_WidthDeterminedByTitle
-22-02-16 09:33:30 08,5179 02,1906 |  |  << mMsgFuncTest.Test_04_WidthDeterminedByTitle
-22-02-16 09:33:30 08,5194         |  |  >> mMsgFuncTest.Test_05_WidthDeterminedByMonoSpacedMessageSection
-22-02-16 09:33:32 09,9112 01,3918 |  |  << mMsgFuncTest.Test_05_WidthDeterminedByMonoSpacedMessageSection
-22-02-16 09:33:32 09,9126         |  |  >> mMsgFuncTest.Test_06_WidthDeterminedByReplyButtons
-22-02-16 09:33:33 11,5224 01,6098 |  |  << mMsgFuncTest.Test_06_WidthDeterminedByReplyButtons
-22-02-16 09:33:33 11,5235         |  |  >> mMsgFuncTest.Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth
-22-02-16 09:33:35 13,5899 02,0664 |  |  << mMsgFuncTest.Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth
-22-02-16 09:33:35 13,5910         |  |  >> mMsgFuncTest.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
-22-02-16 09:33:37 14,9329 01,3419 |  |  << mMsgFuncTest.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
-22-02-16 09:33:37 14,9342         |  |  >> mMsgFuncTest.Test_09_ButtonsOnly
-22-02-16 09:33:40 18,2946 03,3604 |  |  << mMsgFuncTest.Test_09_ButtonsOnly
-22-02-16 09:33:40 18,2959         |  |  >> mMsgFuncTest.Test_10_ButtonsMatrix
-22-02-16 09:33:42 20,2082 01,9123 |  |  << mMsgFuncTest.Test_10_ButtonsMatrix
-22-02-16 09:33:42 20,2092         |  |  >> mMsgFuncTest.Test_11_ButtonScrollBarVertical
-22-02-16 09:33:46 23,8379 03,6286 |  |  << mMsgFuncTest.Test_11_ButtonScrollBarVertical
-22-02-16 09:33:46 23,8395         |  |  >> mMsgFuncTest.Test_12_ButtonScrollBarHorizontal
-22-02-16 09:33:49 27,2760 03,4365 |  |  << mMsgFuncTest.Test_12_ButtonScrollBarHorizontal
-22-02-16 09:33:49 27,2797         |  |  >> mMsgFuncTest.Test_13_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar
-22-02-16 09:33:53 31,4938 04,2141 |  |  << mMsgFuncTest.Test_13_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar
-22-02-16 09:33:53 31,4948         |  |  >> mMsgFuncTest.Test_17_Box_MessageAsString
-22-02-16 09:33:55 33,3126 01,8177 |  |  << mMsgFuncTest.Test_17_Box_MessageAsString
-22-02-16 09:33:55 33,3136         |  |  >> mMsgFuncTest.Test_30_Monitor
-22-02-16 09:34:00 38,4499 05,1363 |  |  << mMsgFuncTest.Test_30_Monitor
-22-02-16 09:34:00 38,4512         |  |  >> mMsgFuncTest.Test_90_All_in_one_Demonstration
-22-02-16 09:34:03 41,2229 02,7717 |  |  << mMsgFuncTest.Test_90_All_in_one_Demonstration
-22-02-16 09:34:03 41,2237 41,2237 |  << mMsgFuncTest.Test_00_Regression
-22-02-16 09:34:03 41,2237 41,2237 << Regression test module mMsg. Impact on performance (caused by the trace) was 00,0007 seconds!
+22-02-18 19:14:26 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-02-18 19:14:26                 >> Regression test module mMsg
+22-02-18 19:14:26 00,0000         |  >> mMsgFuncTest.Test_00_Regression
+22-02-18 19:14:26 00,0026         |  |  >> mMsgFuncTest.Test_01_ErrMsg
+22-02-18 19:14:26 00,0041 00,0015 |  |  << mMsgFuncTest.Test_01_ErrMsg !!! Application Error 5  !!! 
+22-02-18 19:14:28 01,6087         |  |  >> mMsgFuncTest.Test_03_WidthDeterminedByMinimumWidth
+22-02-18 19:14:29 03,2302 01,6215 |  |  << mMsgFuncTest.Test_03_WidthDeterminedByMinimumWidth
+22-02-18 19:14:29 03,2321         |  |  >> mMsgFuncTest.Test_04_WidthDeterminedByTitle
+22-02-18 19:14:31 05,3626 02,1305 |  |  << mMsgFuncTest.Test_04_WidthDeterminedByTitle
+22-02-18 19:14:31 05,3667         |  |  >> mMsgFuncTest.Test_05_WidthDeterminedByMonoSpacedMessageSection
+22-02-18 19:14:34 08,0612 02,6946 |  |  << mMsgFuncTest.Test_05_WidthDeterminedByMonoSpacedMessageSection
+22-02-18 19:14:34 08,0638         |  |  >> mMsgFuncTest.Test_06_WidthDeterminedByReplyButtons
+22-02-18 19:14:36 10,4963 02,4325 |  |  << mMsgFuncTest.Test_06_WidthDeterminedByReplyButtons
+22-02-18 19:14:36 10,4981         |  |  >> mMsgFuncTest.Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth
+22-02-18 19:14:39 12,8538 02,3558 |  |  << mMsgFuncTest.Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth
+22-02-18 19:14:39 12,8564         |  |  >> mMsgFuncTest.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
+22-02-18 19:14:43 16,9026 04,0462 |  |  << mMsgFuncTest.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
+22-02-18 19:14:43 16,9046         |  |  >> mMsgFuncTest.Test_09_ButtonsOnly
+22-02-18 19:14:50 23,9140 07,0094 |  |  << mMsgFuncTest.Test_09_ButtonsOnly
+22-02-18 19:14:50 23,9163         |  |  >> mMsgFuncTest.Test_10_ButtonsMatrix
+22-02-18 19:14:54 28,3760 04,4597 |  |  << mMsgFuncTest.Test_10_ButtonsMatrix
+22-02-18 19:14:54 28,3782         |  |  >> mMsgFuncTest.Test_11_ButtonScrollBarVertical
+22-02-18 19:14:58 31,8061 03,4278 |  |  << mMsgFuncTest.Test_11_ButtonScrollBarVertical
+22-02-18 19:14:58 31,8080         |  |  >> mMsgFuncTest.Test_12_ButtonScrollBarHorizontal
+22-02-18 19:15:01 35,2014 03,3935 |  |  << mMsgFuncTest.Test_12_ButtonScrollBarHorizontal
+22-02-18 19:15:01 35,2034         |  |  >> mMsgFuncTest.Test_13_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar
+22-02-18 19:15:06 39,8940 04,6905 |  |  << mMsgFuncTest.Test_13_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar
+22-02-18 19:15:06 39,8956         |  |  >> mMsgFuncTest.Test_17_Box_MessageAsString
+22-02-18 19:15:08 42,5183 02,6227 |  |  << mMsgFuncTest.Test_17_Box_MessageAsString
+22-02-18 19:15:08 42,5206         |  |  >> mMsgFuncTest.Test_30_Monitor
+22-02-18 19:15:14 48,3808 05,8601 |  |  << mMsgFuncTest.Test_30_Monitor
+22-02-18 19:15:14 48,3839         |  |  >> mMsgFuncTest.Test_90_All_in_one_Demonstration
