@@ -30,3 +30,8 @@
 22-02-18 19:15:08 42,5206         |  |  >> mMsgFuncTest.Test_30_Monitor
 22-02-18 19:15:14 48,3808 05,8601 |  |  << mMsgFuncTest.Test_30_Monitor
 22-02-18 19:15:14 48,3839         |  |  >> mMsgFuncTest.Test_90_All_in_one_Demonstration
+22-02-18 20:48:53 5666,8306 5618,4467 |  |  << mMsgFuncTest.Test_90_All_in_one_Demonstration
+22-02-18 20:48:53 5666,8331 5666,8331 |  << mMsgFuncTest.Test_00_Regression
+22-02-18 20:48:53 5666,8331 5666,8331 << Regression test module mMsg
+22-02-18 20:48:53                     Impact on the overall performance (caused by the trace itself): 00,0023 seconds!
+22-02-18 20:48:53 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)

@@ -10,8 +10,12 @@
 &nbsp;&nbsp;&nbsp;[The _Monitor_ service](#the-monitor-service)<br>
 &nbsp;&nbsp;&nbsp;[The _Buttons_ service](#the-buttons-service)<br>
 
-## Abstract
-A flexible and powerful VBA MsgBox alternative coming in four flavors. **[Dsply](#the-dsply-service)** is for any common message, **[ErrMsg](#the-errmsg-service)** provides a comprehensive error message, **[Box](#the-box-service)** is a very much VBA MsgBox like service and **[Monitor](#the-monitor-service)** is a service to display the progress of a process.
+## Preface
+A flexible and powerful `VBA.MsgBox` alternative with four services:
+- **[Dsply](#the-dsply-service)** as a multi-purpose message service
+- **[ErrMsg](#the-errmsg-service)** for a comprehensive well designed error message
+- **[Box](#the-box-service)** as a very much `VBA.MsgBox` like service 
+- **[Monitor](#the-monitor-service)** to display the progress of a process.
 
 ## Why an alternative MsgBox?
 The alternative implementation addresses many of the MsgBox's deficiencies - without re-implementing it to 100%.
@@ -115,7 +119,7 @@ The _Dsply_ service has these named arguments:
 | _dsply\_buttons_            | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, or a Dictionary, with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row.|
 | _dsply\_button\_default_    | Optional, _Long_ expression, defaults to 1, specifies the index of the button which is the default button. |
 | _dsply\_reply\_with\_index_ | Optional, _Boolean_ expression, defaults to False. When True the index if the pressed button is returned rather than its caption. |
-| _dsply\_modeless_           | Optional, _Boolean_ expression, defaults to False. When True the message is displayed modeless.  |
+| _dsply\_modeless_           | Optional, _Boolean_ expression, defaults to False. When True the message is displayed modeless. See [Multiple message window instances](#multiple-message-window-instances)  |
 | _dsply\_width\_min_         | Optional, _Single_ expression, defaults to 300 which interpreted as pt.                   |
 | _dsply\_width\_max_         | Optional, _Single_ expression, Defaults to 80 which interpreted as % of the screen's width. |
 | _dsply\_height\_max_        | Optional, _Single_ expression, defaults to 75 which is interpreted as % of the screen's height.|
@@ -325,20 +329,105 @@ Dim cll As Collection
 mMsg.Buttons cll, "A", "B", vbOkOnly ' returns the 3 buttons in cll
 Set cll = mMsg.Buttons(cll, "C", "D") ' returns the buttons "C", "D" added to the buttons "A", "B", vbOkOnly
 ```
-#### Proportional versus Mono-spaced
-##### _Monospaced_ = True
 
-Because the text is ++not++  "wrapped" the width of the _Message Form_ is determined by the longest text line (up to the _Maximum Form Width_ specified). When the maximum width is exceeded a vertical scroll bar is applied.<br>Note: The title and the broadest _Button Row_ May still determine an even broader final _Message Form_.
-
-##### _Monospaced_ = False (default)
-Because the text is "wrapped" the width of a proportional-spaced text is determined by the current form width.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the required space for the broadest _Buttons Row_ and the specified _Minimum Form Width_.
-
-##### ErrSrc to get the source of the error for an error message
-```VB
-Private Function ErrSrc(ByVal proc_name As String) As String
-    ErrSrc = "<the name of the module goes here>." & proc_name
-End Function
+### The _MsgInstance_ service
+When the _Monitor_ service is invoked to display a modeless process monitoring window the service creates an instance of the _fMsg_ UserForm which can be addressed by the _MsgInstance_ service with the message window identified by the title.
+Example for how to position the process monitor on the display:
+```vb
+    sTitle = "Any Title"
+    mMsg.Monitor mntr_title:=sTitle _
+               , mntr_msg:=sMsg _
+               , mntr_width_min:=50
+    With mMsg.MsgInstance(sTitle)
+        .Top = INIT_TOP + OFFSET_V * (i - 1)
+        .Left = INIT_LEFT + OFFSET_H * (i - 1)
+    End With
 ```
+Any subsequent message to one of the instances is just another mMsg.Monitor service invokation. The following is a demonstration procedure:
+```vb
+Private Sub Demo_Monitor_Instances()
+' ------------------------------------------------------------------------------
+' - uses the mMsg.Monitor service
+' - displays 5 monitor instances
+' - updates the text in each with up to five lines
+' - removes them in reverse order.
+' ------------------------------------------------------------------------------
+    Const PROC = "Demo_Monotor_Instances"
+    Const INIT_TOP  As Single = 100
+    Const INIT_LEFT As Single = 50
+    Const OFFSET_H  As Single = 80
+    Const OFFSET_V  As Single = 20
+    Const T_WAIT    As Single = 0.000003
+    
+    On Error GoTo eh
+    Dim i           As Long
+    Dim j           As Long
+    Dim MsgForm     As fMsg
+    Dim sTitle      As String
+    Dim sMsg        As String
+    
+    j = 1
+    For i = 1 To 5
+        '~~ Establish 5 monitoring instances
+        '~~ Note that the instances are identified by their different titles
+        sTitle = "Instance-" & i
+        sMsg = "Process step " & j
+        mMsg.Monitor mntr_title:=sTitle _
+                   , mntr_msg:=sMsg _
+                   , mntr_width_min:=15
+        With mMsg.MsgInstance(sTitle)
+            .Top = INIT_TOP + OFFSET_V * (i - 1)
+            .Left = INIT_LEFT + OFFSET_H * (i - 1)
+        End With
+        Application.WAIT Now() + T_WAIT
+    Next i
+    
+    For j = 2 To 5
+        '~~ Display in each of the instances an additional progress message
+        For i = 1 To 5
+            '~~ Go through all instances and add a message line
+            sTitle = "Instance-" & i
+            sMsg = "Process step " & j
+            mMsg.Monitor mntr_title:=sTitle _
+                       , mntr_msg:=sMsg
+            Application.WAIT Now() + T_WAIT
+        Next i
+    Next j
+    
+    For i = 5 To 1 Step -1
+        '~~ Unload the instances in reverse order
+        mMsg.MsgInstance fi_key:="Instance-" & i, fi_unload:=True
+        Application.WAIT Now() + (T_WAIT * 2)
+    Next i
+    
+xt: Exit Sub
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:      Stop: Resume
+        Case Else:          GoTo xt
+    End Select
+End Sub
+```
+wich displays
+#### Demo of the _Monitor_ service using the _MsgInstance_ service
+![](images/DemoMsgMonitorInstances.gif)
+
+## Other aspects
+#### Proportional versus Mono-spaced
+| _Monospaced_ | Result    |
+| ------------ | ----------|
+| True         | Because the text is ++not++  "wrapped" the width of the _Message Form_ is determined by the longest text line (up to the _Maximum Form Width_ specified). When the maximum width is exceeded a vertical scroll bar is applied.<br>Note: The title and the broadest _Button Row_ May still determine an even broader final _Message Form_.|
+| False (default)| Because the text is "wrapped" the width of a proportional-spaced text is determined by the current form width.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the required space for the broadest _Buttons Row_ and the specified _Minimum Form Width_.|
+
+#### Multiple message window instances
+The mode-less option (argument _dsply_modeless_) is used for the _Monitoring_ service for example but it provides an enormous flexibility in using several message windows at a time. Though there is no way back to the code which initiated it the content may be updated at any time as long as the message is displayed.
+
+##### Demonstration of multiple items displayed and terminated
+![](images/MessageFormInstances.gif)
+
+
+
+
 
 [1]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frm
 [2]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frx
