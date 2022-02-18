@@ -311,7 +311,7 @@ xt: Exit Sub
 eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 ```
-displays:<br>
+#### Monitor service demonstration
 ![](images/Demo-Monitor-Service.gif)
 
 ### The _Buttons_ service
