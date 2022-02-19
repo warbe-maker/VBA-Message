@@ -37,3 +37,25 @@
 22-02-18 19:14:25 Standard-Module    mTrc .........: Used Common Component code unchanged
 22-02-18 19:14:25 Workbook           wbMsg ........: Other component unchanged
 22-02-18 19:14:25 Worksheet CodeName wsTest .......: Other component unchanged
+22-02-18 23:13:20 ========================================
+22-02-18 23:13:20 Export Changed (by Addin) for Msg.xlsb: 
+22-02-18 23:13:20 ----------------------------------------
+22-02-18 23:13:21 Export-File obsolete (deleted because component no longer exists)
+22-02-18 23:13:21 UserForm           fMsgProcTest .: Other component unchanged
+22-02-18 23:13:21 Standard-Module    mBasic .......: Used Common Component code unchanged
+22-02-18 23:13:21 Standard-Module    mCompManClient: Used Common Component code unchanged
+22-02-18 23:13:21 Standard-Module    mDct .........: Used Common Component code unchanged
+22-02-18 23:13:21 Standard-Module    mErH .........: Used Common Component code unchanged
+22-02-18 23:13:21 Standard-Module    mExamples ....: Other component unchanged
+22-02-18 23:13:21 Standard-Module    mMsg .........: Hosted Raw Common Component code modified
+22-02-18 23:13:21                                    Hosted Raw Common Component code modified
+22-02-18 23:13:21                                    Exported, Revision Number increased, Export File copied to 'Common Components Folder'
+22-02-18 23:13:21 Standard-Module    mMsgDemo .....: Other component code modification exported
+22-02-18 23:13:21                                    Modification exported
+22-02-18 23:13:21 Standard-Module    mMsgFuncTest .: Other component unchanged
+22-02-18 23:13:22 Standard-Module    mMsgProcTest .: Other component code modification exported
+22-02-18 23:13:22                                    Modification exported
+22-02-18 23:13:22 Standard-Module    mObject ......: Other component unchanged
+22-02-18 23:13:22 Standard-Module    mTrc .........: Used Common Component code unchanged
+22-02-18 23:13:22 Workbook           wbMsg ........: Other component unchanged
+22-02-18 23:13:22 Worksheet CodeName wsTest .......: Other component unchanged

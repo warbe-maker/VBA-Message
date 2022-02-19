@@ -1,4 +1,4 @@
-Attribute VB_Name = "mDemo"
+Attribute VB_Name = "mMsgDemo"
 Option Explicit
 
 #If VBA7 Then
@@ -8,8 +8,9 @@ Option Explicit
 #End If
 
 Private vButtons As Collection
+Private Message  As TypeMsg
 
-Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mDemo." & s:  End Property
+Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mMsgDemo." & s:  End Property
 
 Private Function AppErr(ByVal app_err_no As Long) As Long
 ' ------------------------------------------------------------------------------
@@ -52,11 +53,14 @@ Private Sub BoP(ByVal b_proc As String, ParamArray b_arguments() As Variant)
 End Sub
 
 Public Sub Demos()
-    Demo_Dsply_Service_1
-    Demo_Dsply_Service_2
+    Demo_Box
+    Demo_Dsply_1
+    Demo_Dsply_2
+    Demo_Monitor
+    Demo_Monitor_Instances
 End Sub
 
-Public Sub Demo_Box_Service()
+Public Sub Demo_Box()
     Const PROC          As String = "Demo_Box_service"
     Const BTTN_1        As String = "Button-1 caption"
     Const BTTN_2        As String = "Button-2 caption"
@@ -102,7 +106,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
-Public Sub Demo_Dsply_Service_1()
+Public Sub Demo_Dsply_1()
     Const width_max     As Long = 50
     Const MAX_HEIGHT    As Long = 60
 
@@ -169,7 +173,7 @@ Public Sub Demo_Dsply_Service_1()
     
 End Sub
 
-Public Sub Demo_Dsply_Service_2()
+Public Sub Demo_Dsply_2()
 ' ---------------------------------------------------------
 ' Displays a message with 3 sections, each with a label and
 ' 7 reply buttons ordered in rows 3-3-1
@@ -219,8 +223,8 @@ Public Sub Demo_Dsply_Service_2()
    
 End Sub
 
-Public Sub Demo_ErrMsg_Service()
-    Const PROC = "Demo_ErrMsg_Service"
+Public Sub Demo_ErrMsg()
+    Const PROC = "Demo_ErrMsg"
     
     On Error GoTo eh
     Dim i As Long
@@ -234,8 +238,8 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
-Public Sub Demo_Monitor_Service()
-    Const PROC              As String = "Demo_Monitor_Service"
+Public Sub Demo_Monitor()
+    Const PROC              As String = "Demo_Monitor"
     Const MONITOR_HEADER    As String = " No. Status   Step"
     Const MONITOR_FOOTER    As String = "Process finished! Close this window"
     Const PROCESS_STEPS     As Long = 12
@@ -289,48 +293,35 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
 End Sub
 
 Private Function ErrMsg(ByVal err_source As String, _
-               Optional ByVal err_no As Long = 0, _
-               Optional ByVal err_dscrptn As String = vbNullString, _
-               Optional ByVal err_line As Long = 0) As Variant
+              Optional ByVal err_no As Long = 0, _
+              Optional ByVal err_dscrptn As String = vbNullString, _
+              Optional ByVal err_line As Long = 0) As Variant
 ' ------------------------------------------------------------------------------
-' Universal error message display service. Displays a debugging option button
-' when the Conditional Compile Argument 'Debugging = 1' and an optional
-' additional "About the error:" section when information is concatenated with
-' the error message by two vertical bars (||).
+' Universal error message display service. See:
+' https://warbe-maker.github.io/vba/common/2022/02/15/Personal-and-public-Common-Components.html
 '
-' May be copied as Private Function into any module. Considers the Common VBA
-' Message Service and the Common VBA Error Services as optional components.
-' When neither is installed the error message is displayed by the VBA.MsgBox.
-'
-' Usage: Example with the Conditional Compile Argument 'Debugging = 1'
-'
-'        Private/Public <procedure-name>
-'            Const PROC = "<procedure-name>"
-'
-'            On Error Goto eh
-'            ....
-'        xt: Exit Sub/Function/Property
-'
-'        eh: Select Case ErrMsg(ErrSrc(PROC))
-'               Case vbResume:  Stop: Resume
-'               Case Else:      GoTo xt
-'            End Select
-'        End Sub/Function/Property
-'
-' Note:  The above may seem to be a lot of code but will be a godsend in case
-'        of an error!
+' - Displays a debugging option button when the Conditional Compile Argument
+'   'Debugging = 1'
+' - Displays an optional additional "About the error:" section when a string is
+'   concatenated with the error message by two vertical bars (||)
+' - Invokes mErH.ErrMsg when the Conditional Compile Argument ErHComp = !
+' - Invokes mMsg.ErrMsg when the Conditional Compile Argument MsgComp = ! (and
+'   the mErH module is not installed / MsgComp not set)
+' - Displays the error message by means of VBA.MsgBox when neither of the two
+'   components is installed
 '
 ' Uses:
 ' - AppErr For programmed application errors (Err.Raise AppErr(n), ....) to
-'          turn tem into negative and in the error mesaage back into a positive
-'          number.
-' - ErrSrc To provide an unambigous procedure name - prefixed by the module name
-'
-' W. Rauschenberger Berlin, Nov 2021
+'          turn them into negative and in the error message back into a
+'          positive number.
+' - ErrSrc To provide an unambiguous procedure name by prefixing is with the
+'          module name.
 '
 ' See:
-' https://warbe-maker.github.io/vba/common/2022/02/15/Personal-and-public-Common-Components.html
-' ------------------------------------------------------------------------------
+' https://github.com/warbe-maker/Common-VBA-Error-Services
+'
+' W. Rauschenberger Berlin, Feb 2022
+' ------------------------------------------------------------------------------' ------------------------------------------------------------------------------
 #If ErHComp = 1 Then
     '~~ When Common VBA Error Services (mErH) is availabel in the VB-Project
     '~~ (which includes the mMsg component) the mErh.ErrMsg service is invoked.
@@ -396,7 +387,6 @@ Private Function ErrMsg(ByVal err_source As String, _
     ErrBttns = vbCritical
 #End If
     ErrMsg = MsgBox(Title:=ErrTitle, Prompt:=ErrText, Buttons:=ErrBttns)
-
 xt:
 End Function
 
@@ -468,4 +458,67 @@ Private Function ReplyString(ByVal vReply As Variant) As String
     End If
     
 End Function
+
+Private Sub Demo_Monitor_Instances()
+' ------------------------------------------------------------------------------
+' - uses the mMsg.Monitor service
+' - displays 5 monitor instances
+' - updates the text in each with up to five lines
+' - removes them in reverse order.
+' ------------------------------------------------------------------------------
+    Const PROC = "Demo_Monotor_Instances"
+    Const INIT_TOP  As Single = 100
+    Const INIT_LEFT As Single = 50
+    Const OFFSET_H  As Single = 80
+    Const OFFSET_V  As Single = 20
+    Const T_WAIT    As Single = 0.000003
+    
+    On Error GoTo eh
+    Dim i           As Long
+    Dim j           As Long
+    Dim MsgForm     As fMsg
+    Dim sTitle      As String
+    Dim sMsg        As String
+    
+    j = 1
+    For i = 1 To 5
+        '~~ Establish 5 monitoring instances
+        '~~ Note that the instances are identified by their different titles
+        sTitle = "Instance-" & i
+        sMsg = "Process step " & j
+        mMsg.Monitor mntr_title:=sTitle _
+                   , mntr_msg:=sMsg _
+                   , mntr_width_min:=15
+        With mMsg.MsgInstance(sTitle)
+            .Top = INIT_TOP + OFFSET_V * (i - 1)
+            .Left = INIT_LEFT + OFFSET_H * (i - 1)
+        End With
+        Application.WAIT Now() + T_WAIT
+    Next i
+    
+    For j = 2 To 5
+        '~~ Display in each of the instances an additional progress message
+        For i = 1 To 5
+            '~~ Go through all instances and add a message line
+            sTitle = "Instance-" & i
+            sMsg = "Process step " & j
+            mMsg.Monitor mntr_title:=sTitle _
+                       , mntr_msg:=sMsg
+            Application.WAIT Now() + T_WAIT
+        Next i
+    Next j
+    
+    For i = 5 To 1 Step -1
+        '~~ Unload the instances in reverse order
+        mMsg.MsgInstance fi_key:="Instance-" & i, fi_unload:=True
+        Application.WAIT Now() + (T_WAIT * 2)
+    Next i
+    
+xt: Exit Sub
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:      Stop: Resume
+        Case Else:          GoTo xt
+    End Select
+End Sub
 

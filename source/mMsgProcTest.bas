@@ -106,7 +106,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
     If err_line = 0 Then ErrLine = Erl
-    If err_source = vbNullString Then err_source = Err.Source
+    If err_source = vbNullString Then err_source = Err.source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
     
@@ -603,7 +603,7 @@ Public Sub Test_DisplayWithWithoutFrames()
            , box_msg:="Message should be displayed with visible frames"
 
     mMsg.Box box_title:="With frames test" _
-           , box_msg:="Message should be displayed with frames invible"
+           , box_msg:="Message should be displayed with frames invisible"
            
 End Sub
 
@@ -611,7 +611,7 @@ Public Sub Test_SetupTitle()
     fMsgProcTest.Show False
 End Sub
 
-Public Sub Test_TestInstance()
+Public Sub Test_MultipleMessageInstances()
 ' ------------------------------------------------------------------------------
 ' Creates a number of instance of the UserForm named fMsgProcTest and unloads them
 ' in the revers order. Application.Wait is used to allow the observation of the
@@ -639,7 +639,7 @@ Public Sub Test_TestInstance()
             .Top = INIT_TOP + (30 * i)
             .Left = INIT_LEFT + (30 * i)
         End With
-        Application.Wait Now() + 0.000006
+        Application.WAIT Now() + 0.000006
     Next i
     
     For i = 5 To 1 Step -1
@@ -648,7 +648,7 @@ Public Sub Test_TestInstance()
         '~~ 1. The instance is removed from the Dictionary
         '~~ 2. No error in case the instance no longer exists
         TestInstance fi_key:=key, fi_unload:=True
-        Application.Wait Now() + 0.000006
+        Application.WAIT Now() + 0.000006
     Next i
     
 End Sub
