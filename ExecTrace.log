@@ -1,0 +1,15 @@
+22-02-22 18:47:05 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-02-22 18:47:05                 >> Begin execution trace 
+22-02-22 18:47:05 00,0000         |  >> mMsgFuncTest.Test_02_Buttons_Numeric
+22-02-22 18:47:21 15,1506 15,1506 |  << mMsgFuncTest.Test_02_Buttons_Numeric
+22-02-22 18:47:21 15,1506 15,1506 << End execution trace 
+22-02-22 18:47:21                 Impact on the overall performance (caused by the trace itself): 00,0131 seconds!
+22-02-22 18:47:21 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+
+22-02-22 18:50:06 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-02-22 18:50:06                 >> Begin execution trace 
+22-02-22 18:50:06 00,0000         |  >> mMsgFuncTest.Test_01_ErrMsg
+22-02-22 18:50:34 27,7684 27,7684 |  << mMsgFuncTest.Test_01_ErrMsg !!! Application Error 5  !!! 
+22-02-22 18:50:34 27,7684 27,7684 << End execution trace 
+22-02-22 18:50:34                 Impact on the overall performance (caused by the trace itself): 00,0233 seconds!
+22-02-22 18:50:34 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)

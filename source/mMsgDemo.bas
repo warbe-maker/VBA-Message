@@ -81,14 +81,13 @@ Public Sub Demo_Box()
     
     
     mMsg.Buttons vButtons, BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel
-    Select Case mMsg.Box( _
-             box_title:=DEMO_TITLE _
-           , box_msg:=DemoMessage _
-           , box_monospaced:=True _
-           , box_width_max:=50 _
-           , box_buttons:=vButtons _
-           , box_button_default:=5 _
-            )
+    Select Case mMsg.Box(Prompt:=DemoMessage _
+                       , Buttons:=vButtons _
+                       , Title:=DEMO_TITLE _
+                       , box_monospaced:=True _
+                       , box_width_max:=50 _
+                       , box_button_default:=5 _
+                        )
         Case BTTN_1:    MsgBox """" & BTTN_1 & """ pressed"
         Case BTTN_2:    MsgBox """" & BTTN_2 & """ pressed"
         Case BTTN_3:    MsgBox """" & BTTN_3 & """ pressed"

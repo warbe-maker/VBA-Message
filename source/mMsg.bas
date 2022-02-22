@@ -5,7 +5,6 @@ Option Explicit
 '               Message display services using the fMsg form.
 '
 ' Public services:
-' ------------------------------------------------------------------------------
 ' - Box         In analogy to the MsgBox, provides a simple message but with all
 '               the fexibility for the display of up to 49 reply buttons.
 ' - Buttons     Supports the specification of the design buttons displayed in 7
@@ -15,6 +14,7 @@ Option Explicit
 ' - Monitor     Uses modeless instances of the fMsg form - any instance is
 '               identified by the window title - to display the progress of a
 '               process or monitor intermediate results.
+' - MsgInstance Treturns a fMsg object identified by the Title
 '
 ' Uses:         fMsg
 '
@@ -150,32 +150,25 @@ Public Sub AssertWidthAndHeight(ByRef width_min As Long, _
     
 End Sub
 
-Public Function Box(Optional ByVal box_msg As String = vbNullString, _
-                    Optional ByVal box_title As String = vbNullString, _
-                    Optional ByVal box_monospaced As Boolean = False, _
-                    Optional ByVal box_buttons As Variant = vbOKOnly, _
-                    Optional ByVal box_buttons_width_min = 70, _
-                    Optional ByVal box_button_default = 1, _
-                    Optional ByVal box_returnindex As Boolean = False, _
-                    Optional ByVal box_width_min As Long = 300, _
-                    Optional ByVal box_width_max As Long = 85, _
-                    Optional ByVal box_height_min As Long = 20, _
-                    Optional ByVal box_height_max As Long = 85) As Variant
+Public Function Box(ByVal Prompt As String, _
+           Optional ByVal Buttons As Variant = vbOKOnly, _
+           Optional ByVal Title As String = vbNullString, _
+           Optional ByVal box_monospaced As Boolean = False, _
+           Optional ByVal box_button_default = 1, _
+           Optional ByVal box_button_width_min = 70, _
+           Optional ByVal box_returnindex As Boolean = False, _
+           Optional ByVal box_width_min As Long = 300, _
+           Optional ByVal box_width_max As Long = 85, _
+           Optional ByVal box_height_min As Long = 20, _
+           Optional ByVal box_height_max As Long = 85) As Variant
 ' -------------------------------------------------------------------------------------
-' Common VBA Message Display: A service using the Common VBA Message Form as an
-' alternative MsgBox.
-' Please Note: This Box service is a kind of backward compatibility with the VBA.MsgBox
-'              with equivalent arguments:      VBA.MsgBox | mMsg.Box
-'                                              ---------- + ------------------------
-'                                              Title      | box_title
-'                                              Prompt     | box_msg
-'                                              Buttons    | box_buttons
-'              and explicit                               | box_button_default
-'              and some additional arguments concerning the message size.
+' Display of a message string analogous to the VBA.Msgbox (why the first three
+' arguments are identical.
+' box_button_default
 '
-' See: https://warbe-maker.github.io/vba/common/2020/11/17/Common-VBA-Message-Form.html
+' See: https://github.com/warbe-maker/Common-VBA-Message-Service
 '
-' W. Rauschenberger, Berlin, Nov 2020
+' W. Rauschenberger, Berlin, Feb 2022
 ' -------------------------------------------------------------------------------------
     Const PROC = "Box"
     
@@ -184,16 +177,9 @@ Public Function Box(Optional ByVal box_msg As String = vbNullString, _
     Dim MsgForm As fMsg
 
     '~~ Defaults
-    If box_title = vbNullString Then
-        '~~ Default tile when none had been provided
-        box_title = "Common VBA Message (mMsg.Box) Service"
-    End If
-    If box_msg = vbNullString Then
-        box_msg = "This message is displayed by the Common VBA Message Service 'mMsg.Box' " & _
-                  "as the default for a non provided message string (argument box_msg)"
-    End If
+    If Title = vbNullString Then Title = Application.Name
     
-    Message.Text = box_msg
+    Message.Text = Prompt
     Message.MonoSpaced = box_monospaced
 
     AssertWidthAndHeight box_width_min _
@@ -204,16 +190,16 @@ Public Function Box(Optional ByVal box_msg As String = vbNullString, _
     
     '~~ In order to avoid any interferance with modeless displayed fMsg form
     '~~ all services create and use their own instance identified by the message title.
-    Set MsgForm = MsgInstance(box_title)
+    Set MsgForm = MsgInstance(Title)
     With MsgForm
-        .MsgTitle = box_title
+        .MsgTitle = Title
         .MsgText(1) = Message
-        .MsgButtons = box_buttons
+        .MsgButtons = Buttons
         .MsgHeightMax = box_height_max    ' percentage of screen height
         .MsgHeightMin = box_height_min    ' percentage of screen height
         .MsgWidthMax = box_width_max      ' percentage of screen width
         .MsgWidthMin = box_width_min        ' defaults to 400 pt. the absolute minimum is 200 pt
-        .MinButtonWidth = box_buttons_width_min
+        .MinButtonWidth = box_button_width_min
         .MsgButtonDefault = box_button_default
         '+------------------------------------------------------------------------+
         '|| Setup prior showing the form improves the performance significantly  ||

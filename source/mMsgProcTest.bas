@@ -596,14 +596,9 @@ Public Sub Test_DisplayWithWithoutFrames()
     
     MsgTitle = "With frames test"
     Set MsgForm = mMsg.MsgInstance(MsgTitle)
-    
     MsgForm.DsplyFrmsWthBrdrsTestOnly = True
-    
-    mMsg.Box box_title:="With frames test" _
-           , box_msg:="Message should be displayed with visible frames"
-
-    mMsg.Box box_title:="With frames test" _
-           , box_msg:="Message should be displayed with frames invisible"
+    mMsg.Box "Message should be displayed with visible frames", "With frames test"
+    mMsg.Box "Message should be displayed with frames invisible", "With frames test"
            
 End Sub
 

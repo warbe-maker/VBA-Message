@@ -229,7 +229,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ not the mErH component the mMsg.ErrMsg service is preferred since it
     '~~ provides an enhanced layout and other features.
     '~~ ------------------------------------------------------------------------
-    ErrMsg = mMsg.ErrMsg(err_source, err_no, err_dscrpt, err_line)
+    ErrMsg = mMsg.ErrMsg(err_source, err_no, err_dscrptn, err_line)
     GoTo xt
 #End If
     '~~ -------------------------------------------------------------------
@@ -576,7 +576,7 @@ Public Sub Test_00_Regression()
         
     For Each rng In wsTest.RegressionTests
         If rng.Value = "R" Then
-            sTest = Format(rng.Offset(, -2), "00")
+            sTest = Format(rng.OFFSET(, -2), "00")
             sMakro = "cmdTest" & sTest & "_Click"
             wsTest.TerminateRegressionTest = False
             Application.Run "Msg.xlsb!" & sMakro
@@ -630,9 +630,9 @@ Public Sub Test_01_ErrMsg()
         
 xt: EoP ErrSrc(PROC)
     mMsg.Buttons vButtons, BTTN_PASSED, BTTN_FAILED
-    Select Case mMsg.Box(box_title:="Test result of " & Readable(PROC) _
-                       , box_msg:=vbNullString _
-                       , box_buttons:=vButtons _
+    Select Case mMsg.Box(Title:="Test result of " & Readable(PROC) _
+                       , Prompt:=vbNullString _
+                       , Buttons:=vButtons _
                         )
         Case BTTN_PASSED:       wsTest.Passed = True
         Case BTTN_FAILED:       wsTest.Failed = True
@@ -668,8 +668,7 @@ Public Function Test_02_Buttons_7_By_7() As Variant
     Debug.Assert cll(48) = vbLf
     
     Test_02_Buttons_7_By_7 = _
-    mMsg.Box(box_title:="49 buttons ordered in 7 rows, row breaks inserted by the Buttons service, an excessive 50th button is ignored without notice", _
-             box_buttons:=cll)
+    mMsg.Box(vbNullString, cll, "49 buttons ordered in 7 rows, row breaks inserted by the Buttons service, an excessive 50th button is ignored without notice")
     EoP ErrSrc(PROC)
     
 End Function
@@ -690,8 +689,7 @@ Public Function Test_02_Buttons_Added() As Variant
     Debug.Assert cll(8) = vbLf
     
     Test_02_Buttons_Added = _
-    mMsg.Box(box_title:="7 buttons oin first and 3 buttons in second row (row break after 7 buttons inserted by service)", _
-             box_buttons:=cll)
+    mMsg.Box(vbNullString, cll, "7 buttons oin first and 3 buttons in second row (row break after 7 buttons inserted by service)")
     EoP ErrSrc(PROC)
     
 End Function
@@ -707,11 +705,9 @@ Public Function Test_02_Buttons_Numeric() As Variant
     BoP ErrSrc(PROC)
     mMsg.Buttons cll, vbResumeOk
     Debug.Assert cll.Count = 1
-    
        
     Test_02_Buttons_Numeric = _
-    mMsg.Box(box_title:="Buttons 'Resume Error Line', 'Ok'", _
-             box_buttons:=cll)
+    mMsg.Box(Prompt:=vbNullString, Buttons:=cll, Title:="Buttons 'Resume Error Line', 'Ok'")
 
     EoP ErrSrc(PROC)
 End Function
@@ -1627,9 +1623,9 @@ Public Function Test_17_MessageAsString() As Variant
         
     Test_17_MessageAsString = _
     mMsg.Box( _
-             box_title:=MsgTitle _
-           , box_msg:="This is a message provided as a simple string argument!" _
-           , box_buttons:=vButtons _
+             Title:=MsgTitle _
+           , Prompt:="This is a message provided as a simple string argument!" _
+           , Buttons:=vButtons _
            , box_width_min:=TestMsgWidthMin _
            , box_width_max:=TestMsgWidthMax _
            , box_height_max:=TestMsgHeightMax _
@@ -1852,9 +1848,9 @@ Public Function Test_30_Monitor() As Variant
     Next i
     
     mMsg.Buttons vButtons, BTTN_PASSED, BTTN_FAILED
-    Select Case mMsg.Box(box_title:="Test result of " & Readable(PROC) _
-                       , box_msg:=vbNullString _
-                       , box_buttons:=vButtons _
+    Select Case mMsg.Box(Title:="Test result of " & Readable(PROC) _
+                       , Prompt:=vbNullString _
+                       , Buttons:=vButtons _
                         )
         Case BTTN_PASSED:       wsTest.Passed = True
         Case BTTN_FAILED:       wsTest.Failed = True

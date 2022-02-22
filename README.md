@@ -355,7 +355,20 @@ Set cll = mMsg.Buttons(cll, "C", "D") ' returns the buttons "C", "D" added to th
 ```
 Same as above but the items "C" and "D" are added.
 
-## Other aspects
+### The _MsgInstance_ service
+All services create an instance of the _fMsg_ userForm with the title as the key.<br>
+Syntax: `MsgInstance(title, unload)`<br>
+`unload` defaults to False. When True an already existing instance is unloaded.
+The instance object is kept in a Dictionary with the title as the key and the instance object as the item. When no item with the given title exists the instance is created, stored in the Dictionary and returned.
+
+If an item exists in the Dictionary which is no longer loaded it is removed from the Dictionary.
+
+Example:<br>`Set msg = mMsg.MsgInstasnce("This title")`<br> returns an already existing  _fMsg_ object, when none exists a new created one.
+
+## Miscellaneous aspects
+### Min/Max Message Width/Height
+A value less than 100 is interpreted as percentage of the screen size, a value equal or greater 100 is interpreted as pt - and re-calculated as percentage to check for the specifiable range. The specifiable width ranges from 25 to 98. I.e. a with less than 25 is set to 25, a width greater than 98 is set to 98.
+
 ### Proportional versus Mono-spaced
 - ***Monospaced***: Because the text is ++not++  "wrapped" the width of the _Message Form_ is determined by the longest text line (up to the _Maximum Form Width_ specified). When the maximum width is exceeded a vertical scroll bar is applied.<br>Note: The title and the broadest _Button Row_ May still determine an even broader final _Message Form_.
 - ***Proportional spaced (default)***: Because the text is "wrapped" the width of a proportional-spaced text is determined by the current form width.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the required space for the broadest _Buttons Row_ and the specified _Minimum Form Width_.
