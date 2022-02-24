@@ -1,30 +1,28 @@
 # Common VBA Message Service (a MsgBox Alternative)
 
-<!-- Start Document Outline -->
-
-* [Summary](#summary)
-* [Why an alternative MsgBox?](#why-an-alternative-msgbox)
-* [Installation](#installation)
-* [Usage](#usage)
-	* [The Box service](#the-box-service)
-		* [Syntax](#syntax)
-		* [Using the Box service](#using-the-box-service)
-	* [The Dsply service](#the-dsply-service)
-		* [Syntax](#syntax-1)
-		* [Syntax of the TypeMsg UDT](#syntax-of-the-typemsg-udt)
-		* [Using the Dsply service](#using-the-dsply-service)
-	* [The ErrMsg service](#the-errmsg-service)
-		* [Syntax](#syntax-2)
-		* [Usage example](#usage-example)
-	* [The Monitor service](#the-monitor-service)
-		* [Usage of the Monitor service](#usage-of-the-monitor-service)
-	* [The Buttons service](#the-buttons-service)
-* [Other aspects](#other-aspects)
-	* [Proportional versus Mono-spaced](#proportional-versus-mono-spaced)
-	* [Unambiguous procedure name](#unambiguous-procedure-name)
-	* [Multiple Monitor instances](#multiple-monitor-instances)
-
-<!-- End Document Outline -->
+[Summary](#summary)<br>
+[Why an alternative MsgBox?](#why-an-alternative-msgbox)<br>
+[Installation](#installation)<br>
+[Usage](#usage)<br>
+&nbsp;&nbsp;&nbsp;[The Box service](#the-box-service)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax](#syntax)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[_Box_ service usage example](#box-service-usager-example)<br>
+&nbsp;&nbsp;&nbsp;[The Dsply service](#the-dsply-service)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax](#syntax-1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax of the TypeMsg UDT](#syntax-of-the-typemsg-udt)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[_Dsply_ service usage example](#dsply-service-usage-example)<br>
+&nbsp;&nbsp;&nbsp;[The ErrMsg service](#the-errmsg-service)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax](#syntax-2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Usage example](#usage-example)<br>
+&nbsp;&nbsp;&nbsp;[The Monitor service](#the-monitor-service)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Usage of the Monitor service](#usage-of-the-monitor-service)<br>
+&nbsp;&nbsp;&nbsp;[The Buttons service](#the-buttons-service)<br>
+&nbsp;&nbsp;&nbsp;[The MsgInstance service](#the-msginstance-service)<br>
+[Miscellaneous aspects](#miscellaneous-aspects)<br>
+&nbsp;&nbsp;&nbsp;[Min/Max Message Width/Height](#minmax-message-widthheight)<br>
+&nbsp;&nbsp;&nbsp;[Proportional versus Mono-spaced](#proportional-versus-mono-spaced)<br>
+&nbsp;&nbsp;&nbsp;[Unambiguous procedure name](#unambiguous-procedure-name)<br>
+&nbsp;&nbsp;&nbsp;[Multiple Monitor instances](#multiple-monitor-instances)<br>
 
 ## Summary
 A flexible and powerful `VBA.MsgBox` alternative providing four specific services:
@@ -59,35 +57,37 @@ Note: The
 The _Box_ service mimics the _VBA.MsgBox_ by displaying a single message string like the _VBA.MsgBox Prompt_ argument. However, due to the use of the _fMsg_ form there is no limit in the length of the message string but the systems limit which is about 1GB. With the exception of the box_msg argument all other arguments are identical w\ith the __Dsply_ service - just prefixed with box_ instead of dsply_.
 
 #### Syntax
+`mMsg.Box(Prompt, [Buttons], [Title], [box_monospaced], [box_button_default], [box_button_width_min], [box_return_index],  [box_width_min], [box_width_max], [box_height_min], [box_height_max])`
+
 The _Box_ service has these named arguments:
 
-| Argument               | Meaning                                              |
-| ---------------------- | -----------------------------------------------------|
-| `box_title`            | String expression displayed in the window handle bar |
-| `box_msg`              | String expression displayed |
-| `box_monospaced`       | Boolean expression, defaults to False, displays the `box_msg` with a monospaced font |
-| `box_buttons`           | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, or a Dictionary, with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row. |
-| `box_button_default`    | Optional, numeric expression, defaults to 1, identifies the default button, i.e. the button which has the focus
-| `box_returnindex`       | Optional, boolean expression, default to False, indicates that the return value for the clicked button will be the index rather than its caption string.
+| Argument                | Meaning                                              |
+| ----------------------- | -----------------------------------------------------|
+| `Title`                 | String expression displayed in the window handle bar |
+| `Prompt`                | String expression displayed |
+| `Buttons`               | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, or a Dictionary, with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row. || `box_monospaced`       | Boolean expression, defaults to False, displays the `box_msg` with a monospaced font |
+
+| `box_button_default`    | Optional, numeric expression, defaults to 1, identifies the default button, i.e. the nth button which has the focus
+| `box_return_index`      | Optional, Boolean expression, default to False, indicates that the return value for the clicked button will be the index rather than its caption string.
 | `box_width_min`         | Optional, numeric expression, defaults to 400, the minimum width in pt for the display of the message. A value < 100 is interpreted as % of the screen size, a value > 100 as pt
 | `box_width_max`         | Optional, numeric expression, defaults to 80, specifies the maximum message window width as % of the screen size. A value < 100 is interpreted as % of the screen size, a value > 100 as pt
 | `box_height_max`        | Optional, numeric expression, defaults to 70, specifies the maximum message window height of the screen size. A value < 100 is interpreted as % of the screen size, a value > 100 as pt
 | `box_buttons_width_min` | Optional, numeric expression, defaults to 70, specifies the minimum button width in pt |
 
-#### Using the _Box_ service
+#### _Box_ service usage example
+The below example uses [the _Buttons_ service](#the-buttons-service) to specify the displayed buttons and their order. 
 ```
 Public Sub Demo_Box_Service()
-    Const PROC          As String = "Demo_Box_service"
-    Const BTTN_1        As String = "Button-1 caption"
-    Const BTTN_2        As String = "Button-2 caption"
-    Const BTTN_3        As String = "Button-3 caption"
-    Const BTTN_4        As String = "Button-4 caption"
-    Const DEMO_TITLE    As String = "Demonstration of the Box service"
+    Const PROC      As String = "Demo_Box_service"
+    Const BTTN_1    As String = "Button-1 caption"
+    Const BTTN_2    As String = "Button-2 caption"
+    Const BTTN_3    As String = "Button-3 caption"
+    Const BTTN_4    As String = "Button-4 caption"
     
     On Error GoTo eh
-    Dim DemoMessage     As String
+    Dim DemoMessage As String
     
-    DemoMessage = "The message : The ""Box"" service displays one string just like the VBA MsgBox. However, the mono-spaced" & vbLf & _
+    DemoMessage = "The message : The ""Box"" service displays one string just like the VBA.MsgBox. However, the mono-spaced" & vbLf & _
                   "              option allows a better layout for an indented text like this one for example. It should also be noted" & vbLf & _
                   "              that there is in fact no message width limit." & vbLf & _
                   "The buttons : 7 buttons in 7 rows are possible each with any caption string or a VBA MsgBox value. The latter may" & vbLf & _
@@ -95,14 +95,13 @@ Public Sub Demo_Box_Service()
                   "The window  : When the message exceeds the specified maximum width a horizontal scroll-bar, when it exceeds" & vbLf & _
                   "              the specified maximum height a vertical scroll.bar is displayed  the message is displayed with a horizontal scroll-bar." & vbLf
     
-    Select Case mMsg.Box( _
-             box_title:=DEMO_TITLE _
-           , box_msg:=DemoMessage _
-           , box_monospaced:=True _
-           , box_width_max:=50 _
-           , box_buttons:=mMsg.Buttons(BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel) _
-           , box_button_default:=5 _
-            )
+    Select Case mMsg.Box(Prompt:=DemoMessage _
+                       , Buttons:=mMsg.Buttons(BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel) _
+                       , Title:="Demonstration of the Box service"
+                       , box_monospaced:=True _
+                       , box_width_max:=50 _
+                       , box_button_default:=5 _
+                        )
         Case BTTN_1:    MsgBox """" & BTTN_1 & """ pressed"
         Case BTTN_2:    MsgBox """" & BTTN_2 & """ pressed"
         Case BTTN_3:    MsgBox """" & BTTN_3 & """ pressed"
@@ -124,7 +123,7 @@ The above code displays
 The service provides all features which make the difference to the VBA.MsgBox.
 
 #### Syntax
-`mMsg.Dsply(dsply_title, dsply_msg[, dsply_buttons][, dsply_button_default][, dsply_reply_with_index][, dsply_modeless][, dsply_min_width][, dsply_max_width][, dsply_max_height][, dsply_min_button_width])`
+`mMsg.Dsply(dsply_title, dsply_msg, [dsply_buttons], [dsply_button_default], [dsply_reply_with_index], [dsply_modeless], [dsply_min_width], [dsply_max_width], [dsply_max_height], [dsply_min_button_width])`
 
 The _Dsply_ service has these named arguments:
 
@@ -168,7 +167,7 @@ With Message.Section(n)
 ```
 Going with the defaults the minimum message text assignment (without a label) would be `Message.Section(1).Text.Text = "......"`
 
-#### Using the _Dsply_ service
+#### _Dsply_ service usage example
 The below code demonstrates most of the available features and message window properties.
 ```
 Public Sub DemoMsgDsplyService_1()

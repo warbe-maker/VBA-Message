@@ -14,17 +14,17 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
-Const VSCROLLBAR_WIDTH              As Single = 18              ' Additional horizontal space required for a frame with a vertical scrollbar
-Const HSCROLLBAR_HEIGHT             As Single = 18              ' Additional vertical space required for a frame with a horizontal scroll barr
+Const VSCROLLBAR_WIDTH              As Single = 15              ' Additional horizontal space required for a frame with a vertical scrollbar
+Const HSCROLLBAR_HEIGHT             As Single = 22              ' Additional vertical space required for a frame with a horizontal scroll barr
 
 Public Property Get FrameContentHeight( _
-                                 ByRef frm As Msforms.Frame, _
+                                 ByRef frm As MsForms.Frame, _
                         Optional ByVal applied As Boolean = False) As Single
 ' ------------------------------------------------------------------------------
 ' Returns the height of the frame's (frm) content by considering only
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
-    Dim ctl As Msforms.Control
+    Dim ctl As MsForms.Control
     
     For Each ctl In frm.Controls
         If ctl.Parent Is frm Then
@@ -46,9 +46,9 @@ Public Property Get FrameContentWidth( _
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
     
-    Dim ctl As Msforms.Control
-    Dim frm As Msforms.Frame
-    Dim frm_ctl As Msforms.Control
+    Dim ctl As MsForms.Control
+    Dim frm As MsForms.Frame
+    Dim frm_ctl As MsForms.Control
     
     If TypeName(v) = "Frame" Then Set frm_ctl = v Else Stop
     For Each ctl In frm_ctl.Controls
@@ -64,7 +64,7 @@ Public Property Get FrameContentWidth( _
 End Property
 
 Public Property Let FrameHeight( _
-                 Optional ByRef frm As Msforms.Frame, _
+                 Optional ByRef frm As MsForms.Frame, _
                           ByVal frm_height As Single)
 ' ------------------------------------------------------------------------------
 ' Mimics a frame's height change event. When the height of the frame (frm) is
@@ -97,7 +97,7 @@ Public Property Let FrameHeight( _
 End Property
 
 Public Property Let FrameWidth( _
-                 Optional ByRef frm As Msforms.Frame, _
+                 Optional ByRef frm As MsForms.Frame, _
                           ByVal frm_width As Single)
 ' ------------------------------------------------------------------------------
 ' Mimics a frame's width change event. When the width of the frame (frm) is
@@ -126,21 +126,21 @@ Public Property Let FrameWidth( _
     
 End Property
 
-Private Property Get ScrollBarHeight(Optional ByVal frm As Msforms.Frame) As Single
+Private Property Get ScrollBarHeight(Optional ByVal frm As MsForms.Frame) As Single
     If frm.ScrollBars = fmScrollBarsBoth Or frm.ScrollBars = fmScrollBarsHorizontal Then ScrollBarHeight = 14
 End Property
 
-Private Property Get ScrollBarWidth(Optional ByVal frm As Msforms.Frame) As Single
+Private Property Get ScrollBarWidth(Optional ByVal frm As MsForms.Frame) As Single
     If frm.ScrollBars = fmScrollBarsBoth Or frm.ScrollBars = fmScrollBarsVertical Then ScrollBarWidth = 12
 End Property
 
-Public Property Get VspaceFrame(Optional frm As Msforms.Frame) As Single
+Public Property Get VspaceFrame(Optional frm As MsForms.Frame) As Single
     If frm.Caption = vbNullString Then VspaceFrame = 4 Else VspaceFrame = 8
 
 End Property
 
 Public Sub AutoSizeTextBox( _
-                     ByRef as_tbx As Msforms.TextBox, _
+                     ByRef as_tbx As MsForms.TextBox, _
                      ByVal as_text As String, _
             Optional ByVal as_width_limit As Single = 0, _
             Optional ByVal as_width_min As Single = 0, _
@@ -303,7 +303,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ not the mErH component the mMsg.ErrMsg service is preferred since it
     '~~ provides an enhanced layout and other features.
     '~~ ------------------------------------------------------------------------
-    ErrMsg = mMsg.ErrMsg(err_source, err_no, err_dscrpt, err_line)
+    ErrMsg = mMsg.ErrMsg(err_source, err_no, err_dscrptn, err_line)
     GoTo xt
 #End If
     '~~ -------------------------------------------------------------------
@@ -324,7 +324,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
     If err_line = 0 Then ErrLine = Erl
-    If err_source = vbNullString Then err_source = Err.Source
+    If err_source = vbNullString Then err_source = Err.source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
     
@@ -384,7 +384,7 @@ Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "fMsgProcTest." & sProc
 End Function
 
-Private Function ScrollHorizontalApplied(ByRef frm As Msforms.Frame) As Boolean
+Private Function ScrollHorizontalApplied(ByRef frm As MsForms.Frame) As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns True when the frame (frm) has already a horizontal scrollbar applied.
 ' ------------------------------------------------------------------------------
@@ -394,7 +394,7 @@ Private Function ScrollHorizontalApplied(ByRef frm As Msforms.Frame) As Boolean
 End Function
 
 Private Sub ScrollHorizontalApply( _
-                            ByRef scroll_frame As Msforms.Frame, _
+                            ByRef scroll_frame As MsForms.Frame, _
                             ByVal scrolled_width As Single, _
                    Optional ByVal x_action As fmScrollAction = fmScrollActionBegin)
 ' ------------------------------------------------------------------------------
@@ -443,7 +443,7 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Function ScrollVerticalApplied(ByRef frm As Msforms.Frame) As Boolean
+Private Function ScrollVerticalApplied(ByRef frm As MsForms.Frame) As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns True when the frame (frm) has already a vertical scrollbar applied.
 ' ------------------------------------------------------------------------------
@@ -453,7 +453,7 @@ Private Function ScrollVerticalApplied(ByRef frm As Msforms.Frame) As Boolean
 End Function
 
 Private Sub ScrollVerticalApply( _
-                          ByRef scroll_frame As Msforms.Frame, _
+                          ByRef scroll_frame As MsForms.Frame, _
                           ByVal scrolled_height As Single, _
                  Optional ByVal y_action As fmScrollAction = fmScrollActionBegin)
 ' ------------------------------------------------------------------------------

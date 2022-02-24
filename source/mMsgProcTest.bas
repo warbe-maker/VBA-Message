@@ -85,7 +85,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ not the mErH component the mMsg.ErrMsg service is preferred since it
     '~~ provides an enhanced layout and other features.
     '~~ ------------------------------------------------------------------------
-    ErrMsg = mMsg.ErrMsg(err_source, err_no, err_dscrpt, err_line)
+    ErrMsg = mMsg.ErrMsg(err_source, err_no, err_dscrptn, err_line)
     GoTo xt
 #End If
     '~~ -------------------------------------------------------------------

@@ -160,7 +160,7 @@ End Sub
 Public Sub cmdTest90_Click()
     wsTest.RegressionTest = False
     wsTest.TestNumber = 90
-    mMsgFuncTest.Test_90_All_in_one_Demonstration
+    mMsgDemo.Demo_Dsply_1
 End Sub
 
 Private Function ErrMsg(ByVal err_source As String, _
@@ -336,7 +336,7 @@ Public Sub Explore(ByVal ctl As Variant, _
     Dim i           As Long
     Dim Item        As String
     Dim j           As String
-    Dim frm         As Msforms.Frame
+    Dim frm         As MsForms.Frame
     
     MsgTitle = "Explore"
     Unload mMsg.MsgInstance(MsgTitle) ' Ensure there is no process monitoring with this title still displayed
@@ -1866,105 +1866,105 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_90_All_in_one_Demonstration() As Variant
-' ------------------------------------------------------------------------------
-' Demo as test of as many features as possible at once.
-' ------------------------------------------------------------------------------
-    Const PROC = "Test_90_All_in_one_Demonstration"
-
-    On Error GoTo eh
-    Dim MsgForm     As fMsg
-    Dim MsgTitle    As String
-    Dim cll         As New Collection
-    Dim i, j        As Long
-    Dim Message     As TypeMsg
-   
-    BoP ErrSrc(PROC)
-    wsTest.TestNumber = 90
-    MsgTitle = Readable(PROC)
-    MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
-    With wsTest
-        TestMsgWidthMin = .MsgWidthMin
-        TestMsgWidthMax = .MsgWidthMax
-        TestMsgHeightMax = .MsgHeightMax
-    End With
-    MsgForm.DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
-    
-    With Message.Section(1)
-        .Label.Text = "Displayed message summary "
-        .Label.FontColor = rgbBlue
-        .Label.FontBold = True
-        .Text.Text = "- Display of (all) 4 message sections, each with an (optional) label" & vbLf _
-                   & "- One monospaced section text exceeding the specified maximum width" & vbLf _
-                   & "- Display of some of the 49(7x7) possible reply buttons" & vbLf _
-                   & "- Font options like color, bold, and italic"
-    End With
-    With Message.Section(2)
-        .Label.Text = "Unlimited message width"
-        .Label.FontColor = rgbBlue
-        .Label.FontBold = True
-        .Text.Text = "This section's text is mono-spaced and thus not word-wrapped. I.e. the longest line determines the messag width." & vbLf _
-                   & "Because the maximimum width for this demo has been specified " & PrcPnt(TestMsgWidthMax, "w") & " of the screen width (defaults to " & PrcPnt(80, "w") & vbLf _
-                   & "the text is displayed with a horizontal scrollbar. The size limit for a section's text is only limited by VBA" & vbLf _
-                   & "which as about 1GB! (see also unlimited message height below)"
-        .Text.MonoSpaced = True
-        .Text.FontItalic = True
-    End With
-    With Message.Section(3)
-        .Label.Text = "Unlimited message height"
-        .Label.FontColor = rgbBlue
-        .Label.FontBold = True
-        .Text.Text = "All the message sections together ecxeed the maximum height, specified for this demo " & PrcPnt(TestMsgHeightMax, "h") & " " _
-                   & "of the screen height (defaults to " & PrcPnt(85, "h") & ". Thus the message area is displayed with a vertical scrollbar. I. e. no matter " _
-                   & "how much text is displayed, it is never truncated. The only limit is VBA's limit for a text " _
-                   & "string which is abut 1GB! With 4 strings, each in one section the limit is thus about 4GB !!!!"
-    End With
-    With Message.Section(4)
-        .Label.Text = "Reply buttons flexibility"
-        .Label.FontColor = rgbBlue
-        .Label.FontBold = True
-        .Text.Text = "This demo displays only some of the 49 possible reply buttons (7 rows by 7 buttons). " _
-                   & "It also shows that a reply button can have any caption text and the buttons can be " _
-                   & "displayed in any order within the 7 x 7 limit. Of cource the VBA.MsgBox classic " _
-                   & "vbOkOnly, vbYesNoCancel, etc. are also possible - even in a mixture." & vbLf & vbLf _
-                   & "By the way: End this demo with either " & BTTN_PASSED & " or " & BTTN_FAILED & " clicked (else it loops)."
-    End With
-    '~~ Prepare the buttons collection
-    For j = 1 To 1
-        For i = 1 To 5
-            cll.Add "Sample multiline" & vbLf & "reply button" & vbLf & "Button-" & j & "-" & i
-        Next i
-        cll.Add vbLf
-    Next j
-    cll.Add BTTN_PASSED
-    cll.Add BTTN_FAILED
-        
-    Do
-        Test_90_All_in_one_Demonstration = _
-        mMsg.Dsply(dsply_title:=MsgTitle _
-                 , dsply_msg:=Message _
-                 , dsply_buttons:=cll _
-                 , dsply_button_default:=BTTN_PASSED _
-                 , dsply_width_min:=TestMsgWidthMin _
-                 , dsply_width_max:=TestMsgWidthMax _
-                 , dsply_height_max:=TestMsgHeightMax _
-                 , dsply_modeless:=wsTest.TestOptionDisplayModeless _
-                  )
-        Select Case Test_90_All_in_one_Demonstration
-            Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
-            Case BTTN_FAILED:       wsTest.Failed = True:                   Exit Do
-            Case sBttnTerminate:    wsTest.TerminateRegressionTest = True:  Exit Do
-        End Select
-    Loop
-    
-xt: EoP ErrSrc(PROC)
-    Exit Function
-
-eh: Select Case ErrMsg(ErrSrc(PROC))
-        Case vbResume:  Stop: Resume
-        Case Else:      GoTo xt
-    End Select
-End Function
+'Public Function Test_90_All_in_one_Demonstration() As Variant
+'' ------------------------------------------------------------------------------
+'' Demo as test of as many features as possible at once.
+'' ------------------------------------------------------------------------------
+'    Const PROC = "Test_90_All_in_one_Demonstration"
+'
+'    On Error GoTo eh
+'    Dim MsgForm     As fMsg
+'    Dim MsgTitle    As String
+'    Dim cll         As New Collection
+'    Dim i, j        As Long
+'    Dim Message     As TypeMsg
+'
+'    BoP ErrSrc(PROC)
+'    wsTest.TestNumber = 90
+'    MsgTitle = Readable(PROC)
+'    MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
+'    With wsTest
+'        TestMsgWidthMin = .MsgWidthMin
+'        TestMsgWidthMax = .MsgWidthMax
+'        TestMsgHeightMax = .MsgHeightMax
+'    End With
+'    MsgForm.DsplyFrmsWthBrdrsTestOnly = wsTest.TestOptionDisplayFrames
+'
+'    With Message.Section(1)
+'        .Label.Text = "Displayed message summary "
+'        .Label.FontColor = rgbBlue
+'        .Label.FontBold = True
+'        .Text.Text = "- Display of (all) 4 message sections, each with an (optional) label" & vbLf _
+'                   & "- One monospaced section text exceeding the specified maximum width" & vbLf _
+'                   & "- Display of some of the 49(7x7) possible reply buttons" & vbLf _
+'                   & "- Font options like color, bold, and italic"
+'    End With
+'    With Message.Section(2)
+'        .Label.Text = "Unlimited message width"
+'        .Label.FontColor = rgbBlue
+'        .Label.FontBold = True
+'        .Text.Text = "This section's text is mono-spaced and thus not word-wrapped. I.e. the longest line determines the messag width." & vbLf _
+'                   & "Because the maximimum width for this demo has been specified " & PrcPnt(TestMsgWidthMax, "w") & " of the screen width (defaults to " & PrcPnt(80, "w") & vbLf _
+'                   & "the text is displayed with a horizontal scrollbar. The size limit for a section's text is only limited by VBA" & vbLf _
+'                   & "which as about 1GB! (see also unlimited message height below)"
+'        .Text.MonoSpaced = True
+'        .Text.FontItalic = True
+'    End With
+'    With Message.Section(3)
+'        .Label.Text = "Unlimited message height"
+'        .Label.FontColor = rgbBlue
+'        .Label.FontBold = True
+'        .Text.Text = "All the message sections together ecxeed the maximum height, specified for this demo " & PrcPnt(TestMsgHeightMax, "h") & " " _
+'                   & "of the screen height (defaults to " & PrcPnt(85, "h") & ". Thus the message area is displayed with a vertical scrollbar. I. e. no matter " _
+'                   & "how much text is displayed, it is never truncated. The only limit is VBA's limit for a text " _
+'                   & "string which is abut 1GB! With 4 strings, each in one section the limit is thus about 4GB !!!!"
+'    End With
+'    With Message.Section(4)
+'        .Label.Text = "Reply buttons flexibility"
+'        .Label.FontColor = rgbBlue
+'        .Label.FontBold = True
+'        .Text.Text = "This demo displays only some of the 49 possible reply buttons (7 rows by 7 buttons). " _
+'                   & "It also shows that a reply button can have any caption text and the buttons can be " _
+'                   & "displayed in any order within the 7 x 7 limit. Of cource the VBA.MsgBox classic " _
+'                   & "vbOkOnly, vbYesNoCancel, etc. are also possible - even in a mixture." & vbLf & vbLf _
+'                   & "By the way: End this demo with either " & BTTN_PASSED & " or " & BTTN_FAILED & " clicked (else it loops)."
+'    End With
+'    '~~ Prepare the buttons collection
+'    For j = 1 To 1
+'        For i = 1 To 5
+'            cll.Add "Sample multiline" & vbLf & "reply button" & vbLf & "Button-" & j & "-" & i
+'        Next i
+'        cll.Add vbLf
+'    Next j
+'    cll.Add BTTN_PASSED
+'    cll.Add BTTN_FAILED
+'
+'    Do
+'        Test_90_All_in_one_Demonstration = _
+'        mMsg.Dsply(dsply_title:=MsgTitle _
+'                 , dsply_msg:=Message _
+'                 , dsply_buttons:=cll _
+'                 , dsply_button_default:=BTTN_PASSED _
+'                 , dsply_width_min:=TestMsgWidthMin _
+'                 , dsply_width_max:=TestMsgWidthMax _
+'                 , dsply_height_max:=TestMsgHeightMax _
+'                 , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+'                  )
+'        Select Case Test_90_All_in_one_Demonstration
+'            Case BTTN_PASSED:       wsTest.Passed = True:                   Exit Do
+'            Case BTTN_FAILED:       wsTest.Failed = True:                   Exit Do
+'            Case sBttnTerminate:    wsTest.TerminateRegressionTest = True:  Exit Do
+'        End Select
+'    Loop
+'
+'xt: EoP ErrSrc(PROC)
+'    Exit Function
+'
+'eh: Select Case ErrMsg(ErrSrc(PROC))
+'        Case vbResume:  Stop: Resume
+'        Case Else:      GoTo xt
+'    End Select
+'End Function
 
 Public Function Test_91_MinimumMessage() As Variant
 ' ------------------------------------------------------------------------------
@@ -2092,7 +2092,7 @@ Private Sub BoP(ByVal b_proc As String, _
     If UBound(b_arguments) >= 0 Then s = Join(b_arguments, ",")
 #If ErHComp = 1 Then
     mErH.BoP b_proc, s
-#ElseIf ExecTrace = 1 And TrcComp = 1 Then
+#ElseIf ExecTrace = 1 Then
     mTrc.BoP b_proc, s
 #End If
 End Sub
@@ -2107,7 +2107,7 @@ Private Sub EoP(ByVal e_proc As String, _
 ' ------------------------------------------------------------------------------
 #If ErHComp = 1 Then
     mErH.EoP e_proc
-#ElseIf ExecTrace = 1 And TrcComp = 1 Then
+#ElseIf ExecTrace = 1 Then
     mTrc.EoP e_proc, e_inf
 #End If
 End Sub

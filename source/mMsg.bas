@@ -156,7 +156,7 @@ Public Function Box(ByVal Prompt As String, _
            Optional ByVal box_monospaced As Boolean = False, _
            Optional ByVal box_button_default = 1, _
            Optional ByVal box_button_width_min = 70, _
-           Optional ByVal box_returnindex As Boolean = False, _
+           Optional ByVal box_return_index As Boolean = False, _
            Optional ByVal box_width_min As Long = 300, _
            Optional ByVal box_width_max As Long = 85, _
            Optional ByVal box_height_min As Long = 20, _
@@ -192,6 +192,7 @@ Public Function Box(ByVal Prompt As String, _
     '~~ all services create and use their own instance identified by the message title.
     Set MsgForm = MsgInstance(Title)
     With MsgForm
+'        .DsplyFrmsWthBrdrsTestOnly = True
         .MsgTitle = Title
         .MsgText(1) = Message
         .MsgButtons = Buttons
@@ -468,6 +469,9 @@ Public Function Dsply(ByVal dsply_title As String, _
     Dim i       As Long
     Dim MsgForm As fMsg
 
+#If ExecTrace = 1 Then
+    mTrc.Pause
+#End If
     AssertWidthAndHeight dsply_width_min _
                        , dsply_width_max _
                        , dsply_height_min _
@@ -476,9 +480,11 @@ Public Function Dsply(ByVal dsply_title As String, _
     Set MsgForm = MsgInstance(dsply_title)
     
     With MsgForm
+'        .DsplyFrmsWthBrdrsTestOnly = True
         .ReplyWithIndex = dsply_button_reply_with_index
-        If dsply_height_max > 0 Then .MsgHeightMax = dsply_height_max ' percentage of screen height
-        If dsply_width_max > 0 Then .MsgWidthMax = dsply_width_max    ' percentage of screen width
+        '~~ Use dimensions when explicitely specified
+        If dsply_height_max > 0 Then .MsgHeightMax = dsply_height_max   ' percentage of screen height
+        If dsply_width_max > 0 Then .MsgWidthMax = dsply_width_max      ' percentage of screen width
         If dsply_width_min > 0 Then .MsgWidthMin = dsply_width_min      ' defaults to 300 pt. the absolute minimum is 200 pt
         If dsply_button_width_min > 0 Then .MinButtonWidth = dsply_button_width_min
         .MsgTitle = dsply_title
@@ -506,8 +512,12 @@ Public Function Dsply(ByVal dsply_title As String, _
         End If
     End With
     Dsply = RepliedWith
-
-xt: Exit Function
+    
+xt:
+#If ExecTrace = 1 Then
+    mTrc.Continue
+#End If
+    Exit Function
 
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function

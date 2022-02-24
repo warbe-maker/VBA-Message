@@ -61,29 +61,32 @@ Public Sub Demos()
 End Sub
 
 Public Sub Demo_Box()
-    Const PROC          As String = "Demo_Box_service"
-    Const BTTN_1        As String = "Button-1 caption"
-    Const BTTN_2        As String = "Button-2 caption"
-    Const BTTN_3        As String = "Button-3 caption"
-    Const BTTN_4        As String = "Button-4 caption"
-    Const DEMO_TITLE    As String = "Demonstration of the Box service"
+    Const PROC      As String = "Demo_Box_service"
+    Const BTTN_1    As String = "Button-1 caption"
+    Const BTTN_2    As String = "Button-2 caption"
+    Const BTTN_3    As String = "Button-3 caption"
+    Const BTTN_4    As String = "Button-4 caption"
     
     On Error GoTo eh
-    Dim DemoMessage     As String
+    Dim DemoMessage As String
     
-    DemoMessage = "The message : The ""Box"" service displays one string just like the VBA MsgBox. However, the monospaced" & vbLf & _
-                  "              option allows a better layout for an indented text like this one for example. It should also be noted" & vbLf & _
-                  "              that there is in fact no message width limit." & vbLf & _
-                  "The buttons : 7 buttons in 7 rows are possible each with any caption string or a VBA MsgBox value. The latter may" & vbLf & _
-                  "              result in more than one button, e.g. vbYesNoCancel." & vbLf & _
-                  "The window  : When the message exceeds the specified maximum width a horizontal scroll-bar, when it exceeds" & vbLf & _
-                  "              the specified maximum height a vertical scroll.bar is displayed  the message is displayed with a horizontal scroll-bar." & vbLf
+    DemoMessage = "The        The ""Box"" service displays one string just like the VBA MsgBox." & vbLf & _
+                  "message    However, the monospaced option allows a slightly better layout for an indented " & vbLf & _
+                  "string     like this one. It should also be noted that there is in fact no message width limit." & vbLf & _
+                  vbLf & _
+                  "The        7 buttons in 7 rows are possible each with any caption string or a VBA.MsgBox value." & vbLf & _
+                  "displayed  The latter may result in more than one button, e.g. vbYesNoCancel." & vbLf & _
+                  "buttons" & vbLf & _
+                  vbLf & _
+                  "The        When the message exceeds the specified maximum width a horizontal scroll-bar," & vbLf & _
+                  "message    when it exceeds the specified maximum height a vertical scroll-bar is displayed with" & vbLf & _
+                  "window     the width exceeding section which may be a message section of the buttons section."
     
     
     mMsg.Buttons vButtons, BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel
     Select Case mMsg.Box(Prompt:=DemoMessage _
                        , Buttons:=vButtons _
-                       , Title:=DEMO_TITLE _
+                       , Title:="Demonstration of the Box service" _
                        , box_monospaced:=True _
                        , box_width_max:=50 _
                        , box_button_default:=5 _
@@ -106,8 +109,8 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
 End Sub
 
 Public Sub Demo_Dsply_1()
-    Const width_max     As Long = 50
-    Const MAX_HEIGHT    As Long = 60
+    Const width_max     As Long = 35
+    Const MAX_HEIGHT    As Long = 50
 
     Dim sTitle          As String
     Dim cll             As New Collection
@@ -116,51 +119,45 @@ Public Sub Demo_Dsply_1()
    
     sTitle = "Usage demo: Full featured multiple choice message"
     With Message.Section(1)
-        .Label.Text = "Demonstration overview:"
+        .Label.Text = "Service features used by this displayed message:"
         .Label.FontColor = rgbBlue
-        .Text.Text = "- Use of all 4 message sections" & vbLf _
-                   & "- All sections with a label" & vbLf _
-                   & "- One section monospaced exceeding the specified maximum message form width" & vbLf _
-                   & "- Use of some of the 7x7 reply buttons in a 4-4-1 order" & vbLf _
-                   & "- An an example for available text font options all labels in blue"
+        .Text.Text = "All 4 message sections, and all with a label, monospaced option for the second section, " _
+                   & "some of the 7 x 7 reply buttons in a 4-4-1 order, font color option for all labels."
     End With
     With Message.Section(2)
-        .Label.Text = "Unlimited message width!:"
+        .Label.Text = "Demonstration of the unlimited message width:"
         .Label.FontColor = rgbBlue
-        .Text.Text = "Because this section's text is mono-spaced (which is not word-wrapped) and the maximimum message form width" & vbLf _
-                   & "for this demo has been specified " & width_max & "% of the screen width (the default would be 80%)" & vbLf _
-                   & "the text is displayed with a horizontal scrollbar. There is no message size limit for the display despite the" & vbLf & vbLf _
-                   & "limit of VBA for text strings  which is about 1GB!"
+        .Text.Text = "Because this section's text is mono-spaced (which by definition is not word-wrapped)" & vbLf _
+                   & "the message width is determined by:" & vbLf _
+                   & "a) the for this demo specified maximum width of " & width_max & "% of the screen size" & vbLf _
+                   & "   (defaults to 80% when not specified)" & vbLf _
+                   & "b) the longest line of this section" & vbLf _
+                   & "Because the text exeeds the specified maximum message width, a horizontal scroll-bar is displayed." & vbLf _
+                   & "Due to this feature there is no message size limit other than the sytem's limit which for a string is about 1GB !!!!"
         .Text.MonoSpaced = True
     End With
     With Message.Section(3)
-        .Label.Text = "Unlimited message height!:"
+        .Label.Text = "Unlimited message height (not the fact with this message):"
         .Label.FontColor = rgbBlue
-        .Text.Text = "Because this section lext has many lines (line breaks)" & vbLf _
-                   & "the default word-wrapping for this proportional-spaced text" & vbLf _
-                   & "has not the otherwise usuall effect. The message area thus" & vbLf _
-                   & "exeeds the for this demo specified " & MAX_HEIGHT & "% of the screen size" & vbLf _
-                   & "(defaults to 80%) it is displayed with a vertical scrollbar." & vbLf _
-                   & "So even a proportional spaced text's size - which usually is word-wrapped -" & vbLf _
-                   & "is only limited by the system's limit for a String which is abut 1GB !!!"
+        .Text.Text = "As with the message width, the message height is unlimited. When the maximum height (explicitely specified or the default) " _
+                   & "is exceeded a vertical scroll-bar is displayed. Due to this feature there is no message size limit other than the sytem's " _
+                   & "limit which for a string is about 1GB !!!!"
     End With
     With Message.Section(4)
-        .Label.Text = "Great reply buttons flexibility:"
+        .Label.Text = "Flexibility regarding the displayed reply buttons:"
         .Label.FontColor = rgbBlue
-        .Text.Text = "This demo displays only some of the 49 possible reply buttons (7 rows by 7 buttons). " _
-                   & "It also shows that a reply button can have any caption text and the buttons can be " _
-                   & "displayed in any order within the 7 x 7 limit. Of cource the VBA.MsgBox classic " _
-                   & "vbOkOnly, vbYesNoCancel, etc. are also possible - even in a mixture." & vbLf & vbLf _
-                   & "By the way: This demo ends only with the Ok button clicked and loops with all the ohter."
+        .Text.Text = "This demo displays only some of the 7 x 7 = 49 possible reply buttons which may have any caption text " _
+                   & "including the classic VBA.MsgBox values (vbOkOnly, vbYesNoCancel, etc.) - even in a mixture." & vbLf & vbLf _
+                   & "!! This demo ends only with the Ok button and loops with any other."
     End With
     '~~ Prepare the buttons collection
+    mMsg.Buttons cll, vbOKOnly, vbLf ' The reply when clicked will be vbOK though
     For j = 1 To 2
         For i = 1 To 4
             cll.Add "Multiline reply" & vbLf & "button caption" & vbLf & "Button-" & j & "-" & i
         Next i
-        cll.Add vbLf
+        If j < 2 Then cll.Add vbLf
     Next j
-    cll.Add vbOKOnly ' The reply when clicked will be vbOK though
     
     While mMsg.Dsply(dsply_title:=sTitle _
                    , dsply_msg:=Message _
