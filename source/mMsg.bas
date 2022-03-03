@@ -18,7 +18,7 @@ Option Explicit
 '
 ' Uses:         fMsg
 '
-' Reqires:      Reference to "Microsoft Scripting Runtime"
+' Requires:     Reference to "Microsoft Scripting Runtime"
 '
 ' See: https://github.com/warbe-maker/Common-VBA-Message-Service
 '
@@ -110,7 +110,7 @@ Private Function AppErr(ByVal app_err_no As Long) As Long
 End Function
 
 Public Sub AssertWidthAndHeight(ByRef width_min As Long, _
-                                ByRef width_max As Long, _
+                                ByRef WIDTH_MAX As Long, _
                                 ByRef height_min As Long, _
                                 ByRef height_max As Long)
 ' ------------------------------------------------------------------------------
@@ -133,17 +133,17 @@ Public Sub AssertWidthAndHeight(ByRef width_min As Long, _
     Dim MsgHeightMinLimitPt As Long:    MsgHeightMinLimitPt = Pnts(MSG_HEIGHT_MIN_LIMIT_PERCENTAGE, "h")
     
     '~~ Convert all percentage arguments into pt arguments
-    If width_max <> 0 And width_max <= 100 Then width_max = Pnts(width_max, "w")
+    If WIDTH_MAX <> 0 And WIDTH_MAX <= 100 Then WIDTH_MAX = Pnts(WIDTH_MAX, "w")
     If width_min <> 0 And width_min <= 100 Then width_min = Pnts(width_min, "w")
     If height_max <> 0 And height_max <= 100 Then height_max = Pnts(height_max, "h")
     If height_min <> 0 And height_min <= 100 Then height_min = Pnts(height_min, "h")
         
     '~~ Provide sensible values for all invalid, improper, or useless
-    If width_min > width_max Then width_min = width_max
+    If width_min > WIDTH_MAX Then width_min = WIDTH_MAX
     If height_min > height_max Then height_min = height_max
     If width_min < MsgWidthMinLimitPt Then width_min = MsgWidthMinLimitPt
-    If width_max <= width_min Then width_max = width_min
-    If width_max > MsgWidthMaxLimitPt Then width_max = MsgWidthMaxLimitPt
+    If WIDTH_MAX <= width_min Then WIDTH_MAX = width_min
+    If WIDTH_MAX > MsgWidthMaxLimitPt Then WIDTH_MAX = MsgWidthMaxLimitPt
     If height_min < MsgHeightMinLimitPt Then height_min = MsgHeightMinLimitPt
     If height_max = 0 Or height_max < height_min Then height_max = height_min
     If height_max > MsgHeightMaxLimitPt Then height_max = MsgHeightMaxLimitPt
@@ -192,7 +192,7 @@ Public Function Box(ByVal Prompt As String, _
     '~~ all services create and use their own instance identified by the message title.
     Set MsgForm = MsgInstance(Title)
     With MsgForm
-'        .DsplyFrmsWthBrdrsTestOnly = True
+'        .VisualizeControls = True
         .MsgTitle = Title
         .MsgText(1) = Message
         .MsgButtons = Buttons
@@ -203,11 +203,10 @@ Public Function Box(ByVal Prompt As String, _
         .MinButtonWidth = box_button_width_min
         .MsgButtonDefault = box_button_default
         '+------------------------------------------------------------------------+
-        '|| Setup prior showing the form improves the performance significantly  ||
-        '|| and avoids any flickering message window with its setup.             ||
+        '|| Setup prior showing the form is much faster and avoids flickering.   ||
         '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
-        .Setup '                                                                 ||
         '+------------------------------------------------------------------------+
+        .Setup
         .Show
     End With
     Box = RepliedWith
@@ -442,27 +441,29 @@ Public Function Dsply(ByVal dsply_title As String, _
 ' Common VBA Message Display: A service using the Common VBA Message Form as an
 ' alternative to the VBA.MsgBox.
 '
-' Argument               | Description
-' ---------------------- + ----------------------------------------------------
-' dsply_title            | String, Title
-' dsply_msg              | UDT, Message
-' dsply_buttons          | Button captions as Collection
-' dsply_button_default   | Default button, either the index or the caption,
-'                        | defaults to 1 (= the first displayed button)
+' Argument                      | Description
+' ----------------------------- + ----------------------------------------------
+' dsply_title                   | String, Title
+' dsply_msg                     | UDT, Message
+' dsply_buttons                 | Button captions as Collection
+' dsply_button_default          | Default button, either the index or the
+'                               | caption, defaults to 1 (= the first displayed
+'                               | button)
 ' dsply_button_reply_with_index | Defaults to False, when True the index of the
-'                        | of the pressed button is returned else the caption
-'                        | or the VBA.MsgBox button value respectively
-' dsply_modeless         | The message is displayed modeless, defaults to False
-'                        | = vbModal
-' dsply_width_min        | Overwrites the default when not 0
-' dsply_width_max        | Overwrites the default when not 0
-' dsply_height_max       | Overwrites the default when not 0
-' dsply_button_width_min | Overwrites the default when not 0
+'                               | of the pressed button is returned else the
+'                               | caption or the VBA.MsgBox button value
+'                               | respectively
+' dsply_modeless                | The message is displayed modeless, defaults
+'                               | to False = vbModal
+' dsply_width_min               | Overwrites the default when not 0
+' dsply_width_max               | Overwrites the default when not 0
+' dsply_height_max              | Overwrites the default when not 0
+' dsply_button_width_min       | Overwrites the default when not 0
 '
 ' See: https://github.com/warbe-maker/Common-VBA-Message-Service
 '
 ' W. Rauschenberger, Berlin, Nov 2020
-' -------------------------------------------------------------------------------------
+' ------------------------------------------------------------------------------
     Const PROC = "Dsply"
     
     On Error GoTo eh
@@ -480,7 +481,6 @@ Public Function Dsply(ByVal dsply_title As String, _
     Set MsgForm = MsgInstance(dsply_title)
     
     With MsgForm
-'        .DsplyFrmsWthBrdrsTestOnly = True
         .ReplyWithIndex = dsply_button_reply_with_index
         '~~ Use dimensions when explicitely specified
         If dsply_height_max > 0 Then .MsgHeightMax = dsply_height_max   ' percentage of screen height
@@ -497,11 +497,13 @@ Public Function Dsply(ByVal dsply_title As String, _
         .MsgButtons = dsply_buttons
         .MsgButtonDefault = dsply_button_default
         '+------------------------------------------------------------------------+
-        '|| Setup prior showing the form improves the performance significantly  ||
-        '|| and avoids any flickering message window with its setup.             ||
-        '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
+        '|| Setup prior showing the form is much faster and avoids flickering.   ||
+        '|| For testing - indicated by VisualizerControls = True and             ||
+        '|| dsply_modeless = True - prior Setup is suspended.                    ||
         '+------------------------------------------------------------------------+
-        .Setup '                                                                 ||
+        If Not (.VisualizeControls And dsply_modeless) Then
+            .Setup
+        End If
         If dsply_modeless Then
             DisplayDone = False
             .Show vbModeless
@@ -718,14 +720,13 @@ Public Function Monitor( _
             .MsgHeightMin = mntr_height_min ' pt min height
             .MsgHeightMax = mntr_height_max ' pt max height
             .MonitorMode = True
-            .DsplyFrmsWthCptnTestOnly = False
+            .IndicateFrameCaptions = False
 
             '+------------------------------------------------------------------------+
-            '|| Setup prior showing the form improves the performance significantly  ||
-            '|| and avoids any flickering message window with its setup.             ||
+            '|| Setup prior showing the form is much faster and avoids flickering.   ||
             '|| For testing purpose it may be appropriate to out-comment the Setup.  ||
-            .Setup '                                                                 ||
             '+------------------------------------------------------------------------+
+            .Setup
             .Show vbModeless
             GoTo xt
         End With

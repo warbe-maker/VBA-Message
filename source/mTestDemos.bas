@@ -1,4 +1,4 @@
-Attribute VB_Name = "mMsgDemo"
+Attribute VB_Name = "mTestDemos"
 Option Explicit
 
 #If VBA7 Then
@@ -80,7 +80,8 @@ Public Sub Demo_Box()
                   vbLf & _
                   "The        When the message exceeds the specified maximum width a horizontal scroll-bar," & vbLf & _
                   "message    when it exceeds the specified maximum height a vertical scroll-bar is displayed with" & vbLf & _
-                  "window     the width exceeding section which may be a message section of the buttons section."
+                  "window     the width exceeding section which may be a message section of the buttons section." & vbLf & vbLf & _
+                  "Note       Press any button to terminate the dispplay!"
     
     
     mMsg.Buttons vButtons, BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel
@@ -109,7 +110,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
 End Sub
 
 Public Sub Demo_Dsply_1()
-    Const width_max     As Long = 35
+    Const WIDTH_MAX     As Long = 35
     Const MAX_HEIGHT    As Long = 50
 
     Dim sTitle          As String
@@ -129,7 +130,7 @@ Public Sub Demo_Dsply_1()
         .Label.FontColor = rgbBlue
         .Text.Text = "Because this section's text is mono-spaced (which by definition is not word-wrapped)" & vbLf _
                    & "the message width is determined by:" & vbLf _
-                   & "a) the for this demo specified maximum width of " & width_max & "% of the screen size" & vbLf _
+                   & "a) the for this demo specified maximum width of " & WIDTH_MAX & "% of the screen size" & vbLf _
                    & "   (defaults to 80% when not specified)" & vbLf _
                    & "b) the longest line of this section" & vbLf _
                    & "Because the text exeeds the specified maximum message width, a horizontal scroll-bar is displayed." & vbLf _
@@ -163,7 +164,7 @@ Public Sub Demo_Dsply_1()
                    , dsply_msg:=Message _
                    , dsply_buttons:=cll _
                    , dsply_height_max:=MAX_HEIGHT _
-                   , dsply_width_max:=width_max _
+                   , dsply_width_max:=WIDTH_MAX _
                     ) <> vbOK
     Wend
     

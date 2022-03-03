@@ -1,35 +1,37 @@
-22-02-24 20:21:35 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-02-24 20:21:35                 >> Regression test module mMsg
-22-02-24 20:21:35 00,0000         |  >> mMsgFuncTest.Test_00_Regression
-22-02-24 20:21:35 00,0128         |  |  >> mMsgFuncTest.Test_01_ErrMsg
-22-02-24 20:21:37 00,0196 00,0068 |  |  << mMsgFuncTest.Test_01_ErrMsg
-22-02-24 20:21:38 01,2121         |  |  >> mMsgFuncTest.Test_03_WidthDeterminedByMinimumWidth
-22-02-24 20:21:40 01,2836 00,0716 |  |  << mMsgFuncTest.Test_03_WidthDeterminedByMinimumWidth
-22-02-24 20:21:40 01,3110         |  |  >> mMsgFuncTest.Test_04_WidthDeterminedByTitle
-22-02-24 20:21:41 01,4117 00,1007 |  |  << mMsgFuncTest.Test_04_WidthDeterminedByTitle
-22-02-24 20:21:41 01,4195         |  |  >> mMsgFuncTest.Test_05_WidthDeterminedByMonoSpacedMessageSection
-22-02-24 20:21:43 01,4983 00,0788 |  |  << mMsgFuncTest.Test_05_WidthDeterminedByMonoSpacedMessageSection
-22-02-24 20:21:43 01,5056         |  |  >> mMsgFuncTest.Test_06_WidthDeterminedByReplyButtons
-22-02-24 20:21:44 01,5833 00,0777 |  |  << mMsgFuncTest.Test_06_WidthDeterminedByReplyButtons
-22-02-24 20:21:44 01,5908         |  |  >> mMsgFuncTest.Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth
-22-02-24 20:21:45 01,6892 00,0984 |  |  << mMsgFuncTest.Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth
-22-02-24 20:21:45 01,6978         |  |  >> mMsgFuncTest.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
-22-02-24 20:21:47 01,8152 00,1174 |  |  << mMsgFuncTest.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
-22-02-24 20:21:47 01,8239         |  |  >> mMsgFuncTest.Test_09_ButtonsOnly
-22-02-24 20:21:48 01,9110 00,0871 |  |  << mMsgFuncTest.Test_09_ButtonsOnly
-22-02-24 20:21:48 01,9167         |  |  >> mMsgFuncTest.Test_10_ButtonsMatrix
-22-02-24 20:21:50 01,9937 00,0770 |  |  << mMsgFuncTest.Test_10_ButtonsMatrix
-22-02-24 20:21:50 02,0028         |  |  >> mMsgFuncTest.Test_11_ButtonScrollBarVertical
-22-02-24 20:21:54 02,1156 00,1128 |  |  << mMsgFuncTest.Test_11_ButtonScrollBarVertical
-22-02-24 20:21:54 02,1234         |  |  >> mMsgFuncTest.Test_12_ButtonScrollBarHorizontal
-22-02-24 20:21:55 02,1982 00,0748 |  |  << mMsgFuncTest.Test_12_ButtonScrollBarHorizontal
-22-02-24 20:21:55 02,2039         |  |  >> mMsgFuncTest.Test_13_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar
-22-02-24 20:21:57 02,2968 00,0929 |  |  << mMsgFuncTest.Test_13_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar
-22-02-24 20:21:57 02,3031         |  |  >> mMsgFuncTest.Test_17_Box_MessageAsString
-22-02-24 20:21:59 03,9789 01,6757 |  |  << mMsgFuncTest.Test_17_Box_MessageAsString
-22-02-24 20:21:59 03,9846         |  |  >> mMsgFuncTest.Test_30_Monitor
-22-02-24 20:22:04 08,8291 04,8445 |  |  << mMsgFuncTest.Test_30_Monitor
-22-02-24 20:22:05 08,8372 08,8372 |  << mMsgFuncTest.Test_00_Regression
-22-02-24 20:22:05 08,8372 08,8372 << Regression test module mMsg
-22-02-24 20:22:05                 Impact on the overall performance (caused by the trace itself): 00,0076 seconds!
-22-02-24 20:22:05 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-03-03 18:52:50 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-03-03 18:52:50                 >> Regression test module mMsg
+22-03-03 18:52:50 00,0000         |  >> mTestServices.Test_00_Regression
+22-03-03 18:52:50 00,0118         |  |  >> mTestServices.Test_01_ErrMsg
+22-03-03 18:52:53 00,0175 00,0057 |  |  << mTestServices.Test_01_ErrMsg
+22-03-03 18:52:55 01,5592         |  |  >> mTestServices.Test_03_WidthDeterminedByMinimumWidth
+22-03-03 18:52:57 01,6242 00,0649 |  |  << mTestServices.Test_03_WidthDeterminedByMinimumWidth
+22-03-03 18:52:57 01,6300         |  |  >> mTestServices.Test_04_WidthDeterminedByTitle
+22-03-03 18:52:58 01,6791 00,0492 |  |  << mTestServices.Test_04_WidthDeterminedByTitle
+22-03-03 18:52:58 01,6855         |  |  >> mTestServices.Test_05_WidthDeterminedByMonoSpacedMessageSection
+22-03-03 18:53:00 01,7315 00,0459 |  |  << mTestServices.Test_05_WidthDeterminedByMonoSpacedMessageSection
+22-03-03 18:53:00 01,7361         |  |  >> mTestServices.Test_06_WidthDeterminedByReplyButtons
+22-03-03 18:53:02 01,7970 00,0608 |  |  << mTestServices.Test_06_WidthDeterminedByReplyButtons
+22-03-03 18:53:02 01,8017         |  |  >> mTestServices.Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth
+22-03-03 18:53:04 01,9118 00,1101 |  |  << mTestServices.Test_07_MonoSpacedSectionWidthExceedsMaxMsgWidth
+22-03-03 18:53:04 01,9177         |  |  >> mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
+22-03-03 18:53:06 01,9987 00,0811 |  |  << mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
+22-03-03 18:53:06 02,0039         |  |  >> mTestServices.Test_09_ButtonsOnly
+22-03-03 18:53:07 02,0643 00,0603 |  |  << mTestServices.Test_09_ButtonsOnly
+22-03-03 18:53:07 02,0691         |  |  >> mTestServices.Test_10_ButtonsMatrix
+22-03-03 18:53:08 02,1287 00,0597 |  |  << mTestServices.Test_10_ButtonsMatrix
+22-03-03 18:53:08 02,1335         |  |  >> mTestServices.Test_11_ButtonScrollBarVertical
+22-03-03 18:53:12 02,2170 00,0835 |  |  << mTestServices.Test_11_ButtonScrollBarVertical
+22-03-03 18:53:12 02,2252         |  |  >> mTestServices.Test_12_ButtonScrollBarHorizontal
+22-03-03 18:53:13 02,2801 00,0549 |  |  << mTestServices.Test_12_ButtonScrollBarHorizontal
+22-03-03 18:53:13 02,2850         |  |  >> mTestServices.Test_13_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar
+22-03-03 18:53:15 02,3550 00,0700 |  |  << mTestServices.Test_13_ButtonsMatrix_Horizontal_and_Vertical_Scrollbar
+22-03-03 18:53:15 02,3602         |  |  >> mTestServices.Test_17_Box_MessageAsString
+22-03-03 18:53:17 04,0227 01,6625 |  |  << mTestServices.Test_17_Box_MessageAsString
+22-03-03 18:53:17 04,0276         |  |  >> mTestServices.Test_23_MonoSpacedSectionOnly
+22-03-03 18:53:19 04,0812 00,0536 |  |  << mTestServices.Test_23_MonoSpacedSectionOnly
+22-03-03 18:53:19 04,0882         |  |  >> mTestServices.Test_30_Monitor
+22-03-03 18:53:26 10,8819 06,7937 |  |  << mTestServices.Test_30_Monitor
+22-03-03 18:53:29 10,9349 10,9349 |  << mTestServices.Test_00_Regression
+22-03-03 18:53:29 10,9349 10,9349 << Regression test module mMsg
+22-03-03 18:53:29                 Impact on the overall performance (caused by the trace itself): 00,0052 seconds!
+22-03-03 18:53:29 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)

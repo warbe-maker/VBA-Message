@@ -65,7 +65,7 @@ Public Property Get RegressionTests() As Range
     Set RegressionTests = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colRegression").EntireColumn)
 End Property
 
-Private Property Get RowTest(Optional ByVal Test As Long) As Range: Set RowTest = Me.Range("rowTest" & wsTest.TestNumber):                              End Property
+Private Property Get RowTest(Optional ByVal Test As Long) As Range: Set RowTest = Me.Range("rowTest" & wsTest.TestNumber):  End Property
 
 Public Property Let TerminateRegressionTest(ByVal b As Boolean):    bTerminateRegressionTest = b:                           End Property
 Public Property Get TerminateRegressionTest() As Boolean:           TerminateRegressionTest = bTerminateRegressionTest:     End Property
@@ -85,11 +85,11 @@ Private Property Get TestNumbers() As Range
     Set TestNumbers = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colTestNo").EntireColumn)
 End Property
 
-Public Property Get TestOptionDisplayFrames() As Boolean
+Public Property Get VisualizeControls() As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns the status True or False of the shape named SHAPE_NAME.
 ' ------------------------------------------------------------------------------
-    Const PROC          As String = "TestOptionDisplayFrames"
+    Const PROC          As String = "VisualizeControls"
     Const SHAPE_NAME    As String = "optDisplayFrames"
     
     On Error GoTo eh
@@ -97,8 +97,8 @@ Public Property Get TestOptionDisplayFrames() As Boolean
     Then Err.Raise AppErr(1), ErrSrc(PROC), "A shape named '" & SHAPE_NAME & "' does not exist in Worksheet '" & Me.Name & "'!"
     
     If Me.Shapes(SHAPE_NAME).OLEFormat.Object.Value = 1 _
-    Then TestOptionDisplayFrames = True _
-    Else TestOptionDisplayFrames = False
+    Then VisualizeControls = True _
+    Else VisualizeControls = False
     
 xt: Exit Property
 
@@ -220,7 +220,7 @@ Private Function NextRegressionTest() As Long
     For Each rng In TestNumbers
         If rng.Value = vbNullString Then Exit Function  ' End of test reached
         If rng.Value > TestNumber Then                  ' This is the current/last test
-            If rng.Offset(iRow, 2).Value = "R" Then
+            If rng.OFFSET(iRow, 2).Value = "R" Then
                 NextRegressionTest = rng.Value
                 Exit Function
             End If

@@ -1,4 +1,4 @@
-Attribute VB_Name = "mMsgProcTest"
+Attribute VB_Name = "mTestProcs"
 Option Explicit
 
 ' ------------------------------------------------------------------------------
@@ -6,7 +6,7 @@ Option Explicit
 '          Test of procedures - rather than fMsg/mMsg services/functions.
 '
 ' ------------------------------------------------------------------------------
-Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mMsgFuncTest." & s:  End Property
+Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mTestServices." & s:  End Property
 
 Private Function AppErr(ByVal app_err_no As Long) As Long
 ' ------------------------------------------------------------------------------
@@ -172,8 +172,8 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
     
     On Error GoTo eh
     Dim MyUserForm          As VBComponent
-    Dim NewCommandButton1   As Msforms.CommandButton
-    Dim NewCommandButton2   As Msforms.CommandButton
+    Dim NewCommandButton1   As MSForms.CommandButton
+    Dim NewCommandButton2   As MSForms.CommandButton
     Dim N                   As Long
     Dim X                   As Long
     Dim MaxWidth            As Long
@@ -596,7 +596,7 @@ Public Sub Test_DisplayWithWithoutFrames()
     
     MsgTitle = "With frames test"
     Set MsgForm = mMsg.MsgInstance(MsgTitle)
-    MsgForm.DsplyFrmsWthBrdrsTestOnly = True
+    MsgForm.VisualizeControls = True
     mMsg.Box "Message should be displayed with visible frames", "With frames test"
     mMsg.Box "Message should be displayed with frames invisible", "With frames test"
            
