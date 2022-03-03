@@ -112,7 +112,7 @@ Private bDoneMsgArea                As Boolean
 Private bDonePropSpacedSects        As Boolean
 Private bDoneTitle                  As Boolean
 Private bIndicateFrameCaptions      As Boolean
-Private bVisualizeControls     As Boolean
+Private bVisualizeControls          As Boolean
 Private bFormEvents                 As Boolean
 Private bMonitorMode                As Boolean
 Private bReplyWithIndex             As Boolean
@@ -125,7 +125,6 @@ Private cllDsgnMsgSectsLabel        As Collection
 Private cllDsgnMsgSectsTextBox      As Collection   ' Collection of section textboxes
 Private cllDsgnMsgSectsTextFrame    As Collection   ' Collection of section textframes
 Private cllDsgnRowBttns             As Collection   ' Collection of a designed reply button row's buttons
-Private dctIsApplied                As Dictionary   ' Dictionary of all applied controls (versus just designed)
 Private dctMonoSpaced               As Dictionary
 Private dctMonoSpacedTbx            As Dictionary
 Private dctSectsLabel               As Dictionary   ' SectFrm specific label either provided via properties MsgLabel or Msg
@@ -158,21 +157,21 @@ Private VirtualScreenHeightPts      As Single
 Private VirtualScreenLeftPts        As Single
 Private VirtualScreenTopPts         As Single
 Private VirtualScreenWidthPts       As Single
-Private vMsgButtonDefault           As Variant      ' Index or caption of the default button
+Private vMsgButtonDefault           As Variant          ' Index or caption of the default button
 Private vReplyValue                 As Variant
 Private cyTimerTicksBegin           As Currency
 Private cyTimerTicksEnd             As Currency
 Private TimerSystemFrequency        As Currency
-Private Sections                    As Long         ' No of message sections
-Private SectFrm                     As MSForms.Frame
-Private SectTxtFrm                  As MSForms.Frame
-Private SectTxtBox                  As MSForms.TextBox
-Private SectLbl                     As MSForms.Label
-Private AreaMsg                     As MSForms.Frame
-Private AreaBttns                   As MSForms.Frame
-Private BttnsFrm                    As MSForms.Frame
-Private MsgSectTxt                  As TypeMsgText
-Private MsgSectLbl                  As TypeMsgLabel
+Private Sections                    As Long             ' Set with CollectDesignControls (number of message sections designed)
+Private SectFrm                     As MSForms.Frame    ' Set with SetCtrlsOfSection for a certain section
+Private SectTxtFrm                  As MSForms.Frame    ' Set with SetCtrlsOfSection for a certain section
+Private SectTxtBox                  As MSForms.TextBox  ' Set with SetCtrlsOfSection for a certain section
+Private SectLbl                     As MSForms.Label    ' Set with SetCtrlsOfSection for a certain section
+Private AreaMsg                     As MSForms.Frame    ' Set with CollectDesignControls
+Private AreaBttns                   As MSForms.Frame    ' Set with CollectDesignControls
+Private BttnsFrm                    As MSForms.Frame    ' Set with CollectDesignControls
+Private MsgSectTxt                  As TypeMsgText      ' Text section of the TypeMsg UDT
+Private MsgSectLbl                  As TypeMsgLabel     ' Label section of the TypeMsg UDT
 
 Private Sub UserForm_Initialize()
     Const PROC = "UserForm_Initialize"
@@ -220,7 +219,6 @@ Private Sub UserForm_Terminate()
     Set cllDsgnMsgSectsTextBox = Nothing
     Set cllDsgnMsgSectsTextFrame = Nothing
     Set cllDsgnRowBttns = Nothing
-    Set dctIsApplied = Nothing
     Set dctMonoSpaced = Nothing
     Set dctMonoSpacedTbx = Nothing
     Set dctSectsLabel = Nothing
@@ -1265,7 +1263,6 @@ Private Sub CollectDesignControls()
         cllDsgnBttns.Add cllDsgnRowBttns
     Next v
     
-    ProvideDictionary dctIsApplied ' provides a clean or new dictionary for collection applied controls
     ProvideDictionary AppliedBttns
     ProvideDictionary AppliedBttnsRetVal
 
@@ -1455,15 +1452,6 @@ Private Function Max(ParamArray va() As Variant) As Variant
     
 End Function
 
-Private Function MaxUsedMsgSectWidth()
-    Dim i As Long
-    For i = 1 To Sections
-        If IsApplied(DsgnMsgSect(i)) Then
-            MaxUsedMsgSectWidth = Max(MaxUsedMsgSectWidth, DsgnMsgSect(i).Width)
-        End If
-    Next i
-End Function
-
 Private Function MaxUsedWidthTextFrames() As Single
     Dim i As Long
     For i = 1 To Sections
@@ -1550,8 +1538,6 @@ Public Sub Monitor(ByVal mntr_text As String, _
     '~~ taller the than 60% of the total heigth, both will get a vertical scrollbar,
     '~~ else only the one which uses 60% or more of the height.
     ScrollV_WhereApplicable
-'    SizeAndPosition1MsgSects
-'    SizeAndPosition3Areas
     AdjustParentsWidthAndHeight DsgnMsgSectTxtBox(1)
     AdjustParentsWidthAndHeight DsgnMsgSectTxtBox(2)
     AdjustTopPositions
@@ -2571,44 +2557,6 @@ Private Sub SizeAndPosition2Bttns4Area()
     FormWidth = AreaBttns.Width + ScrollV_Width(AreaBttns)
     FrameCenterHorizontal center_frame:=AreaBttns, left_margin:=10
     
-xt: Exit Sub
-    
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
-End Sub
-
-Private Sub SizeAndPosition3Areas()
-'' ------------------------------------------------------------------------------
-'
-' ------------------------------------------------------------------------------
-    Const PROC = "SizeAndPosition3Areas"
-    
-    On Error GoTo eh
-    Dim TopNextArea As Single
-    Dim AreaFrame   As MSForms.Frame
-    
-    TopNextArea = siVmarginFrames
-    If IsApplied(AreaMsg) Then
-        With AreaMsg
-            .Top = TopNextArea
-            TopNextArea = VgridPos(.Top + .Height + VSPACE_AREAS)
-'            .Width = FrameContentWidth(AreaMsg)
-        End With
-        Set AreaFrame = AreaMsg
-    Else
-        TopNextArea = 15
-    End If
-    
-    If IsApplied(AreaBttns) Then
-        With AreaBttns
-            .Top = TopNextArea
-            TopNextArea = VgridPos(.Top + .Height + VSPACE_AREAS)
-        End With
-        Set AreaFrame = AreaBttns
-    End If
-    
-    '~~ Adjust the final height of the message form
-    Me.Height = VgridPos(AreaFrame.Top + AreaFrame.Height + VSPACE_BOTTOM)
-            
 xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
