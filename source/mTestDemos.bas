@@ -7,7 +7,7 @@ Option Explicit
     Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
 #End If
 
-Private vButtons As Collection
+Private vButtons As New Collection
 Private Message  As TypeMsg
 
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mMsgDemo." & s:  End Property
@@ -84,7 +84,7 @@ Public Sub Demo_Box()
                   "Note       Press any button to terminate the dispplay!"
     
     
-    mMsg.Buttons vButtons, BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel
+    Set vButtons = mMsg.Buttons(BTTN_1, BTTN_2, BTTN_3, BTTN_4, vbLf, vbYesNoCancel)
     Select Case mMsg.Box(Prompt:=DemoMessage _
                        , Buttons:=vButtons _
                        , Title:="Demonstration of the Box service" _
@@ -211,7 +211,7 @@ Public Sub Demo_Dsply_2()
         .Text.Text = "Any section-3 text (without a label)"
    End With
        
-   mMsg.Buttons vButtons, vbAbortRetryIgnore, vbLf, B1, B2, B3, vbLf, B4, B5, B6, vbLf, B7
+   Set vButtons = mMsg.Buttons(vbAbortRetryIgnore, vbLf, B1, B2, B3, vbLf, B4, B5, B6, vbLf, B7)
    vReturn = mMsg.Dsply(dsply_title:="Any title", _
                         dsply_msg:=Message, _
                         dsply_buttons:=vButtons _

@@ -37,7 +37,7 @@ Public Property Get MsgHeightIncrDecr() As Long:            MsgHeightIncrDecr = 
 Public Property Get MsgHeightMax() As Long
     On Error Resume Next
     MsgHeightMax = Intersect(RowTest(lTestNumber), Me.Range("colMsgHeightMax").EntireColumn).Value
-    If Err.Number <> 0 Then Stop
+    If Err.Number <> 0 Then MsgHeightMax = 85 ' Default in case
 End Property
 
 Public Property Get MsgWidthIncrDecr() As Long:             MsgWidthIncrDecr = Intersect(RowTest(lTestNumber), ColMsgWidthIncrDecr).Value:              End Property

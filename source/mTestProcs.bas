@@ -8,6 +8,22 @@ Option Explicit
 ' ------------------------------------------------------------------------------
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mTestServices." & s:  End Property
 
+Public Function AdjustedToVerticalGrid(ByVal atvg_si As Single, _
+                              Optional ByVal atvg_threshold As Single = 1.5, _
+                              Optional ByVal atvg_grid As Single = 6) As Single
+' -------------------------------------------------------------------------------
+' Returns an integer which is a multiple of the grid value (stvg_grid)
+' considering a certain threshold (atvg_threshold) which defaults to 1.5. The
+' result vertically aligns a control in a userform to a grid value which ensures
+' that a text within the control is correctly displayed in accordance with its
+' font size. A threshold (atvg_threshold) of 1.5 - the default - with a grid
+' value (atvg_grid) of 6 - the default - means:
+'  7.5 < si >= 0   results to 6
+' 13.5 < si >= 7.5 results in 12
+' -------------------------------------------------------------------------------
+    AdjustedToVerticalGrid = (Int((atvg_si - atvg_threshold) / atvg_grid) * atvg_grid) + atvg_grid
+End Function
+
 Private Function AppErr(ByVal app_err_no As Long) As Long
 ' ------------------------------------------------------------------------------
 ' Ensures that a programmed (i.e. an application) error numbers never conflicts
@@ -18,6 +34,141 @@ Private Function AppErr(ByVal app_err_no As Long) As Long
 ' ------------------------------------------------------------------------------
     If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
 End Function
+
+Private Function BttnsNo(ByVal v As Variant) As Long
+    Select Case v
+        Case vbYesNo, vbRetryCancel, vbResumeOk:    BttnsNo = 2
+        Case vbAbortRetryIgnore, vbYesNoCancel:     BttnsNo = 3
+        Case Else:                                  BttnsNo = 1
+    End Select
+End Function
+
+Private Sub Qenqueue(ByRef qu As Collection, ByVal qu_item As Variant)
+    If qu Is Nothing Then Set qu = New Collection
+    qu.Add qu_item
+End Sub
+
+Private Function QisEmpty(ByVal qu As Collection) As Boolean
+    If Not qu Is Nothing _
+    Then QisEmpty = qu.Count = 0 _
+    Else QisEmpty = True
+End Function
+
+Private Function Qdequeue(ByRef qu As Collection) As Variant
+    Const PROC = "DeQueue"
+    
+    On Error GoTo eh
+    If qu Is Nothing Then GoTo xt
+    If QisEmpty(qu) Then GoTo xt
+    On Error Resume Next
+    Set Qdequeue = qu(1)
+    If Err.Number <> 0 _
+    Then Qdequeue = qu(1)
+    qu.Remove 1
+
+xt: Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbYes: Stop: Resume
+        Case Else:  GoTo xt
+    End Select
+End Function
+
+Private Function Buttons(ParamArray bttns() As Variant) As Collection
+' --------------------------------------------------------------------------
+' Returns a collection if the items (bttns) provided. If an item is a
+' Collection its items are included. When the number of buttons in a row
+' exceeds 7 a vbLf is included to add a new row. When the number of rows is
+' exieeded any subsequent items are ignored.
+' --------------------------------------------------------------------------
+    Const PROC          As String = "Buttons"
+    
+    On Error GoTo eh
+    Static StackItems   As Collection
+    Static QueueResult  As Collection
+    Static cllResult    As Collection
+    Static lBttnsInRow  As Long         ' buttons in a row counter (excludes break items)
+    Static lBttns       As Long         ' total buttons in cllAdd
+    Static lRows        As Long         ' button rows counter
+    Static SubItems     As Long
+    Static SubItemsDone As Long
+    Dim cll             As Collection
+    Dim v2              As Variant
+    Dim i               As Long
+    
+    If cllResult Is Nothing Then
+        Set StackItems = New Collection
+        Set QueueResult = New Collection
+        Set cllResult = New Collection
+        lBttnsInRow = 0
+        lBttns = 0
+        lRows = 0
+        SubItemsDone = 0
+    End If
+    If UBound(bttns) = -1 Then GoTo xt
+    If UBound(bttns) = 0 Then
+        '~~ Only one item
+        Select Case TypeName(bttns(0))
+            Case "Collection"
+                Set cll = bttns(0)
+                For i = cll.Count To 1 Step -1
+                    StckPush StackItems, cll(i)
+                Next i
+            Case Else
+                If bttns(0) = vbNullString Then Exit Function
+                Select Case bttns(0)
+                    Case vbLf, vbCr, vbCrLf
+                        cllResult.Add bttns(0)
+                        lBttnsInRow = 0
+                        lRows = lRows + 1
+                    Case Else
+                        If lBttnsInRow + BttnsNo(bttns(0)) >= 7 Then
+                            If lRows < 7 Then
+                                cllResult.Add vbLf
+                                lRows = lRows + 1
+                                lBttnsInRow = 1
+                            End If
+                        End If
+                        cllResult.Add bttns(0)
+                        lBttnsInRow = lBttnsInRow + BttnsNo(bttns(0))
+                End Select
+        End Select
+    Else
+        '~~ More than one item in ParamArray
+        For i = UBound(bttns) To 0 Step -1
+            StckPush StackItems, bttns(i)
+        Next i
+    End If
+    
+    If Not StckIsEmpty(StackItems) Then
+        Do
+            If lRows >= 7 And lBttnsInRow >= 7 Then
+                GoTo xt
+            End If
+            Qenqueue QueueResult, cllResult
+            Buttons StckPop(StackItems)
+            If StckIsEmpty(StackItems) Then Exit Do
+        Loop
+    End If
+
+xt: If Not QisEmpty(QueueResult) Then
+        Set cllResult = Qdequeue(QueueResult)
+        Exit Function
+    End If
+    
+    If StckIsEmpty(StackItems) And QisEmpty(QueueResult) Then
+        Debug.Print "1. cllResult.Count: " & cllResult.Count
+        Set Buttons = cllResult
+        Set cllResult = Nothing
+        Debug.Print "2. Buttons.Count: " & Buttons.Count
+        Set QueueResult = Nothing
+        Set StackItems = Nothing
+    End If
+    Exit Function
+        
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Function
+
 
 Private Function ErrMsg(ByVal err_source As String, _
                Optional ByVal err_no As Long = 0, _
@@ -279,6 +430,11 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
+Private Function PrcPnt(ByVal pp_value As Single, _
+                        ByVal pp_dimension As String) As String
+    PrcPnt = mMsg.Prcnt(pp_value, pp_dimension) & "% (" & mMsg.Pnts(pp_value, "w") & "pt)"
+End Function
+
 Private Function TestInstance(ByVal fi_key As String, _
                      Optional ByVal fi_unload As Boolean = False) As fMsgProcTest
 ' -------------------------------------------------------------------------
@@ -342,6 +498,14 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
         Case Else:      GoTo xt
     End Select
 End Function
+
+Private Sub Test_AdjustedToVerticalGrid()
+    Dim i As Single
+    
+    For i = 5.8 To 8 Step 0.1
+        Debug.Print Format(i, "00.0: ") & AdjustedToVerticalGrid(i)
+    Next i
+End Sub
 
 Public Sub Test_AssertWidthAndHeight()
 ' ------------------------------------------------------------------------------
@@ -602,10 +766,6 @@ Public Sub Test_DisplayWithWithoutFrames()
            
 End Sub
 
-Public Sub Test_SetupTitle()
-    fMsgProcTest.Show False
-End Sub
-
 Public Sub Test_MultipleMessageInstances()
 ' ------------------------------------------------------------------------------
 ' Creates a number of instance of the UserForm named fMsgProcTest and unloads them
@@ -646,6 +806,10 @@ Public Sub Test_MultipleMessageInstances()
         Application.WAIT Now() + 0.000006
     Next i
     
+End Sub
+
+Public Sub Test_SetupTitle()
+    fMsgProcTest.Show False
 End Sub
 
 Public Sub Test_SizingAndPositioning()
@@ -715,8 +879,58 @@ Public Sub Test_SizingAndPositioning()
 
 End Sub
 
-Private Function PrcPnt(ByVal pp_value As Single, _
-                        ByVal pp_dimension As String) As String
-    PrcPnt = mMsg.Prcnt(pp_value, pp_dimension) & "% (" & mMsg.Pnts(pp_value, "w") & "pt)"
+Private Function StckIsEmpty(ByVal stck As Collection) As Boolean
+' ----------------------------------------------------------------------------
+' Common Stack Empty check service. Returns True when either there is no stack
+' (stck Is Nothing) or when the stack is empty (items count is 0).
+' ----------------------------------------------------------------------------
+    StckIsEmpty = stck Is Nothing
+    If Not StckIsEmpty Then StckIsEmpty = stck.Count = 0
 End Function
+
+Private Function StckPop(ByVal stck As Collection) As Variant
+' ----------------------------------------------------------------------------
+' Common Stack Pop service. Returns the last item pushed on the stack (stck)
+' and removes the item from the stack. When the stack (stck) is empty a
+' vbNullString is returned.
+' ----------------------------------------------------------------------------
+    Const PROC = "StckPop"
+    
+    On Error GoTo eh
+    If StckIsEmpty(stck) Then GoTo xt
+    
+    On Error Resume Next
+    Set StckPop = stck(stck.Count)
+    If Err.Number <> 0 _
+    Then StckPop = stck(stck.Count)
+    stck.Remove stck.Count
+
+xt: Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbYes: Stop: Resume
+        Case Else:  GoTo xt
+    End Select
+End Function
+
+Private Sub StckPush(ByRef stck As Collection, _
+                     ByVal stck_item As Variant)
+' ----------------------------------------------------------------------------
+' Common Stack Push service. Pushes (adds) an item (stck_item) to the stack
+' (stck). When the provided stack (stck) is Nothing the stack is created.
+' ----------------------------------------------------------------------------
+    Const PROC = "StckPush"
+    
+    On Error GoTo eh
+    If stck Is Nothing Then Set stck = New Collection
+    stck.Add stck_item
+
+xt: Exit Sub
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbYes: Stop: Resume
+        Case Else:  GoTo xt
+    End Select
+End Sub
+
 

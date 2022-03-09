@@ -341,18 +341,17 @@ displays:<br>
 ![](images/Demo-Monitor-Service.gif)
 
 ### The _Buttons_ service
-Eases the provision of any number of buttons by allowing to specify them through a ParamArray which may be a mixture of  strings and numeric (VBA.MsgBox) values. The service allows to specify buttons as well as to add buttons to specified ones. The service ensures a maximum of 7 buttons in 7 rows by ignoring any exceeding button without notice. When no row break items (vbLf, vbCrLf, or vbCr) are included the service includes those break after each 7 buttons in a row.  
+Provides buttons as Collection. Example:<br>
 ```vb
 Dim cll As Collection
-mMsg.Buttons cll, "A", "B", vbOkOnly
+Set cll = mMsg.Buttons("A", "B", vbOkOnly)
 ```
-returns the the items "A", "B", and vbOkOnly in the Collection which results in the buttons "A", "B", "Ok" in the displayed message.
+The service may be used directly as buttons argument. Example:
+```vb
+    mMsg.Box Prompt:="Message text" _
+           , Buttons:=mMsg.Buttons("True", "False", vbYesNoCancel) _
+           , Title:="Title"
 ```
-Dim cll As Collection
-mMsg.Buttons cll, "A", "B", vbOkOnly
-Set cll = mMsg.Buttons(cll, "C", "D") ' returns the buttons "C", "D" added to the buttons "A", "B", vbOkOnly
-```
-Same as above but the items "C" and "D" are added.
 
 ### The _MsgInstance_ service
 All services create an instance of the _fMsg_ userForm with the title as the key.<br>

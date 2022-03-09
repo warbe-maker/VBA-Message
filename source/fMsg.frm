@@ -57,7 +57,7 @@ Const SCROLL_H_HEIGHT               As Single = 17              ' Additional ver
 Const TEST_WITH_FRAME_BORDERS       As Boolean = False          ' For test purpose only! Display frames with visible border
 Const TEST_WITH_FRAME_CAPTIONS      As Boolean = False          ' For test purpose only! Display frames with their test captions (erased by default)
 Const VSPACE_AREAS                  As Single = 10              ' Vertical space between message area and replies area
-Const VSPACE_BOTTOM                 As Single = 35              ' Vertical space at the bottom after the last displayed area
+Const VSPACE_BOTTOM                 As Single = 30              ' Space occupied by the title bar
 Const VSPACE_BTTN_ROWS              As Single = 5               ' Vertical space between button rows
 Const VSPACE_LABEL                  As Single = 0               ' Vertical space between the section-label and the following section-text
 Const VSPACE_SECTIONS               As Single = 7               ' Vertical space between displayed message sections
@@ -294,7 +294,7 @@ Public Property Get ContentHeight(ByVal ch_ctl As Variant) As Single
             End With
         Case Else
             sName = TypeName(ch_ctl)
-            Debug.Print ch_ctl.Controls.Count
+'            Debug.Print ch_ctl.Controls.Count
             siHght = ch_ctl.Height
             i = 0
             For Each ctl In ch_ctl.Controls
@@ -745,9 +745,9 @@ Public Property Let VmarginButtons(ByVal si As Single):     siVmarginButtons = s
 
 Public Property Get VmarginFrames() As Single:              VmarginFrames = siVmarginFrames:                            End Property
 
-Public Property Let VmarginFrames(ByVal si As Single):      siVmarginFrames = VgridPos(si):                             End Property
+Public Property Let VmarginFrames(ByVal si As Single):      siVmarginFrames = AdjustedToVerticalGrid(si):                             End Property
 
-Private Sub AdjustParentsWidthAndHeight(ByVal ctrl As MSForms.Control)
+Private Sub AdjustedParentsWidthAndHeight(ByVal ctrl As MSForms.Control)
 ' ------------------------------------------------------------------------------
 ' Adjust the width and height of the parent frame of the control therein (ctrl)
 ' by considering the control's width and height and a possibly applied vertical
@@ -810,11 +810,11 @@ xt: '~~ Adjust finally the top frame's width anf height which is the UserForm
 eh:
 End Sub
 
-Private Sub AdjustTopPositions()
+Private Sub AdjustedTopPositions()
 ' ------------------------------------------------------------------------------
 ' - Adjusts each applied controls top position considering its current height.
 ' ------------------------------------------------------------------------------
-    Const PROC = "AdjustTopPositions"
+    Const PROC = "AdjustedTopPositions"
     
     On Error GoTo eh
     Dim i                   As Long
@@ -837,7 +837,7 @@ Private Sub AdjustTopPositions()
                 '~~ Adjust the section label
                 With SectLbl
                     .Top = 0
-                    TopPosTextFrame = VgridPos(.Top + .Height)
+                    TopPosTextFrame = AdjustedToVerticalGrid(.Top + .Height)
                     SectLbl.Width = Me.Width - .Left - 5
                 End With
             End If
@@ -854,31 +854,44 @@ Private Sub AdjustTopPositions()
                 If IsApplied(SectTxtFrm) Then
                     .Height = SectTxtFrm.Top + SectTxtFrm.Height
                 End If
-                TopPosNextSect = VgridPos(.Top + .Height + VSPACE_SECTIONS)
+                TopPosNextSect = AdjustedToVerticalGrid(.Top + .Height + VSPACE_SECTIONS)
             End With
             TimedDoEvents    ' to properly h-align the text
-            AdjustParentsWidthAndHeight SectFrm
+            AdjustedParentsWidthAndHeight SectFrm
         End If
     Next i
     
     '~~ Top position Message Area
-    If IsApplied(AreaMsg) Then
-        If IsApplied(AreaBttns) Then
-            AreaBttns.Top = AreaMsg.Top + AreaMsg.Height + VSPACE_AREAS
-            Me.Height = AreaBttns.Top + AreaBttns.Height + (4 * VSPACE_AREAS)
-        Else
-            Me.Height = AreaMsg.Top + AreaMsg.Height + VSPACE_AREAS
-        End If
-    ElseIf IsApplied(AreaBttns) Then
+    If IsApplied(AreaBttns) And IsApplied(AreaMsg) Then
+        AreaBttns.Top = AreaMsg.Top + AreaMsg.Height + VSPACE_AREAS
+        Me.Height = AreaBttns.Top + AreaBttns.Height + VSPACE_AREAS
+    
+    ElseIf IsApplied(AreaBttns) And Not IsApplied(AreaMsg) Then
         AreaBttns.Top = VSPACE_AREAS
         FrameCenterHorizontal AreaBttns
-        Me.Height = AreaBttns.Top + AreaBttns.Height + (4 * VSPACE_AREAS)
+        Me.Height = AreaBttns.Top + AreaBttns.Height + VSPACE_AREAS
+    
+    ElseIf Not IsApplied(AreaBttns) And IsApplied(AreaMsg) Then
+        Me.Height = AreaMsg.Top + AreaMsg.Height + VSPACE_AREAS
     End If
+    Me.Height = Me.Height + VSPACE_BOTTOM
 
 xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
+
+Public Function AdjustedToVerticalGrid(ByVal si As Single) As Single
+' -------------------------------------------------------------------------------
+' Returns an integer which is a multiple of 6 considering a certain THRESHOLD.
+' The result aligns a control in a userform to the grid which ensures a text
+' within the control is correctly displayed with it font size.
+' A THRESHOLD of 2.5 means: 7 < si >= 0 results to 6
+'
+' -------------------------------------------------------------------------------
+    Const THRESHOLD = 2.5
+    AdjustedToVerticalGrid = (Int((si - THRESHOLD) / 6) * 6) + 6
+End Function
 
 Private Function AppErr(ByVal app_err_no As Long) As Long
 ' ------------------------------------------------------------------------------
@@ -955,7 +968,7 @@ Public Sub AutoSizeTextBox(ByRef as_tbx As MSForms.TextBox, _
             .AutoSize = False
             .Width = as_width_limit - 2 ' the readability space is added later
             
-            Debug.Print ".Width = " & .Width
+'            Debug.Print ".Width = " & .Width
             
             If Not as_append Then
                 .Value = as_text
@@ -1001,7 +1014,7 @@ Public Sub AutoSizeTextBox(ByRef as_tbx As MSForms.TextBox, _
             '~~ When a max height is provided and exceeded a vertical scrollbar is applied
             '~~ by the assignment of a frame height which is less then the frame's content height
             If as_height_max > 0 Then
-                Debug.Print Min(as_height_max, .Height + ScrollH_Height(.Parent))
+'                Debug.Print Min(as_height_max, .Height + ScrollH_Height(.Parent))
                 FrameHeight(.Parent) = Min(as_height_max, .Height + ScrollH_Height(.Parent))
             End If
         End If
@@ -1538,9 +1551,9 @@ Public Sub Monitor(ByVal mntr_text As String, _
     '~~ taller the than 60% of the total heigth, both will get a vertical scrollbar,
     '~~ else only the one which uses 60% or more of the height.
     ScrollV_WhereApplicable
-    AdjustParentsWidthAndHeight DsgnMsgSectTxtBox(1)
-    AdjustParentsWidthAndHeight DsgnMsgSectTxtBox(2)
-    AdjustTopPositions
+    AdjustedParentsWidthAndHeight DsgnMsgSectTxtBox(1)
+    AdjustedParentsWidthAndHeight DsgnMsgSectTxtBox(2)
+    AdjustedTopPositions
 
 End Sub
 
@@ -1725,19 +1738,19 @@ Private Sub ScrollV_MsgSectionOrArea(ByVal exceeding_height As Single)
             ' frame's content height
             ' ------------------------------------------------------------------------------
             If UsageType = usage_progress_display Then
-                Debug.Print SectTxtFrm.Height - exceeding_height
+'                Debug.Print SectTxtFrm.Height - exceeding_height
                 FrameHeight(SectTxtFrm, fmScrollActionEnd) = SectTxtFrm.Height - exceeding_height
-                AdjustParentsWidthAndHeight SectTxtBox
-                AdjustTopPositions
+                AdjustedParentsWidthAndHeight SectTxtBox
+                AdjustedTopPositions
                 SetCtrlsOfSection i ' reset
                 VScrollApplied = ScrollV_Applied(SectTxtFrm)
                 Exit For
             Else
                 If SectTxtFrm.Height - exceeding_height > 0 Then
-                    Debug.Print SectTxtFrm.Height - exceeding_height
+'                    Debug.Print SectTxtFrm.Height - exceeding_height
                     FrameHeight(SectTxtFrm) = SectTxtFrm.Height - exceeding_height
-                    AdjustParentsWidthAndHeight SectTxtBox
-                    AdjustTopPositions
+                    AdjustedParentsWidthAndHeight SectTxtBox
+                    AdjustedTopPositions
                     SetCtrlsOfSection i ' reset
                     VScrollApplied = ScrollV_Applied(SectTxtFrm)
                     Exit For
@@ -1750,10 +1763,10 @@ Private Sub ScrollV_MsgSectionOrArea(ByVal exceeding_height As Single)
         '~~ None of the message sections has a dominating height. Becaue the overall message area
         '~~ occupies >=60% of the height it is now reduced to fit the maximum message height
         '~~ thereby receiving a vertical scroll-bar
-        Debug.Print ContentHeight(AreaMsg) - exceeding_height
+'        Debug.Print ContentHeight(AreaMsg) - exceeding_height
         FrameHeight(AreaMsg) = ContentHeight(AreaMsg) - exceeding_height
-        AdjustParentsWidthAndHeight SectTxtBox
-        AdjustTopPositions
+        AdjustedParentsWidthAndHeight SectTxtBox
+        AdjustedTopPositions
     End If
 
 xt: Exit Sub
@@ -1790,14 +1803,14 @@ Private Sub ScrollV_WhereApplicable()
                 ScrollV_MsgSectionOrArea TotalExceedingHeight
             ElseIf PrcntgHeightAreaBttns >= 0.6 Then
                 '~~ Only the buttons area will be reduced and applied with a vertical scrollbar.
-                Debug.Print AreaBttns.Height - TotalExceedingHeight
+'                Debug.Print AreaBttns.Height - TotalExceedingHeight
                 FrameHeight(AreaBttns) = AreaBttns.Height - TotalExceedingHeight
             Else
                 '~~ Both, the message area and the buttons area will be
                 '~~ height reduced proportionally and applied with a vertical scrollbar
-                Debug.Print AreaMsg.Height - (TotalExceedingHeight * PrcntgHeightMsgArea)
+'                Debug.Print AreaMsg.Height - (TotalExceedingHeight * PrcntgHeightMsgArea)
                 FrameHeight(AreaMsg) = AreaMsg.Height - (TotalExceedingHeight * PrcntgHeightMsgArea)
-                Debug.Print AreaBttns.Height - (TotalExceedingHeight * PrcntgHeightAreaBttns)
+'                Debug.Print AreaBttns.Height - (TotalExceedingHeight * PrcntgHeightAreaBttns)
                 FrameHeight(AreaBttns) = AreaBttns.Height - (TotalExceedingHeight * PrcntgHeightAreaBttns)
             End If
         End With
@@ -1864,7 +1877,7 @@ Public Sub Setup()
         SizeAndPosition2Bttns1
         SizeAndPosition2Bttns2Rows
         SizeAndPosition2Bttns3Frame
-        AdjustParentsWidthAndHeight AreaBttns
+        AdjustedParentsWidthAndHeight AreaBttns
         SizeAndPosition2Bttns4Area
     End If
     
@@ -1882,7 +1895,7 @@ Public Sub Setup()
     ' When both areas are about the same height (neither is taller the than 60% of the total heigth)
     ' both will get a vertical scrollbar, else only the one which uses 60% or more of the height.
     ' -----------------------------------------------------------------------------------------------
-    AdjustTopPositions
+    AdjustedTopPositions
     ScrollV_WhereApplicable
     
     '~~ Final form width adjustment
@@ -1891,7 +1904,7 @@ Public Sub Setup()
     '~~ message form width. In order not to interfere again with the width of all content
     '~~ the message form width is extended (over the specified maximum) in order to have
     '~~ the vertical scrollbar visible
-    AdjustTopPositions
+    AdjustedTopPositions
     PositionMessageOnScreen
     SetUpDone = True ' To indicate for the Activate event that the setup had already be done beforehand
     
@@ -1957,9 +1970,9 @@ Private Sub Setup2_MsgSectsMonoSpaced()
             If .MonoSpaced And .Text <> vbNullString Then
                 SetCtrlsOfSection i
                 SetupMsgSect
-                AdjustParentsWidthAndHeight SectTxtBox
-                AdjustTopPositions
-                AdjustParentsWidthAndHeight AreaMsg
+                AdjustedParentsWidthAndHeight SectTxtBox
+                AdjustedTopPositions
+                AdjustedParentsWidthAndHeight AreaMsg
             End If
         End With
     Next i
@@ -2046,7 +2059,7 @@ Private Sub SetupBttnsFromCollection(ByVal cllButtons As Collection)
     Bttn.Width = DFLT_BTTN_MIN_WIDTH
     
     For Each v In cllButtons
-        If IsNumeric(v) Then v = mMsg.ButtonsNumeric(v)
+        If IsNumeric(v) Then v = mMsg.BttnsArgs(v)
         Select Case v
             Case vbOKOnly, vbOKCancel, vbYesNo, vbRetryCancel, vbYesNoCancel, vbAbortRetryIgnore, vbYesNo, vbResumeOk
                 SetupBttnsFromValue v
@@ -2218,13 +2231,13 @@ Private Sub SetupMsgSect()
         IsApplied(SectFrm) = True
         IsApplied(SectTxtFrm) = True
         IsApplied(SectTxtBox) = True
-        Debug.Print SectFrm.Name
-        Debug.Print SectTxtFrm.Name
-        Debug.Print SectTxtBox.Name
+'        Debug.Print SectFrm.Name
+'        Debug.Print SectTxtFrm.Name
+'        Debug.Print SectTxtBox.Name
                 
         If MsgSectLbl.Text <> vbNullString Then
             IsApplied(SectLbl) = True
-            Debug.Print SectLbl.Name
+'            Debug.Print SectLbl.Name
             With SectLbl
                 .Left = 10
                 .Width = Me.InsideWidth - (siHmarginFrames * 2)
@@ -2326,7 +2339,7 @@ Const PROC = "SetupMsgSectMonoSpaced"
     SectFrm.Width = Min(MaxWidthSectFrame, SectTxtFrm.Width)
     AreaMsg.Width = Min(MaxWidthSectFrame, SectFrm.Width)
     FormWidth = AreaMsg.Width
-    AdjustParentsWidthAndHeight SectTxtBox
+    AdjustedParentsWidthAndHeight SectTxtBox
     
 xt: Exit Sub
     
@@ -2361,7 +2374,7 @@ Private Sub SetupMsgSectPropSpaced(Optional ByVal msg_append As Boolean = False,
     AreaMsg.Width = Me.InsideWidth
     SectFrm.Width = AreaMsg.Width
     SectTxtFrm.Width = SectFrm.Width - 5
-    Debug.Print "SectTxtFrm.Width = " & SectTxtFrm.Width
+'    Debug.Print "SectTxtFrm.Width = " & SectTxtFrm.Width
     
     AreaBttns.Top = AreaMsg.Top + AreaMsg.Height + 20
     Me.Height = AreaBttns.Top + AreaBttns.Height + 20
@@ -2590,28 +2603,6 @@ Private Sub UserForm_Activate()
 ' -------------------------------------------------------------------------------
     If Not SetUpDone Then Setup
 End Sub
-
-Public Function VgridPos(ByVal si As Single) As Single
-' -------------------------------------------------------------------------------
-' Returns an integer of which the remainder (Int(si) / 6) is 0.
-' Background: A controls content is only properly displayed when the top position
-' of it is aligned to such a position.
-' -------------------------------------------------------------------------------
-    Dim i As Long
-    
-    For i = 0 To 6
-        If Int(si) = 0 Then
-            VgridPos = 0
-        Else
-            If Int(si) < 6 Then si = 6
-            If (Int(si) + i) Mod 6 = 0 Then
-                VgridPos = Int(si) + i
-                Exit For
-            End If
-        End If
-    Next i
-
-End Function
 
 Private Sub VisualizeControlsSetup()
     

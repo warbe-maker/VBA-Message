@@ -173,12 +173,12 @@ Private Function ErrMsg(ByVal err_source As String, _
 ' Uses: AppErr to translate a negative programmed application error into its
 '              original positive number
 ' ------------------------------------------------------------------------------
-    Dim ErrNo   As Long
-    Dim ErrDesc As String
-    Dim ErrType As String
-    Dim ErrLine As Long
-    Dim AtLine  As String
-    Dim Buttons As Long
+    Dim ErrNo       As Long
+    Dim ErrDesc     As String
+    Dim ErrType     As String
+    Dim ErrLine     As Long
+    Dim AtLine      As String
+    Dim ArgButtons  As Long
     
     If err_no = 0 Then err_no = Err.Number
     If err_no < 0 Then
@@ -198,15 +198,15 @@ Private Function ErrMsg(ByVal err_source As String, _
 
     
 #If Debugging = 1 Then
-    Buttons = vbYesNo
+    ArgButtons = vbYesNo
     ErrDesc = ErrDesc & vbLf & vbLf & "Debugging: Yes=Resume error line, No=Continue"
 #Else
-    Buttons = vbCritical
+    ArgButtons = vbCritical
 #End If
     
     ErrMsg = MsgBox(Title:=ErrType & ErrNo & " in " & err_source _
                   , Prompt:=ErrDesc _
-                  , Buttons:=Buttons)
+                  , Buttons:=ArgButtons)
 End Function
 
 Public Function ErrNo(ByVal l As Long) As Long
