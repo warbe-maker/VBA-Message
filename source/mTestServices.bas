@@ -382,14 +382,14 @@ Public Sub Explore(ByVal ctl As Variant, _
     If TypeName(ctl) <> "Frame" And TypeName(ctl) <> "fMsg" Then Exit Sub
     
     '~~ Collect Controls
-    mDct.DctAdd dct, ctl, ctl.Name, order_byitem, seq_ascending, sense_casesensitive
+    mDct.DctAdd dct, ctl, ctl.name, order_byitem, seq_ascending, sense_casesensitive
       
     i = 0: j = 1
     Do
         If TypeName(dct.Keys()(i)) = "Frame" Or TypeName(dct.Keys()(i)) = "fMsg" Then
             For Each v In dct.Keys()(i).Controls
                 If v.Parent Is dct.Keys()(i) Then
-                    Item = dct.Items()(i) & ":" & v.Name
+                    Item = dct.Items()(i) & ":" & v.name
                     If applied Then
                         If MsgForm.IsApplied(v) Then mDct.DctAdd dct, v, Item
                     Else
@@ -418,7 +418,7 @@ Public Sub Explore(ByVal ctl As Variant, _
         FW = Align(Format(MsgForm.InsideWidth, "000.0"), 7, AlignCentered, " ")
         If TypeName(ctl) = "Frame" Then
             Set frm = ctl
-            CW = Align(Format(MsgForm.FrameContentWidth(frm), "000.0"), 7, AlignCentered, " ")
+            CW = Align(Format(MsgForm.ContentWidth(frm), "000.0"), 7, AlignCentered, " ")
             CH = Align(Format(MsgForm.ContentHeight(frm), "000.0"), 7, AlignCentered, " ")
             SW = "   -   "
             SH = "   -   "
@@ -448,7 +448,7 @@ Public Sub Explore(ByVal ctl As Variant, _
             End With
         End If
         
-        Debug.Print Align(ctl.Name, 20, AlignLeft) & "|" & Appl & "|" & l & "|" & W & "|" & CW & "|" & T & "|" & H & "|" & CH & "|" & SH & "|" & SW & "|" & FW & "|" & FH
+        Debug.Print Align(ctl.name, 20, AlignLeft) & "|" & Appl & "|" & l & "|" & W & "|" & CW & "|" & T & "|" & H & "|" & CH & "|" & SH & "|" & SW & "|" & FW & "|" & FH
     Next v
 
 xt: Set dct = Nothing
@@ -532,15 +532,15 @@ End Function
 
 Private Function Repeat(repeat_string As String, repeat_n_times As Long)
     Dim s As String
-    Dim C As Long
+    Dim c As Long
     Dim l As Long
     Dim i As Long
 
     l = Len(repeat_string)
-    C = l * repeat_n_times
-    s = Space$(C)
+    c = l * repeat_n_times
+    s = Space$(c)
 
-    For i = 1 To C Step l
+    For i = 1 To c Step l
         Mid(s, i, l) = repeat_string
     Next
 
@@ -605,7 +605,7 @@ Public Sub Test_00_Regression()
     Const PROC = "Test_00_Regression"
     
     On Error GoTo eh
-    Dim rng     As Range
+    Dim Rng     As Range
     Dim sTest   As String
     Dim sMakro  As String
         
@@ -615,19 +615,19 @@ Public Sub Test_00_Regression()
     wsTest.RegressionTest = True
     mTestServices.RegressionTest = True
     mErH.Regression = True
-    mTrc.LogFile = Replace(ThisWorkbook.FullName, ThisWorkbook.Name, "RegressionTest.log")
+    mTrc.LogFile = Replace(ThisWorkbook.FullName, ThisWorkbook.name, "RegressionTest.log")
     mTrc.LogTitle = "Regression test module mMsg"
     
     BoP ErrSrc(PROC)
-    For Each rng In wsTest.RegressionTests
-        If rng.Value = "R" Then
-            sTest = Format(rng.OFFSET(, -2), "00")
+    For Each Rng In wsTest.RegressionTests
+        If Rng.Value = "R" Then
+            sTest = Format(Rng.OFFSET(, -2), "00")
             sMakro = "cmdTest" & sTest & "_Click"
             wsTest.TerminateRegressionTest = False
             Application.Run "Msg.xlsb!" & sMakro
             If wsTest.TerminateRegressionTest Then Exit For
         End If
-    Next rng
+    Next Rng
 
 xt: EoP ErrSrc(PROC)
     mErH.Regression = False
@@ -2057,39 +2057,42 @@ Public Function Test_30_Monitor() As Variant
     Dim MsgTitle    As String
     Dim i           As Long
     Dim PrgrsHeader As String
-    Dim PrgrsMsg    As String
+    Dim PrgrsStep    As String
     Dim iLoops      As Long
     Dim lWait       As Long
     
     BoP ErrSrc(PROC)
     SetupTest 30
     PrgrsHeader = " No. Status   Step"
-    iLoops = 12
+    iLoops = 15
+    lWait = 500
     
     MsgTitle = Readable(PROC)
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
     
     MsgForm.VisualizeControls = wsTest.VisualizeControls
-    PrgrsMsg = vbNullString
+    PrgrsStep = vbNullString
     
     For i = 1 To iLoops
-        PrgrsMsg = mBasic.Align(i, 4, AlignRight, " ") & mBasic.Align("Passed", 8, AlignCentered, " ") & Repeat(repeat_n_times:=Int(((i - 1) / 10)) + 1, repeat_string:="  " & mBasic.Align(i, 2, AlignRight) & ".  Follow-Up line after " & Format(lWait, "0000") & " Milliseconds.")
-        If i < iLoops Then
-            mMsg.Monitor mntr_title:=MsgTitle _
-                       , mntr_msg:=PrgrsMsg _
-                       , mntr_msg_monospaced:=True _
-                       , mntr_header:=" No. Status  Step"
-            '~~ Simmulation of a process
-            lWait = 100 * i
-            DoEvents
-            Sleep 200
-        Else
-            mMsg.Monitor mntr_title:=MsgTitle _
-                       , mntr_msg:=PrgrsMsg _
-                       , mntr_header:=" No. Status  Step" _
-                       , mntr_footer:="Process finished! Close this window"
-        End If
+        PrgrsStep = Format(i, "00") & ". Follow-Up line after " & Format(lWait, "0000") & " Milliseconds."
+        PrgrsStep = Repeat(PrgrsStep & " ", Int(i / 5) + 1) & vbLf & "      second line for test"
+        mMsg.Monitor mon_title:=MsgTitle _
+                   , mon_step:=PrgrsStep _
+                   , mon_steps_monospaced:=True _
+                   , mon_header:=" No. Status  Step" _
+                   , mon_width_max:=wsTest.MsgWidthMax _
+                   , mon_width_min:=wsTest.MsgWidthMin _
+                   , mon_height_max:=wsTest.MsgHeightMax
+                   
+        '~~ Simmulation of a process
+        DoEvents
+        Sleep lWait
     Next i
+    mMsg.Monitor mon_title:=MsgTitle _
+               , mon_width_max:=wsTest.MsgWidthMax _
+               , mon_width_min:=wsTest.MsgWidthMin _
+               , mon_height_max:=wsTest.MsgHeightMax _
+               , mon_footer:="Process finished! Close this window"
     
     MsgTitle = "Test result of: " & Readable(PROC)
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
@@ -2213,12 +2216,7 @@ Public Function Test_91_MinimumMessage() As Variant
         TestMsgHeightMax = .MsgHeightMax
     End With
     MsgForm.VisualizeControls = wsTest.VisualizeControls
-    
-    TestMsgWidthIncrDecr = wsTest.MsgWidthIncrDecr
-    TestMsgHeightIncrDecr = wsTest.MsgHeightIncrDecr
-    If TestMsgWidthIncrDecr = 0 Then Err.Raise AppErr(1), ErrSrc(PROC), "Width increment/decrement must not be 0 for this test!"
-    If TestMsgHeightIncrDecr = 0 Then Err.Raise AppErr(1), ErrSrc(PROC), "Height increment/decrement must not be 0 for this test!"
-    
+        
     With Message.Section(1)
         .Label.Text = "Test description:"
         .Text.Text = wsTest.TestDescription

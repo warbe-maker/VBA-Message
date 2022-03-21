@@ -23,8 +23,6 @@ Private Property Get ColMsgWidthMax() As Range:             Set ColMsgWidthMax =
 
 Private Property Get ColMsgWidthMin() As Range:             Set ColMsgWidthMin = Me.Range("colMsgWidthMin"):                                            End Property
 
-Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "wsTest." & s:                                                             End Property
-
 Public Property Let Failed(ByVal b As Boolean)
     If b Then
         TestPassedFailed = "Failed!"
@@ -57,9 +55,9 @@ Public Property Let Passed(ByVal b As Boolean)
     End If
 End Property
 
-Public Property Get RegressionTest() As Boolean:                    wsTest.RegressionTest = bRegressionTest:                                            End Property
+Public Property Get RegressionTest() As Boolean:            wsTest.RegressionTest = bRegressionTest:                                                    End Property
 
-Public Property Let RegressionTest(ByVal b As Boolean):             bRegressionTest = b:                                                                End Property
+Public Property Let RegressionTest(ByVal b As Boolean):     bRegressionTest = b:                                                                        End Property
 
 Public Property Get RegressionTests() As Range
     Set RegressionTests = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colRegression").EntireColumn)
@@ -67,8 +65,9 @@ End Property
 
 Private Property Get RowTest(Optional ByVal Test As Long) As Range: Set RowTest = Me.Range("rowTest" & wsTest.TestNumber):  End Property
 
-Public Property Let TerminateRegressionTest(ByVal b As Boolean):    bTerminateRegressionTest = b:                           End Property
 Public Property Get TerminateRegressionTest() As Boolean:           TerminateRegressionTest = bTerminateRegressionTest:     End Property
+
+Public Property Let TerminateRegressionTest(ByVal b As Boolean):    bTerminateRegressionTest = b:                           End Property
 
 Public Property Get TestDescription()
     With Me
@@ -85,26 +84,6 @@ Private Property Get TestNumbers() As Range
     Set TestNumbers = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colTestNo").EntireColumn)
 End Property
 
-Public Property Get VisualizeControls() As Boolean
-' ------------------------------------------------------------------------------
-' Returns the status True or False of the shape named SHAPE_NAME.
-' ------------------------------------------------------------------------------
-    Const PROC          As String = "VisualizeControls"
-    Const SHAPE_NAME    As String = "optDisplayFrames"
-    
-    On Error GoTo eh
-    If Not mObject.WsShapeExists(wse_ws:=Me, wse_shape_name:=SHAPE_NAME) _
-    Then Err.Raise AppErr(1), ErrSrc(PROC), "A shape named '" & SHAPE_NAME & "' does not exist in Worksheet '" & Me.Name & "'!"
-    
-    If Me.Shapes(SHAPE_NAME).OLEFormat.Object.Value = 1 _
-    Then VisualizeControls = True _
-    Else VisualizeControls = False
-    
-xt: Exit Property
-
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
-End Property
-
 Public Property Get TestOptionDisplayModeless() As Boolean
     Const PROC          As String = "TestOptionDisplayModeless_Get"
     Const SHAPE_NAME    As String = "optDisplayModeless"
@@ -112,7 +91,7 @@ Public Property Get TestOptionDisplayModeless() As Boolean
     On Error GoTo eh
 
     If Not mObject.WsShapeExists(wse_ws:=Me, wse_shape_name:=SHAPE_NAME) _
-    Then Err.Raise AppErr(1), ErrSrc(PROC), "A shape named '" & SHAPE_NAME & "' does not exist in Worksheet '" & Me.Name & "'!"
+    Then Err.Raise AppErr(1), ErrSrc(PROC), "A shape named '" & SHAPE_NAME & "' does not exist in Worksheet '" & Me.name & "'!"
         
     If Me.Shapes("optDisplayModeless").OLEFormat.Object.Value = 1 _
     Then TestOptionDisplayModeless = True _
@@ -144,6 +123,26 @@ Public Property Let TestResultNote(ByVal s As String)
     With Me
         Intersect(.Range("rowTest" & wsTest.TestNumber), .Range("colTestPassedFailedNote")).Value = s
     End With
+End Property
+
+Public Property Get VisualizeControls() As Boolean
+' ------------------------------------------------------------------------------
+' Returns the status True or False of the shape named SHAPE_NAME.
+' ------------------------------------------------------------------------------
+    Const PROC          As String = "VisualizeControls"
+    Const SHAPE_NAME    As String = "optDisplayFrames"
+    
+    On Error GoTo eh
+    If Not mObject.WsShapeExists(wse_ws:=Me, wse_shape_name:=SHAPE_NAME) _
+    Then Err.Raise AppErr(1), ErrSrc(PROC), "A shape named '" & SHAPE_NAME & "' does not exist in Worksheet '" & Me.name & "'!"
+    
+    If Me.Shapes(SHAPE_NAME).OLEFormat.Object.Value = 1 _
+    Then VisualizeControls = True _
+    Else VisualizeControls = False
+    
+xt: Exit Property
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Property
 
 Private Function AppErr(ByVal app_err_no As Long) As Long
@@ -209,33 +208,37 @@ Private Function ErrMsg(ByVal err_source As String, _
                   , Buttons:=ErrBttns)
 End Function
 
+Private Function ErrSrc(ByVal s As String) As String
+    ErrSrc = "wsTest." & s
+End Function
+
 Private Function NextRegressionTest() As Long
 ' -------------------------------------------------------------------------
 ' Returns the Testnumber of the next regression test, 0 if there's no next.
 ' -------------------------------------------------------------------------
-    Dim rng     As Range
+    Dim Rng     As Range
     Dim iRow    As Long
     
     NextRegressionTest = 0
-    For Each rng In TestNumbers
-        If rng.Value = vbNullString Then Exit Function  ' End of test reached
-        If rng.Value > TestNumber Then                  ' This is the current/last test
-            If rng.OFFSET(iRow, 2).Value = "R" Then
-                NextRegressionTest = rng.Value
+    For Each Rng In TestNumbers
+        If Rng.Value = vbNullString Then Exit Function  ' End of test reached
+        If Rng.Value > TestNumber Then                  ' This is the current/last test
+            If Rng.OFFSET(iRow, 2).Value = "R" Then
+                NextRegressionTest = Rng.Value
                 Exit Function
             End If
         End If
-    Next rng
+    Next Rng
     
 End Function
 
 Private Sub Worksheet_Activate()
-    Dim rng As Range
+    Dim Rng As Range
     Application.ScreenUpdating = False
-    Set rng = Selection
+    Set Rng = Selection
     wsTest.Range("rngZoom").Select
     ActiveWindow.Zoom = True
-    rng.Select
+    Rng.Select
 End Sub
 
 Private Sub Worksheet_SelectionChange(ByVal Target As Range)

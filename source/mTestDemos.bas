@@ -110,7 +110,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
 End Sub
 
 Public Sub Demo_Dsply_1()
-    Const WIDTH_MAX     As Long = 35
+    Const width_max     As Long = 35
     Const MAX_HEIGHT    As Long = 50
 
     Dim sTitle          As String
@@ -130,7 +130,7 @@ Public Sub Demo_Dsply_1()
         .Label.FontColor = rgbBlue
         .Text.Text = "Because this section's text is mono-spaced (which by definition is not word-wrapped)" & vbLf _
                    & "the message width is determined by:" & vbLf _
-                   & "a) the for this demo specified maximum width of " & WIDTH_MAX & "% of the screen size" & vbLf _
+                   & "a) the for this demo specified maximum width of " & width_max & "% of the screen size" & vbLf _
                    & "   (defaults to 80% when not specified)" & vbLf _
                    & "b) the longest line of this section" & vbLf _
                    & "Because the text exeeds the specified maximum message width, a horizontal scroll-bar is displayed." & vbLf _
@@ -164,7 +164,7 @@ Public Sub Demo_Dsply_1()
                    , dsply_msg:=Message _
                    , dsply_buttons:=cll _
                    , dsply_height_max:=MAX_HEIGHT _
-                   , dsply_width_max:=WIDTH_MAX _
+                   , dsply_width_max:=width_max _
                     ) <> vbOK
     Wend
     
@@ -262,10 +262,10 @@ Public Sub Demo_Monitor()
         
         If i < PROCESS_STEPS Then
             '~~ Steps 1 to n - 1
-            mMsg.Monitor mntr_title:=MonitorTitle _
-                       , mntr_msg:=ProgressStep _
-                       , mntr_msg_monospaced:=True _
-                       , mntr_header:=MONITOR_HEADER
+            mMsg.Monitor mon_title:=MonitorTitle _
+                       , mon_step:=ProgressStep _
+                       , mon_steps_monospaced:=True _
+                       , mon_header:=MONITOR_HEADER
             
             '~~ Simmulation of a process
             lWait = 100 * i
@@ -274,10 +274,10 @@ Public Sub Demo_Monitor()
         
         Else
             '~~ The last step, separated in order to display the footer along with it
-            mMsg.Monitor mntr_title:=MonitorTitle _
-                       , mntr_msg:=ProgressStep _
-                       , mntr_header:=MONITOR_HEADER _
-                       , mntr_footer:=MONITOR_FOOTER
+            mMsg.Monitor mon_title:=MonitorTitle _
+                       , mon_step:=ProgressStep _
+                       , mon_header:=MONITOR_HEADER _
+                       , mon_footer:=MONITOR_FOOTER
         End If
     Next i
     
@@ -389,15 +389,15 @@ End Function
 
 Private Function Repeat(repeat_string As String, repeat_n_times As Long)
     Dim s As String
-    Dim C As Long
+    Dim c As Long
     Dim l As Long
     Dim i As Long
 
     l = Len(repeat_string)
-    C = l * repeat_n_times
-    s = Space$(C)
+    c = l * repeat_n_times
+    s = Space$(c)
 
-    For i = 1 To C Step l
+    For i = 1 To c Step l
         Mid(s, i, l) = repeat_string
     Next
 
@@ -483,14 +483,14 @@ Private Sub Demo_Monitor_Instances()
         '~~ Note that the instances are identified by their different titles
         sTitle = "Instance-" & i
         sMsg = "Process step " & j
-        mMsg.Monitor mntr_title:=sTitle _
-                   , mntr_msg:=sMsg _
-                   , mntr_width_min:=15
+        mMsg.Monitor mon_title:=sTitle _
+                   , mon_step:=sMsg _
+                   , mon_width_min:=15
         With mMsg.MsgInstance(sTitle)
             .Top = INIT_TOP + OFFSET_V * (i - 1)
             .Left = INIT_LEFT + OFFSET_H * (i - 1)
         End With
-        Application.WAIT Now() + T_WAIT
+        Application.Wait Now() + T_WAIT
     Next i
     
     For j = 2 To 5
@@ -499,16 +499,16 @@ Private Sub Demo_Monitor_Instances()
             '~~ Go through all instances and add a message line
             sTitle = "Instance-" & i
             sMsg = "Process step " & j
-            mMsg.Monitor mntr_title:=sTitle _
-                       , mntr_msg:=sMsg
-            Application.WAIT Now() + T_WAIT
+            mMsg.Monitor mon_title:=sTitle _
+                       , mon_step:=sMsg
+            Application.Wait Now() + T_WAIT
         Next i
     Next j
     
     For i = 5 To 1 Step -1
         '~~ Unload the instances in reverse order
         mMsg.MsgInstance fi_key:="Instance-" & i, fi_unload:=True
-        Application.WAIT Now() + (T_WAIT * 2)
+        Application.Wait Now() + (T_WAIT * 2)
     Next i
     
 xt: Exit Sub

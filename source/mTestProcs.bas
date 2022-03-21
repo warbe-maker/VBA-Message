@@ -6,22 +6,26 @@ Option Explicit
 '          Test of procedures - rather than fMsg/mMsg services/functions.
 '
 ' ------------------------------------------------------------------------------
+Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
+
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mTestServices." & s:  End Property
 
-Public Function AdjustedToVerticalGrid(ByVal atvg_si As Single, _
-                              Optional ByVal atvg_threshold As Single = 1.5, _
-                              Optional ByVal atvg_grid As Single = 6) As Single
+Public Function AdjustToVgrid(ByVal atvg_si As Single, _
+                     Optional ByVal atvg_threshold As Single = 1.5, _
+                     Optional ByVal atvg_grid As Single = 6) As Single
 ' -------------------------------------------------------------------------------
-' Returns an integer which is a multiple of the grid value (stvg_grid)
-' considering a certain threshold (atvg_threshold) which defaults to 1.5. The
+' Returns an integer which is a multiple of the grid value (stvg_grid) which
+' defaults to 6, by considering a certain threshold (atvg_threshold) which
+' defaults to 1.5.
+' The function is used to vertically align form controls with the grid in order
 ' result vertically aligns a control in a userform to a grid value which ensures
-' that a text within the control is correctly displayed in accordance with its
-' font size. A threshold (atvg_threshold) of 1.5 - the default - with a grid
-' value (atvg_grid) of 6 - the default - means:
+' to have any text within the control correctly displayed in accordance with its
+' font size. A certain threshold prevents an optically irritating large space to
+' a control abovel. Examples:
 '  7.5 < si >= 0   results to 6
 ' 13.5 < si >= 7.5 results in 12
 ' -------------------------------------------------------------------------------
-    AdjustedToVerticalGrid = (Int((atvg_si - atvg_threshold) / atvg_grid) * atvg_grid) + atvg_grid
+    AdjustToVgrid = (Int((atvg_si - atvg_threshold) / atvg_grid) * atvg_grid) + atvg_grid
 End Function
 
 Private Function AppErr(ByVal app_err_no As Long) As Long
@@ -40,37 +44,6 @@ Private Function BttnsNo(ByVal v As Variant) As Long
         Case vbYesNo, vbRetryCancel, vbResumeOk:    BttnsNo = 2
         Case vbAbortRetryIgnore, vbYesNoCancel:     BttnsNo = 3
         Case Else:                                  BttnsNo = 1
-    End Select
-End Function
-
-Private Sub Qenqueue(ByRef qu As Collection, ByVal qu_item As Variant)
-    If qu Is Nothing Then Set qu = New Collection
-    qu.Add qu_item
-End Sub
-
-Private Function QisEmpty(ByVal qu As Collection) As Boolean
-    If Not qu Is Nothing _
-    Then QisEmpty = qu.Count = 0 _
-    Else QisEmpty = True
-End Function
-
-Private Function Qdequeue(ByRef qu As Collection) As Variant
-    Const PROC = "DeQueue"
-    
-    On Error GoTo eh
-    If qu Is Nothing Then GoTo xt
-    If QisEmpty(qu) Then GoTo xt
-    On Error Resume Next
-    Set Qdequeue = qu(1)
-    If Err.Number <> 0 _
-    Then Qdequeue = qu(1)
-    qu.Remove 1
-
-xt: Exit Function
-
-eh: Select Case ErrMsg(ErrSrc(PROC))
-        Case vbYes: Stop: Resume
-        Case Else:  GoTo xt
     End Select
 End Function
 
@@ -168,7 +141,6 @@ xt: If Not QisEmpty(QueueResult) Then
         
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
-
 
 Private Function ErrMsg(ByVal err_source As String, _
                Optional ByVal err_no As Long = 0, _
@@ -334,7 +306,7 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
     
     '~~ Check the form doesn't already exist
     For Each cmp In uf_wb.VBProject.VBComponents
-        If cmp.Name = uf_name Then
+        If cmp.name = uf_name Then
             Set FormNew = uf_wb.VBProject.VBComponents(uf_name)
             Exit Function
         End If
@@ -344,7 +316,7 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
     Set cmp = uf_wb.VBProject.VBComponents.Add(vbext_ct_MSForm)
     DoEvents
     With cmp
-        .Name = uf_name
+        .name = uf_name
         .Properties("Height") = 100
         .Properties("Width") = 200
         On Error Resume Next
@@ -415,7 +387,7 @@ Private Sub FormRemove(ByVal wb As Workbook, _
     
     With wb.VBProject
         For Each cmp In .VBComponents
-            If cmp.Name = FRM_NAME Then
+            If cmp.name = FRM_NAME Then
                 .VBComponents.Remove cmp
                 Exit Sub
             End If
@@ -430,10 +402,158 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
+Public Function Monitor(ByVal mon_title As String, _
+                   ByVal mon_visible_steps As Long, _
+          Optional ByVal mon_monospaced As Boolean = False, _
+          Optional ByVal mon_header As String = vbNullString, _
+          Optional ByVal mon_footer As String = vbNullString, _
+          Optional ByVal mon_step As String = vbNullString, _
+          Optional ByVal mon_step_monospaced As Boolean = False) As fMsgProcTest
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
+    Dim fMon    As fMsgProcTest
+            
+    If fMon Is Nothing _
+    Then Set fMon = MonitorInitialize(mon_title:=mon_title _
+                                    , mon_steps_displayed:=mon_visible_steps _
+                                    , mon_header:=mon_header _
+                                    , mon_footer:=mon_footer)
+    If mon_step <> vbNullString Then
+        fMon.MonitorStep mon_step:=mon_step _
+                       , mon_footer:=mon_footer
+    End If
+    Set Monitor = fMon
+    
+End Function
+
+Private Function MonitorInitialize(ByVal mon_title As String, _
+                                   ByVal mon_steps_displayed As Long, _
+                          Optional ByVal mon_monospaced As Boolean = False, _
+                          Optional ByVal mon_header As String = vbNullString, _
+                          Optional ByVal mon_footer As String = vbNullString) As fMsgProcTest
+' ------------------------------------------------------------------------------
+' Establish a monitor window for n (mon_steps) steps by creating the
+' corresponding number of - st first invisible - text boxes
+' ------------------------------------------------------------------------------
+    Dim fMon    As fMsgProcTest
+        
+    Set fMon = TestInstance(mon_title)
+    fMon.MonitorInitialize mon_title:=mon_title _
+                         , mon_steps_displayed:=mon_steps_displayed _
+                         , mon_header:=mon_header _
+                         , mon_footer:=mon_footer
+    fMon.Show False
+    Set MonitorInitialize = fMon
+        
+End Function
+
+Private Sub Monitor_Test()
+    Dim i       As Long
+    Dim fMon    As fMsgProcTest
+    
+    For i = 1 To 20
+        DoEvents
+        Set fMon = mTestProcs.Monitor(mon_title:="Process monitored: xxxxxxx" _
+                                    , mon_visible_steps:=10 _
+                                    , mon_header:="Process steps" _
+                                    , mon_footer:="Process in progress, please wait" _
+                                    , mon_step:=Format(i, "00 ") & "Step")
+        Sleep 250
+    Next i
+    fMon.MonitorStep , "Process finished! Close window."
+
+End Sub
+
 Private Function PrcPnt(ByVal pp_value As Single, _
                         ByVal pp_dimension As String) As String
     PrcPnt = mMsg.Prcnt(pp_value, pp_dimension) & "% (" & mMsg.Pnts(pp_value, "w") & "pt)"
 End Function
+
+Private Function Qdequeue(ByRef qu As Collection) As Variant
+    Const PROC = "DeQueue"
+    
+    On Error GoTo eh
+    If qu Is Nothing Then GoTo xt
+    If QisEmpty(qu) Then GoTo xt
+    On Error Resume Next
+    Set Qdequeue = qu(1)
+    If Err.Number <> 0 _
+    Then Qdequeue = qu(1)
+    qu.Remove 1
+
+xt: Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbYes: Stop: Resume
+        Case Else:  GoTo xt
+    End Select
+End Function
+
+Private Sub Qenqueue(ByRef qu As Collection, ByVal qu_item As Variant)
+    If qu Is Nothing Then Set qu = New Collection
+    qu.Add qu_item
+End Sub
+
+Private Function QisEmpty(ByVal qu As Collection) As Boolean
+    If Not qu Is Nothing _
+    Then QisEmpty = qu.Count = 0 _
+    Else QisEmpty = True
+End Function
+
+Private Function StckIsEmpty(ByVal stck As Collection) As Boolean
+' ----------------------------------------------------------------------------
+' Common Stack Empty check service. Returns True when either there is no stack
+' (stck Is Nothing) or when the stack is empty (items count is 0).
+' ----------------------------------------------------------------------------
+    StckIsEmpty = stck Is Nothing
+    If Not StckIsEmpty Then StckIsEmpty = stck.Count = 0
+End Function
+
+Private Function StckPop(ByVal stck As Collection) As Variant
+' ----------------------------------------------------------------------------
+' Common Stack Pop service. Returns the last item pushed on the stack (stck)
+' and removes the item from the stack. When the stack (stck) is empty a
+' vbNullString is returned.
+' ----------------------------------------------------------------------------
+    Const PROC = "StckPop"
+    
+    On Error GoTo eh
+    If StckIsEmpty(stck) Then GoTo xt
+    
+    On Error Resume Next
+    Set StckPop = stck(stck.Count)
+    If Err.Number <> 0 _
+    Then StckPop = stck(stck.Count)
+    stck.Remove stck.Count
+
+xt: Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbYes: Stop: Resume
+        Case Else:  GoTo xt
+    End Select
+End Function
+
+Private Sub StckPush(ByRef stck As Collection, _
+                     ByVal stck_item As Variant)
+' ----------------------------------------------------------------------------
+' Common Stack Push service. Pushes (adds) an item (stck_item) to the stack
+' (stck). When the provided stack (stck) is Nothing the stack is created.
+' ----------------------------------------------------------------------------
+    Const PROC = "StckPush"
+    
+    On Error GoTo eh
+    If stck Is Nothing Then Set stck = New Collection
+    stck.Add stck_item
+
+xt: Exit Sub
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbYes: Stop: Resume
+        Case Else:  GoTo xt
+    End Select
+End Sub
 
 Private Function TestInstance(ByVal fi_key As String, _
                      Optional ByVal fi_unload As Boolean = False) As fMsgProcTest
@@ -499,12 +619,13 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Private Sub Test_AdjustedToVerticalGrid()
+Private Sub Test_AdjustToVgrid()
     Dim i As Single
     
     For i = 5.8 To 8 Step 0.1
-        Debug.Print Format(i, "00.0: ") & AdjustedToVerticalGrid(i)
+        Debug.Print Format(i, "00.0: ") & AdjustToVgrid(i)
     Next i
+    Debug.Print Format(fMsgProcTest.tbxFactor.Object, "00.0: ") & AdjustToVgrid(i)
 End Sub
 
 Public Sub Test_AssertWidthAndHeight()
@@ -624,7 +745,7 @@ again:
                 .MultiLine = True
                 .WordWrap = False
                 With .Font
-                    .Name = "Courier New"
+                    .name = "Courier New"
                     .Size = 8
                 End With
                 .Top = 5
@@ -711,7 +832,7 @@ again:
                 .MultiLine = True
                 .WordWrap = False
                 With .Font
-                    .Name = "Courier New"
+                    .name = "Courier New"
                     .Size = 8
                 End With
                 .Top = 5
@@ -779,22 +900,22 @@ Public Sub Test_MultipleMessageInstances()
     
     Dim i   As Long
     Dim key As String
-    Dim obj As Object ' not required for the function but only to get the UserForm's name
+    Dim Obj As Object ' not required for the function but only to get the UserForm's name
     
     For i = 1 To 5
         key = "Instance-" & i
         '~~ Set obj ... will create the instance. However, this is not not required.
         '~~ It is just used to obtain the UserForms name
-        Set obj = TestInstance(fi_key:=key)
+        Set Obj = TestInstance(fi_key:=key)
         With TestInstance(fi_key:=key)
             .Height = 80
             .Width = 200
-            .Caption = key & " of UserForm '" & obj.Name & "'"
+            .Caption = key & " of UserForm '" & Obj.name & "'"
             .Show Modeless
             .Top = INIT_TOP + (30 * i)
             .Left = INIT_LEFT + (30 * i)
         End With
-        Application.WAIT Now() + 0.000006
+        Application.Wait Now() + 0.000006
     Next i
     
     For i = 5 To 1 Step -1
@@ -803,7 +924,7 @@ Public Sub Test_MultipleMessageInstances()
         '~~ 1. The instance is removed from the Dictionary
         '~~ 2. No error in case the instance no longer exists
         TestInstance fi_key:=key, fi_unload:=True
-        Application.WAIT Now() + 0.000006
+        Application.Wait Now() + 0.000006
     Next i
     
 End Sub
@@ -879,58 +1000,22 @@ Public Sub Test_SizingAndPositioning()
 
 End Sub
 
-Private Function StckIsEmpty(ByVal stck As Collection) As Boolean
-' ----------------------------------------------------------------------------
-' Common Stack Empty check service. Returns True when either there is no stack
-' (stck Is Nothing) or when the stack is empty (items count is 0).
-' ----------------------------------------------------------------------------
-    StckIsEmpty = stck Is Nothing
-    If Not StckIsEmpty Then StckIsEmpty = stck.Count = 0
-End Function
-
-Private Function StckPop(ByVal stck As Collection) As Variant
-' ----------------------------------------------------------------------------
-' Common Stack Pop service. Returns the last item pushed on the stack (stck)
-' and removes the item from the stack. When the stack (stck) is empty a
-' vbNullString is returned.
-' ----------------------------------------------------------------------------
-    Const PROC = "StckPop"
-    
-    On Error GoTo eh
-    If StckIsEmpty(stck) Then GoTo xt
-    
-    On Error Resume Next
-    Set StckPop = stck(stck.Count)
-    If Err.Number <> 0 _
-    Then StckPop = stck(stck.Count)
-    stck.Remove stck.Count
-
-xt: Exit Function
-
-eh: Select Case ErrMsg(ErrSrc(PROC))
-        Case vbYes: Stop: Resume
-        Case Else:  GoTo xt
-    End Select
-End Function
-
-Private Sub StckPush(ByRef stck As Collection, _
-                     ByVal stck_item As Variant)
-' ----------------------------------------------------------------------------
-' Common Stack Push service. Pushes (adds) an item (stck_item) to the stack
-' (stck). When the provided stack (stck) is Nothing the stack is created.
-' ----------------------------------------------------------------------------
-    Const PROC = "StckPush"
-    
-    On Error GoTo eh
-    If stck Is Nothing Then Set stck = New Collection
-    stck.Add stck_item
-
-xt: Exit Sub
-
-eh: Select Case ErrMsg(ErrSrc(PROC))
-        Case vbYes: Stop: Resume
-        Case Else:  GoTo xt
-    End Select
+Private Sub Test_IsFrameOrForm()
+    Debug.Assert IsFrameOrForm(fMsgProcTest.TextBox1) = False
+    Debug.Assert IsFrameOrForm(fMsgProcTest.frm) = True
+    Debug.Assert IsFrameOrForm(fMsgProcTest.frm.Parent) = True
+    Debug.Assert IsForm(fMsgProcTest.frm) = False
+    Debug.Assert IsForm(fMsgProcTest.frm.Parent) = True
 End Sub
 
+Private Function IsFrameOrForm(ByVal v As Object) As Boolean
+    IsFrameOrForm = TypeOf v Is MSForms.UserForm Or TypeOf v Is MSForms.Frame
+End Function
+
+Private Function IsForm(ByVal v As Object) As Boolean
+    Dim o As Object
+    On Error Resume Next
+    Set o = v.Parent
+    IsForm = Err.Number <> 0
+End Function
 

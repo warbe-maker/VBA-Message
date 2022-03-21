@@ -14,12 +14,15 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
-Const SCROLL_V_WIDTH              As Single = 18              ' Additional horizontal space required for a frame with a vertical scrollbar
-Const SCROLL_H_HEIGHT             As Single = 18              ' Additional vertical space required for a frame with a horizontal scroll barr
+Const SCROLL_V_WIDTH            As Single = 18              ' Additional horizontal space required for a frame with a vertical scrollbar
+Const SCROLL_H_HEIGHT           As Single = 18              ' Additional vertical space required for a frame with a horizontal scroll barr
 
-Private Property Get TitleLengthFactor() As Single
-    TitleLengthFactor = CSng(Me.tbxFactor.Value)
-End Property
+Private lMonitorSteps           As Long
+Private cllSteps                As Collection
+Private lStepsDisplayed         As Long
+Private tbxHeader               As MSForms.TextBox
+Private tbxFooter               As MSForms.TextBox
+Private bMonitorInitialized     As Boolean
 
 Public Property Get ContentHeight( _
                                  ByRef frm As MSForms.Frame, _
@@ -28,7 +31,7 @@ Public Property Get ContentHeight( _
 ' Returns the height of the frame's (frm) content by considering only
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
-    Dim ctl As MSForms.Control
+    Dim ctl As MSForms.control
     
     For Each ctl In frm.Controls
         If ctl.Parent Is frm Then
@@ -42,17 +45,16 @@ Public Property Get ContentHeight( _
 
 End Property
 
-Public Property Get FrameContentWidth( _
-                       Optional ByRef v As Variant, _
-                       Optional ByVal applied As Boolean = False) As Single
+Public Property Get FrameContentWidth(Optional ByRef v As Variant, _
+                                      Optional ByVal applied As Boolean = False) As Single
 ' ------------------------------------------------------------------------------
 ' Returns the maximum width of the frames (frm) content by considering only
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
     
-    Dim ctl As MSForms.Control
-    Dim frm As MSForms.Frame
-    Dim frm_ctl As MSForms.Control
+    Dim ctl     As MSForms.control
+    Dim frm     As MSForms.Frame
+    Dim frm_ctl As MSForms.control
     
     If TypeName(v) = "Frame" Then Set frm_ctl = v Else Stop
     For Each ctl In frm_ctl.Controls
@@ -140,10 +142,25 @@ Private Property Get ScrollBarWidth(Optional ByVal frm As MSForms.Frame) As Sing
     If frm.ScrollBars = fmScrollBarsBoth Or frm.ScrollBars = fmScrollBarsVertical Then ScrollBarWidth = 12
 End Property
 
+Private Property Get TitleLengthFactor() As Single
+    TitleLengthFactor = CSng(Me.tbxFactor.Value)
+End Property
+
 Public Property Get VspaceFrame(Optional frm As MSForms.Frame) As Single
     If frm.Caption = vbNullString Then VspaceFrame = 4 Else VspaceFrame = 8
 
 End Property
+
+Private Function AppErr(ByVal app_err_no As Long) As Long
+' ------------------------------------------------------------------------------
+' Ensures that a programmed (i.e. an application) error numbers never conflicts
+' with the number of a VB runtime error. Thr function returns a given positive
+' number (app_err_no) with the vbObjectError added - which turns it into a
+' negative value. When the provided number is negative it returns the original
+' positive "application" error number e.g. for being used with an error message.
+' ------------------------------------------------------------------------------
+    If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
+End Function
 
 Public Sub AutoSizeTextBox( _
                      ByRef as_tbx As MSForms.TextBox, _
@@ -232,16 +249,18 @@ xt: Exit Sub
 
 End Sub
 
-Private Function AppErr(ByVal app_err_no As Long) As Long
-' ------------------------------------------------------------------------------
-' Ensures that a programmed (i.e. an application) error numbers never conflicts
-' with the number of a VB runtime error. Thr function returns a given positive
-' number (app_err_no) with the vbObjectError added - which turns it into a
-' negative value. When the provided number is negative it returns the original
-' positive "application" error number e.g. for being used with an error message.
-' ------------------------------------------------------------------------------
-    If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
-End Function
+Private Sub cbSetupTitle_Click()
+    Dim FACTOR As Single
+    Dim MinWidth    As Single
+    Dim MaxWidth    As Single
+    
+    MinWidth = 100
+    MaxWidth = 1500
+    FACTOR = 1.1
+    Setup1_Title setup_title:=Me.tbxTestTitle & " " & Format(FACTOR, "0.000") _
+               , setup_width_min:=MinWidth _
+               , setup_width_max:=MaxWidth
+End Sub
 
 Private Function ErrMsg(ByVal err_source As String, _
                Optional ByVal err_no As Long = 0, _
@@ -390,6 +409,171 @@ Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "fMsgProcTest." & sProc
 End Function
 
+Public Sub MonitorInitialize(ByVal mon_title As String, _
+                             ByVal mon_steps_displayed As Long, _
+                    Optional ByVal mon_header As String = vbNullString, _
+                    Optional ByVal mon_footer As String = vbNullString)
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
+    Dim ctl     As MSForms.control
+    Dim siTop   As Single
+    Dim i       As Long
+    Dim tbx     As MSForms.TextBox
+    
+    If Not bMonitorInitialized Then
+        lMonitorSteps = mon_steps_displayed
+        For Each ctl In Me.Controls
+            ctl.Visible = False
+        Next ctl
+        siTop = 6
+        
+        With Me
+            .Caption = mon_title
+            If mon_header <> vbNullString Then
+                '~~ Initialize Header
+                Set tbxHeader = .Controls.Add("Forms.TextBox.1")
+                With tbxHeader
+                    .Top = siTop
+                    .Left = 0
+                    .Value = mon_header
+                    .Height = 18
+                    .Width = Me.InsideWidth
+                    siTop = .Top + .Height
+                    .Font.Bold = True
+                    .ForeColor = rgbBlue
+                    .BackColor = Me.BackColor
+                    .BorderColor = Me.BackColor
+                    .BorderStyle = fmBorderStyleSingle
+                End With
+            End If
+        
+            For i = 1 To lMonitorSteps
+                '~~ Initialize Steps
+                Set tbx = .Controls.Add("Forms.TextBox.1")
+                With tbx
+                    .Top = siTop
+                    .Left = 0
+                    .Visible = False
+                    .Height = 18
+                    .Width = Me.InsideWidth
+                    siTop = .Top + .Height
+                    .BackColor = Me.BackColor
+                    .BorderColor = Me.BackColor
+                    .BorderStyle = fmBorderStyleSingle
+               End With
+                Qenqueue cllSteps, tbx
+            Next i
+            
+            .Height = siTop + 35
+        
+            If mon_footer <> vbNullString Then
+                '~~ Initialize Footer
+                Set tbxFooter = .Controls.Add("Forms.TextBox.1")
+                With tbxFooter
+                    .Visible = True
+                    .Top = siTop + 6
+                    .Left = 0
+                    .Value = mon_footer
+                    .Height = 18
+                    .Width = Me.InsideWidth
+                    .Font.Bold = True
+                    .ForeColor = rgbBlue
+                    .BackColor = Me.BackColor
+                    .BorderColor = Me.BackColor
+                    .BorderStyle = fmBorderStyleSingle
+                    Me.Height = .Top + .Height + 35
+                End With
+            End If
+        End With
+        bMonitorInitialized = True
+    End If
+
+End Sub
+
+Public Sub MonitorStep(Optional ByVal mon_step As String = vbNullString, _
+                       Optional ByVal mon_footer As String = vbNullString)
+' ------------------------------------------------------------------------------
+' Display a step
+' ------------------------------------------------------------------------------
+    Dim tbx     As MSForms.TextBox
+    Dim i       As Long
+    Dim lTop    As Long
+    
+    If mon_step <> vbNullString Then
+        If lStepsDisplayed < lMonitorSteps Then
+            Set tbx = cllSteps(lStepsDisplayed + 1)
+            With tbx
+                .Visible = True
+                .Value = mon_step
+                lStepsDisplayed = lStepsDisplayed + 1
+            End With
+        Else ' All steps arte displayed
+            Set tbx = Qdequeue(cllSteps)
+            tbx.Value = vbNullString
+            Qenqueue cllSteps, tbx
+            If tbxHeader Is Nothing Then
+                lTop = 6
+            Else
+                With tbxHeader
+                    lTop = .Top + .Height
+                End With
+            End If
+            
+            For i = 1 To lMonitorSteps
+                Set tbx = cllSteps(i)
+                tbx.Top = lTop + (18 * (i - 1))
+            Next i
+            tbx.Value = mon_step
+        End If
+    End If
+    
+    If mon_footer <> vbNullString Then
+        If Not tbxFooter Is Nothing Then tbxFooter.Value = mon_footer
+    End If
+
+End Sub
+
+Private Function Qdequeue(ByRef qu As Collection) As Variant
+    Const PROC = "DeQueue"
+    
+    On Error GoTo eh
+    If qu Is Nothing Then GoTo xt
+    If QisEmpty(qu) Then GoTo xt
+    On Error Resume Next
+    Set Qdequeue = qu(1)
+    If Err.Number <> 0 _
+    Then Qdequeue = qu(1)
+    qu.Remove 1
+
+xt: Exit Function
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Function
+
+Private Sub Qenqueue(ByRef qu As Collection, ByVal qu_item As Variant)
+    If qu Is Nothing Then Set qu = New Collection
+    qu.Add qu_item
+End Sub
+
+Private Function QisEmpty(ByVal qu As Collection) As Boolean
+    If Not qu Is Nothing _
+    Then QisEmpty = qu.Count = 0 _
+    Else QisEmpty = True
+End Function
+
+Private Function QLen(ByVal qu As Collection) As Long
+    If qu Is Nothing Then Set qu = New Collection
+    QLen = qu.Count
+End Function
+
+Private Function Qrequeue(ByRef qu As Collection) As Variant
+' ------------------------------------------------------------------------------
+' Deques the first item and Enqueues it again.
+' ------------------------------------------------------------------------------
+    Qenqueue qu, Qdequeue(qu)
+End Function
+
 Private Function ScrollH_Applied(ByRef frm As MSForms.Frame) As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns True when the frame (frm) has already a horizontal scrollbar applied.
@@ -528,7 +712,7 @@ Public Sub Setup1_Title( _
         With .laMsgTitle
             With .Font
                 .Bold = False
-                .Name = Me.Font.Name
+                .name = Me.Font.name
                 .Size = 8    ' Value which comes to a length close to the length required
             End With
             .Caption = vbNullString
@@ -544,18 +728,5 @@ Public Sub Setup1_Title( _
 xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
-End Sub
-
-Private Sub cbSetupTitle_Click()
-    Dim FACTOR As Single
-    Dim MinWidth    As Single
-    Dim MaxWidth    As Single
-    
-    MinWidth = 100
-    MaxWidth = 1500
-    FACTOR = 1.1
-    Setup1_Title setup_title:=Me.tbxTestTitle & " " & Format(FACTOR, "0.000") _
-               , setup_width_min:=MinWidth _
-               , setup_width_max:=MaxWidth
 End Sub
 

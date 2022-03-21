@@ -437,9 +437,9 @@ Private Sub ErrMsgButtons(ByRef err_buttons As Variant)
     Dim cll As Collection
 
 #If Debugging = 1 Then
-    Set cll = mMsg.Buttons(vbResumeOk)
+    mMsg.Buttons cll, vbResumeOk
 #Else
-    Set cll = mMsg.Buttons(ErrMsgDefaultButton)
+    mMsg.Buttons cll, ErrMsgDefaultButton
 #End If
     Set err_buttons = cll
 End Sub
