@@ -362,7 +362,7 @@ Public Sub Explore(ByVal ctl As Variant, _
     Dim Appl        As String   ' ControlApplied
     Dim l           As String   ' .Left
     Dim W           As String   ' .Width
-    Dim T           As String   ' .Top
+    Dim t           As String   ' .Top
     Dim H           As String   ' .Height
     Dim SW          As String   ' .ScrollWidth
     Dim SH          As String   ' .ScrollHeight
@@ -412,7 +412,7 @@ Public Sub Explore(ByVal ctl As Variant, _
         If MsgForm.IsApplied(ctl) Then Appl = "Yes " Else Appl = " No "
         l = Align(Format(ctl.Left, "000.0"), 7, AlignCentered, " ")
         W = Align(Format(ctl.Width, "000.0"), 7, AlignCentered, " ")
-        T = Align(Format(ctl.Top, "000.0"), 7, AlignCentered, " ")
+        t = Align(Format(ctl.Top, "000.0"), 7, AlignCentered, " ")
         H = Align(Format(ctl.Height, "000.0"), 7, AlignCentered, " ")
         FH = Align(Format(MsgForm.InsideHeight, "000.0"), 7, AlignCentered, " ")
         FW = Align(Format(MsgForm.InsideWidth, "000.0"), 7, AlignCentered, " ")
@@ -448,7 +448,7 @@ Public Sub Explore(ByVal ctl As Variant, _
             End With
         End If
         
-        Debug.Print Align(ctl.name, 20, AlignLeft) & "|" & Appl & "|" & l & "|" & W & "|" & CW & "|" & T & "|" & H & "|" & CH & "|" & SH & "|" & SW & "|" & FW & "|" & FH
+        Debug.Print Align(ctl.name, 20, AlignLeft) & "|" & Appl & "|" & l & "|" & W & "|" & CW & "|" & t & "|" & H & "|" & CH & "|" & SH & "|" & SW & "|" & FW & "|" & FH
     Next v
 
 xt: Set dct = Nothing
@@ -2056,43 +2056,62 @@ Public Function Test_30_Monitor() As Variant
     Dim MsgForm     As fMsg
     Dim MsgTitle    As String
     Dim i           As Long
-    Dim PrgrsHeader As String
-    Dim PrgrsStep    As String
+    Dim Header      As TypeMsgText
+    Dim Step        As TypeMsgText
+    Dim Footer      As TypeMsgText
     Dim iLoops      As Long
     Dim lWait       As Long
     
     BoP ErrSrc(PROC)
     SetupTest 30
-    PrgrsHeader = " No. Status   Step"
+    TestMsgWidthMin = wsTest.MsgWidthMin
+    TestMsgWidthMax = wsTest.MsgWidthMax
+    TestMsgHeightMax = wsTest.MsgHeightMax
+    
+    With Header
+        .Text = "Step Status"
+        .MonoSpaced = True
+    End With
     iLoops = 15
-    lWait = 500
+    lWait = 300
     
     MsgTitle = Readable(PROC)
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications
     
     MsgForm.VisualizeControls = wsTest.VisualizeControls
-    PrgrsStep = vbNullString
     
     For i = 1 To iLoops
-        PrgrsStep = Format(i, "00") & ". Follow-Up line after " & Format(lWait, "0000") & " Milliseconds."
-        PrgrsStep = Repeat(PrgrsStep & " ", Int(i / 5) + 1) & vbLf & "      second line for test"
+        With Step
+            .Text = Format(i, "00") & ". Follow-Up line after " & Format(lWait, "0000") & " Milliseconds."
+            .Text = Repeat(.Text & " ", Int(i / 5) + 1) & vbLf & "    Second line just for test " & Repeat(".", i)
+            .MonoSpaced = True
+        End With
         mMsg.Monitor mon_title:=MsgTitle _
-                   , mon_step:=PrgrsStep _
-                   , mon_steps_monospaced:=True _
-                   , mon_header:=" No. Status  Step" _
-                   , mon_width_max:=wsTest.MsgWidthMax _
-                   , mon_width_min:=wsTest.MsgWidthMin _
-                   , mon_height_max:=wsTest.MsgHeightMax
+                   , mon_header:=Header _
+                   , mon_step:=Step _
+                   , mon_steps_visible:=20 _
+                   , mon_footer:=Footer _
+                   , mon_width_max:=TestMsgWidthMax _
+                   , mon_width_min:=TestMsgWidthMin _
+                   , mon_height_max:=TestMsgHeightMax
                    
         '~~ Simmulation of a process
         DoEvents
         Sleep lWait
     Next i
+    Step.Text = vbNullString
+    With Footer
+        .Text = "Process finished! Close this window"
+        .FontBold = True
+        .FontColor = rgbBlueViolet
+    End With
     mMsg.Monitor mon_title:=MsgTitle _
+               , mon_header:=Header _
+               , mon_step:=Step _
+               , mon_footer:=Footer _
                , mon_width_max:=wsTest.MsgWidthMax _
                , mon_width_min:=wsTest.MsgWidthMin _
-               , mon_height_max:=wsTest.MsgHeightMax _
-               , mon_footer:="Process finished! Close this window"
+               , mon_height_max:=wsTest.MsgHeightMax
     
     MsgTitle = "Test result of: " & Readable(PROC)
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC) ' set test-global message specifications

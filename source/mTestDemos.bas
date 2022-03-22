@@ -236,50 +236,62 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
 End Sub
 
 Public Sub Demo_Monitor()
-    Const PROC              As String = "Demo_Monitor"
-    Const MONITOR_HEADER    As String = " No. Status   Step"
-    Const MONITOR_FOOTER    As String = "Process finished! Close this window"
-    Const PROCESS_STEPS     As Long = 12
-    
+    Const PROC          As String = "Demo_Monitor"
+    Const PROCESS_STEPS As Long = 12
+
     On Error GoTo eh
+    Dim Header          As TypeMsgText
+    Dim Footer          As TypeMsgText
     Dim i               As Long
     Dim lWait           As Long
-    Dim MonitorTitle    As String
-    Dim ProgressStep    As String
+    Dim Title           As String
+    Dim Step            As TypeMsgText
     
-    MonitorTitle = "Demonstration of the monitoring of a process step by step"
-    mMsg.MsgInstance MonitorTitle, fi_unload:=True ' Ensure there is no process monitoring with this title still displayed
+    With Header
+        .Text = " No. Status   Step"
+        .MonoSpaced = True
+        .FontColor = rgbBlue
+    End With
+    
+    With Footer
+        .Text = "Process in progress! Please wait."
+        .FontBold = True
+    End With
+    
+    Title = "Demonstration of the monitoring of a process step by step"
+    mMsg.MsgInstance Title, fi_unload:=True ' Ensure there is no process monitoring with this title still displayed
         
     For i = 1 To PROCESS_STEPS
         '~~ Preparing a process step message string
-        ProgressStep = mBasic.Align(i, 4, AlignRight, " ") & _
-                   mBasic.Align("Passed", 8, AlignCentered, " ") & _
-                   Repeat(repeat_n_times:=Int(((i - 1) / 10)) + 1, repeat_string:="  " & _
-                   mBasic.Align(i, 2, AlignRight) & _
-                   ".  Follow-Up line after " & _
-                   Format(lWait, "0000") & _
-                   " Milliseconds.")
+        With Step
+            .Text = mBasic.Align(i, 4, AlignRight, " ") & _
+                            mBasic.Align("Passed", 8, AlignCentered, " ") & _
+                            Repeat(repeat_n_times:=Int(((i - 1) / 10)) + 1, repeat_string:="  " & _
+                            mBasic.Align(i, 2, AlignRight) & _
+                            ".  Follow-Up line after " & _
+                            Format(lWait, "0000") & _
+                            " Milliseconds.")
+            .MonoSpaced = True
+        End With
         
-        If i < PROCESS_STEPS Then
-            '~~ Steps 1 to n - 1
-            mMsg.Monitor mon_title:=MonitorTitle _
-                       , mon_step:=ProgressStep _
-                       , mon_steps_monospaced:=True _
-                       , mon_header:=MONITOR_HEADER
-            
-            '~~ Simmulation of a process
-            lWait = 100 * i
-            DoEvents
-            Sleep 200
+        mMsg.Monitor mon_title:=Title _
+                   , mon_header:=Header _
+                   , mon_step:=Step _
+                   , mon_footer:=Footer
+
+        '~~ Simmulation of a process
+        lWait = 100 * i
+        DoEvents
+        Sleep 200
         
-        Else
-            '~~ The last step, separated in order to display the footer along with it
-            mMsg.Monitor mon_title:=MonitorTitle _
-                       , mon_step:=ProgressStep _
-                       , mon_header:=MONITOR_HEADER _
-                       , mon_footer:=MONITOR_FOOTER
-        End If
     Next i
+    
+    Step.Text = vbNullString
+    Footer.Text = "Process finished! Close this window"
+    mMsg.Monitor mon_title:=Title _
+               , mon_header:=Header _
+               , mon_step:=Step _
+               , mon_footer:=Footer
     
 xt: Exit Sub
 
@@ -475,16 +487,20 @@ Private Sub Demo_Monitor_Instances()
     Dim j           As Long
     Dim MsgForm     As fMsg
     Dim sTitle      As String
-    Dim sMsg        As String
+    Dim Header      As TypeMsgText
+    Dim Step        As TypeMsgText
+    Dim Footer        As TypeMsgText
     
     j = 1
     For i = 1 To 5
         '~~ Establish 5 monitoring instances
         '~~ Note that the instances are identified by their different titles
         sTitle = "Instance-" & i
-        sMsg = "Process step " & j
+        Step.Text = "Process step " & j
         mMsg.Monitor mon_title:=sTitle _
-                   , mon_step:=sMsg _
+                   , mon_header:=Header _
+                   , mon_step:=Step _
+                   , mon_footer:=Footer _
                    , mon_width_min:=15
         With mMsg.MsgInstance(sTitle)
             .Top = INIT_TOP + OFFSET_V * (i - 1)
@@ -498,9 +514,11 @@ Private Sub Demo_Monitor_Instances()
         For i = 1 To 5
             '~~ Go through all instances and add a message line
             sTitle = "Instance-" & i
-            sMsg = "Process step " & j
+            Step.Text = "Process step " & j
             mMsg.Monitor mon_title:=sTitle _
-                       , mon_step:=sMsg
+                   , mon_header:=Header _
+                   , mon_step:=Step _
+                   , mon_footer:=Footer
             Application.Wait Now() + T_WAIT
         Next i
     Next j

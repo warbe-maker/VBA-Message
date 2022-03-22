@@ -1019,3 +1019,56 @@ Private Function IsForm(ByVal v As Object) As Boolean
     IsForm = Err.Number <> 0
 End Function
 
+Private Sub Test_Pass_TypeMsgText()
+' ------------------------------------------------------------------------------
+' Test of passing on any 'kind of' TypeMsgText to a UserForm and retrieving it
+' again as a TypeMsgText.
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_Pass_TypeMsgText"
+    
+    On Error GoTo eh
+    Dim t As TypeMsgText
+    Dim f As fMsgProcTest
+    Dim k As KindOfText
+    Dim i As Long
+    
+    Set f = TestInstance(fi_key:="Test-Title", fi_unload:=True)
+    Set f = TestInstance(fi_key:="Test-Title")
+    
+    t.FontBold = True
+    With f
+        k = m_header
+        .Text(k) = t
+        Debug.Assert .Text(k).FontBold = True
+        Debug.Assert .Text(m_footer).FontBold = False
+    
+        k = m_footer
+        .Text(k) = t
+        Debug.Assert .Text(k).FontBold = True
+    
+        k = m_step
+        .Text(k) = t
+        Debug.Assert .Text(k).FontBold = True
+    
+        For i = 1 To 4
+            k = m_label
+            .Text(k, i) = t
+            Debug.Assert .Text(k, i).FontBold = True
+        Next i
+        For i = 1 To 4
+            k = m_text
+            .Text(k, i) = t
+            Debug.Assert .Text(k, i).FontBold = True
+        Next i
+      
+    End With
+    
+xt: Exit Sub
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
+End Sub
+
+

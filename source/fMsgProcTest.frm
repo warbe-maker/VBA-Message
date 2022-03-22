@@ -23,6 +23,62 @@ Private lStepsDisplayed         As Long
 Private tbxHeader               As MSForms.TextBox
 Private tbxFooter               As MSForms.TextBox
 Private bMonitorInitialized     As Boolean
+Private MsgText1                As TypeMsgText  ' common text element
+Private TextMonitorHeader       As TypeMsgText
+Private TextMonitorFooter       As TypeMsgText
+Private TextMonitorStep         As TypeMsgText
+Private TextMsg                 As TypeMsgText
+Private TextLabel               As TypeMsgText
+Private TextSection             As TypeMsg
+
+Public Property Let Text(Optional ByVal txt_part As KindOfText, _
+                         Optional ByVal txt_section As Long = 1, _
+                                  ByRef txt_text As TypeMsgText)
+' ------------------------------------------------------------------------------
+' Provide text as section text, section label, monitor header, footer or step.
+' ------------------------------------------------------------------------------
+    MsgText1.FontBold = txt_text.FontBold
+    MsgText1.FontColor = txt_text.FontColor
+    MsgText1.FontItalic = txt_text.FontItalic
+    MsgText1.FontName = txt_text.FontName
+    MsgText1.FontSize = txt_text.FontSize
+    MsgText1.FontUnderline = txt_text.FontUnderline
+    MsgText1.MonoSpaced = txt_text.MonoSpaced
+    MsgText1.Text = txt_text.Text
+    Select Case txt_part
+        Case m_header:    TextMonitorHeader = MsgText1
+        Case m_footer:    TextMonitorFooter = MsgText1
+        Case m_step:      TextMonitorStep = MsgText1
+        Case m_text:      TextSection.Section(txt_section).Text = MsgText1
+        Case m_label:     TextSection.Section(txt_section).Label = MsgText1
+    End Select
+
+End Property
+
+Public Property Get Text(Optional ByVal txt_part As KindOfText, _
+                         Optional ByVal txt_section As Long = 1) As TypeMsgText
+' ------------------------------------------------------------------------------
+' Returns the provided text as section-text or -label, monitor-header,
+' -footer, or -step.
+' ------------------------------------------------------------------------------
+    Select Case txt_part
+        Case m_header:    MsgText1 = TextMonitorHeader
+        Case m_footer:    MsgText1 = TextMonitorFooter
+        Case m_step:      MsgText1 = TextMonitorStep
+        Case m_text:      TextSection.Section(txt_section).Text = TextMsg
+        Case m_label:     TextSection.Section(txt_section).Label = TextLabel
+    End Select
+    
+    Text.FontBold = MsgText1.FontBold
+    Text.FontColor = MsgText1.FontColor
+    Text.FontItalic = MsgText1.FontItalic
+    Text.FontName = MsgText1.FontName
+    Text.FontSize = MsgText1.FontSize
+    Text.FontUnderline = MsgText1.FontUnderline
+    Text.MonoSpaced = MsgText1.MonoSpaced
+    Text.Text = MsgText1.Text
+
+End Property
 
 Public Property Get ContentHeight( _
                                  ByRef frm As MSForms.Frame, _
