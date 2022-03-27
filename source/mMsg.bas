@@ -22,7 +22,7 @@ Option Explicit
 '
 ' See: https://github.com/warbe-maker/Common-VBA-Message-Service
 '
-' W. Rauschenberger, Berlin Jan 2021 (last revision)
+' W. Rauschenberger, Berlin Mar 2022 (last revision)
 ' ------------------------------------------------------------------------------
 ' ------------------------------------------------------------
 ' Means to get and calculate the display devices DPI in points
@@ -37,6 +37,14 @@ Private Declare PtrSafe Function GetSystemMetrics32 Lib "user32" Alias "GetSyste
 Private Declare PtrSafe Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare PtrSafe Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long) As Long
+
+' Declarations for making a UserForm resizable
+Private Declare PtrSafe Function GetForegroundWindow Lib "User32.dll" () As Long
+Private Declare PtrSafe Function GetWindowLong Lib "User32.dll" Alias "GetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
+Private Declare PtrSafe Function SetWindowLong Lib "User32.dll" Alias "SetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Private Const WS_THICKFRAME As Long = &H40000
+Private Const GWL_STYLE As Long = -16
+
 ' ------------------------------------------------------------
 Public Const MSG_WIDTH_MIN_LIMIT_PERCENTAGE     As Long = 25
 Public Const MSG_WIDTH_MAX_LIMIT_PERCENTAGE     As Long = 98
@@ -52,16 +60,6 @@ Public Const vbResume                           As Long = 6 ' return value (equa
 
 Public ProgressText As String
 
-'Public Type TypeMsgText
-'        FontBold As Boolean
-'        FontColor As XlRgbColor
-'        FontItalic As Boolean
-'        FontName As String
-'        FontSize As Long
-'        FontUnderline As Boolean
-'        MonoSpaced As Boolean ' overwrites any FontName
-'        Text As String
-'End Type
 Public Type TypeMsgText
         FontBold As Boolean
         FontColor As XlRgbColor
@@ -77,7 +75,7 @@ Public Type TypeMsgSect
        Text As TypeMsgText
 End Type
 Public Type TypeMsg
-    Section(1 To 4) As TypeMsgSect
+    section(1 To 4) As TypeMsgSect
 End Type
 
 Public Enum KindOfText
@@ -124,8 +122,8 @@ Private Property Get Text(Optional ByVal txt_part As KindOfText, _
         Case m_header:    MsgText1 = TextMonitorHeader
         Case m_footer:    MsgText1 = TextMonitorFooter
         Case m_step:      MsgText1 = TextMonitorStep
-        Case m_text:      TextSection.Section(txt_section).Text = TextMsg
-        Case m_label:     TextSection.Section(txt_section).Label = TextLabel
+        Case m_text:      TextSection.section(txt_section).Text = TextMsg
+        Case m_label:     TextSection.section(txt_section).Label = TextLabel
     End Select
     
     Text.FontBold = MsgText1.FontBold
@@ -157,8 +155,8 @@ Private Property Let Text(Optional ByVal txt_part As KindOfText, _
         Case m_header:    TextMonitorHeader = MsgText1
         Case m_footer:    TextMonitorFooter = MsgText1
         Case m_step:      TextMonitorStep = MsgText1
-        Case m_text:      TextSection.Section(txt_section).Text = MsgText1
-        Case m_label:     TextSection.Section(txt_section).Label = MsgText1
+        Case m_text:      TextSection.section(txt_section).Text = MsgText1
+        Case m_label:     TextSection.section(txt_section).Label = MsgText1
     End Select
 
 End Property
@@ -255,7 +253,7 @@ Public Function Box(ByVal Prompt As String, _
     '~~ all services create and use their own instance identified by the message title.
     Set MsgForm = MsgInstance(Title)
     With MsgForm
-'        .VisualizeControls = True
+'        .VisualizeForTest = True
         .MsgTitle = Title
         .MsgText(1) = Message
         .MsgButtons = Buttons
@@ -565,8 +563,8 @@ Public Function Dsply(ByVal dsply_title As String, _
         .MsgTitle = dsply_title
         For i = 1 To .NoOfDesignedMsgSects
             '~~ Save the label and the text udt into a Dictionary by transfering it into an array
-            .MsgLabel(i) = dsply_msg.Section(i).Label
-            .MsgText(i) = dsply_msg.Section(i).Text
+            .MsgLabel(i) = dsply_msg.section(i).Label
+            .MsgText(i) = dsply_msg.section(i).Text
         Next i
         
         .MsgButtons = dsply_buttons
@@ -576,7 +574,7 @@ Public Function Dsply(ByVal dsply_title As String, _
         '|| For testing - indicated by VisualizerControls = True and             ||
         '|| dsply_modeless = True - prior Setup is suspended.                    ||
         '+------------------------------------------------------------------------+
-        If Not (.VisualizeControls And dsply_modeless) Then
+        If Not (.VisualizeForTest And dsply_modeless) Then
             .Setup
         End If
         If dsply_modeless Then
@@ -663,21 +661,21 @@ Public Function ErrMsg(ByVal err_source As String, _
 #End If
         
     '~~ Display the error message by means of the mMsg's Dsply function
-    With ErrMsgText.Section(1)
+    With ErrMsgText.section(1)
         With .Label
             .Text = "Error description:"
             .FontColor = rgbBlue
         End With
         .Text.Text = ErrDesc
     End With
-    With ErrMsgText.Section(2)
+    With ErrMsgText.section(2)
         With .Label
             .Text = "Error source:"
             .FontColor = rgbBlue
         End With
         .Text.Text = err_source
     End With
-    With ErrMsgText.Section(3)
+    With ErrMsgText.section(3)
         If ErrAbout = vbNullString Then
             .Label.Text = vbNullString
             .Text.Text = vbNullString
@@ -688,7 +686,7 @@ Public Function ErrMsg(ByVal err_source As String, _
         .Label.FontColor = rgbBlue
     End With
 #If Debugging = 1 Then
-    With ErrMsgText.Section(4)
+    With ErrMsgText.section(4)
         With .Label
             .Text = "About Debugging:"
             .FontColor = rgbBlue
@@ -1046,5 +1044,24 @@ Private Sub StckPush(ByRef stck As Collection, _
 xt: Exit Sub
 
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Public Sub MakeFormResizable()
+' ----------------------------------------------------------------------------
+' Written: February 14, 2011
+' Author:  Leith Ross
+'
+' NOTE:  This code should be executed within the UserForm_Activate() event.
+' ----------------------------------------------------------------------------
+    Dim lStyle As Long
+    Dim hWnd As Long
+    Dim RetVal
+  
+    hWnd = GetForegroundWindow
+    'Get the basic window style
+     lStyle = GetWindowLong(hWnd, GWL_STYLE) Or WS_THICKFRAME
+    'Set the basic window styles
+     RetVal = SetWindowLong(hWnd, GWL_STYLE, lStyle)
+
 End Sub
 

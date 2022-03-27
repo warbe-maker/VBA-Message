@@ -881,7 +881,7 @@ Public Sub Test_DisplayWithWithoutFrames()
     
     MsgTitle = "With frames test"
     Set MsgForm = mMsg.MsgInstance(MsgTitle)
-    MsgForm.VisualizeControls = True
+    MsgForm.VisualizeForTest = True
     mMsg.Box "Message should be displayed with visible frames", "With frames test"
     mMsg.Box "Message should be displayed with frames invisible", "With frames test"
            

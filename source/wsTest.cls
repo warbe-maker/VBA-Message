@@ -125,20 +125,20 @@ Public Property Let TestResultNote(ByVal s As String)
     End With
 End Property
 
-Public Property Get VisualizeControls() As Boolean
+Public Property Get VisualizeForTest() As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns the status True or False of the shape named SHAPE_NAME.
 ' ------------------------------------------------------------------------------
-    Const PROC          As String = "VisualizeControls"
-    Const SHAPE_NAME    As String = "optDisplayFrames"
+    Const PROC          As String = "VisualizeForTest"
+    Const SHAPE_NAME    As String = "optVisualizeForTest"
     
     On Error GoTo eh
     If Not mObject.WsShapeExists(wse_ws:=Me, wse_shape_name:=SHAPE_NAME) _
     Then Err.Raise AppErr(1), ErrSrc(PROC), "A shape named '" & SHAPE_NAME & "' does not exist in Worksheet '" & Me.name & "'!"
     
     If Me.Shapes(SHAPE_NAME).OLEFormat.Object.Value = 1 _
-    Then VisualizeControls = True _
-    Else VisualizeControls = False
+    Then VisualizeForTest = True _
+    Else VisualizeForTest = False
     
 xt: Exit Property
 
