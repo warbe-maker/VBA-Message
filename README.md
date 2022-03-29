@@ -10,6 +10,7 @@
 &nbsp;&nbsp;&nbsp;[The Dsply service](#the-dsply-service)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax](#syntax-1)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax of the TypeMsg UDT](#syntax-of-the-typemsg-udt)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax of the TypeMsgText UDT](#syntax-of-the-typemsgtext-udt)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[_Dsply_ service usage example](#dsply-service-usage-example)<br>
 &nbsp;&nbsp;&nbsp;[The ErrMsg service](#the-errmsg-service)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax](#syntax-2)<br>
@@ -34,7 +35,7 @@ A flexible and powerful `VBA.MsgBox` alternative providing four specific service
 ## Why an alternative MsgBox?
 The alternative implementation addresses many of the MsgBox's deficiencies - without re-implementing it to 100%.
 
-|MsgBox|Alternative|
+|MsgBox|This "Common&nbsp;VBA&nbsp;Message&nbsp;Service"|
 |------|-----------|
 | The message width and height is limited and cannot be altered | The&nbsp;maximum&nbsp;width and&nbsp;height&nbsp;is&nbsp;specified as&nbsp;a percentage of the screen&nbsp;size&nbsp; which&nbsp;defaults&nbsp;to: 80%&nbsp;width and  90%&nbsp;height (hardly ever used)|
 | When a message exceeds the (hard to tell) size limit it is truncated | When the maximum size is exceeded a vertical and/or a horizontal scroll bar is applied
@@ -45,6 +46,7 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 | vbApplicationModal or vbSystemModal, no vbModeless option | The message can be displayed both ways which _modal_ (the default) or _modeless_. _modal_ equals to vbApplicationModal, there is (yet) no vbSystemModal option.|
 | Specifying the default button | The default button may be specified as index or as the displayed caption. However, it cannot be specified as vbOk, vbYes, vbNo, etc. |
 | Display of an alert image (?, !, etc.) | (yet) not implemented |
+| not available           | An optional "Label" above a message section allows the specification of anything to open: URL, mailto, folder, file, or an application like Excel.|
 
 ## Installation
 1. Download [fMsg.frm][1], [fMsg.frx][2], and [mMsg.bas][3] .
@@ -66,13 +68,13 @@ The _Box_ service has these named arguments:
 | `Title`                 | String expression displayed in the window handle bar |
 | `Prompt`                | String expression displayed |
 | `Buttons`               | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, or a Dictionary, with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row. || `box_monospaced`       | Boolean expression, defaults to False, displays the `box_msg` with a monospaced font |
-
 | `box_button_default`    | Optional, numeric expression, defaults to 1, identifies the default button, i.e. the nth button which has the focus
 | `box_return_index`      | Optional, Boolean expression, default to False, indicates that the return value for the clicked button will be the index rather than its caption string.
 | `box_width_min`         | Optional, numeric expression, defaults to 400, the minimum width in pt for the display of the message. A value < 100 is interpreted as % of the screen size, a value > 100 as pt
-| `box_width_max`         | Optional, numeric expression, defaults to 80, specifies the maximum message window width as % of the screen size. A value < 100 is interpreted as % of the screen size, a value > 100 as pt
+| `box_width_max`         | Optional, numeric expression, defaults to 80, specifies the maximum message window width as % of the screen size. A value < 100 is interpreted as % of the screen size, a value > 100 as pt |
 | `box_height_max`        | Optional, numeric expression, defaults to 70, specifies the maximum message window height of the screen size. A value < 100 is interpreted as % of the screen size, a value > 100 as pt
 | `box_buttons_width_min` | Optional, numeric expression, defaults to 70, specifies the minimum button width in pt |
+
 
 #### _Box_ service usage example
 The below example uses [the _Buttons_ service](#the-buttons-service) to specify the displayed buttons and their order. 
@@ -130,7 +132,7 @@ The _Dsply_ service has these named arguments:
 | Part                        | Description             |
 |-----------------------------|-------------------------|
 | `dsply_title`             | Required. String expression displayed in the title bar of the dialog box. If you omit title, the application name is placed in the title bar.|
-| `dsply_msg`               | Required. [UDT _TypeMsg_ ][#syntax-of-the-typemsgMsg-udt] expression providing 4 message sections, each with a label and the message text, displayed as the message in the dialog box. The maximum length of each of the four possible message text strings is only limited by the system's limit for string expressions which is about 1GB!. When one of the 4 message text strings consists of more than one line, they can be separated by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line.|
+| `dsply_msg`               | Required. [UDT _TypeMsg_ ](#syntax-of-the-typemsg-udt) expression providing 4 message sections, each with a label and the message text, displayed as the message in the dialog box. The maximum length of each of the four possible message text strings is only limited by the system's limit for string expressions which is about 1GB!. When one of the 4 message text strings consists of more than one line, they can be separated by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line.|
 | `dsply_buttons`           | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, or a Dictionary, with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row.|
 | `dsply_button_default`   | Optional, _Long_ expression, defaults to 1, specifies the index of the button which is the default button. |
 | `dsply_reply_with_index` | Optional, _Boolean_ expression, defaults to False. When True the index if the pressed button is returned rather than its caption. |
@@ -152,8 +154,9 @@ With Message.Section(n)
         .FontName = "Tahoma"
         .FontSize = 9
         .FontUnderline = True
-        .Monospaced = True ' FontName will be ignored and default to "Courier New"
-        .Text As String
+        .Monospaced = True          ' FontName defaults to "Courier New" (FontName is ignored)
+        .Text = "......"
+        .OpenWhenClicked = "......" ' anything which can be opened
     End With
     With .Text
          .FontBold = True
@@ -163,9 +166,27 @@ With Message.Section(n)
         .FontSize = 9
         .FontUnderline = True
         .Monospaced = True ' FontName will be ignored and default to "Courier New"
-        .Text As String
+        .Text = "...."
+    End With
 ```
 Going with the defaults the minimum message text assignment (without a label) would be `Message.Section(1).Text.Text = "......"`
+
+#### Syntax of the _TypeMsgText_ UDT
+The syntax is described best as a code snippet using all options 
+```vb
+Dim Message As TypeMsgText
+    With Message
+        .FontBold = True
+        .FontColor = rgbRed
+        .FontItalic = True
+        .FontName = "Tahoma"
+        .FontSize = 9
+        .FontUnderline = True
+        .Monospaced = True          ' FontName defaults to "Courier New" (FontName is ignored)
+        .Text = "......"
+    End With
+```
+Going with the defaults the minimum message text assignment would be `Message.Text = "......"`
 
 #### _Dsply_ service usage example
 The below code demonstrates most of the available features and message window properties.
@@ -273,15 +294,16 @@ The _Monitor_ service has the following named arguments
 
 | Part                  | Description             |
 |-----------------------|-------------------------|
-| `mntr_title`          | _String_ expression, displayed as title of the message window. |
-| `mntr_msg`            | _String_ expression, displayed as the message/information. |
-| `mntr_header`         | _String_ expression, optional, defaults to `vbNullString`, displayed abovr ther `mntr_msg`,  |
-| `mntr_footer`         | _String_ expression, defaults to "Process in progress! Please wait.", displayed below `mntr_msg` |
-| `mntr_msg_append`     | _Boolean_ expression, defaults to True. Appends the `mntr_msg` to the current displayed message string. |
-| `mntr_msg_monospaced` | _Boolean_ expression, defaults to False. When True the message string is displayed with a mono-spaced font. |
-| `mntr_width_min`      | _Long_ expression, defaults to 400, which interpreted as pt. |
-| `mntr_width_max`      | _Long_ expression, defaults to 80, which is interpreted as % of the screen's width. |
-| `mntr_height_max`     | |
+| `mon_title`          | _String_ expression, displayed as title in the message window handle bar. When the service is called with different titles each of them open its dedicated monitor window. |
+| `mon_step`            | Type `TypeMsgText` expression (see [Syntax of the _TypeMsgText_ UDT](#syntax-of-the-typemsgtext-udt)), displayed as the process step. |
+| `mon_header`         |Type `TypeMsgText` expression (see [Syntax of the _TypeMsgText_ UDT](#syntax-of-the-typemsgtext-udt)), obligatory, may be a vbNullString if not desired displayed above the first `mon_step`,  |
+| `mon_footer`         |Type `TypeMsgText` expression (see [Syntax of the _TypeMsgText_ UDT](#syntax-of-the-typemsgtext-udt)), obligatory, displayed below the last `mon_step`, maybe a vbNullString when not desired, may be specified with an extra service call when the process has ended. |
+| `mon_steps_visible`| _Long_ expression, defaults to 10, specifies the number of steps to be displayed. When more steps are provided the displayed steps are scrolled.|
+| `mon_width_min`      | _Long_ expression, defaults to 400, which interpreted as pt. |
+| `mon_width_max`      | _Long_ expression, defaults to 80, which is interpreted as % of the screen's width. |
+| `mon_height_max`     | _Single_ expression specifying the maximum message window height. When the number of to be displayed steps exceed this height a vertical scroll-bar is displayed.|
+| `mon_pos`            | Variant expression. When a Range the monitor window will be displayed at its window/screen position. |
+
 
 #### Usage of the _Monitor_ service
 The code below
@@ -313,10 +335,10 @@ Public Sub Demo_Monitor_Service()
         
         If i < PROCESS_STEPS Then
             '~~ Steps 1 to n - 1
-            mMsg.Monitor mntr_title:=MonitorTitle _
-                       , mntr_msg:=ProgressStep _
-                       , mntr_msg_monospaced:=True _
-                       , mntr_header:=MONITOR_HEADER
+            mMsg.Monitor mon_title:=MonitorTitle _
+                       , mon_msg:=ProgressStep _
+                       , mon_msg_monospaced:=True _
+                       , mon_header:=MONITOR_HEADER
             
             '~~ Simmulation of a process
             lWait = 100 * i
@@ -325,10 +347,10 @@ Public Sub Demo_Monitor_Service()
         
         Else
             '~~ The last step, separated in order to display the footer along with it
-            mMsg.Monitor mntr_title:=MonitorTitle _
-                       , mntr_msg:=ProgressStep _
-                       , mntr_header:=MONITOR_HEADER _
-                       , mntr_footer:=MONITOR_FOOTER
+            mMsg.Monitor mon_title:=MonitorTitle _
+                       , mon_msg:=ProgressStep _
+                       , mon_header:=MONITOR_HEADER _
+                       , mon_footer:=MONITOR_FOOTER
         End If
     Next i
     

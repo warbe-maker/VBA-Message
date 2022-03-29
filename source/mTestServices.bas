@@ -186,6 +186,11 @@ Public Sub cmdTest91_Click()
     mTestServices.Test_91_MinimumMessage
 End Sub
 
+Public Sub cmdTest92_Click()
+    wsTest.RegressionTest = False
+    mTestServices.Test_92_LabelWithUnderlayedURL
+End Sub
+
 Private Sub EoP(ByVal e_proc As String, _
        Optional ByVal e_inf As String = vbNullString)
 ' ------------------------------------------------------------------------------
@@ -489,7 +494,7 @@ Private Sub MessageInit(ByRef msg_form As fMsg, _
     mMsg.MsgInstance fi_key:=msg_title, fi_unload:=True                    ' Ensures a message starts from scratch
     Set msg_form = mMsg.MsgInstance(msg_title)
     
-    For i = 1 To msg_form.NoOfDesignedMsgSects
+    For i = 1 To msg_form.NoOfDesignedMsgSects ' obtained when the designed controls are collected
         With Message.Section(i)
             .Label.Text = vbNullString
             .Label.FontColor = rgbBlue
@@ -961,7 +966,7 @@ Public Function Test_03_WidthDeterminedByMinimumWidth() As Variant
             Case BTTN_PASSED:       wsTest.Passed = True:   Exit Do
             Case BTTN_FAILED:       wsTest.Failed = True:   Exit Do
             Case sBttnTerminate:    wsTest.TerminateRegressionTest = True:  Exit Do
-            Case Else ' Stop and Next are passed on to the caller
+            Case Else: Stop ' Stop and Next are passed on to the caller
         End Select
     
     Loop
@@ -2180,7 +2185,7 @@ Public Function Test_90_AllInOne() As Variant
         .Label.FontColor = rgbBlue
         .Text.Text = "This demo displays only some of the 7 x 7 = 49 possible reply buttons which may have any caption text " _
                    & "including the classic VBA.MsgBox values (vbOkOnly, vbYesNoCancel, etc.) - even in a mixture." & vbLf & vbLf _
-                   & "!! This demo ends only with the Ok button and loops with any other."
+                   & "!! This test ends with any button !!"
     End With
     '~~ Prepare the buttons collection
     
@@ -2244,6 +2249,76 @@ Public Function Test_91_MinimumMessage() As Variant
         .Text.Text = "The message form height is adjusted to the required height up to the specified " & _
                      "maximum heigth which is " & PrcPnt(TestMsgHeightMax, "h") & " and not exceeded."
         .Text.FontColor = rgbRed
+    End With
+                                                                                              
+    Select Case mMsg.Dsply(dsply_title:=MsgTitle _
+                         , dsply_msg:=Message _
+                         , dsply_buttons:=mMsg.Buttons() _
+                         , dsply_width_min:=TestMsgWidthMin _
+                         , dsply_width_max:=TestMsgWidthMax _
+                         , dsply_height_max:=TestMsgHeightMax _
+                         , dsply_modeless:=wsTest.TestOptionDisplayModeless)
+        Case BTTN_PASSED:       wsTest.Passed = True
+        Case BTTN_FAILED:       wsTest.Failed = True
+        Case sBttnTerminate:    wsTest.TerminateRegressionTest = True
+    End Select
+             
+xt: EoP ErrSrc(PROC)
+    Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
+End Function
+
+Public Function Test_92_LabelWithUnderlayedURL() As Variant
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_92_LabelWithUnderlayedURL"
+    
+    On Error GoTo eh
+    Dim MsgForm     As fMsg
+    Dim MsgTitle    As String
+    
+    BoP ErrSrc(PROC)
+    SetupTest 92
+    MsgTitle = Readable(PROC)
+    MessageInit msg_form:=MsgForm, msg_title:=MsgTitle, caller:=ErrSrc(PROC)  ' set test-global message specifications
+    
+    '~~ Obtain initial test values from the Test Worksheet
+    With wsTest
+        TestMsgWidthMin = .MsgWidthMin
+        TestMsgWidthMax = .MsgWidthMax
+        TestMsgHeightMax = .MsgHeightMax
+    End With
+    MsgForm.VisualizeForTest = wsTest.VisualizeForTest
+        
+    With Message.Section(1)
+        .Label.Text = "Public github repo Common-VBA-Message-Service"
+        .Label.OpenWhenClicked = "https://github.com/warbe-maker/Common-VBA-Message-Service"
+        .Text.Text = "The label above is underlayed with a url *)."
+    End With
+    With Message.Section(2)
+        .Label.Text = "About this feature of the 'Common-VBA-Message-Service':"
+        .Text.Text = "The Common-VBA-Message-Service makes use of the 'Click' and the 'MouseMove' event " & _
+                     "of the Label control to allow not only to open a URL but also to open a file or " & _
+                     "start an application (open a Workbook, Word document, etc). Examples:"
+    End With
+    With Message.Section(3).Text
+        .Text = "Open a folder:       C:\TEMP\                 " & vbLf & _
+                "Call the eMail app:  mailto:dash10@hotmail.com" & vbLf & _
+                "Open a Url:          http://......            " & vbLf & _
+                "Open a file:         C:\TEMP\TestThis   (opens a dialog for the selection of the app" & vbLf & _
+                "Open an application: x:\my\workbooks\this.xlsb (opens Excel)"
+        .MonoSpaced = True
+    End With
+    
+    With Message.Section(4).Text
+        .Text = "*) 'https://github.com/warbe-maker/Common-VBA-Message-Service'"
+        .MonoSpaced = True
+        .FontSize = 8
     End With
                                                                                               
     Select Case mMsg.Dsply(dsply_title:=MsgTitle _

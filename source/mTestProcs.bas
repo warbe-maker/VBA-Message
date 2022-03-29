@@ -306,7 +306,7 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
     
     '~~ Check the form doesn't already exist
     For Each cmp In uf_wb.VBProject.VBComponents
-        If cmp.name = uf_name Then
+        If cmp.Name = uf_name Then
             Set FormNew = uf_wb.VBProject.VBComponents(uf_name)
             Exit Function
         End If
@@ -316,7 +316,7 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
     Set cmp = uf_wb.VBProject.VBComponents.Add(vbext_ct_MSForm)
     DoEvents
     With cmp
-        .name = uf_name
+        .Name = uf_name
         .Properties("Height") = 100
         .Properties("Width") = 200
         On Error Resume Next
@@ -387,7 +387,7 @@ Private Sub FormRemove(ByVal wb As Workbook, _
     
     With wb.VBProject
         For Each cmp In .VBComponents
-            If cmp.name = FRM_NAME Then
+            If cmp.Name = FRM_NAME Then
                 .VBComponents.Remove cmp
                 Exit Sub
             End If
@@ -745,7 +745,7 @@ again:
                 .MultiLine = True
                 .WordWrap = False
                 With .Font
-                    .name = "Courier New"
+                    .Name = "Courier New"
                     .Size = 8
                 End With
                 .Top = 5
@@ -832,7 +832,7 @@ again:
                 .MultiLine = True
                 .WordWrap = False
                 With .Font
-                    .name = "Courier New"
+                    .Name = "Courier New"
                     .Size = 8
                 End With
                 .Top = 5
@@ -910,7 +910,7 @@ Public Sub Test_MultipleMessageInstances()
         With TestInstance(fi_key:=key)
             .Height = 80
             .Width = 200
-            .Caption = key & " of UserForm '" & Obj.name & "'"
+            .Caption = key & " of UserForm '" & Obj.Name & "'"
             .Show Modeless
             .Top = INIT_TOP + (30 * i)
             .Left = INIT_LEFT + (30 * i)
@@ -1037,26 +1037,26 @@ Private Sub Test_Pass_TypeMsgText()
     
     t.FontBold = True
     With f
-        k = m_header
+        k = enMonHeader
         .Text(k) = t
         Debug.Assert .Text(k).FontBold = True
-        Debug.Assert .Text(m_footer).FontBold = False
+        Debug.Assert .Text(enMonFooter).FontBold = False
     
-        k = m_footer
+        k = enMonFooter
         .Text(k) = t
         Debug.Assert .Text(k).FontBold = True
     
-        k = m_step
+        k = enMonStep
         .Text(k) = t
         Debug.Assert .Text(k).FontBold = True
     
         For i = 1 To 4
-            k = m_label
+            k = enSectLabel
             .Text(k, i) = t
             Debug.Assert .Text(k, i).FontBold = True
         Next i
         For i = 1 To 4
-            k = m_text
+            k = enSectText
             .Text(k, i) = t
             Debug.Assert .Text(k, i).FontBold = True
         Next i
@@ -1071,4 +1071,15 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
+Private Sub Test_OpenHyperlink()
+    mMsg.OpenUrlEtc "https://github.com/warbe-maker/Common-VBA-Message-Service", WIN_NORMAL
+End Sub
+
+Private Sub Test_OpenFile()
+    mMsg.OpenUrlEtc "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\ExecTrace.log", WIN_NORMAL
+End Sub
+
+Private Sub Test_OpenFile_No_Assoc()
+    mMsg.OpenUrlEtc "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\.gitattributes", WIN_NORMAL
+End Sub
 

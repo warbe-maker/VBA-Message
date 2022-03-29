@@ -57,22 +57,6 @@ Public Property Get Text(Optional ByVal txt_kind_of_text As KindOfText, _
                 Text.MonoSpaced = vArry(6)
                 Text.Text = vArry(7)
             End If
-        Case enSectLabel
-            If dctSectLabel Is Nothing Then
-                Text.Text = vbNullString
-            ElseIf Not dctSectLabel.Exists(txt_section) Then
-                Text.Text = vbNullString
-            Else
-                vArry = dctSectLabel(txt_section)
-                Text.FontBold = vArry(0)
-                Text.FontColor = vArry(1)
-                Text.FontItalic = vArry(2)
-                Text.FontName = vArry(3)
-                Text.FontSize = vArry(4)
-                Text.FontUnderline = vArry(5)
-                Text.MonoSpaced = vArry(6)
-                Text.Text = vArry(7)
-            End If
     End Select
 End Property
 
@@ -106,8 +90,7 @@ Public Property Let Text(Optional ByVal txt_kind_of_text As KindOfText, _
         Case enMonHeader:    TextMonitorHeader = txt_text
         Case enMonFooter:    TextMonitorFooter = txt_text
         Case enMonStep:      TextMonitorStep = txt_text
-        Case enSectText:      dctSectText.Add txt_section, vArry
-        Case enSectLabel:     dctSectLabel.Add txt_section, vArry
+        Case enSectText:     dctSectText.Add txt_section, vArry
     End Select
 
 End Property

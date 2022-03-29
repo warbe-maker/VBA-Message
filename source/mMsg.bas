@@ -33,14 +33,36 @@ Const SM_XVIRTUALSCREEN                         As Long = &H4C&     ' display's
 Const SM_YVIRTUALSCREEN                         As Long = &H4D&     ' DPI in points
 Const TWIPSPERINCH                              As Long = 1440      ' -------------
 Private Declare PtrSafe Function GetSystemMetrics32 Lib "user32" Alias "GetSystemMetrics" (ByVal nIndex As Long) As Long
-Private Declare PtrSafe Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
+Private Declare PtrSafe Function GetDC Lib "user32" (ByVal hwnd As Long) As Long
 Private Declare PtrSafe Function GetDeviceCaps Lib "gdi32" (ByVal hDC As Long, ByVal nIndex As Long) As Long
-Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hDC As Long) As Long
+Private Declare PtrSafe Function ReleaseDC Lib "user32" (ByVal hwnd As Long, ByVal hDC As Long) As Long
+Private Declare PtrSafe Function apiShellExecute Lib "shell32.dll" _
+    Alias "ShellExecuteA" _
+    (ByVal hwnd As Long, _
+    ByVal lpOperation As String, _
+    ByVal lpFile As String, _
+    ByVal lpParameters As String, _
+    ByVal lpDirectory As String, _
+    ByVal nShowCmd As Long) _
+    As Long
+
+'***App Window Constants***
+Public Const WIN_NORMAL = 1         'Open Normal
+Public Const WIN_MAX = 3            'Open Maximized
+Public Const WIN_MIN = 2            'Open Minimized
+
+'***Error Codes***
+Private Const ERROR_SUCCESS = 32&
+Private Const ERROR_NO_ASSOC = 31&
+Private Const ERROR_OUT_OF_MEM = 0&
+Private Const ERROR_FILE_NOT_FOUND = 2&
+Private Const ERROR_PATH_NOT_FOUND = 3&
+Private Const ERROR_BAD_FORMAT = 11&
 
 ' Declarations for making a UserForm resizable
 Private Declare PtrSafe Function GetForegroundWindow Lib "User32.dll" () As Long
-Private Declare PtrSafe Function GetWindowLong Lib "User32.dll" Alias "GetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long) As Long
-Private Declare PtrSafe Function SetWindowLong Lib "User32.dll" Alias "SetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
+Private Declare PtrSafe Function GetWindowLong Lib "User32.dll" Alias "GetWindowLongA" (ByVal hwnd As Long, ByVal nIndex As Long) As Long
+Private Declare PtrSafe Function SetWindowLong Lib "User32.dll" Alias "SetWindowLongA" (ByVal hwnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long
 Private Const WS_THICKFRAME As Long = &H40000
 Private Const GWL_STYLE As Long = -16
 
@@ -59,6 +81,18 @@ Public Const vbResume                           As Long = 6 ' return value (equa
 
 Public ProgressText As String
 
+Public Type TypeMsgLabel
+        FontBold As Boolean
+        FontColor As XlRgbColor
+        FontItalic As Boolean
+        FontName As String
+        FontSize As Long
+        FontUnderline As Boolean
+        MonoSpaced As Boolean ' overwrites any FontName
+        Text As String
+        OpenWhenClicked As String
+End Type
+
 Public Type TypeMsgText
         FontBold As Boolean
         FontColor As XlRgbColor
@@ -70,19 +104,18 @@ Public Type TypeMsgText
         Text As String
 End Type
 Public Type TypeMsgSect
-       Label As TypeMsgText
+       Label As TypeMsgLabel
        Text As TypeMsgText
 End Type
 Public Type TypeMsg
     Section(1 To 4) As TypeMsgSect
 End Type
 
-Public Enum KindOfText
+Public Enum KindOfText  ' Used with Property Text Get/LET
     enMonHeader
     enMonFooter
     enMonStep
     enSectText
-    enSectLabel
 End Enum
 
 Private bModeless       As Boolean
@@ -109,55 +142,6 @@ End Property
 Public Property Get ScreenWidth() As Single
 '    Debug.Print "Screen-Width: " & GetSystemMetrics32(SM_CXVIRTUALSCREEN) & " dpi"
     ConvertPixelsToPoints x_dpi:=GetSystemMetrics32(SM_CXVIRTUALSCREEN), x_pts:=ScreenWidth
-End Property
-
-Private Property Get Text(Optional ByVal txt_part As KindOfText, _
-                          Optional ByVal txt_section As Long = 1) As TypeMsgText
-' ------------------------------------------------------------------------------
-' Returns the provided text as section-text or -label, monitor-header,
-' -footer, or -step.
-' ------------------------------------------------------------------------------
-    Select Case txt_part
-        Case enMonHeader:    MsgText1 = TextMonitorHeader
-        Case enMonFooter:    MsgText1 = TextMonitorFooter
-        Case enMonStep:      MsgText1 = TextMonitorStep
-        Case enSectText:      TextSection.Section(txt_section).Text = TextMsg
-        Case enSectLabel:     TextSection.Section(txt_section).Label = TextLabel
-    End Select
-    
-    Text.FontBold = MsgText1.FontBold
-    Text.FontColor = MsgText1.FontColor
-    Text.FontItalic = MsgText1.FontItalic
-    Text.FontName = MsgText1.FontName
-    Text.FontSize = MsgText1.FontSize
-    Text.FontUnderline = MsgText1.FontUnderline
-    Text.MonoSpaced = MsgText1.MonoSpaced
-    Text.Text = MsgText1.Text
-
-End Property
-
-Private Property Let Text(Optional ByVal txt_part As KindOfText, _
-                          Optional ByVal txt_section As Long = 1, _
-                                   ByRef txt_text As TypeMsgText)
-' ------------------------------------------------------------------------------
-' Provide text as section text, section label, monitor header, footer or step.
-' ------------------------------------------------------------------------------
-    MsgText1.FontBold = txt_text.FontBold
-    MsgText1.FontColor = txt_text.FontColor
-    MsgText1.FontItalic = txt_text.FontItalic
-    MsgText1.FontName = txt_text.FontName
-    MsgText1.FontSize = txt_text.FontSize
-    MsgText1.FontUnderline = txt_text.FontUnderline
-    MsgText1.MonoSpaced = txt_text.MonoSpaced
-    MsgText1.Text = txt_text.Text
-    Select Case txt_part
-        Case enMonHeader:    TextMonitorHeader = MsgText1
-        Case enMonFooter:    TextMonitorFooter = MsgText1
-        Case enMonStep:      TextMonitorStep = MsgText1
-        Case enSectText:      TextSection.Section(txt_section).Text = MsgText1
-        Case enSectLabel:     TextSection.Section(txt_section).Label = MsgText1
-    End Select
-
 End Property
 
 Private Function AppErr(ByVal app_err_no As Long) As Long
@@ -562,7 +546,7 @@ Public Function Dsply(ByVal dsply_title As String, _
         .MsgTitle = dsply_title
         For i = 1 To .NoOfDesignedMsgSects
             '~~ Save the label and the text udt into a Dictionary by transfering it into an array
-            .Text(enSectLabel, i) = dsply_msg.Section(i).Label
+            .MsgLabel(i) = dsply_msg.Section(i).Label
             .Text(enSectText, i) = dsply_msg.Section(i).Text
         Next i
         
@@ -724,6 +708,25 @@ Private Function GetPanesIndex(ByVal Rng As Range) As Integer
     GetPanesIndex = Index
 End Function
 
+Public Sub MakeFormResizable()
+' ----------------------------------------------------------------------------
+' Written: February 14, 2011
+' Author:  Leith Ross
+'
+' NOTE:  This code should be executed within the UserForm_Activate() event.
+' ----------------------------------------------------------------------------
+    Dim lStyle As Long
+    Dim hwnd As Long
+    Dim RetVal
+  
+    hwnd = GetForegroundWindow
+    'Get the basic window style
+     lStyle = GetWindowLong(hwnd, GWL_STYLE) Or WS_THICKFRAME
+    'Set the basic window styles
+     RetVal = SetWindowLong(hwnd, GWL_STYLE, lStyle)
+
+End Sub
+
 Private Function Max(ParamArray va() As Variant) As Variant
 ' --------------------------------------------------------
 ' Returns the maximum value of all values provided (va).
@@ -741,12 +744,11 @@ Public Function Monitor(ByVal mon_title As String, _
                         ByRef mon_header As TypeMsgText, _
                         ByRef mon_footer As TypeMsgText, _
                         ByRef mon_step As TypeMsgText, _
-               Optional ByVal mon_steps_monospaced As Boolean = True, _
                Optional ByVal mon_steps_visible As Long = 10, _
                Optional ByVal mon_width_min As Long = 25, _
                Optional ByVal mon_width_max As Long = 85, _
                Optional ByVal mon_height_max As Long = 85, _
-               Optional ByVal mon_pos As Range = Nothing) As fMsg
+               Optional ByVal mon_pos As Variant = Nothing) As fMsg
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -756,7 +758,6 @@ Public Function Monitor(ByVal mon_title As String, _
     Static fMon As fMsg
     Set fMon = MonitorInitialize(mon_title:=mon_title _
                                , mon_steps_displayed:=mon_steps_visible _
-                               , mon_steps_monospaced:=mon_steps_monospaced _
                                , mon_header:=mon_header _
                                , mon_footer:=mon_footer _
                                , mon_width_min:=mon_width_min _
@@ -812,7 +813,8 @@ Private Function MonitorInitialize(ByVal mon_title As String, _
                          , mon_steps_displayed:=mon_steps_displayed
     End With
     If Not mon_pos Is Nothing Then
-        ShowAtRange fMon, mon_pos, False
+        If TypeName(mon_pos) = "Range" _
+        Then ShowAtRange fMon, mon_pos, False
     Else
         fMon.Show False
     End If
@@ -880,6 +882,50 @@ Public Function MsgInstance(ByVal fi_key As String, _
 xt: Exit Function
 
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Function
+
+Public Function OpenUrlEtc(ByVal oue_string As String, _
+                           ByVal oue_show_how As Long) As String
+' ----------------------------------------------------------------------------
+' Opens a folder, email-app, url, or even an Access instance.
+'
+' Usage Examples
+' - Open a folder:          OpenUrlEtc("C:\TEMP\",WIN_NORMAL)
+' - Call Email app:         OpenUrlEtc("mailto:dash10@hotmail.com",WIN_NORMAL)
+' - Open URL:               OpenUrlEtc("http://home.att.net/~dashish", WIN_NORMAL)
+' - Handle Unknown extensions (call Open With Dialog):
+'                           OpenUrlEtc("C:\TEMP\TestThis",Win_Normal)
+' - Start Access instance:  OpenUrlEtc("I:\mdbs\CodeNStuff.mdb", Win_NORMAL)
+'
+' Copyright:
+' This code was originally written by Dev Ashish. It is not to be altered or
+' distributed, except as part of an application. You are free to use it in any
+' application, provided the copyright notice is left unchanged.
+'
+' Code Courtesy of: Dev Ashish
+' ----------------------------------------------------------------------------
+
+    Dim lRet            As Long
+    Dim varTaskID       As Variant
+    Dim stRet           As String
+    Dim hWndAccessApp   As Long
+    
+    '~~ First try ShellExecute
+    lRet = apiShellExecute(hWndAccessApp, vbNullString, oue_string, vbNullString, vbNullString, oue_show_how)
+    
+    Select Case True
+        Case lRet = ERROR_OUT_OF_MEM:       stRet = "Error: Out of Memory/Resources. Couldn't Execute!"
+        Case lRet = ERROR_FILE_NOT_FOUND:   stRet = "Error: File not found.  Couldn't Execute!"
+        Case lRet = ERROR_PATH_NOT_FOUND:   stRet = "Error: Path not found. Couldn't Execute!"
+        Case lRet = ERROR_BAD_FORMAT:       stRet = "Error:  Bad File Format. Couldn't Execute!"
+        Case lRet = ERROR_NO_ASSOC          ' Try the OpenWith dialog
+            varTaskID = Shell("rundll32.exe shell32.dll,OpenAs_RunDLL " & oue_string, WIN_NORMAL)
+            lRet = (varTaskID <> 0)
+        Case lRet > ERROR_SUCCESS:         lRet = -1
+    End Select
+    
+    OpenUrlEtc = lRet & IIf(stRet = vbNullString, vbNullString, ", " & stRet)
+
 End Function
 
 Public Function Pnts(ByVal pt_value As Long, _
@@ -1043,24 +1089,5 @@ Private Sub StckPush(ByRef stck As Collection, _
 xt: Exit Sub
 
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
-End Sub
-
-Public Sub MakeFormResizable()
-' ----------------------------------------------------------------------------
-' Written: February 14, 2011
-' Author:  Leith Ross
-'
-' NOTE:  This code should be executed within the UserForm_Activate() event.
-' ----------------------------------------------------------------------------
-    Dim lStyle As Long
-    Dim hWnd As Long
-    Dim RetVal
-  
-    hWnd = GetForegroundWindow
-    'Get the basic window style
-     lStyle = GetWindowLong(hWnd, GWL_STYLE) Or WS_THICKFRAME
-    'Set the basic window styles
-     RetVal = SetWindowLong(hWnd, GWL_STYLE, lStyle)
-
 End Sub
 
