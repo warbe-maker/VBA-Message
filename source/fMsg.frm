@@ -580,10 +580,10 @@ Public Property Get Text(Optional ByVal txt_kind_of_text As KindOfText, _
 ' ------------------------------------------------------------------------------
     Dim vArry() As Variant
     Select Case txt_kind_of_text
-        Case mon_header:    Text = TextMonitorHeader
-        Case mon_footer:    Text = TextMonitorFooter
-        Case mon_step:      Text = TextMonitorStep
-        Case sect_text
+        Case enMonHeader:    Text = TextMonitorHeader
+        Case enMonFooter:    Text = TextMonitorFooter
+        Case enMonStep:      Text = TextMonitorStep
+        Case enSectText
             If dctSectText Is Nothing Then
                 Text.Text = vbNullString
             ElseIf Not dctSectText.Exists(txt_section) Then
@@ -599,7 +599,7 @@ Public Property Get Text(Optional ByVal txt_kind_of_text As KindOfText, _
                 Text.MonoSpaced = vArry(6)
                 Text.Text = vArry(7)
             End If
-        Case sect_label
+        Case enSectLabel
             If dctSectLabel Is Nothing Then
                 Text.Text = vbNullString
             ElseIf Not dctSectLabel.Exists(txt_section) Then
@@ -636,11 +636,11 @@ Public Property Let Text(Optional ByVal txt_kind_of_text As KindOfText, _
     vArry(6) = txt_text.MonoSpaced
     vArry(7) = txt_text.Text
     Select Case txt_kind_of_text
-        Case mon_header:    TextMonitorHeader = txt_text
-        Case mon_footer:    TextMonitorFooter = txt_text
-        Case mon_step:      TextMonitorStep = txt_text
-        Case sect_text:     dctSectText.Add txt_section, vArry
-        Case sect_label:    dctSectLabel.Add txt_section, vArry
+        Case enMonHeader:    TextMonitorHeader = txt_text
+        Case enMonFooter:    TextMonitorFooter = txt_text
+        Case enMonStep:      TextMonitorStep = txt_text
+        Case enSectText:     dctSectText.Add txt_section, vArry
+        Case enSectLabel:    dctSectLabel.Add txt_section, vArry
     End Select
 
 End Property
@@ -1680,7 +1680,7 @@ Private Sub EstblshMonitorFooter(ByVal mf_top As Single)
 ' ------------------------------------------------------------------------------
     If tbxFooter Is Nothing Then
         Set tbxFooter = AddControl(ac_ctl:=TextBox, ac_visible:=True, ac_name:="tbMonitorFooter")
-        SetupTextFont tbxFooter, mon_footer
+        SetupTextFont tbxFooter, enMonFooter
         With tbxFooter
             .Top = mf_top + 6
             .Left = 0
@@ -1701,7 +1701,7 @@ Private Sub EstblshMonitorHeader(ByRef mh_top As Single)
 ' ------------------------------------------------------------------------------
     If tbxHeader Is Nothing Then
         Set tbxHeader = AddControl(ac_ctl:=TextBox, ac_visible:=False, ac_name:="tbMonitorHeader")
-        SetupTextFont tbxHeader, mon_header
+        SetupTextFont tbxHeader, enMonHeader
         With tbxHeader
             .Top = mh_top
             .Left = 0
@@ -1728,7 +1728,7 @@ Private Sub EstblshMonitorStep(ByRef ms_top As Single)
                            , ac_in:=frmSteps _
                            , ac_visible:=False _
                            , ac_name:=CTL_NAME & cllSteps.Count + 1)
-    SetupTextFont tbxStep, mon_step
+    SetupTextFont tbxStep, enMonStep
     With tbxStep
         .Top = ms_top
         .Left = 0
@@ -1988,7 +1988,7 @@ Public Sub MonitorStep()
                 siTop = AdjustToVgrid(tbx.Top + tbx.Height)
             End If
             Set tbx = cllSteps(lStepsDisplayed + 1)
-            SetupTextFont tbx, mon_step
+            SetupTextFont tbx, enMonStep
             tbx.Visible = True
             tbx.Top = siTop
             
@@ -2453,8 +2453,8 @@ Private Sub SetCtrlsOfSection(ByVal i As Long)
     Set MsectLbl = MsectsLbl(i)
     Set MsectTbxFrm = MsectsTbxFrm(i)
     Set MsectTbx = MsectsTbx(i)
-    MsgSectTxt = Text(sect_text, i)
-    MsgSectLbl = Text(sect_label, i)
+    MsgSectTxt = Text(enSectText, i)
+    MsgSectLbl = Text(enSectLabel, i)
 End Sub
 
 Public Sub Setup()
@@ -2589,7 +2589,7 @@ Private Sub Setup2_MsgSectsMonoSpaced()
     Dim i As Long
     
     For i = 1 To UBound(TextSection.Section)
-        With Me.Text(sect_text, i)
+        With Me.Text(enSectText, i)
             If .MonoSpaced And .Text <> vbNullString Then
                 SetCtrlsOfSection i
                 SetupMsgSect
@@ -2647,7 +2647,7 @@ Private Sub Setup4_MsgSectsPropSpaced()
     Dim v   As Variant
     
     For i = i To UBound(TextSection.Section)
-        With Me.Text(sect_text, i)
+        With Me.Text(enSectText, i)
             If .Text <> vbNullString And Not .MonoSpaced Then
                 SetCtrlsOfSection i
                 SetupMsgSect

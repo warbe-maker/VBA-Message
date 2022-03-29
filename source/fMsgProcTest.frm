@@ -38,10 +38,10 @@ Public Property Get Text(Optional ByVal txt_kind_of_text As KindOfText, _
 ' ------------------------------------------------------------------------------
     Dim vArry() As Variant
     Select Case txt_kind_of_text
-        Case mon_header:    Text = TextMonitorHeader
-        Case mon_footer:    Text = TextMonitorFooter
-        Case mon_step:      Text = TextMonitorStep
-        Case sect_text
+        Case enMonHeader:    Text = TextMonitorHeader
+        Case enMonFooter:    Text = TextMonitorFooter
+        Case enMonStep:      Text = TextMonitorStep
+        Case enSectText
             If dctSectText Is Nothing Then
                 Text.Text = vbNullString
             ElseIf Not dctSectText.Exists(txt_section) Then
@@ -57,7 +57,7 @@ Public Property Get Text(Optional ByVal txt_kind_of_text As KindOfText, _
                 Text.MonoSpaced = vArry(6)
                 Text.Text = vArry(7)
             End If
-        Case sect_label
+        Case enSectLabel
             If dctSectLabel Is Nothing Then
                 Text.Text = vbNullString
             ElseIf Not dctSectLabel.Exists(txt_section) Then
@@ -103,11 +103,11 @@ Public Property Let Text(Optional ByVal txt_kind_of_text As KindOfText, _
     vArry(6) = txt_text.MonoSpaced
     vArry(7) = txt_text.Text
     Select Case txt_kind_of_text
-        Case mon_header:    TextMonitorHeader = txt_text
-        Case mon_footer:    TextMonitorFooter = txt_text
-        Case mon_step:      TextMonitorStep = txt_text
-        Case sect_text:      dctSectText.Add txt_section, vArry
-        Case sect_label:     dctSectLabel.Add txt_section, vArry
+        Case enMonHeader:    TextMonitorHeader = txt_text
+        Case enMonFooter:    TextMonitorFooter = txt_text
+        Case enMonStep:      TextMonitorStep = txt_text
+        Case enSectText:      dctSectText.Add txt_section, vArry
+        Case enSectLabel:     dctSectLabel.Add txt_section, vArry
     End Select
 
 End Property
