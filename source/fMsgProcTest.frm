@@ -27,56 +27,88 @@ Private MsgText1                As TypeMsgText  ' common text element
 Private TextMonitorHeader       As TypeMsgText
 Private TextMonitorFooter       As TypeMsgText
 Private TextMonitorStep         As TypeMsgText
-Private TextMsg                 As TypeMsgText
-Private TextLabel               As TypeMsgText
-Private TextSection             As TypeMsg
+Private dctSectText             As New Dictionary
+Private dctSectLabel            As New Dictionary
 
-Public Property Let Text(Optional ByVal txt_part As KindOfText, _
+Public Property Get Text(Optional ByVal txt_kind_of_text As KindOfText, _
+                         Optional ByVal txt_section As Long = 1) As TypeMsgText
+' ------------------------------------------------------------------------------
+' Returns the text (txt_kind_of_text) as section-text or -label, monitor-header,
+' -footer, or -step.
+' ------------------------------------------------------------------------------
+    Dim vArry() As Variant
+    Select Case txt_kind_of_text
+        Case mon_header:    Text = TextMonitorHeader
+        Case mon_footer:    Text = TextMonitorFooter
+        Case mon_step:      Text = TextMonitorStep
+        Case sect_text
+            If dctSectText Is Nothing Then
+                Text.Text = vbNullString
+            ElseIf Not dctSectText.Exists(txt_section) Then
+                Text.Text = vbNullString
+            Else
+                vArry = dctSectText(txt_section)
+                Text.FontBold = vArry(0)
+                Text.FontColor = vArry(1)
+                Text.FontItalic = vArry(2)
+                Text.FontName = vArry(3)
+                Text.FontSize = vArry(4)
+                Text.FontUnderline = vArry(5)
+                Text.MonoSpaced = vArry(6)
+                Text.Text = vArry(7)
+            End If
+        Case sect_label
+            If dctSectLabel Is Nothing Then
+                Text.Text = vbNullString
+            ElseIf Not dctSectLabel.Exists(txt_section) Then
+                Text.Text = vbNullString
+            Else
+                vArry = dctSectLabel(txt_section)
+                Text.FontBold = vArry(0)
+                Text.FontColor = vArry(1)
+                Text.FontItalic = vArry(2)
+                Text.FontName = vArry(3)
+                Text.FontSize = vArry(4)
+                Text.FontUnderline = vArry(5)
+                Text.MonoSpaced = vArry(6)
+                Text.Text = vArry(7)
+            End If
+    End Select
+End Property
+
+Public Property Let Text(Optional ByVal txt_kind_of_text As KindOfText, _
                          Optional ByVal txt_section As Long = 1, _
                                   ByRef txt_text As TypeMsgText)
 ' ------------------------------------------------------------------------------
-' Provide text as section text, section label, monitor header, footer or step.
+' Provide the text (txt_text) as section (txt_section) text, section label,
+' monitor header, footer, or step (txt_kind_of_text).
 ' ------------------------------------------------------------------------------
-    MsgText1.FontBold = txt_text.FontBold
-    MsgText1.FontColor = txt_text.FontColor
-    MsgText1.FontItalic = txt_text.FontItalic
-    MsgText1.FontName = txt_text.FontName
-    MsgText1.FontSize = txt_text.FontSize
-    MsgText1.FontUnderline = txt_text.FontUnderline
-    MsgText1.MonoSpaced = txt_text.MonoSpaced
-    MsgText1.Text = txt_text.Text
-    Select Case txt_part
-        Case m_header:    TextMonitorHeader = MsgText1
-        Case m_footer:    TextMonitorFooter = MsgText1
-        Case m_step:      TextMonitorStep = MsgText1
-        Case m_text:      TextSection.Section(txt_section).Text = MsgText1
-        Case m_label:     TextSection.Section(txt_section).Label = MsgText1
-    End Select
-
-End Property
-
-Public Property Get Text(Optional ByVal txt_part As KindOfText, _
-                         Optional ByVal txt_section As Long = 1) As TypeMsgText
-' ------------------------------------------------------------------------------
-' Returns the provided text as section-text or -label, monitor-header,
-' -footer, or -step.
-' ------------------------------------------------------------------------------
-    Select Case txt_part
-        Case m_header:    MsgText1 = TextMonitorHeader
-        Case m_footer:    MsgText1 = TextMonitorFooter
-        Case m_step:      MsgText1 = TextMonitorStep
-        Case m_text:      TextSection.Section(txt_section).Text = TextMsg
-        Case m_label:     TextSection.Section(txt_section).Label = TextLabel
-    End Select
+    Dim vArry(0 To 7)   As Variant
     
-    Text.FontBold = MsgText1.FontBold
-    Text.FontColor = MsgText1.FontColor
-    Text.FontItalic = MsgText1.FontItalic
-    Text.FontName = MsgText1.FontName
-    Text.FontSize = MsgText1.FontSize
-    Text.FontUnderline = MsgText1.FontUnderline
-    Text.MonoSpaced = MsgText1.MonoSpaced
-    Text.Text = MsgText1.Text
+'    Dim t As TypeMsgText
+'    t.FontBold = txt_text.FontBold
+'    t.FontColor = txt_text.FontColor
+'    t.FontItalic = txt_text.FontItalic
+'    t.FontName = txt_text.FontName
+'    t.FontSize = txt_text.FontSize
+'    t.FontUnderline = txt_text.FontUnderline
+'    t.MonoSpaced = txt_text.MonoSpaced
+'    t.Text = txt_text.Text
+    vArry(0) = txt_text.FontBold
+    vArry(1) = txt_text.FontColor
+    vArry(2) = txt_text.FontItalic
+    vArry(3) = txt_text.FontName
+    vArry(4) = txt_text.FontSize
+    vArry(5) = txt_text.FontUnderline
+    vArry(6) = txt_text.MonoSpaced
+    vArry(7) = txt_text.Text
+    Select Case txt_kind_of_text
+        Case mon_header:    TextMonitorHeader = txt_text
+        Case mon_footer:    TextMonitorFooter = txt_text
+        Case mon_step:      TextMonitorStep = txt_text
+        Case sect_text:      dctSectText.Add txt_section, vArry
+        Case sect_label:     dctSectLabel.Add txt_section, vArry
+    End Select
 
 End Property
 
@@ -87,7 +119,7 @@ Public Property Get ContentHeight( _
 ' Returns the height of the frame's (frm) content by considering only
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
-    Dim ctl As MSForms.control
+    Dim ctl As MSForms.Control
     
     For Each ctl In frm.Controls
         If ctl.Parent Is frm Then
@@ -108,9 +140,9 @@ Public Property Get FrameContentWidth(Optional ByRef v As Variant, _
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
     
-    Dim ctl     As MSForms.control
+    Dim ctl     As MSForms.Control
     Dim frm     As MSForms.Frame
-    Dim frm_ctl As MSForms.control
+    Dim frm_ctl As MSForms.Control
     
     If TypeName(v) = "Frame" Then Set frm_ctl = v Else Stop
     For Each ctl In frm_ctl.Controls
@@ -472,7 +504,7 @@ Public Sub MonitorInitialize(ByVal mon_title As String, _
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Dim ctl     As MSForms.control
+    Dim ctl     As MSForms.Control
     Dim siTop   As Single
     Dim i       As Long
     Dim tbx     As MSForms.TextBox
@@ -768,7 +800,7 @@ Public Sub Setup1_Title( _
         With .laMsgTitle
             With .Font
                 .Bold = False
-                .name = Me.Font.name
+                .Name = Me.Font.Name
                 .Size = 8    ' Value which comes to a length close to the length required
             End With
             .Caption = vbNullString

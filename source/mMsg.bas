@@ -75,15 +75,15 @@ Public Type TypeMsgSect
        Text As TypeMsgText
 End Type
 Public Type TypeMsg
-    section(1 To 4) As TypeMsgSect
+    Section(1 To 4) As TypeMsgSect
 End Type
 
 Public Enum KindOfText
-    m_header
-    m_footer
-    m_step
-    m_text
-    m_label
+    mon_header
+    mon_footer
+    mon_step
+    sect_text
+    sect_label
 End Enum
 
 Private bModeless       As Boolean
@@ -122,8 +122,8 @@ Private Property Get Text(Optional ByVal txt_part As KindOfText, _
         Case m_header:    MsgText1 = TextMonitorHeader
         Case m_footer:    MsgText1 = TextMonitorFooter
         Case m_step:      MsgText1 = TextMonitorStep
-        Case m_text:      TextSection.section(txt_section).Text = TextMsg
-        Case m_label:     TextSection.section(txt_section).Label = TextLabel
+        Case m_text:      TextSection.Section(txt_section).Text = TextMsg
+        Case m_label:     TextSection.Section(txt_section).Label = TextLabel
     End Select
     
     Text.FontBold = MsgText1.FontBold
@@ -155,8 +155,8 @@ Private Property Let Text(Optional ByVal txt_part As KindOfText, _
         Case m_header:    TextMonitorHeader = MsgText1
         Case m_footer:    TextMonitorFooter = MsgText1
         Case m_step:      TextMonitorStep = MsgText1
-        Case m_text:      TextSection.section(txt_section).Text = MsgText1
-        Case m_label:     TextSection.section(txt_section).Label = MsgText1
+        Case m_text:      TextSection.Section(txt_section).Text = MsgText1
+        Case m_label:     TextSection.Section(txt_section).Label = MsgText1
     End Select
 
 End Property
@@ -238,7 +238,7 @@ Public Function Box(ByVal Prompt As String, _
     Dim MsgForm As fMsg
 
     '~~ Defaults
-    If Title = vbNullString Then Title = Application.name
+    If Title = vbNullString Then Title = Application.Name
     
     Message.Text = Prompt
     Message.MonoSpaced = box_monospaced
@@ -255,11 +255,11 @@ Public Function Box(ByVal Prompt As String, _
     With MsgForm
 '        .VisualizeForTest = True
         .MsgTitle = Title
-        .MsgText(1) = Message
+        .Text(sect_text, 1) = Message
         .MsgButtons = Buttons
-        .MsgHeightMax = box_height_max    ' percentage of screen height
-        .MsgHeightMin = box_height_min    ' percentage of screen height
-        .MsgWidthMax = box_width_max      ' percentage of screen width
+        .MsgHeightMax = box_height_max      ' percentage of screen height
+        .MsgHeightMin = box_height_min      ' percentage of screen height
+        .MsgWidthMax = box_width_max        ' percentage of screen width
         .MsgWidthMin = box_width_min        ' defaults to 400 pt. the absolute minimum is 200 pt
         .MinButtonWidth = box_button_width_min
         .MsgButtonDefault = box_button_default
@@ -563,8 +563,10 @@ Public Function Dsply(ByVal dsply_title As String, _
         .MsgTitle = dsply_title
         For i = 1 To .NoOfDesignedMsgSects
             '~~ Save the label and the text udt into a Dictionary by transfering it into an array
-            .MsgLabel(i) = dsply_msg.section(i).Label
-            .MsgText(i) = dsply_msg.section(i).Text
+            .Text(sect_label, i) = dsply_msg.Section(i).Label
+            .Text(sect_text, i) = dsply_msg.Section(i).Text
+'            .MsgLabel(i) = dsply_msg.Section(i).Label
+'            .MsgText(i) = dsply_msg.Section(i).Text
         Next i
         
         .MsgButtons = dsply_buttons
@@ -661,21 +663,21 @@ Public Function ErrMsg(ByVal err_source As String, _
 #End If
         
     '~~ Display the error message by means of the mMsg's Dsply function
-    With ErrMsgText.section(1)
+    With ErrMsgText.Section(1)
         With .Label
             .Text = "Error description:"
             .FontColor = rgbBlue
         End With
         .Text.Text = ErrDesc
     End With
-    With ErrMsgText.section(2)
+    With ErrMsgText.Section(2)
         With .Label
             .Text = "Error source:"
             .FontColor = rgbBlue
         End With
         .Text.Text = err_source
     End With
-    With ErrMsgText.section(3)
+    With ErrMsgText.Section(3)
         If ErrAbout = vbNullString Then
             .Label.Text = vbNullString
             .Text.Text = vbNullString
@@ -686,7 +688,7 @@ Public Function ErrMsg(ByVal err_source As String, _
         .Label.FontColor = rgbBlue
     End With
 #If Debugging = 1 Then
-    With ErrMsgText.section(4)
+    With ErrMsgText.Section(4)
         With .Label
             .Text = "About Debugging:"
             .FontColor = rgbBlue

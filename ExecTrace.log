@@ -1,51 +1,7 @@
-22-03-27 23:56:11 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-03-27 23:56:11                 >> Begin execution trace 
-22-03-27 23:56:11 00,0000         |  >> mTestServices.Test_01_Buttons
-22-03-27 23:56:11 00,0026         |  |  >> mTestServices.Test_01_Buttons_01_Empty
-22-03-27 23:56:11 00,0030 00,0004 |  |  << mTestServices.Test_01_Buttons_01_Empty
-22-03-27 23:56:11 00,0035         |  |  >> mTestServices.Test_01_Buttons_02_Single_String
-22-03-27 23:56:11 00,0039 00,0004 |  |  << mTestServices.Test_01_Buttons_02_Single_String
-22-03-27 23:56:11 00,0044         |  |  >> mTestServices.Test_01_Buttons_03_Single_Numeric_Item
-22-03-27 23:56:11 00,0048 00,0004 |  |  << mTestServices.Test_01_Buttons_03_Single_Numeric_Item
-22-03-27 23:56:11 00,0055         |  |  >> mTestServices.Test_01_Buttons_04_String_String
-22-03-27 23:56:11 00,0061 00,0005 |  |  << mTestServices.Test_01_Buttons_04_String_String
-22-03-27 23:56:11 00,0068         |  |  >> mTestServices.Test_01_Buttons_05_Collection_String_String
-22-03-27 23:56:11 00,0078 00,0011 |  |  << mTestServices.Test_01_Buttons_05_Collection_String_String
-22-03-27 23:56:11 00,0084         |  |  >> mTestServices.Test_01_Buttons_06_String_Collection_String
-22-03-27 23:56:11 00,0091 00,0007 |  |  << mTestServices.Test_01_Buttons_06_String_Collection_String
-22-03-27 23:56:11 00,0096         |  |  >> mTestServices.Test_01_Buttons_07_String_String_Collection
-22-03-27 23:56:11 00,0101 00,0005 |  |  << mTestServices.Test_01_Buttons_07_String_String_Collection
-22-03-27 23:56:11 00,0105         |  |  >> mTestServices.Test_01_Buttons_08_Semicolon_Delimited_String_Collection
-22-03-27 23:56:11 00,0110 00,0005 |  |  << mTestServices.Test_01_Buttons_08_Semicolon_Delimited_String_Collection
-22-03-27 23:56:11 00,0114         |  |  >> mTestServices.Test_01_Buttons_09_Comma_Delimited_String_Dictionary
-22-03-27 23:56:11 00,0143 00,0029 |  |  << mTestServices.Test_01_Buttons_09_Comma_Delimited_String_Dictionary
-22-03-27 23:56:11 00,0148         |  |  >> mTestServices.Function Test_01_Buttons_10_Box_7_By_7_Matrix
-22-03-27 23:56:26 14,7672 14,7524 |  |  << mTestServices.Function Test_01_Buttons_10_Box_7_By_7_Matrix
-22-03-27 23:56:26 14,7681 14,7681 |  << mTestServices.Test_01_Buttons
-22-03-27 23:56:26 14,7681 14,7681 << End execution trace 
-22-03-27 23:56:26                 Impact on the overall performance (caused by the trace itself): 00,0009 seconds!
-22-03-27 23:56:26 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-
-22-03-27 23:57:34 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-03-27 23:57:34                 >> Begin execution trace 
-22-03-27 23:57:34 00,0000         |  >> mTestServices.Test_02_ErrMsg
-22-03-27 23:57:57 00,0035 00,0035 |  << mTestServices.Test_02_ErrMsg
-22-03-27 23:57:57 00,0035 00,0035 << End execution trace 
-22-03-27 23:57:57                 Impact on the overall performance (caused by the trace itself): 00,0027 seconds!
-22-03-27 23:57:57 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-
-22-03-28 00:04:05 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-03-28 00:04:05                 >> Begin execution trace 
-22-03-28 00:04:05 00,0000         |  >> mTestServices.Test_03_WidthDeterminedByMinimumWidth
-22-03-28 00:04:07 00,1180 00,1180 |  << mTestServices.Test_03_WidthDeterminedByMinimumWidth
-22-03-28 00:04:07 00,1180 00,1180 << End execution trace 
-22-03-28 00:04:07                 Impact on the overall performance (caused by the trace itself): 00,0027 seconds!
-22-03-28 00:04:07 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-
-22-03-28 00:04:10 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-03-28 00:04:10                 >> Begin execution trace 
-22-03-28 00:04:10 00,0000         |  >> mTestServices.Test_03_WidthDeterminedByMinimumWidth
-22-03-28 00:04:30 00,0846 00,0846 |  << mTestServices.Test_03_WidthDeterminedByMinimumWidth
-22-03-28 00:04:30 00,0846 00,0846 << End execution trace 
-22-03-28 00:04:30                 Impact on the overall performance (caused by the trace itself): 00,0027 seconds!
-22-03-28 00:04:30 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-03-28 23:22:32 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-03-28 23:22:32                 >> Begin execution trace 
+22-03-28 23:22:32 00,0000         |  >> mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
+22-03-28 23:24:43 00,5258 00,5258 |  << mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
+22-03-28 23:24:43 00,5258 00,5258 << End execution trace 
+22-03-28 23:24:43                 Impact on the overall performance (caused by the trace itself): 00,0073 seconds!
+22-03-28 23:24:43 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)

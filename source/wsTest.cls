@@ -91,7 +91,7 @@ Public Property Get TestOptionDisplayModeless() As Boolean
     On Error GoTo eh
 
     If Not mObject.WsShapeExists(wse_ws:=Me, wse_shape_name:=SHAPE_NAME) _
-    Then Err.Raise AppErr(1), ErrSrc(PROC), "A shape named '" & SHAPE_NAME & "' does not exist in Worksheet '" & Me.name & "'!"
+    Then Err.Raise AppErr(1), ErrSrc(PROC), "A shape named '" & SHAPE_NAME & "' does not exist in Worksheet '" & Me.Name & "'!"
         
     If Me.Shapes("optDisplayModeless").OLEFormat.Object.Value = 1 _
     Then TestOptionDisplayModeless = True _
@@ -134,7 +134,7 @@ Public Property Get VisualizeForTest() As Boolean
     
     On Error GoTo eh
     If Not mObject.WsShapeExists(wse_ws:=Me, wse_shape_name:=SHAPE_NAME) _
-    Then Err.Raise AppErr(1), ErrSrc(PROC), "A shape named '" & SHAPE_NAME & "' does not exist in Worksheet '" & Me.name & "'!"
+    Then Err.Raise AppErr(1), ErrSrc(PROC), "A shape named '" & SHAPE_NAME & "' does not exist in Worksheet '" & Me.Name & "'!"
     
     If Me.Shapes(SHAPE_NAME).OLEFormat.Object.Value = 1 _
     Then VisualizeForTest = True _
@@ -239,9 +239,5 @@ Private Sub Worksheet_Activate()
     wsTest.Range("rngZoom").Select
     ActiveWindow.Zoom = True
     Rng.Select
-End Sub
-
-Private Sub Worksheet_SelectionChange(ByVal Target As Range)
-
 End Sub
 
