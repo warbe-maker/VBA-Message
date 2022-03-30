@@ -220,6 +220,14 @@ Public Function Box(ByVal Prompt As String, _
     Dim Message As TypeMsgText
     Dim MsgForm As fMsg
 
+    If Not IsValidMsgButtonsArg(Buttons) _
+    Then Err.Raise AppErr(1), ErrSrc(PROC), _
+                   "The provided buttons argument is neither empty (defaults to vbOkOnly), a string " & _
+                   "(optionally comma separated), a valid VBA.MsgBox value (vbYesNo, vbRetryCancel, " & _
+                   "etc. plus any extra options - which may or may not be implemented), an Array, a " & _
+                   "Collection, or a Dictionary! When an Array, Collection, or Dictionary at least " & _
+                   "one of its items in incorrect!"
+
     '~~ Defaults
     If Title = vbNullString Then Title = Application.Name
     
@@ -239,7 +247,7 @@ Public Function Box(ByVal Prompt As String, _
 '        .VisualizeForTest = True
         .MsgTitle = Title
         .Text(enSectText, 1) = Message
-        .MsgButtons = Buttons
+        .MsgBttns = mMsg.Buttons(Buttons)   ' Provide the buttons as Collection
         .MsgHeightMax = box_height_max      ' percentage of screen height
         .MsgHeightMin = box_height_min      ' percentage of screen height
         .MsgWidthMax = box_width_max        ' percentage of screen width
@@ -260,6 +268,34 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
+Private Function IsValidMsgButtonsArg(ByVal v_arg As Variant) As Boolean
+' -------------------------------------------------------------------------------------
+' Returns TRUE when the buttons argument (v_arg) is valid. When v_arg is an Array,
+' a Collection, or a Dictionary, TRUE is returned when all items are valid.
+' -------------------------------------------------------------------------------------
+    Dim i As Long
+    Dim v As Variant
+    
+    Select Case VarType(v_arg)
+        Case vbString, vbEmpty
+            IsValidMsgButtonsArg = True
+        Case Else
+            Select Case True
+                Case IsArray(v_arg), TypeName(v_arg) = "Collection", TypeName(v_arg) = "Dictionary"
+                     For Each v In v_arg
+                        If Not IsValidMsgButtonsArg(v) Then Exit Function
+                     Next v
+                    IsValidMsgButtonsArg = True
+                Case IsNumeric(v_arg)
+                    Select Case BttnsArgs(v_arg) ' The numeric buttons argument with all additional option 'unstripped'
+                        Case vbOKOnly, vbOKCancel, vbYesNo, vbRetryCancel, vbYesNoCancel, vbAbortRetryIgnore, vbYesNo, vbResumeOk
+                            IsValidMsgButtonsArg = True
+                    End Select
+            End Select
+    End Select
+
+End Function
+
 Public Function BttnsArgs(ByVal ba_arg As Long, _
                  Optional ByRef ba_rtl_reading As Boolean, _
                  Optional ByRef ba_box_right As Boolean, _
@@ -277,7 +313,16 @@ Public Function BttnsArgs(ByVal ba_arg As Long, _
 ' values added for other options but the display of the buttons are unstripped/deducted.
 ' I.e. the values are deducted and the corresponding argument is returtned instead).
 ' -------------------------------------------------------------------------------------
-        
+    Dim l As Long
+    
+    l = ba_arg - (Abs(Int(ba_arg / 16) * 16))
+    Select Case l
+        Case vbOKOnly, vbOKCancel, vbAbortRetryIgnore, vbYesNoCancel, vbYesNo, vbRetryCancel
+        Case Else
+            BttnsArgs = l ' may be a wromg value and thus need to be validated further
+            Exit Function
+    End Select
+
     While ba_arg >= vbCritical                          ' 16
         Select Case ba_arg
             '~~ VBA.MsgBox Display options
@@ -529,6 +574,15 @@ Public Function Dsply(ByVal dsply_title As String, _
 #If ExecTrace = 1 Then
     mTrc.Pause
 #End If
+    
+    If Not IsValidMsgButtonsArg(dsply_buttons) _
+    Then Err.Raise AppErr(1), ErrSrc(PROC), _
+                   "The provided buttons argument is neither empty (defaults to vbOkOnly), a string " & _
+                   "(optionally comma separated), a valid VBA.MsgBox value (vbYesNo, vbRetryCancel, " & _
+                   "etc. plus any extra options - which may or may not be implemented), an Array, a " & _
+                   "Collection, or a Dictionary! When an Array, Collection, or Dictionary at least " & _
+                   "one of its items in incorrect!"
+    
     AssertWidthAndHeight dsply_width_min _
                        , dsply_width_max _
                        , dsply_height_min _
@@ -550,7 +604,7 @@ Public Function Dsply(ByVal dsply_title As String, _
             .Text(enSectText, i) = dsply_msg.Section(i).Text
         Next i
         
-        .MsgButtons = dsply_buttons
+        .MsgBttns = dsply_buttons
         .MsgButtonDefault = dsply_button_default
         '+------------------------------------------------------------------------+
         '|| Setup prior showing the form is much faster and avoids flickering.   ||
@@ -558,7 +612,7 @@ Public Function Dsply(ByVal dsply_title As String, _
         '|| dsply_modeless = True - prior Setup is suspended.                    ||
         '+------------------------------------------------------------------------+
         If Not (.VisualizeForTest And dsply_modeless) Then
-            .Setup
+'            .Setup
         End If
         If dsply_modeless Then
             DisplayDone = False

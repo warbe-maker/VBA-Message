@@ -1,23 +1,15 @@
-22-03-29 23:08:06 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-03-29 23:08:06                 >> Begin execution trace 
-22-03-29 23:08:06 00,0000         |  >> mTestServices.Test_92_LabelWithUnderlayedURL
-22-03-29 23:08:25 04,9465 04,9465 |  << mTestServices.Test_92_LabelWithUnderlayedURL
-22-03-29 23:08:25 04,9465 04,9465 << End execution trace 
-22-03-29 23:08:25                 Impact on the overall performance (caused by the trace itself): 00,0080 seconds!
-22-03-29 23:08:25 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-03-30 22:02:30 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-03-30 22:02:30                 >> Begin execution trace 
+22-03-30 22:02:30 00,0000         |  >> mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
+22-03-30 22:02:30 00,3133 00,3133 |  << mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
+22-03-30 22:02:30 00,3133 00,3133 << End execution trace 
+22-03-30 22:02:30                 Impact on the overall performance (caused by the trace itself): 00,0117 seconds!
+22-03-30 22:02:30 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
 
-22-03-29 23:09:21 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-03-29 23:09:21                 >> Begin execution trace 
-22-03-29 23:09:21 00,0000         |  >> mTestServices.Test_92_LabelWithUnderlayedURL
-22-03-29 23:09:41 00,1144 00,1144 |  << mTestServices.Test_92_LabelWithUnderlayedURL
-22-03-29 23:09:41 00,1144 00,1144 << End execution trace 
-22-03-29 23:09:41                 Impact on the overall performance (caused by the trace itself): 00,0035 seconds!
-22-03-29 23:09:41 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-
-22-03-29 23:10:10 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-03-29 23:10:10                 >> Begin execution trace 
-22-03-29 23:10:10 00,0000         |  >> mTestServices.Test_92_LabelWithUnderlayedURL
-22-03-29 23:10:36 00,1346 00,1346 |  << mTestServices.Test_92_LabelWithUnderlayedURL
-22-03-29 23:10:36 00,1346 00,1346 << End execution trace 
-22-03-29 23:10:36                 Impact on the overall performance (caused by the trace itself): 00,0033 seconds!
-22-03-29 23:10:36 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-03-30 22:02:50 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-03-30 22:02:50                 >> Begin execution trace 
+22-03-30 22:02:50 00,0000         |  >> mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
+22-03-30 22:02:54 00,2792 00,2792 |  << mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
+22-03-30 22:02:54 00,2792 00,2792 << End execution trace 
+22-03-30 22:02:54                 Impact on the overall performance (caused by the trace itself): 00,0021 seconds!
+22-03-30 22:02:54 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)

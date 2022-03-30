@@ -55,7 +55,7 @@ Public Property Let Passed(ByVal b As Boolean)
     End If
 End Property
 
-Public Property Get RegressionTest() As Boolean:            wsTest.RegressionTest = bRegressionTest:                                                    End Property
+Public Property Get RegressionTest() As Boolean:            RegressionTest = bRegressionTest:                                                    End Property
 
 Public Property Let RegressionTest(ByVal b As Boolean):     bRegressionTest = b:                                                                        End Property
 
@@ -67,7 +67,10 @@ Private Property Get RowTest(Optional ByVal Test As Long) As Range: Set RowTest 
 
 Public Property Get TerminateRegressionTest() As Boolean:           TerminateRegressionTest = bTerminateRegressionTest:     End Property
 
-Public Property Let TerminateRegressionTest(ByVal b As Boolean):    bTerminateRegressionTest = b:                           End Property
+Public Property Let TerminateRegressionTest(ByVal b As Boolean)
+    bTerminateRegressionTest = b
+    If bTerminateRegressionTest Then bRegressionTest = False
+End Property
 
 Public Property Get TestDescription()
     With Me

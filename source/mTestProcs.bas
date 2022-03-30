@@ -402,6 +402,86 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
+Private Function IsForm(ByVal v As Object) As Boolean
+    Dim o As Object
+    On Error Resume Next
+    Set o = v.Parent
+    IsForm = Err.Number <> 0
+End Function
+
+Private Function IsFrameOrForm(ByVal v As Object) As Boolean
+    IsFrameOrForm = TypeOf v Is MSForms.UserForm Or TypeOf v Is MSForms.Frame
+End Function
+
+Private Function IsValidMsgButtonsArg(ByVal v_arg As Variant) As Boolean
+' -------------------------------------------------------------------------------------
+' Returns TRUE when the buttons argument (v_arg) is valid. When v_arg is an Array,
+' a Collection, or a Dictionary, TRUE is returned when all items are valid.
+' -------------------------------------------------------------------------------------
+    Dim i As Long
+    Dim v As Variant
+    
+    Select Case VarType(v_arg)
+        Case vbString, vbEmpty
+            IsValidMsgButtonsArg = True
+        Case Else
+            Select Case True
+                Case IsArray(v_arg), TypeName(v_arg) = "Collection", TypeName(v_arg) = "Dictionary"
+                     For Each v In v_arg
+                        If Not IsValidMsgButtonsArg(v) Then Exit Function
+                     Next v
+                    IsValidMsgButtonsArg = True
+                Case IsNumeric(v_arg)
+                    Select Case BttnsArgs(v_arg) ' The numeric buttons argument with all additional option 'unstripped'
+                        Case vbOKOnly, vbOKCancel, vbYesNo, vbRetryCancel, vbYesNoCancel, vbAbortRetryIgnore, vbYesNo, vbResumeOk
+                            IsValidMsgButtonsArg = True
+                    End Select
+            End Select
+    End Select
+
+End Function
+
+Private Sub IsValidMsgButtonsArg_Test()
+' -------------------------------------------------------------------------------------
+' Test of the "IsValidMsgButtonsArg" function, !! the copy from mMsg !!
+' -------------------------------------------------------------------------------------
+    Dim ValidCollection         As New Collection
+    Dim ValidDictionary         As New Dictionary
+    Dim ValidArray(1 To 3)      As Variant
+    Dim InValidCollection       As New Collection
+    Dim InValidDictionary       As New Dictionary
+    Dim InValidArray(1 To 3)    As Variant
+    
+    ValidArray(1) = vbOKCancel
+    ValidArray(2) = "xxx"
+    ValidArray(3) = "xxx,yyy"
+    
+    InValidArray(1) = vbOKCancel
+    InValidArray(2) = 2377
+    InValidArray(3) = "xxx,yyy"
+    
+    ValidCollection.Add vbOKCancel
+    ValidCollection.Add "xxx"
+    ValidCollection.Add "xxx,yyy"
+    
+    ValidDictionary.Add vbOKCancel, vbOKCancel
+    ValidDictionary.Add "xxx", "xxx"
+    ValidDictionary.Add "xxx,yyy", "xxx,yyy"
+    
+    Debug.Assert IsValidMsgButtonsArg(vbYesNo) = True
+    Debug.Assert IsValidMsgButtonsArg("xxx") = True
+    Debug.Assert IsValidMsgButtonsArg("xxx,yyy") = True
+    Debug.Assert IsValidMsgButtonsArg("xxx") = True
+    Debug.Assert IsValidMsgButtonsArg(ValidArray) = True
+    Debug.Assert IsValidMsgButtonsArg(ValidCollection) = True
+    Debug.Assert IsValidMsgButtonsArg(ValidDictionary) = True
+
+    Debug.Assert IsValidMsgButtonsArg(InValidArray) = False
+
+    Set ValidCollection = Nothing
+    Set ValidDictionary = Nothing
+End Sub
+
 Public Function Monitor(ByVal mon_title As String, _
                    ByVal mon_visible_steps As Long, _
           Optional ByVal mon_monospaced As Boolean = False, _
@@ -887,6 +967,14 @@ Public Sub Test_DisplayWithWithoutFrames()
            
 End Sub
 
+Private Sub Test_IsFrameOrForm()
+    Debug.Assert IsFrameOrForm(fMsgProcTest.TextBox1) = False
+    Debug.Assert IsFrameOrForm(fMsgProcTest.frm) = True
+    Debug.Assert IsFrameOrForm(fMsgProcTest.frm.Parent) = True
+    Debug.Assert IsForm(fMsgProcTest.frm) = False
+    Debug.Assert IsForm(fMsgProcTest.frm.Parent) = True
+End Sub
+
 Public Sub Test_MultipleMessageInstances()
 ' ------------------------------------------------------------------------------
 ' Creates a number of instance of the UserForm named fMsgProcTest and unloads them
@@ -927,6 +1015,70 @@ Public Sub Test_MultipleMessageInstances()
         Application.Wait Now() + 0.000006
     Next i
     
+End Sub
+
+Private Sub Test_OpenFile()
+    mMsg.OpenUrlEtc "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\ExecTrace.log", WIN_NORMAL
+End Sub
+
+Private Sub Test_OpenFile_No_Assoc()
+    mMsg.OpenUrlEtc "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\.gitattributes", WIN_NORMAL
+End Sub
+
+Private Sub Test_OpenHyperlink()
+    mMsg.OpenUrlEtc "https://github.com/warbe-maker/Common-VBA-Message-Service", WIN_NORMAL
+End Sub
+
+Private Sub Test_Pass_TypeMsgText()
+' ------------------------------------------------------------------------------
+' Test of passing on any 'kind of' TypeMsgText to a UserForm and retrieving it
+' again as a TypeMsgText.
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_Pass_TypeMsgText"
+    
+    On Error GoTo eh
+    Dim t As TypeMsgText
+    Dim f As fMsgProcTest
+    Dim k As KindOfText
+    Dim i As Long
+    
+    Set f = TestInstance(fi_key:="Test-Title", fi_unload:=True)
+    Set f = TestInstance(fi_key:="Test-Title")
+    
+    t.FontBold = True
+    With f
+        k = enMonHeader
+        .Text(k) = t
+        Debug.Assert .Text(k).FontBold = True
+        Debug.Assert .Text(enMonFooter).FontBold = False
+    
+        k = enMonFooter
+        .Text(k) = t
+        Debug.Assert .Text(k).FontBold = True
+    
+        k = enMonStep
+        .Text(k) = t
+        Debug.Assert .Text(k).FontBold = True
+    
+        For i = 1 To 4
+            k = enSectLabel
+            .Text(k, i) = t
+            Debug.Assert .Text(k, i).FontBold = True
+        Next i
+        For i = 1 To 4
+            k = enSectText
+            .Text(k, i) = t
+            Debug.Assert .Text(k, i).FontBold = True
+        Next i
+      
+    End With
+    
+xt: Exit Sub
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Sub
 
 Public Sub Test_SetupTitle()
@@ -998,88 +1150,5 @@ Public Sub Test_SizingAndPositioning()
     TestInstance Instance4, True
     TestInstance Instance5, True
 
-End Sub
-
-Private Sub Test_IsFrameOrForm()
-    Debug.Assert IsFrameOrForm(fMsgProcTest.TextBox1) = False
-    Debug.Assert IsFrameOrForm(fMsgProcTest.frm) = True
-    Debug.Assert IsFrameOrForm(fMsgProcTest.frm.Parent) = True
-    Debug.Assert IsForm(fMsgProcTest.frm) = False
-    Debug.Assert IsForm(fMsgProcTest.frm.Parent) = True
-End Sub
-
-Private Function IsFrameOrForm(ByVal v As Object) As Boolean
-    IsFrameOrForm = TypeOf v Is MSForms.UserForm Or TypeOf v Is MSForms.Frame
-End Function
-
-Private Function IsForm(ByVal v As Object) As Boolean
-    Dim o As Object
-    On Error Resume Next
-    Set o = v.Parent
-    IsForm = Err.Number <> 0
-End Function
-
-Private Sub Test_Pass_TypeMsgText()
-' ------------------------------------------------------------------------------
-' Test of passing on any 'kind of' TypeMsgText to a UserForm and retrieving it
-' again as a TypeMsgText.
-' ------------------------------------------------------------------------------
-    Const PROC = "Test_Pass_TypeMsgText"
-    
-    On Error GoTo eh
-    Dim t As TypeMsgText
-    Dim f As fMsgProcTest
-    Dim k As KindOfText
-    Dim i As Long
-    
-    Set f = TestInstance(fi_key:="Test-Title", fi_unload:=True)
-    Set f = TestInstance(fi_key:="Test-Title")
-    
-    t.FontBold = True
-    With f
-        k = enMonHeader
-        .Text(k) = t
-        Debug.Assert .Text(k).FontBold = True
-        Debug.Assert .Text(enMonFooter).FontBold = False
-    
-        k = enMonFooter
-        .Text(k) = t
-        Debug.Assert .Text(k).FontBold = True
-    
-        k = enMonStep
-        .Text(k) = t
-        Debug.Assert .Text(k).FontBold = True
-    
-        For i = 1 To 4
-            k = enSectLabel
-            .Text(k, i) = t
-            Debug.Assert .Text(k, i).FontBold = True
-        Next i
-        For i = 1 To 4
-            k = enSectText
-            .Text(k, i) = t
-            Debug.Assert .Text(k, i).FontBold = True
-        Next i
-      
-    End With
-    
-xt: Exit Sub
-
-eh: Select Case ErrMsg(ErrSrc(PROC))
-        Case vbResume:  Stop: Resume
-        Case Else:      GoTo xt
-    End Select
-End Sub
-
-Private Sub Test_OpenHyperlink()
-    mMsg.OpenUrlEtc "https://github.com/warbe-maker/Common-VBA-Message-Service", WIN_NORMAL
-End Sub
-
-Private Sub Test_OpenFile()
-    mMsg.OpenUrlEtc "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\ExecTrace.log", WIN_NORMAL
-End Sub
-
-Private Sub Test_OpenFile_No_Assoc()
-    mMsg.OpenUrlEtc "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\.gitattributes", WIN_NORMAL
 End Sub
 
