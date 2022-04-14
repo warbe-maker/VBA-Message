@@ -1981,9 +1981,8 @@ Public Function Test_30_mMsg_Monitor_Service() As Variant
                , mon_width_min:=wsTest.MsgWidthMin _
                , mon_height_max:=wsTest.MsgHeightMax
     
+    '~~ Obtain the test result
     MsgTitle = "Test result of: " & Readable(PROC)
-    MsgForm.VisualizeForTest = wsTest.VisualizeForTest
-    
     Set MsgButtons = mMsg.Buttons(BTTN_PASSED, BTTN_FAILED)
     Select Case mMsg.Box(Title:=MsgTitle _
                        , Prompt:=vbNullString _

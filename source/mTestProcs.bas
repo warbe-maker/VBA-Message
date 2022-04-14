@@ -1018,15 +1018,15 @@ Public Sub Test_MultipleMessageInstances()
 End Sub
 
 Private Sub Test_OpenFile()
-    mMsg.OpenUrlEtc "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\ExecTrace.log", WIN_NORMAL
+    mMsg.ShellRun "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\ExecTrace.log", WIN_NORMAL
 End Sub
 
 Private Sub Test_OpenFile_No_Assoc()
-    mMsg.OpenUrlEtc "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\.gitattributes", WIN_NORMAL
+    mMsg.ShellRun "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\.gitattributes", WIN_NORMAL
 End Sub
 
 Private Sub Test_OpenHyperlink()
-    mMsg.OpenUrlEtc "https://github.com/warbe-maker/Common-VBA-Message-Service", WIN_NORMAL
+    mMsg.ShellRun "https://github.com/warbe-maker/Common-VBA-Message-Service", WIN_NORMAL
 End Sub
 
 Private Sub Test_Pass_TypeMsgText()
