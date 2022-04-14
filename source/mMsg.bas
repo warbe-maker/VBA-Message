@@ -611,9 +611,7 @@ Public Function Dsply(ByVal dsply_title As String, _
         '|| For testing - indicated by VisualizerControls = True and             ||
         '|| dsply_modeless = True - prior Setup is suspended.                    ||
         '+------------------------------------------------------------------------+
-        If Not (.VisualizeForTest And dsply_modeless) Then
-'            .Setup
-        End If
+        .Setup
         If dsply_modeless Then
             DisplayDone = False
             .Show vbModeless

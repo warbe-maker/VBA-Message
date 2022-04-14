@@ -321,16 +321,9 @@ xt: Exit Sub
 End Sub
 
 Private Sub cbSetupTitle_Click()
-    Dim FACTOR As Single
-    Dim MinWidth    As Single
-    Dim MaxWidth    As Single
-    
-    MinWidth = 100
-    MaxWidth = 1500
-    FACTOR = 1.1
-    Setup1_Title setup_title:=Me.tbxTestTitle & " " & Format(FACTOR, "0.000") _
-               , setup_width_min:=MinWidth _
-               , setup_width_max:=MaxWidth
+    Setup1_Title setup_title:=Me.Caption _
+               , setup_width_min:=20 _
+               , setup_width_max:=90
 End Sub
 
 Private Function ErrMsg(ByVal err_source As String, _
@@ -761,21 +754,25 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Public Sub Setup1_Title( _
-                ByVal setup_title As String, _
-                ByVal setup_width_min As Single, _
-                ByVal setup_width_max As Single)
+Public Sub Setup1_Title(ByVal setup_title As String, _
+                        ByVal setup_width_min As Single, _
+                        ByVal setup_width_max As Single)
 ' ------------------------------------------------------------------------------
 ' Setup the message form for the provided title (setup_title) optimized with the
 ' provided minimum width (setup_width_min) and the provided maximum width
 ' (setup_width_max) by using a certain factor (setup_factor) for the calculation
 ' of the width required to display an untruncated title - as long as the maximum
 ' widht is not exeeded.
+' A FACTOR of 1.4 is good for a very short title and has to grow up to 1.5 for a
+' very long title. So the correction needs to be a function (percentage) of the
+' lenght.
 ' ------------------------------------------------------------------------------
     Const PROC = "Setup1_Title"
+    Const FACTOR = 1.4
     
     On Error GoTo eh
-    Dim Correction    As Single
+    Dim Correction  As Single
+    Dim siWidth     As Single
     
     With Me
         .Width = setup_width_min
@@ -786,18 +783,19 @@ Public Sub Setup1_Title( _
                 .Name = Me.Font.Name
                 .Size = 8    ' Value which comes to a length close to the length required
             End With
+            .Visible = True
             .Caption = vbNullString
             .AutoSize = True
             .Caption = " " & setup_title    ' some left margin
         End With
         .Caption = setup_title
-        Correction = (CInt(.laMsgTitle.Width)) / 1700
-'        Debug.Print ".laMsgTitle.Width: " & .laMsgTitle.Width, "Factor: " & FACTOR, "FactorCorrection: " & FactorCorrection
-        .Width = Min(setup_width_max, .laMsgTitle.Width * (TitleLengthFactor - Correction))
+        Correction = .laMsgTitle.Width * 0.12
+        siWidth = .laMsgTitle.Width + 40 + Correction
+        .Width = siWidth
     End With
-   
+'    bDoneTitle = True
+    
 xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
-

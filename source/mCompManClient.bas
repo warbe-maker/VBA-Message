@@ -241,5 +241,3 @@ Private Function IsString(ByVal v As Variant, _
         End If
     End If
 End Function
-
-

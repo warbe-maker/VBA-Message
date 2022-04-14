@@ -23,11 +23,9 @@ Private Property Get ColMsgWidthMax() As Range:             Set ColMsgWidthMax =
 
 Private Property Get ColMsgWidthMin() As Range:             Set ColMsgWidthMin = Me.Range("colMsgWidthMin"):                                            End Property
 
-Public Property Let Failed(ByVal b As Boolean)
-    If b Then
-        TestPassedFailed = "Failed!"
-        TestPassedFailedNote.Select
-    End If
+Public Property Get FailedText() As String
+    Intersect(Range("rowTest" & wsTest.TestNumber), Range("colTestPassedFailed")).Value = "Failed"
+    FailedText = Intersect(RowTest(lTestNumber).EntireRow, Range("colTestPassedFailedNote").EntireColumn).Value
 End Property
 
 Public Property Get MsgHeightIncrDecr() As Long:            MsgHeightIncrDecr = Intersect(RowTest(lTestNumber), ColMsgHeightIncrDecr).Value:            End Property
@@ -46,13 +44,6 @@ Public Property Get MsgWidthMin() As Single
     On Error Resume Next
     MsgWidthMin = Intersect(RowTest(lTestNumber).EntireRow, Me.Range("colMsgWidthMin").EntireColumn).Value
     If Err.Number <> 0 Then Stop
-End Property
-
-Public Property Let Passed(ByVal b As Boolean)
-    If b Then
-        TestPassedFailed = "Passed"
-        TestPassedFailedNote.Select
-    End If
 End Property
 
 Public Property Get RegressionTest() As Boolean:            RegressionTest = bRegressionTest:                                                    End Property
@@ -105,27 +96,8 @@ xt: Exit Property
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Property
 
-Public Property Let TestPassed(ByVal b As Boolean)
-    With Me
-        If b _
-        Then Intersect(.Range("rowTest" & wsTest.TestNumber), .Range("colTestPassedFailed")).Value = "Passed" _
-        Else Intersect(.Range("rowTest" & wsTest.TestNumber), .Range("colTestPassedFailed")).Value = "Failed"
-    End With
-End Property
-
-Private Property Let TestPassedFailed(ByVal s As String)
-    Intersect(RowTest(lTestNumber).EntireRow, Range("colTestPassedFailed").EntireColumn).Value = s
-End Property
-
-Private Property Get TestPassedFailedNote() As Range
-    Set TestPassedFailedNote = Intersect(RowTest(lTestNumber).EntireRow, Range("colTestPassedFailedNote").EntireColumn)
-    TestPassedFailedNote.Worksheet.Activate ' just in case it is yet not active
-End Property
-
 Public Property Let TestResultNote(ByVal s As String)
-    With Me
-        Intersect(.Range("rowTest" & wsTest.TestNumber), .Range("colTestPassedFailedNote")).Value = s
-    End With
+    Intersect(Range("rowTest" & wsTest.TestNumber), Range("colTestPassedFailedNote")).Value = s
 End Property
 
 Public Property Get VisualizeForTest() As Boolean
@@ -234,6 +206,32 @@ Private Function NextRegressionTest() As Long
     Next Rng
     
 End Function
+
+Public Sub TestFailed()
+    Intersect(Range("rowTest" & wsTest.TestNumber), Range("colTestPassedFailed")).Value = "Failed"
+    With Intersect(RowTest(lTestNumber).EntireRow, Range("colTestPassedFailedNote").EntireColumn)
+        .Value = _
+        VBA.InputBox(Prompt:="Enter the failed text" _
+                   , Title:="Test failed" _
+                   , Default:=.Value _
+                   , XPos:=.Top _
+                   , YPos:=.Left _
+                )
+        Application.EnableEvents = False
+        .Select
+        Application.EnableEvents = True
+    End With
+End Sub
+
+Public Sub TestPassed()
+    Intersect(Range("rowTest" & wsTest.TestNumber), Range("colTestPassedFailed")).Value = "Passed"
+    With Intersect(RowTest(lTestNumber).EntireRow, Range("colTestPassedFailedNote").EntireColumn)
+        .ClearContents
+        Application.EnableEvents = False
+        .Select
+        Application.EnableEvents = True
+    End With
+End Sub
 
 Private Sub Worksheet_Activate()
     Dim Rng As Range

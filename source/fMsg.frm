@@ -26,10 +26,11 @@ Option Explicit
 ' - MsgTitle               The title displayed in the window handle bar
 ' - MinButtonWidth         Minimum button width in pt
 ' - MsgButtonDefault       The number of the default button
-' - MsgBttns             Buttons to be displayed
+' - MsgBttns               Buttons to be displayed, Collection provided by the
+'                          mMsg.Buttons service
 ' - MsgHeightMax           Percentage of screen height
 ' - MsgHeightMin           Percentage of screen height
-' - MsgLabel                A section's label
+' - MsgLabel               A section's label
 ' - MsgWidthMax            Percentage of screen width
 ' - MsgWidthMin            Defaults to 400 pt. the absolute minimum is 200 pt
 ' - Text                   A section's text or a monitor header, monitor footer
@@ -188,6 +189,7 @@ Private bSetUpDone              As Boolean
 Private bVisualizeForTest       As Boolean
 Private cllDsgnBttnRows         As Collection       ' Collection of the designed reply button row frames
 Private cllDsgnRowBttns         As Collection       ' Collection of a designed reply button row's buttons
+Private cllMsgBttns             As New Collection
 Private cllSteps                As Collection
 Private cyTimerTicksBegin       As Currency
 Private cyTimerTicksEnd         As Currency
@@ -208,9 +210,9 @@ Private DfltMnSpcdLblFontName   As String
 Private DfltMnSpcdLblFontSize   As Single
 Private DfltMnSpcdTxtFontName   As String
 Private DfltMnSpcdTxtFontSize   As Single
-Private frmAreaButtns           As MSForms.Frame
-Private frmAreaMsects           As MSForms.Frame
+Private frmBttnsArea            As MSForms.Frame
 Private frmBttnsFrm             As MSForms.Frame    ' Set with CollectDesignControls
+Private frmMsectsArea           As MSForms.Frame
 Private frmSteps                As MSForms.Frame
 Private lBackColor              As Long
 Private lMonitorSteps           As Long
@@ -245,8 +247,6 @@ Private TextMonitorStep         As TypeMsgText
 Private TextSection             As TypeMsg
 Private TimerSystemFrequency    As Currency
 Private TitleWidth              As Single
-Private UsageType               As enMsgFormUsage
-Private cllMsgBttns             As New Collection
 Private VirtualScreenHeightPts  As Single
 Private VirtualScreenLeftPts    As Single
 Private VirtualScreenTopPts     As Single
@@ -346,7 +346,7 @@ Private Property Let FormWidth(ByVal considered_width As Single)
 ' ------------------------------------------------------------------------------
     Dim new_width As Single
     new_width = Max(Me.Width, TitleWidth, siMsgWidthMin, considered_width + 15)
-    Me.Width = Min(new_width, siMsgWidthMax + Max(ScrollV_Width(frmAreaMsects), ScrollV_Width(frmAreaButtns)))
+    Me.Width = Min(new_width, siMsgWidthMax + Max(ScrollVscrollWidth(frmMsectsArea), ScrollVscrollWidth(frmBttnsArea)))
 End Property
 
 Private Property Get FormWidthMaxUsable()
@@ -521,79 +521,78 @@ Public Property Get MsgWidthMin() As Single:            MsgWidthMin = siMsgWidth
 
 Public Property Let MsgWidthMin(ByVal si As Single):    siMsgWidthMin = si:                                             End Property
 
-Public Property Let NewHeight(Optional ByRef nh_frame_or_form As Object, _
+Public Property Let NewHeight(Optional ByRef nh_frame_form As Object, _
                               Optional ByVal nh_for_visible_only As Boolean = True, _
                               Optional ByVal nh_y_action As fmScrollAction = fmScrollActionBegin, _
+                              Optional ByVal nh_threshold_height_diff As Single = 5, _
                                        ByVal nh_height As Single)
 ' ------------------------------------------------------------------------------
-' Mimics a height change event. When the height of the frame (nh_frame_or_form) is
-' changed (nh_frame_or_form_height) to less than the frame's content height and no vertical
-' scrollbar is applied one is applied with the frame content's height. If one
-' is already applied just the height is adjusted to the frame content's height.
-' When the height becomes more than the frame's content height a vertical
-' scrollbar becomes obsolete and is removed.
+' Mimics a height change event. Applies a vertical scroll-bar when the content
+' height of the frame or form (nh_frame_form) is greater than the height of
+' the frame or form by considering a threshold (nh_threshold_height_diff) in
+' order to avoid a usesless scroll-bar for a redicolous height difference. In
+' case the new height is less the the frame's height a vertical scrollbar is
+' removed.
 ' ------------------------------------------------------------------------------
-    Const PROC          As String = "NewHeight"
+    Const PROC = "NewHeight"
     
     On Error GoTo eh
-    Dim siHeight    As Single
+    Dim siContentHeight As Single:  siContentHeight = ContentHeight(nh_frame_form, nh_for_visible_only)
     
-    If nh_frame_or_form Is Nothing Then Err.Raise AppErr(1), ErrSrc(PROC), "The required argument 'nh_frame_or_form' is Nothing!"
-    If Not IsFrameOrForm(nh_frame_or_form) _
+    If nh_frame_form Is Nothing Then Err.Raise AppErr(1), ErrSrc(PROC), "The required argument 'nh_frame_form' is Nothing!"
+    If Not IsFrameOrForm(nh_frame_form) _
     Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form!"
+        
+'    Debug.Print "nh_frame_form.Name   = " & nh_frame_form.Name
+'    Debug.Print "nh_frame_form.Height = " & nh_frame_form.Height
+'    Debug.Print "siContentHeight      = " & siContentHeight
+    nh_frame_form.Height = nh_height
+'    Debug.Print "New frame height     = " & nh_frame_form.Height
+'    Debug.Print "V-Scroll             = " & ScrollVscrollApplied(nh_frame_form)
     
-    siHeight = ContentHeight(nh_frame_or_form, nh_for_visible_only)  ' height of the content in the frame or UserForm
-    nh_frame_or_form.Height = nh_height
-    
-    If nh_frame_or_form.Height < siHeight Then
-        '~~ Apply a vertical scrollbar if none is applied yet, adjust its height otherwise
-        If Not ScrollV_Applied(nh_frame_or_form) Then
-            ScrollV_Apply sa_height:=siHeight, sa_frame_or_form:=nh_frame_or_form, sa_y_action:=nh_y_action
-        Else
-            nh_frame_or_form.ScrollHeight = siHeight
-            nh_frame_or_form.Scroll yAction:=nh_y_action
-        End If
+    If siContentHeight - nh_frame_form.Height > nh_threshold_height_diff Then
+        Debug.Print "apply a vertical scroll-bar for " & nh_frame_form.Name
+        ScrollVscrollApply sva_frame_form:=nh_frame_form, sva_content_height:=siContentHeight, sva_y_action:=nh_y_action
+    ElseIf ScrollVscrollApplied(nh_frame_form) Then
+        ScrollVscrollRemove nh_frame_form
     End If
-'    nh_frame_or_form.Height = ContentHeight(nh_frame_or_form, nh_for_visible_only)
     
 xt: Exit Property
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Property
 
-Private Property Let NewWidth(Optional ByRef nw_frame_or_form As Object, _
+Private Property Let NewWidth(Optional ByRef nw_frame_form As Object, _
                               Optional ByVal nw_for_visible_only As Boolean = True, _
+                              Optional ByVal nw_threshold_width_diff As Single = 5, _
                                        ByVal nw_width As Single)
 ' ------------------------------------------------------------------------------
-' Applies a horizontal scroll-bar when the new width (nw_width) is less than
-' the content's width. When a horizontal scroll-bar is already applied only its
-' is applied (when none is applied yet) or the already applied one's width is
-' width is adjusted to the content's width.
-' When no frame (nw_frame_or_form) is provided, it is the Userform which is concerned.
+' Mimics a width change event. Applies a horizontal scroll-bar when the content
+' height of the frame or form (nw_frame_form) is greater than the width of
+' the frame or form by considering a threshold (nw_threshold_width_diff) in
+' order to avoid a usesless scroll-bar for a redicolous width difference. In
+' case the new width is less the frame's width a horizontal scrollbar is removed.
 ' ------------------------------------------------------------------------------
     Const PROC = "NewWidth"
     
     On Error GoTo eh
-    Dim siContentWidth  As Single
+    Dim siContentWidth  As Single:  siContentWidth = ContentWidth(nw_frame_form, nw_for_visible_only)
     
-    If nw_frame_or_form Is Nothing Then Err.Raise AppErr(1), ErrSrc(PROC), "The required argument 'nw_frame_or_form' is Nothing!"
-    If Not IsFrameOrForm(nw_frame_or_form) Then Err.Raise AppErr(2), ErrSrc(PROC), "The provided argument 'nw_frame_or_form' is neither a Frame nor a Form!"
+    If nw_frame_form Is Nothing Then Err.Raise AppErr(1), ErrSrc(PROC), "The required argument 'nw_frame_form' is Nothing!"
+    If Not IsFrameOrForm(nw_frame_form) Then Err.Raise AppErr(2), ErrSrc(PROC), "The provided argument 'nw_frame_form' is neither a Frame nor a Form!"
     
-    siContentWidth = ContentWidth(nw_frame_or_form, nw_for_visible_only) - ScrollV_Width(nw_frame_or_form)
-    
-    With nw_frame_or_form
-        .Width = nw_width
-        If nw_width < siContentWidth Then
-            '~~ Apply a horizontal scrollbar if none is applied yet,
-            '~~ or just adjust its width otherwise
-            If Not ScrollH_Applied(nw_frame_or_form) Then
-                ScrollH_Apply sa_width:=siContentWidth, sa_frame_or_form:=nw_frame_or_form
-            Else
-                .ScrollWidth = siContentWidth
-            End If
-        End If
-'        .Width = ContentWidth(nw_frame_or_form, nw_for_visible_only)
-    End With
+'    Debug.Print "nw_frame_form.Name  = " & nw_frame_form.Name
+'    Debug.Print "nw_frame_form.Width = " & nw_frame_form.Width
+'    Debug.Print "siContentWidth      = " & siContentWidth
+    nw_frame_form.Width = nw_width
+'    Debug.Print "New frame width     = " & nw_frame_form.Width
+'    Debug.Print "H-Scroll            = " & ScrollHscrollApplied(nw_frame_form)
+
+    If siContentWidth - nw_frame_form.Width > nw_threshold_width_diff Then
+        ScrollHscrollApply sha_frame_form:=nw_frame_form, sha_content_width:=siContentWidth
+    ElseIf ScrollHscrollApplied(nw_frame_form) Then
+        ScrollHscrollRemove nw_frame_form
+    End If
     
 xt: Exit Property
     
@@ -608,12 +607,12 @@ Private Property Let NoOfDesignedMsgSects(ByVal l As Long)
     lNoOfDesignedMsgSects = l
 End Property
 
-Private Property Get PrcntgHeightfrmAreaButtns() As Single
-    PrcntgHeightfrmAreaButtns = Round(frmAreaButtns.Height / (frmAreaMsects.Height + frmAreaButtns.Height), 2)
+Private Property Get PrcntgHeightfrmBttnsArea() As Single
+    PrcntgHeightfrmBttnsArea = Round(frmBttnsArea.Height / (frmMsectsArea.Height + frmBttnsArea.Height), 2)
 End Property
 
 Private Property Get PrcntgHeightMsgArea() As Single
-    PrcntgHeightMsgArea = Round(frmAreaMsects.Height / (frmAreaMsects.Height + frmAreaButtns.Height), 2)
+    PrcntgHeightMsgArea = Round(frmMsectsArea.Height / (frmMsectsArea.Height + frmBttnsArea.Height), 2)
 End Property
 
 Public Property Get ReplyValue() As Variant:                ReplyValue = vReplyValue:                                   End Property
@@ -721,7 +720,6 @@ Public Function AddControl(ByVal ac_ctl As MSFormControls _
     
     If ac_in Is Nothing Then
         If Not CtlExists(ac_name) Then
-            Debug.Print "Create " & MSFormsCtlType(ac_ctl) & ": 'Me." & ac_name & "'"
             Set ctl = Me.Controls.Add(bstrProgID:=MSFormsProgID(ac_ctl) _
                                     , Name:=ac_name _
                                     , Visible:=ac_visible)
@@ -732,7 +730,6 @@ Public Function AddControl(ByVal ac_ctl As MSFormControls _
         Then Err.Raise AppErr(1), ErrSrc(PROC), "The object in argument 'ac_in' is neither a Frame nor a UserForm!"
         
         If Not CtlExists(ac_name) Then
-            Debug.Print "Create a '" & MSFormsCtlType(ac_ctl) & "' in '" & TypeName(ac_in) & "' named : '" & ac_in.Name & "." & ac_name & "'"
             If ac_ctl = Frame Then Stop
             If ac_ctl = Frame Then
                 Set frm = ac_in.Controls.Add(bstrProgID:=MSFormsProgID(ac_ctl) _
@@ -781,11 +778,15 @@ Private Sub AdjustedParentsWidthAndHeight(ByVal ctrl As MSForms.Control)
     
     Do
         If IsForm(FrmParent) Then
-            FrmParent.Width = ContentWidth(FrmParent) + 5
-            FrmParent.Height = ctrl.Top + ContentHeight(FrmParent) + 30
+            If Not ScrollVscrollApplied(FrmParent) Then
+                FrmParent.Width = ContentWidth(FrmParent) + 5
+                FrmParent.Height = ctrl.Top + ContentHeight(FrmParent) + 30
+            End If
         ElseIf IsFrameOrForm(FrmParent) Then
-            FrmParent.Width = ContentWidth(FrmParent)
-            FrmParent.Height = ContentHeight(FrmParent)
+            If Not ScrollVscrollApplied(FrmParent) Then
+                FrmParent.Width = ContentWidth(FrmParent)
+                FrmParent.Height = ContentHeight(FrmParent)
+            End If
         End If
         If IsForm(FrmParent) Then Exit Do
         Set FrmParent = FrmParent.Parent
@@ -809,7 +810,7 @@ Private Sub AdjustTopPositions()
     
     MaxTextFrameWidth = MaxUsedWidthTextFrames
     TopPosNextSect = 0 ' The top sections top position
-    frmAreaMsects.Top = 0
+    frmMsectsArea.Top = 0
     
     For i = 1 To lNoOfDesignedMsgSects
         TopPosTextFrame = 0
@@ -836,7 +837,7 @@ Private Sub AdjustTopPositions()
             With MsectFrm
                 .Top = TopPosNextSect
                 .Width = MaxTextFrameWidth
-                If MsectTbxFrm.Visible Then
+                If MsectTbxFrm.Visible And Not ScrollVscrollApplied(MsectTbxFrm) And .Height <> MsectTbxFrm.Top + MsectTbxFrm.Height Then
                     .Height = MsectTbxFrm.Top + MsectTbxFrm.Height
                 End If
                 TopPosNextSect = AdjustToVgrid(.Top + .Height + VSPACE_SECTIONS)
@@ -847,19 +848,22 @@ Private Sub AdjustTopPositions()
     Next i
     
     '~~ Top position Message Area
-    If frmAreaButtns.Visible And frmAreaMsects.Visible Then
-        frmAreaButtns.Top = frmAreaMsects.Top + frmAreaMsects.Height + VSPACE_AREAS
-        Me.Height = frmAreaButtns.Top + frmAreaButtns.Height + VSPACE_AREAS
-    
-    ElseIf frmAreaButtns.Visible And Not frmAreaMsects.Visible Then
-        frmAreaButtns.Top = VSPACE_AREAS
-        FrameCenterHorizontal frmAreaButtns
-        Me.Height = frmAreaButtns.Top + frmAreaButtns.Height + VSPACE_AREAS
-    
-    ElseIf Not frmAreaButtns.Visible And frmAreaMsects.Visible Then
-        Me.Height = frmAreaMsects.Top + frmAreaMsects.Height + VSPACE_AREAS
+    If frmBttnsArea.Visible And frmMsectsArea.Visible Then
+        frmBttnsArea.Top = frmMsectsArea.Top + frmMsectsArea.Height + VSPACE_AREAS
+        If Me.Height <> frmBttnsArea.Top + frmBttnsArea.Height + VSPACE_AREAS Then
+            Me.Height = frmBttnsArea.Top + frmBttnsArea.Height + VSPACE_AREAS
+        End If
+    ElseIf frmBttnsArea.Visible And Not frmMsectsArea.Visible Then
+        frmBttnsArea.Top = VSPACE_AREAS
+        FrameCenterHorizontal frmBttnsArea
+        If Me.Height <> frmBttnsArea.Top + frmBttnsArea.Height + VSPACE_AREAS Then
+            Me.Height = frmBttnsArea.Top + frmBttnsArea.Height + VSPACE_AREAS
+            Me.Height = Me.Height + VSPACE_BOTTOM
+        End If
+    ElseIf Not frmBttnsArea.Visible And frmMsectsArea.Visible And Me.Height <> frmMsectsArea.Top + frmMsectsArea.Height + VSPACE_AREAS Then
+        Me.Height = frmMsectsArea.Top + frmMsectsArea.Height + VSPACE_AREAS
+        Me.Height = Me.Height + VSPACE_BOTTOM
     End If
-    Me.Height = Me.Height + VSPACE_BOTTOM
     
 xt: Exit Sub
     
@@ -932,23 +936,23 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Private Function AreaMsects() As MSForms.Frame
+Private Function MsectsArea() As MSForms.Frame
 ' ------------------------------------------------------------------------------
 ' Returns the Frame of the message area section, created if yet not existing.
 ' ------------------------------------------------------------------------------
     
-    If frmAreaMsects Is Nothing Then
-        Set frmAreaMsects = Me.AddControl(ac_ctl:=Frame, ac_visible:=True)
-        With frmAreaMsects
+    If frmMsectsArea Is Nothing Then
+        Set frmMsectsArea = Me.AddControl(ac_ctl:=Frame, ac_visible:=True)
+        With frmMsectsArea
             .Top = 0
             .Left = 0
             .Height = 50
             .Width = Me.InsideWidth
             .Visible = True
         End With
-        VisualizeCtl frmAreaMsects, VISLZE_BCKCLR_AREA
+        VisualizeCtl frmMsectsArea, VISLZE_BCKCLR_AREA
     End If
-    Set AreaMsects = frmAreaMsects
+    Set MsectsArea = frmMsectsArea
 
 End Function
 
@@ -972,8 +976,8 @@ Public Sub AutoSizeTextBox(ByRef as_tbx As MSForms.TextBox, _
 '   > 0) is provided the size of the textbox is set correspondingly. This
 '   option is specifically usefull when text is appended to avoid much flicker.
 '
-' Uses: NewWidth, FrameContentWidth, ScrollH_Apply,
-'       NewHeight, ContentHeight, ScrollV_Apply
+' Uses: NewWidth, FrameContentWidth, ScrollHscrollApply,
+'       NewHeight, ContentHeight, ScrollVscrollApply
 '
 ' W. Rauschenberger Berlin June 2021
 ' ------------------------------------------------------------------------------
@@ -1023,21 +1027,21 @@ Private Function BttnsArea() As MSForms.Frame
 ' Returns the Buttons area Frame, created if yet not existing.
 ' ------------------------------------------------------------------------------
 
-    If frmAreaButtns Is Nothing Then
-        Set frmAreaButtns = Me.AddControl(ac_ctl:=Frame, ac_visible:=True, ac_name:="frBttnsArea")
-        With frmAreaButtns
+    If frmBttnsArea Is Nothing Then
+        Set frmBttnsArea = Me.AddControl(ac_ctl:=Frame, ac_visible:=True, ac_name:="frBttnsArea")
+        With frmBttnsArea
             .Top = 0
-            If Not frmAreaMsects Is Nothing Then
-                .Top = AdjustToVgrid(frmAreaMsects.Top + frmAreaMsects.Height) + VSPACE_AREAS
+            If Not frmMsectsArea Is Nothing Then
+                .Top = AdjustToVgrid(frmMsectsArea.Top + frmMsectsArea.Height) + VSPACE_AREAS
             End If
             .Left = 0
             .Height = 50
             .Width = Me.InsideWidth
             .Visible = True
         End With
-        VisualizeCtl frmAreaButtns, VISLZE_BCKCLR_AREA
+        VisualizeCtl frmBttnsArea, VISLZE_BCKCLR_AREA
     End If
-    Set BttnsArea = frmAreaButtns
+    Set BttnsArea = frmBttnsArea
 
 End Function
 
@@ -1252,7 +1256,7 @@ Private Sub Collect(ByRef col_into As Variant, _
                         End With
                         i = col_into.Count + 1
                         col_into.Add i, ctl
-                        Debug.Print col_into.Count & ": " & ctl.Name
+'                        Debug.Print col_into.Count & ": " & ctl.Name
                     End If
                Next ctl
             Next v
@@ -1268,7 +1272,7 @@ Private Sub Collect(ByRef col_into As Variant, _
                         Case "Dictionary"
                             i = col_into.Count + 1
                             col_into.Add i, ctl
-                            Debug.Print col_into.Count & ": " & ctl.Name
+'                            Debug.Print col_into.Count & ": " & ctl.Name
                         Case Else
                             Set col_into = ctl
                             Exit For
@@ -1303,17 +1307,17 @@ Private Sub CollectDesignControls()
           , col_with_parent:=Me _
           , col_set_height:=10 _
           , col_set_width:=siWidth
-    Set frmAreaMsects = dctAreas(1)
-    Set frmAreaButtns = dctAreas(2)
-    VisualizeCtl frmAreaMsects, VISLZE_BCKCLR_AREA
-    VisualizeCtl frmAreaButtns, VISLZE_BCKCLR_AREA
+    Set frmMsectsArea = dctAreas(1)
+    Set frmBttnsArea = dctAreas(2)
+    VisualizeCtl frmMsectsArea, VISLZE_BCKCLR_AREA
+    VisualizeCtl frmBttnsArea, VISLZE_BCKCLR_AREA
     
     ProvideDict dctMsectsFrm
     Collect col_into:=dctMsectsFrm _
           , col_cntrl_type:="Frame" _
-          , col_with_parent:=frmAreaMsects _
+          , col_with_parent:=frmMsectsArea _
           , col_set_height:=50 _
-          , col_set_width:=frmAreaMsects.Width - siHmarginFrames
+          , col_set_width:=frmMsectsArea.Width - siHmarginFrames
     For Each v In dctMsectsFrm
         VisualizeCtl dctMsectsFrm(v), VISLZE_BCKCLR_MSEC_FRM
     Next v
@@ -1323,7 +1327,7 @@ Private Sub CollectDesignControls()
           , col_cntrl_type:="Label" _
           , col_with_parent:=dctMsectsFrm _
           , col_set_height:=15 _
-          , col_set_width:=frmAreaMsects.Width - (siHmarginFrames * 2)
+          , col_set_width:=frmMsectsArea.Width - (siHmarginFrames * 2)
     For Each v In dctMsectsLbl
         VisualizeCtl dctMsectsLbl(v), VISLZE_BCKCLR_MSEC_LBL
     Next v
@@ -1333,7 +1337,7 @@ Private Sub CollectDesignControls()
           , col_cntrl_type:="Frame" _
           , col_with_parent:=dctMsectsFrm _
           , col_set_height:=20 _
-          , col_set_width:=frmAreaMsects.Width - (siHmarginFrames * 2)
+          , col_set_width:=frmMsectsArea.Width - (siHmarginFrames * 2)
     For Each v In dctMsectsTbxFrm
         VisualizeCtl dctMsectsTbxFrm(v), VISLZE_BCKCLR_MSEC_TBX_FRM
     Next v
@@ -1343,14 +1347,14 @@ Private Sub CollectDesignControls()
           , col_cntrl_type:="TextBox" _
           , col_with_parent:=dctMsectsTbxFrm _
           , col_set_height:=20 _
-          , col_set_width:=frmAreaMsects.Width - (siHmarginFrames * 3)
+          , col_set_width:=frmMsectsArea.Width - (siHmarginFrames * 3)
     For Each v In dctMsectsTbx
         VisualizeCtl dctMsectsTbx(v), VISLZE_BCKCLR_MSEC_TBX
     Next v
         
     Collect col_into:=frmBttnsFrm _
           , col_cntrl_type:="Frame" _
-          , col_with_parent:=frmAreaButtns _
+          , col_with_parent:=frmBttnsArea _
           , col_set_height:=10 _
           , col_set_width:=10 _
           , col_set_visible:=True ' minimum is one button
@@ -1388,90 +1392,74 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Public Function ContentHeight(ByVal ch_frame_or_form As Variant, _
+Public Function ContentHeight(ByVal ch_frame_form As Variant, _
                      Optional ByVal ch_visible_only As Boolean = True) As Single
 ' ------------------------------------------------------------------------------
-' Returns the height of the controls (ch_frame_or_form) content by considering only
-' applied = visible controls. When no control is provided it is the UserForm
-' which is ment.
+' Returns the height of the largest control in a Frame or Form (ch_frame_form)
+' which is the maximum value of the Controls Top + Height.
 ' ------------------------------------------------------------------------------
     Const PROC = "ContzentHeight"
     
     On Error GoTo eh
-    Dim ctl     As MSForms.Control
-    Dim i       As Long
+    Dim ctl As MSForms.Control
+    Dim i   As Long
     
-    If Not IsFrameOrForm(ch_frame_or_form) _
+    If Not IsFrameOrForm(ch_frame_form) _
     Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form - and thus has no controls!"
     
-    If ScrollV_Applied(ch_frame_or_form) Then
-        ContentHeight = ch_frame_or_form.Height + ScrollH_Height(ch_frame_or_form)
-    Else
-        For Each ctl In ch_frame_or_form.Controls
-            With ctl
-                If .Parent Is ch_frame_or_form Then
-                    If ch_visible_only Then
-                        If ctl.Visible Then
-                            ContentHeight = Max(ContentHeight, .Top + .Height)
-                            i = i + 1
-                        End If
-                    Else
+    For Each ctl In ch_frame_form.Controls
+        With ctl
+            If .Parent Is ch_frame_form Then
+                If ch_visible_only Then
+                    If ctl.Visible Then
                         ContentHeight = Max(ContentHeight, .Top + .Height)
                         i = i + 1
                     End If
+                Else
+                    ContentHeight = Max(ContentHeight, .Top + .Height)
+                    i = i + 1
                 End If
-            End With
-        Next ctl
-         ContentHeight = ContentHeight + ScrollH_Height(ch_frame_or_form)
-        If IsForm(ch_frame_or_form) Then ContentHeight = ContentHeight + 3
-        ' Debug.Print i & " Controls = " & ContentHeight & " pt"
-    End If
+            End If
+        End With
+    Next ctl
+    
+    ' Debug.Print i & " Controls = " & ContentHeight & " pt"
     
 xt: Exit Function
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function ContentWidth(ByVal cw_frame_or_form As Variant, _
+Public Function ContentWidth(ByVal cw_frame_form As Variant, _
                     Optional ByVal cw_visible_only As Boolean = True) As Single
 ' ------------------------------------------------------------------------------
-' Returns the width of the Frame's or Form's (cw_frame_or_form) content by
-' considering only visible or all controls and a possibly appliued vertical
-' scrol-bar.
+' Returns the width of the largest control in a Frame or Form (cw_frame_form)
+' which is the maximum value of the Controls Left + Width.
 ' ------------------------------------------------------------------------------
     Const PROC = "ContentWidth"
     
     On Error GoTo eh
-    Dim ctl     As MSForms.Control
-    Dim siWidth As Single
-    Dim i       As Long
+    Dim ctl As MSForms.Control
+    Dim i   As Long
     
-    If Not IsFrameOrForm(cw_frame_or_form) _
+    If Not IsFrameOrForm(cw_frame_form) _
     Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form - and thus has no controls!"
 
-    If ScrollH_Applied(cw_frame_or_form) Then
-        '~~ Once a horizontal scroll-bar is applied the width is already adjusted and must not be altered
-        ContentWidth = cw_frame_or_form.Width + ScrollV_Width(cw_frame_or_form)
-    Else
-        For Each ctl In cw_frame_or_form.Controls
-            With ctl
-                If .Parent Is cw_frame_or_form Then
-                    If cw_visible_only Then
-                        If ctl.Visible Then
-                            siWidth = Max(siWidth, (.Left + .Width))
-                            i = i + 1
-                        End If
-                    Else
-                        siWidth = Max(siWidth, (.Left + .Width))
+    For Each ctl In cw_frame_form.Controls
+        With ctl
+            If .Parent Is cw_frame_form Then
+                If cw_visible_only Then
+                    If ctl.Visible Then
+                        ContentWidth = Max(ContentWidth, (.Left + .Width))
                         i = i + 1
                     End If
+                Else
+                    ContentWidth = Max(ContentWidth, (.Left + .Width))
+                    i = i + 1
                 End If
-            End With
-        Next ctl
-        ContentWidth = siWidth + ScrollV_Width(cw_frame_or_form)
-    '    Debug.Print i & " Controls = " & ContentWidth & "pt"
-        If IsForm(cw_frame_or_form) Then ContentWidth = ContentWidth + 15
-    End If
+            End If
+        End With
+    Next ctl
     
 xt: Exit Function
     
@@ -1608,7 +1596,7 @@ Private Sub EstblshMonitorFooter(ByVal mf_top As Single)
             .Value = TextMonitorFooter.Text
             .Height = 18
             .Width = Me.InsideWidth
-            Me.Height = .Top + .Height + 30 + ScrollH_Height(frmSteps)
+            Me.Height = .Top + .Height + 30 + ScrollHscrollHeight(frmSteps)
         End With
         VisualizeCtl tbxFooter, VISLZE_BCKCLR_MSEC_TBX
     End If
@@ -2054,7 +2042,7 @@ Private Function MsectsFrm(ByVal est_section As Long) As MSForms.Frame
     Dim frmAbove    As MSForms.Frame
     
     If Not dctMsectsFrm.Exists(est_section) Then
-        Set frm = AddControl(ac_ctl:=Frame, ac_visible:=True, ac_in:=AreaMsects, ac_name:="frMsgSection" & est_section)
+        Set frm = AddControl(ac_ctl:=Frame, ac_visible:=True, ac_in:=MsectsArea, ac_name:="frMsgSection" & est_section)
         With frm
             .Top = 0
             If est_section > 1 Then
@@ -2274,126 +2262,150 @@ Private Function QisEmpty(ByVal qu As Collection) As Boolean
     Else QisEmpty = True
 End Function
 
-Private Function ScrollH_Applied(ByVal sa_frame_or_form As Variant) As Boolean
+Private Function ScrollHscrollApplied(ByVal sa_frame_form As Variant) As Boolean
 ' ------------------------------------------------------------------------------
-' Returns True when the control (sa_frame_or_form) has a horizontal scrollbar applied. When
+' Returns True when the control (sa_frame_form) has a horizontal scrollbar applied. When
 ' no control is provided it is the UserForm which is ment.
 ' ------------------------------------------------------------------------------
-    If IsFrameOrForm(sa_frame_or_form) Then
-        Select Case sa_frame_or_form.ScrollBars
-            Case fmScrollBarsBoth, fmScrollBarsHorizontal: ScrollH_Applied = True
+    If IsFrameOrForm(sa_frame_form) Then
+        Select Case sa_frame_form.ScrollBars
+            Case fmScrollBarsBoth, fmScrollBarsHorizontal: ScrollHscrollApplied = True
         End Select
     End If
 End Function
 
-Private Sub ScrollH_Apply(ByVal sa_width As Single, _
-                          ByRef sa_frame_or_form As Variant, _
-                 Optional ByVal sa_x_action As fmScrollAction = fmScrollActionBegin)
+Private Sub ScrollHscrollApply(ByRef sha_frame_form As Variant, _
+                               ByVal sha_content_width, _
+                      Optional ByVal sha_x_action As fmScrollAction = fmScrollActionBegin)
 ' ------------------------------------------------------------------------------
-' Apply a horizontal scrollbar is applied to the frame (sa_frame_or_form) and
-' adjusted to the frame content's width (sa_width). In case a horizontal
-' scrollbar is already applied only its width is adjusted.
+' - Apllies a horizontal scroll-bar when the width of the content of the frame
+'   (sha_frame_form) is greater than its content
+' - Adjust the scroll-bar's width by considering an already displayed vertical
+'   scroll-bar
 ' ------------------------------------------------------------------------------
-    Const PROC = "ScrollH_Apply"
+    Const PROC = "ScrollHscrollApply"
     
     On Error GoTo eh
-    If Not IsFrameOrForm(sa_frame_or_form) _
+    If Not IsFrameOrForm(sha_frame_form) _
     Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form!"
-    
-    With sa_frame_or_form
-        Select Case .ScrollBars
-            Case fmScrollBarsBoth
-                '~~ The already displayed horizonzal scrollbar's width is adjusted
-                .KeepScrollBarsVisible = fmScrollBarsBoth
-                .ScrollWidth = sa_width
-                .Scroll xAction:=sa_x_action
-            Case fmScrollBarsHorizontal
-                '~~ Already displayed (no vertical scrollbar yet)
-                '~~ No need to adjust the height for the scrollbar
-                .KeepScrollBarsVisible = fmScrollBarsHorizontal
-                .ScrollWidth = sa_width
-                .Scroll xAction:=sa_x_action
-                .Height = ContentHeight(sa_frame_or_form)
-            Case fmScrollBarsVertical
-                '~~ Add a horizontal scrollbar to the already displayed vertical
-                .ScrollBars = fmScrollBarsBoth
-                .KeepScrollBarsVisible = fmScrollBarsBoth
-                .ScrollWidth = sa_width
-                .Scroll xAction:=sa_x_action
-            Case fmScrollBarsNone
-                '~~ Add a horizontal scrollbar
-                .ScrollBars = fmScrollBarsHorizontal
-                .KeepScrollBarsVisible = fmScrollBarsHorizontal
-                .ScrollWidth = sa_width
-                .Scroll xAction:=sa_x_action
-                .Height = ContentHeight(sa_frame_or_form)
-        End Select
+        
+    With sha_frame_form
+        If Not ScrollHscrollApplied(sha_frame_form) Then
+            Debug.Print "apply a horizontal scroll-bar for " & sha_frame_form.Name
+            Select Case .ScrollBars
+                Case fmScrollBarsBoth
+                    .KeepScrollBarsVisible = fmScrollBarsBoth
+                Case fmScrollBarsHorizontal
+                    .KeepScrollBarsVisible = fmScrollBarsHorizontal
+                Case fmScrollBarsVertical
+                    .ScrollBars = fmScrollBarsBoth
+                    .KeepScrollBarsVisible = fmScrollBarsBoth
+                Case fmScrollBarsNone
+                    .ScrollBars = fmScrollBarsHorizontal
+                    .KeepScrollBarsVisible = fmScrollBarsHorizontal
+            End Select
+            If Not ScrollVscrollApplied(sha_frame_form) Then
+                .Height = ContentHeight(sha_frame_form) + ScrollHscrollHeight(sha_frame_form)
+            Else
+                .Height = .Height + ScrollHscrollHeight(sha_frame_form)
+            End If
+        End If
+       .ScrollWidth = sha_content_width
+       .Scroll xAction:=sha_x_action
     End With
+    Debug.Print "Width Frame   = " & sha_frame_form.Width
+    Debug.Print "Width Scroll  = " & sha_content_width
 
 xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Function ScrollH_Height(ByVal sh_frame_or_form As Variant) As Single
-    If IsFrameOrForm(sh_frame_or_form) Then
-        If ScrollH_Applied(sh_frame_or_form) Then ScrollH_Height = SCROLL_H_HEIGHT
+Private Function ScrollHscrollHeight(ByVal sh_frame_form As Variant) As Single
+    If IsFrameOrForm(sh_frame_form) Then
+        If ScrollHscrollApplied(sh_frame_form) Then ScrollHscrollHeight = SCROLL_H_HEIGHT
     End If
 End Function
 
-Private Function ScrollV_Applied(Optional ByVal sa_frame_or_form As Variant = Nothing) As Boolean
+Private Function ScrollVscrollApplied(Optional ByVal sa_frame_form As Variant = Nothing) As Boolean
 ' ------------------------------------------------------------------------------
-' Returns True when the control (sa_frame_or_form) has a vertical scrollbar applied. When no
+' Returns True when the control (sa_frame_form) has a vertical scrollbar applied. When no
 ' control is provided it is the UserForm which is ment.
 ' ------------------------------------------------------------------------------
-    If IsFrameOrForm(sa_frame_or_form) Then
-        Select Case sa_frame_or_form.ScrollBars
-            Case fmScrollBarsBoth, fmScrollBarsVertical: ScrollV_Applied = True
+    If IsFrameOrForm(sa_frame_form) Then
+        Select Case sa_frame_form.ScrollBars
+            Case fmScrollBarsBoth, fmScrollBarsVertical: ScrollVscrollApplied = True
         End Select
     End If
 End Function
 
-Private Sub ScrollV_Apply(ByVal sa_height As Single, _
-                          ByRef sa_frame_or_form As Variant, _
-                 Optional ByVal sa_y_action As fmScrollAction = fmScrollActionBegin)
+Private Sub ScrollVscrollApply(ByRef sva_frame_form As Variant, _
+                               ByVal sva_content_height As Single, _
+                      Optional ByVal sva_y_action As fmScrollAction = fmScrollActionBegin)
 ' ------------------------------------------------------------------------------
-' A vertical scrollbar is applied to the frame (sa_frame_or_form) and adjusted to
-' the frame content's height (sa_height). In case a vertical scrollbar is
-' already applied only its width is adjusted.
+' - Apllies a vertical scroll-bar when the height of the content of the frame
+'   (sva_frame_form) is greater than its content
+' - Adjust the scroll-bar's height by considering an already displayed
+'   horizontal scroll-bar
 ' ------------------------------------------------------------------------------
-    Const PROC = "ScrollV_Apply"
+    Const PROC = "ScrollVscrollApply"
     
     On Error GoTo eh
-    If Not IsFrameOrForm(sa_frame_or_form) _
+    If Not IsFrameOrForm(sva_frame_form) _
     Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form!"
     
-    With sa_frame_or_form
-        Select Case .ScrollBars
-            Case fmScrollBarsBoth
-                '~~ The already displayed horizonzal scrollbar's width is adjusted
-                .KeepScrollBarsVisible = fmScrollBarsBoth
-                .ScrollHeight = sa_height
-                .Scroll yAction:=sa_y_action
-            Case fmScrollBarsHorizontal
-                '~~ Already displayed (no vertical scrollbar yet)
-                '~~ No need to adjust the height for the scrollbar
-                .ScrollBars = fmScrollBarsBoth
-                .KeepScrollBarsVisible = fmScrollBarsBoth
-                .ScrollHeight = sa_height
-                .Scroll yAction:=sa_y_action
-            Case fmScrollBarsVertical
-                '~~ Add a horizontal scrollbar to the already displayed vertical
-                .KeepScrollBarsVisible = fmScrollBarsVertical
-                .ScrollHeight = sa_height
-                .Scroll yAction:=sa_y_action
-            Case fmScrollBarsNone
-                '~~ Add a horizontal scrollbar
-                .ScrollBars = fmScrollBarsVertical
-                .KeepScrollBarsVisible = fmScrollBarsVertical
-                .ScrollHeight = sa_height
-                .Scroll yAction:=sa_y_action
-        End Select
-        .Width = ContentWidth(sa_frame_or_form)
+    With sva_frame_form
+        If Not ScrollVscrollApplied(sva_frame_form) Then
+            '~~ Establish the vertical scroll-bar, added to the horizontal scroll-bar when one is already applied
+            Select Case .ScrollBars
+                Case fmScrollBarsBoth
+                    .KeepScrollBarsVisible = fmScrollBarsBoth
+                Case fmScrollBarsHorizontal
+                    .ScrollBars = fmScrollBarsBoth
+                    .KeepScrollBarsVisible = fmScrollBarsBoth
+                Case fmScrollBarsVertical
+                    .KeepScrollBarsVisible = fmScrollBarsVertical
+                Case fmScrollBarsNone
+                    .ScrollBars = fmScrollBarsVertical
+                    .KeepScrollBarsVisible = fmScrollBarsVertical
+            End Select
+        End If
+        .Scroll yAction:=sva_y_action
+        .ScrollHeight = sva_content_height
+        If Not ScrollHscrollApplied(sva_frame_form) Then
+            .Width = ContentWidth(sva_frame_form) + ScrollVscrollWidth(sva_frame_form)
+        End If
+    End With
+    Debug.Print "Height Frame   = " & sva_frame_form.Height
+    Debug.Print "Height Scroll  = " & sva_content_height
+
+xt: Exit Sub
+    
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Private Sub ScrollVscrollRemove(ByRef sr_frame_form As Variant)
+' ------------------------------------------------------------------------------
+' Removes a vertical scroll-bar.
+' ------------------------------------------------------------------------------
+    Const PROC = "ScrollVscrollRemove"
+    
+    On Error GoTo eh
+    If Not IsFrameOrForm(sr_frame_form) _
+    Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form!"
+    
+    With sr_frame_form
+        If Not ScrollVscrollApplied(sr_frame_form) Then
+            '~~ Establish the vertical scroll-bar, added to the horizontal scroll-bar when one is already applied
+            Select Case .ScrollBars
+                Case fmScrollBarsBoth, fmScrollBarsHorizontal
+                    .KeepScrollBarsVisible = fmScrollBarsHorizontal
+                    .ScrollBars = fmScrollBarsHorizontal
+                Case fmScrollBarsVertical
+                    .KeepScrollBarsVisible = fmScrollBarsNone
+                    .ScrollBars = fmScrollBarsNone
+            End Select
+        End If
     End With
     
 xt: Exit Sub
@@ -2401,19 +2413,48 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Sub ScrollV_MsgSectionOrArea(ByVal exceeding_height As Single)
+Private Sub ScrollHscrollRemove(ByRef shr_frame_form As Variant)
+' ------------------------------------------------------------------------------
+' Removes a vertical scroll-bar.
+' ------------------------------------------------------------------------------
+    Const PROC = "ScrollHscrollRemove"
+    
+    On Error GoTo eh
+    If Not IsFrameOrForm(shr_frame_form) _
+    Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form!"
+    
+    With shr_frame_form
+        If ScrollHscrollApplied(shr_frame_form) Then
+            '~~ Establish the vertical scroll-bar, added to the horizontal scroll-bar when one is already applied
+            Select Case .ScrollBars
+                Case fmScrollBarsBoth, fmScrollBarsVertical
+                    .KeepScrollBarsVisible = fmScrollBarsHorizontal
+                    .ScrollBars = fmScrollBarsHorizontal
+                Case fmScrollBarsHorizontal
+                    .KeepScrollBarsVisible = fmScrollBarsNone
+                    .ScrollBars = fmScrollBarsNone
+            End Select
+        End If
+    End With
+    
+xt: Exit Sub
+    
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Private Sub ScrollVscrollMsgSectionOrArea(ByVal exceeding_height As Single)
 ' ------------------------------------------------------------------------------
 ' Either because the message area occupies 60% or more of the total height or
 ' because both, the message area and the buttons area us about the same height,
 ' it - or only the section text occupying 65% or more - will be reduced by the
 ' exceeding height amount (exceeding_height) and will get a vertical scrollbar.
 ' ------------------------------------------------------------------------------
-    Const PROC = "ScrollV_MsgSectionOrArea"
+    Const PROC = "ScrollVscrollMsgSectionOrArea"
     
     On Error GoTo eh
-    Dim VScrollApplied      As Boolean
-    Dim v                   As Variant
-    Dim frm                 As MSForms.Frame
+    Dim v               As Variant
+    Dim frm             As MSForms.Frame
+    Dim bScrollApplied  As Boolean
     
     '~~ Find a/the message section text which occupies 65% or more of the message area's height,
     For Each v In dctMsectsFrm
@@ -2421,30 +2462,21 @@ Private Sub ScrollV_MsgSectionOrArea(ByVal exceeding_height As Single)
         If frm.Visible Then
             ProvideSectionItems v
             
-            If MsectTbxFrm.Height >= frmAreaMsects.Height * 0.65 _
-            Or ScrollV_Applied(MsectTbxFrm) Then
+            If MsectTbxFrm.Height >= frmMsectsArea.Height * 0.65 _
+            Or ScrollVscrollApplied(MsectTbxFrm) Then
                 ' ------------------------------------------------------------------------------
                 ' There is a section which occupies 65% of the overall height or has already a
                 ' vertical scrollbar applied. Assigning a new frame height applies a vertical
                 ' scrollbar if none is applied yet or just adjusts the scrollbar's height to the
                 ' frame's content height
                 ' ------------------------------------------------------------------------------
-                If UsageType = usage_progress_display Then
-    '                Debug.Print MsectTbxFrm.Height - exceeding_height
-                    NewHeight(MsectTbxFrm, fmScrollActionEnd) = MsectTbxFrm.Height - exceeding_height
-                    AdjustedParentsWidthAndHeight MsectTbx
-                    AdjustTopPositions
-                    ProvideSectionItems v ' reset
-                    VScrollApplied = ScrollV_Applied(MsectTbxFrm)
-                    Exit For
-                Else
-                    If MsectTbxFrm.Height - exceeding_height > 0 Then
-    '                    Debug.Print MsectTbxFrm.Height - exceeding_height
+                If MsectTbxFrm.Height - exceeding_height > 0 Then
+                    If MsectTbxFrm.Height <> MsectTbxFrm.Height - exceeding_height Then
                         NewHeight(MsectTbxFrm) = MsectTbxFrm.Height - exceeding_height
                         AdjustedParentsWidthAndHeight MsectTbx
                         AdjustTopPositions
                         ProvideSectionItems v ' reset
-                        VScrollApplied = ScrollV_Applied(MsectTbxFrm)
+                        bScrollApplied = True
                         Exit For
                     End If
                 End If
@@ -2452,11 +2484,11 @@ Private Sub ScrollV_MsgSectionOrArea(ByVal exceeding_height As Single)
         End If ' visible
     Next v
     
-    If Not VScrollApplied Then
+    If Not ScrollVscrollApplied(frmMsectsArea) And Not bScrollApplied And MsectsArea.Height <> ContentHeight(frmMsectsArea) - exceeding_height Then
         '~~ None of the message sections has a dominating height. Becaue the overall message area
         '~~ occupies >=60% of the height it is now reduced to fit the maximum message height
         '~~ thereby receiving a vertical scroll-bar
-        NewHeight(frmAreaMsects) = ContentHeight(frmAreaMsects) - exceeding_height
+        NewHeight(frmMsectsArea) = ContentHeight(frmMsectsArea) - exceeding_height
         AdjustedParentsWidthAndHeight MsectTbx
         AdjustTopPositions
     End If
@@ -2466,7 +2498,7 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Sub ScrollV_WhereApplicable()
+Private Sub ScrollVscrollWhereApplicable()
 ' ------------------------------------------------------------------------------
 ' Reduce the height of the message area and or the height of the buttons area to
 ' have the message form not exceeds the specified maximum height. The area which
@@ -2477,7 +2509,7 @@ Private Sub ScrollV_WhereApplicable()
 ' is reduced and gets a verticall scrollbar.
 ' The reduced frames are returned (frame_msg, frame_bttns).
 ' ------------------------------------------------------------------------------
-    Const PROC = "ScrollV_WhereApplicable"
+    Const PROC = "ScrollVscrollWhereApplicable"
     
     On Error GoTo eh
     Dim TotalExceedingHeight    As Single
@@ -2490,20 +2522,20 @@ Private Sub ScrollV_WhereApplicable()
             .Height = siMsgHeightMax     '~~ Reduce the height to the max height specified
             
             If PrcntgHeightMsgArea >= 0.6 Then
-                '~~ Either the message area as a whole or the dominating message section - if theres is any -
+                '~~ Either the message area as a whole or the dominating message section - if ther is any -
                 '~~ will be height reduced and applied with a vertical scroll bar
-                ScrollV_MsgSectionOrArea TotalExceedingHeight
-            ElseIf PrcntgHeightfrmAreaButtns >= 0.6 Then
+                ScrollVscrollMsgSectionOrArea TotalExceedingHeight
+            ElseIf PrcntgHeightfrmBttnsArea >= 0.6 Then
                 '~~ Only the buttons area will be reduced and applied with a vertical scrollbar.
-'                Debug.Print frmAreaButtns.Height - TotalExceedingHeight
-                NewHeight(frmAreaButtns) = frmAreaButtns.Height - TotalExceedingHeight
+'                Debug.Print frmBttnsArea.Height - TotalExceedingHeight
+                NewHeight(frmBttnsArea) = frmBttnsArea.Height - TotalExceedingHeight
             Else
                 '~~ Both, the message area and the buttons area will be
                 '~~ height reduced proportionally and applied with a vertical scrollbar
-'                Debug.Print frmAreaMsects.Height - (TotalExceedingHeight * PrcntgHeightMsgArea)
-                NewHeight(frmAreaMsects) = frmAreaMsects.Height - (TotalExceedingHeight * PrcntgHeightMsgArea)
-'                Debug.Print frmAreaButtns.Height - (TotalExceedingHeight * PrcntgHeightfrmAreaButtns)
-                NewHeight(frmAreaButtns) = frmAreaButtns.Height - (TotalExceedingHeight * PrcntgHeightfrmAreaButtns)
+'                Debug.Print frmMsectsArea.Height - (TotalExceedingHeight * PrcntgHeightMsgArea)
+                NewHeight(frmMsectsArea) = frmMsectsArea.Height - (TotalExceedingHeight * PrcntgHeightMsgArea)
+'                Debug.Print frmBttnsArea.Height - (TotalExceedingHeight * PrcntgHeightfrmBttnsArea)
+                NewHeight(frmBttnsArea) = frmBttnsArea.Height - (TotalExceedingHeight * PrcntgHeightfrmBttnsArea)
             End If
         End With
     End If ' height exceeds specified maximum
@@ -2513,9 +2545,9 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Function ScrollV_Width(ByVal sw_frame_or_form As Variant) As Single
-    If IsFrameOrForm(sw_frame_or_form) Then
-        If ScrollV_Applied(sw_frame_or_form) Then ScrollV_Width = SCROLL_V_WIDTH
+Private Function ScrollVscrollWidth(ByVal sw_frame_form As Variant) As Single
+    If IsFrameOrForm(sw_frame_form) Then
+        If ScrollVscrollApplied(sw_frame_form) Then ScrollVscrollWidth = SCROLL_V_WIDTH
     End If
 End Function
 
@@ -2531,8 +2563,8 @@ Public Sub Setup()
     Me.Width = siMsgWidthMin
     
 '    PositionMessageOnScreen pos_top_left:=True  ' in case of test best pos to start with
-    frmAreaMsects.Visible = False
-    frmAreaButtns.Top = VSPACE_AREAS
+    frmMsectsArea.Visible = False
+    frmBttnsArea.Top = VSPACE_AREAS
     
     '~~ ----------------------------------------------------------------------------------------
     '~~ The  p r i m a r y  setup of the title, the message sections and the reply buttons
@@ -2578,7 +2610,7 @@ Public Sub Setup()
     ' When both areas are about the same height (neither is taller the than 60% of the total heigth)
     ' both will get a vertical scrollbar, else only the one which uses 60% or more of the height.
     ' -----------------------------------------------------------------------------------------------
-    ScrollV_WhereApplicable
+    ScrollVscrollWhereApplicable
     
     '~~ Final form width adjustment
     '~~ When the message area or the buttons area has a vertical scrollbar applied
@@ -2587,6 +2619,12 @@ Public Sub Setup()
     '~~ the message form width is extended (over the specified maximum) in order to have
     '~~ the vertical scrollbar visible
     AdjustTopPositions
+    If Not (ScrollHscrollApplied(BttnsArea) Or ScrollHscrollApplied(MsectsArea)) Then
+        Me.Width = Max(Me.Width, BttnsArea.Width, MsectsArea.Width) + 5 + (Me.Width - Me.InsideWidth)
+    End If
+    If Not (ScrollVscrollApplied(BttnsArea) Or ScrollVscrollApplied(MsectsArea)) Then
+        Me.Height = Max(Me.Height, ContentHeight(BttnsArea.Parent), ContentHeight(MsectsArea.Parent)) + 20 + (Me.Width - Me.InsideWidth)
+    End If
     PositionMessageOnScreen
     bSetUpDone = True ' To indicate for the Activate event that the setup had already be done beforehand
     
@@ -2604,12 +2642,14 @@ Private Sub Setup1_Title(ByVal setup_title As String, _
 ' (setup_width_max) by using a certain factor (setup_factor) for the calculation
 ' of the width required to display an untruncated title - as long as the maximum
 ' widht is not exeeded.
+' The correction of the template length label is a function (percentage) of the
+' lenght.
 ' ------------------------------------------------------------------------------
     Const PROC = "Setup1_Title"
-    Const FACTOR = 1.45
     
     On Error GoTo eh
-    Dim Correction    As Single
+    Dim Correction  As Single
+    Dim siWidth     As Single
     
     With Me
         .Width = setup_width_min
@@ -2625,8 +2665,9 @@ Private Sub Setup1_Title(ByVal setup_title As String, _
             .Caption = " " & setup_title    ' some left margin
         End With
         .Caption = setup_title
-        Correction = (CInt(.laMsgTitle.Width)) / 2000
-        .Width = Min(setup_width_max, .laMsgTitle.Width * (FACTOR - Correction))
+        Correction = .laMsgTitle.Width * 0.11 ' The correction is a percentage of the length of the title template Label control
+        siWidth = .laMsgTitle.Width + 40 + Correction
+        .Width = Min(setup_width_max, siWidth)
         .Width = Max(.Width, setup_width_min)
         TitleWidth = .Width
     End With
@@ -2636,6 +2677,7 @@ xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
+
 
 Private Sub Setup2_MsgSectsMonoSpaced()
 ' --------------------------------------------------------------------------------------
@@ -2655,7 +2697,7 @@ Private Sub Setup2_MsgSectsMonoSpaced()
                 SetupMsgSect
 '                AdjustedParentsWidthAndHeight MsectTbx
 '                AdjustTopPositions
-'                AdjustedParentsWidthAndHeight frmAreaMsects
+'                AdjustedParentsWidthAndHeight frmMsectsArea
             End If
         End With
     Next i
@@ -2707,7 +2749,7 @@ Private Sub Setup3_Bttns()
     Dim Bttn        As MSForms.CommandButton
 
     If cllMsgBttns.Count = 0 Then GoTo xt
-    frmAreaButtns.Visible = True
+    frmBttnsArea.Visible = True
     frmBttnsFrm.Visible = True
 
     lSetupRows = 1
@@ -2716,8 +2758,8 @@ Private Sub Setup3_Bttns()
     Set Bttn = dctBttns(1 & "-" & 1)
     
     Me.Height = 100 ' just to start with
-    frmAreaButtns.Top = VSPACE_AREAS
-    BttnsFrm.Top = frmAreaButtns.Top
+    frmBttnsArea.Top = VSPACE_AREAS
+    BttnsFrm.Top = frmBttnsArea.Top
     BttnRow.Top = BttnsFrm.Top
     Bttn.Top = BttnRow.Top
     Bttn.Width = DFLT_BTTN_MIN_WIDTH
@@ -2869,14 +2911,14 @@ Private Sub SetupMsgSect()
     
     On Error GoTo eh
                 
-    MsectFrm.Width = frmAreaMsects.Width
+    MsectFrm.Width = frmMsectsArea.Width
     MsectLbl.Width = MsectFrm.Width
     MsectTbxFrm.Width = MsectFrm.Width
     MsectTbx.Width = MsectFrm.Width
         
     If MsgSectTxt.Text <> vbNullString Then
     
-        frmAreaMsects.Visible = True
+        frmMsectsArea.Visible = True
         MsectFrm.Visible = True
         MsectTbxFrm.Visible = True
         MsectTbx.Visible = True
@@ -2948,7 +2990,7 @@ Const PROC = "SetupMsgSectMonoSpaced"
     MaxWidthTextFrame = MaxWidthSectFrame
     
     '~~ Keep record of the controls which had been applied
-    frmAreaMsects.Visible = True
+    frmMsectsArea.Visible = True
     MsectFrm.Visible = True
     MsectTbxFrm.Visible = True: MonoSpaced(MsectTbxFrm) = True
     MsectTbx.Visible = True:    MonoSpaced(MsectTbx) = True:  MonoSpacedTbx(MsectTbx) = True
@@ -2983,8 +3025,8 @@ Const PROC = "SetupMsgSectMonoSpaced"
     '~~ However, it cannot expand beyond the maximum width calculated for the text frame
     NewWidth(MsectTbxFrm) = Min(MaxWidthTextFrame, MsectTbx.Width)
     MsectFrm.Width = Min(MaxWidthSectFrame, MsectTbxFrm.Width)
-    frmAreaMsects.Width = Min(MaxWidthSectFrame, MsectFrm.Width)
-    FormWidth = frmAreaMsects.Width
+    frmMsectsArea.Width = Min(MaxWidthSectFrame, MsectFrm.Width)
+    FormWidth = frmMsectsArea.Width
     AdjustTopPositions
 '    AdjustedParentsWidthAndHeight MsectTbx
     
@@ -3012,19 +3054,19 @@ Private Sub SetupMsgSectPropSpaced(Optional ByVal msg_append As Boolean = False,
     
     On Error GoTo eh
     
-    frmAreaMsects.Visible = True
+    frmMsectsArea.Visible = True
     MsectFrm.Visible = True
     MsectTbxFrm.Visible = True
     MsectTbx.Visible = True
 
     '~~ For proportional spaced message sections the width is determined by the Message area's width
-    frmAreaMsects.Width = Me.InsideWidth
-    MsectFrm.Width = frmAreaMsects.Width
+    frmMsectsArea.Width = Me.InsideWidth
+    MsectFrm.Width = frmMsectsArea.Width
     MsectTbxFrm.Width = MsectFrm.Width - 5
 '    Debug.Print "MsectTbxFrm.Width = " & MsectTbxFrm.Width
     
-    frmAreaButtns.Top = frmAreaMsects.Top + frmAreaMsects.Height + 20
-    Me.Height = frmAreaButtns.Top + frmAreaButtns.Height + 20
+    frmBttnsArea.Top = frmMsectsArea.Top + frmMsectsArea.Height + 20
+    Me.Height = frmBttnsArea.Top + frmBttnsArea.Height + 20
     
     If msg_text <> vbNullString Then MsgSectTxt.Text = msg_text
     
@@ -3053,9 +3095,9 @@ Private Sub SetupMsgSectPropSpaced(Optional ByVal msg_append As Boolean = False,
     
     MsectTbxFrm.Height = MsectTbx.Top + MsectTbx.Height
     MsectFrm.Height = MsectTbxFrm.Top + MsectTbxFrm.Height
-    frmAreaMsects.Height = ContentHeight(frmAreaMsects)
-    frmAreaButtns.Top = frmAreaMsects.Top + frmAreaMsects.Height + 20
-    Me.Height = frmAreaButtns.Top + frmAreaButtns.Height + 20
+    frmMsectsArea.Height = ContentHeight(frmMsectsArea)
+    frmBttnsArea.Top = frmMsectsArea.Top + frmMsectsArea.Height + 20
+    Me.Height = frmBttnsArea.Top + frmBttnsArea.Height + 20
     
 xt: Exit Sub
     
@@ -3107,7 +3149,7 @@ Private Sub SizeAndPosition2Bttns1()
     Dim v               As Variant
     Dim lRow            As Long
     Dim lButton         As Long
-    Dim HeightfrmAreaButtns As Single
+    Dim HeightfrmBttnsArea As Single
     Dim cmb             As MSForms.CommandButton
     
     For lRow = 1 To dctBttnsRow.Count
@@ -3133,12 +3175,12 @@ Private Sub SizeAndPosition2Bttns1()
                         End With
                     End If
                 End If
-                HeightfrmAreaButtns = HeightfrmAreaButtns + siMaxButtonHeight + siHmarginButtons
+                HeightfrmBttnsArea = HeightfrmBttnsArea + siMaxButtonHeight + siHmarginButtons
             Next v
         End If
         frmRow.Width = frmRow.Width + HSPACE_LEFTRIGHT_BUTTONS
     Next lRow
-    Me.Height = frmAreaMsects.Top + frmAreaMsects.Height + HeightfrmAreaButtns
+    Me.Height = frmMsectsArea.Top + frmMsectsArea.Height + HeightfrmBttnsArea
         
 xt: Exit Sub
     
@@ -3218,8 +3260,9 @@ Private Sub SizeAndPosition2Bttns3Frame()
             Next v
         End With
     End If
-    NewHeight(frmAreaButtns) = Max(Me.InsideHeight, ContentHeight(BttnsFrm))
-
+    If BttnsArea.Height <> Max(Me.InsideHeight, ContentHeight(BttnsFrm)) Then
+        NewHeight(BttnsArea) = Max(Me.InsideHeight, ContentHeight(BttnsFrm))
+    End If
 xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
@@ -3236,27 +3279,36 @@ Private Sub SizeAndPosition2Bttns4Area()
     Dim siWidth     As Single
     Dim frm         As MSForms.Frame: Set frm = BttnsArea
     
-    siHeight = ContentHeight(frm)                           ' + ScrollH_Height(frm)
-    siWidth = ContentWidth(frm)                             ' + ScrollV_Widthfrm)
-    NewWidth(frm) = Min(siWidth, (siMsgWidthMax - 10))
-    NewHeight(frm) = Min(siHeight, (siMsgHeightMax - 30))
-    siHeight = ContentHeight(frm)                           ' + ScrollH_Height(frm)
-    siWidth = ContentWidth(frm)                             ' + ScrollV_Width(frm)
-    NewWidth(frm) = Min(siWidth, (siMsgWidthMax - 10))
-    NewHeight(frm) = Min(siHeight, (siMsgHeightMax - 30))
-    
-    If Not ScrollH_Applied(frm) Then
-        frm.Width = BttnsFrm.Left + BttnsFrm.Width + ScrollV_Width(frm)
+    siHeight = ContentHeight(frm) + ScrollHscrollHeight(frm)
+    siWidth = ContentWidth(frm) + ScrollVscrollWidth(frm)
+    If frm.Width <> Min(siWidth, (siMsgWidthMax - 10)) Then
+        NewWidth(frm) = Min(siWidth, (siMsgWidthMax - 10))
     End If
     
-    If Not ScrollH_Applied(frm) Then
-        If Not ScrollV_Applied(frm) Then
-            frm.Height = BttnsFrm.Top + BttnsFrm.Height + ScrollH_Height(frm)
+    If frm.Height <> Min(siHeight, (siMsgHeightMax - 30)) Then
+        NewHeight(frm) = Min(siHeight, (siMsgHeightMax - 30))
+    End If
+    siHeight = ContentHeight(frm) + ScrollHscrollHeight(frm)
+    siWidth = ContentWidth(frm) + ScrollVscrollWidth(frm)
+    If frm.Width <> Min(siWidth, (siMsgWidthMax - 10)) Then
+        NewWidth(frm) = Min(siWidth, (siMsgWidthMax - 10))
+    End If
+    If frm.Height <> Min(siHeight, (siMsgHeightMax - 30)) Then
+        NewHeight(frm) = Min(siHeight, (siMsgHeightMax - 30))
+    End If
+    
+    If Not ScrollHscrollApplied(frm) Then
+        frm.Width = BttnsFrm.Left + BttnsFrm.Width + ScrollVscrollWidth(frm)
+    End If
+    
+    If Not ScrollHscrollApplied(frm) Then
+        If Not ScrollVscrollApplied(frm) Then
+            frm.Height = BttnsFrm.Top + BttnsFrm.Height + ScrollHscrollHeight(frm)
         End If
     End If
     
-    FormWidth = frm.Width + ScrollV_Width(frm)
-    FrameCenterHorizontal center_frame:=frmAreaButtns, left_margin:=10
+    FormWidth = frm.Width + ScrollVscrollWidth(frm)
+    FrameCenterHorizontal center_frame:=frmBttnsArea, left_margin:=10
     
 xt: Exit Sub
     

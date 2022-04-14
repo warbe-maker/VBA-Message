@@ -3,7 +3,7 @@
 ### General
 
 The design of the _Message Form_ consists of
-- 3 message sections, no matter which one is used
+- 4 message sections, no matter which one is used
 - 7 rows each with 7 reply _Buttons_ allowing any display from all in one to one in each row.
 
 ### Design of the controls
@@ -27,6 +27,12 @@ The message form is organized in a hierarchy of frames as follows.
     | | Message Section 3 Label (Label)        | |
     | | +-- Message Section 3 Text (Frame) --+ | |
     | | |  Message Section 3 (TextBox)  --     | |
+    | | +------------------------------------+ | |
+    | +----------------------------------------+ |
+    | +-- Message Section 4 (Frame) -----------+ |
+    | | Message Section 4 Label (Label)        | |
+    | | +-- Message Section 4 Text (Frame) --+ | |
+    | | |  Message Section 4 (TextBox)  --     | |
     | | +------------------------------------+ | |
     | +----------------------------------------+ |
     +--------------------------------------------+
@@ -56,4 +62,6 @@ The message form is organized in a hierarchy of frames as follows.
     | +--------------------------------------+ | |
     +--------------------------------------------+
 ````    
-The [Implementation](#Implementation.md) is merely design driven. Not using control's name is achieved by storing  all controls (frames, text boxes, and command buttons) in collections by relying on the design rather than on control names. As a consequence, additional message sections and additional reply buttons are primarily a matter of a design change and require a minimum code change.
+The [Implementation](#Implementation.md) is merely design driven. Not using control's name is achieved by collecting all controls (Frames, TextBoxes, and CommandButtons) in Dictionaries by relying on the design rather than on control names. As a consequence, additional message sections and additional reply buttons are primarily a matter of a design change and require a minimum code change.
+
+The controls used by their name are the reply CommandButtons and the Message Section Lables. Both to handle them when clicked.

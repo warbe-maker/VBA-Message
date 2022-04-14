@@ -1,15 +1,7 @@
-22-03-30 22:02:30 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-03-30 22:02:30                 >> Begin execution trace 
-22-03-30 22:02:30 00,0000         |  >> mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
-22-03-30 22:02:30 00,3133 00,3133 |  << mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
-22-03-30 22:02:30 00,3133 00,3133 << End execution trace 
-22-03-30 22:02:30                 Impact on the overall performance (caused by the trace itself): 00,0117 seconds!
-22-03-30 22:02:30 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-
-22-03-30 22:02:50 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-03-30 22:02:50                 >> Begin execution trace 
-22-03-30 22:02:50 00,0000         |  >> mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
-22-03-30 22:02:54 00,2792 00,2792 |  << mTestServices.Test_08_MonoSpacedMessageSectionExceedsMaxHeight
-22-03-30 22:02:54 00,2792 00,2792 << End execution trace 
-22-03-30 22:02:54                 Impact on the overall performance (caused by the trace itself): 00,0021 seconds!
-22-03-30 22:02:54 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-04-14 08:57:52 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-04-14 08:57:52                 >> Begin execution trace 
+22-04-14 08:57:52 00,0000         |  >> mTestServices.Test_30_mMsg_Monitor_Service
+22-04-14 08:58:11 19,1263 19,1263 |  << mTestServices.Test_30_mMsg_Monitor_Service
+22-04-14 08:58:11 19,1263 19,1263 << End execution trace 
+22-04-14 08:58:11                 Impact on the overall performance (caused by the trace itself): 00,0028 seconds!
+22-04-14 08:58:11 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)

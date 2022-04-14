@@ -1061,11 +1061,6 @@ Private Sub Test_Pass_TypeMsgText()
         Debug.Assert .Text(k).FontBold = True
     
         For i = 1 To 4
-            k = enSectLabel
-            .Text(k, i) = t
-            Debug.Assert .Text(k, i).FontBold = True
-        Next i
-        For i = 1 To 4
             k = enSectText
             .Text(k, i) = t
             Debug.Assert .Text(k, i).FontBold = True
@@ -1092,63 +1087,34 @@ Public Sub Test_SizingAndPositioning()
     Dim Instance3 As String
     Dim Instance4 As String
     Dim Instance5 As String
+    Dim Title     As String
+    Dim i         As Long
     
-    
-    Instance1 = "Test Sizing and Positioning: Top=0, Left=0, Width=" & PrcPnt(50, "w") & ", Height=" & PrcPnt(50, "h")
-    With TestInstance(Instance1)
-        .Top = 0
-        .Left = 0
-        .Width = Pnts(50, "w")
-        .Height = Pnts(50, "h")
-        .Caption = Instance1
-        .Show Modeless
-    End With
-    
-    Instance2 = "Test Sizing and Positioning: Top=0, Left=" & PrcPnt(50, "w") & ", Width=" & PrcPnt(50, "w") & ", Height=" & PrcPnt(50, "h")
-    With TestInstance(Instance2)
-        .Top = 0
-        .Left = TestInstance(Instance1).Width
-        .Width = Pnts(50, "w")
-        .Height = Pnts(50, "h")
-        .Caption = Instance2
-        .Show Modeless
-    End With
-    
-    Instance3 = "Test Sizing and Positioning: Top=" & PrcPnt(50, "h") & ", Left=0, Width=" & PrcPnt(50, "w") & ", Height=" & PrcPnt(50, "h")
-    With TestInstance(Instance3)
-        .Top = TestInstance(Instance1).Height
-        .Left = 0
-        .Width = Pnts(50, "w")
-        .Height = Pnts(50, "h")
-        .Caption = Instance3
-        .Show Modeless
-    End With
-    
-    Instance4 = "Test Sizing and Positioning: Top=" & PrcPnt(50, "h") & ", Left=" & PrcPnt(50, "w") & ", Width=" & PrcPnt(50, "w") & ", Height=" & PrcPnt(50, "h")
-    With TestInstance(Instance4)
-        .Top = TestInstance(Instance2).Height
-        .Left = TestInstance(Instance3).Width
-        .Width = Pnts(50, "w")
-        .Height = Pnts(50, "h")
-        .Caption = Instance4
-        .Show Modeless
-    End With
-    
-    Instance5 = "Test Sizing and Positioning: Top=0, Left=0, Width=" & PrcPnt(100, "w") & ", Height=" & PrcPnt(100, "h")
-    With TestInstance(Instance5)
-        .Top = 0
-        .Left = 0
-        .Width = Pnts(100, "w")
-        .Height = Pnts(95, "h")
-        .Caption = Instance5
-        .Show Modeless
-    End With
-       
-    TestInstance Instance1, True
-    TestInstance Instance2, True
-    TestInstance Instance3, True
-    TestInstance Instance4, True
-    TestInstance Instance5, True
+    For i = 1 To 7
+        Title = RepeatStrng("Test Sizing and Positioning", i)
+        With TestInstance(Title)
+            .Top = 0
+            .Left = 0
+            .Height = Pnts(50, "h")
+            .Caption = Title
+            .Top = i * 35
+            .Left = i * 10
+            .Setup1_Title Title, 200, 800
+            .Show False
+        End With
+    Next i
 
 End Sub
+
+Private Function RepeatStrng( _
+                       ByVal rs_s As String, _
+                       ByVal rs_n As Long) As String
+' ----------------------------------------------------------------------------
+' Returns the string (s) concatenated (n) times. VBA.String in not appropriate
+' because it does not support leading and trailing spaces.
+' ----------------------------------------------------------------------------
+    Dim i   As Long
+    For i = 1 To rs_n: RepeatStrng = RepeatStrng & rs_s:  Next i
+End Function
+
 
