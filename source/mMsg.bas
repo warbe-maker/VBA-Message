@@ -268,7 +268,7 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Private Function IsValidMsgButtonsArg(ByVal v_arg As Variant) As Boolean
+Public Function IsValidMsgButtonsArg(ByVal v_arg As Variant) As Boolean
 ' -------------------------------------------------------------------------------------
 ' Returns TRUE when the buttons argument (v_arg) is valid. When v_arg is an Array,
 ' a Collection, or a Dictionary, TRUE is returned when all items are valid.
