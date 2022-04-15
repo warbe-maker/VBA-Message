@@ -563,7 +563,7 @@ Public Function Dsply(ByVal dsply_title As String, _
 '
 ' See: https://github.com/warbe-maker/Common-VBA-Message-Service
 '
-' W. Rauschenberger, Berlin, Nov 2020
+' W. Rauschenberger, Berlin, Apr 2022
 ' ------------------------------------------------------------------------------
     Const PROC = "Dsply"
     
@@ -611,7 +611,7 @@ Public Function Dsply(ByVal dsply_title As String, _
         '|| For testing - indicated by VisualizerControls = True and             ||
         '|| dsply_modeless = True - prior Setup is suspended.                    ||
         '+------------------------------------------------------------------------+
-        .Setup
+        If Not .VisualizeForTest Then .Setup
         If dsply_modeless Then
             DisplayDone = False
             .Show vbModeless

@@ -253,6 +253,8 @@ Private VirtualScreenTopPts     As Single
 Private VirtualScreenWidthPts   As Single
 Private vMsgButtonDefault       As Variant          ' Index or caption of the default button
 Private vReplyValue             As Variant
+Private iSectionsPropSpaced     As Long             ' number of prop. spaced sections setup
+Private iSectionsMonoSpaced     As Long             ' number of mono-spaced sections setup
 
 Private Sub UserForm_Initialize()
     Const PROC = "UserForm_Initialize"
@@ -1014,7 +1016,7 @@ Public Sub AutoSizeTextBox(ByRef as_tbx As MSForms.TextBox, _
                 End If
             End If
         End If
-        If as_width_limit <> 0 Then .Width = as_width_limit + 2   ' readability space
+        .Width = .Width + 2 ' readability space
         .Height = AdjustToVgrid(.Height, 0)
     End With
         
@@ -1422,9 +1424,7 @@ Public Function ContentHeight(ByVal ch_frame_form As Variant, _
             End If
         End With
     Next ctl
-    
-    ' Debug.Print i & " Controls = " & ContentHeight & " pt"
-    
+        
 xt: Exit Function
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
@@ -2587,7 +2587,7 @@ Public Sub Setup()
     '~~ Setup of any monospaced message sections, the second element which potentially effects the final message width.
     '~~ In case the section width exceeds the maximum width specified a horizontal scrollbar is applied.
     Setup2_MsgSectsMonoSpaced
-    AdjustTopPositions
+    If iSectionsMonoSpaced > 0 Then VisualizeSetupStep "Step2 Message Section(s) Monospaced"
 
     '~~ Setup the reply buttons. This is the third element which may effect the final message's width.
     '~~ In case the widest buttons row exceeds the maximum width specified for the message
@@ -2599,6 +2599,7 @@ Public Sub Setup()
         SizeAndPosition2Bttns3Frame
         AdjustTopPositions
         SizeAndPosition2Bttns4Area
+        VisualizeSetupStep "Step3 Buttons"
     End If
     
     ' -----------------------------------------------------------------------------------------------
@@ -2634,6 +2635,8 @@ Public Sub Setup()
     PositionMessageOnScreen
     bSetUpDone = True ' To indicate for the Activate event that the setup had already be done beforehand
     
+    VisualizeSetupStep "Setup finalized"
+
 xt: Exit Sub
 
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
@@ -2684,7 +2687,6 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-
 Private Sub Setup2_MsgSectsMonoSpaced()
 ' --------------------------------------------------------------------------------------
 ' Setup of all sections for which a text is provided indicated mono-spaced.
@@ -2694,24 +2696,36 @@ Private Sub Setup2_MsgSectsMonoSpaced()
     Const PROC = "Setup2_MsgSectsMonoSpaced"
     
     On Error GoTo eh
-    Dim i As Long
+    Dim i           As Long
     
     For i = 1 To UBound(TextSection.Section)
         With Me.Text(enSectText, i)
             If .MonoSpaced And .Text <> vbNullString Then
                 ProvideSectionItems i
                 SetupMsgSect
-'                AdjustedParentsWidthAndHeight MsectTbx
-'                AdjustTopPositions
-'                AdjustedParentsWidthAndHeight frmMsectsArea
+                iSectionsMonoSpaced = iSectionsMonoSpaced + 1
             End If
         End With
     Next i
+    bDoneMonoSpacedSects = True
 
-xt: bDoneMonoSpacedSects = True
-    Exit Sub
+xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Private Sub VisualizeSetupStep(ByVal vss_status As String)
+' -------------------------------------------------------------------------------
+' Display the Message form with visualized controls at the top left.
+' -------------------------------------------------------------------------------
+    With Me
+        If .VisualizeForTest Then
+            .Top = 10
+            .Left = 10
+            Application.StatusBar = "Setup step visualization for debug and test: " & vss_status
+            Stop
+        End If
+    End With
 End Sub
 
 Private Sub Setup4_MsgSectsPropSpaced()
@@ -2724,20 +2738,21 @@ Private Sub Setup4_MsgSectsPropSpaced()
     Const PROC = "Setup4_MsgSectsPropSpaced"
     
     On Error GoTo eh
-    Dim i   As Long
-    
+    Dim i           As Long
+
     For i = i To UBound(TextSection.Section)
         With Me.Text(enSectText, i)
             If .Text <> vbNullString And Not .MonoSpaced Then
                 ProvideSectionItems i
                 SetupMsgSect
+                iSectionsPropSpaced = iSectionsPropSpaced + 1
             End If
         End With
     Next i
-    
-xt: bDonePropSpacedSects = True
+    bDonePropSpacedSects = True
     bDoneMsgArea = True
-    Exit Sub
+
+xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
@@ -3309,12 +3324,14 @@ Private Sub SizeAndPosition2Bttns4Area()
     
     If Not ScrollHscrollApplied(frm) Then
         If Not ScrollVscrollApplied(frm) Then
-            frm.Height = BttnsFrm.Top + BttnsFrm.Height + ScrollHscrollHeight(frm)
+'            frm.Height = BttnsFrm.Top + BttnsFrm.Height + ScrollHscrollHeight(frm)
+            frm.Height = ContentHeight(frmBttnsFrm) + ScrollHscrollHeight(frm)
         End If
     End If
     
     FormWidth = frm.Width + ScrollVscrollWidth(frm)
     FrameCenterHorizontal center_frame:=frmBttnsArea, left_margin:=10
+    Me.Height = ContentHeight(frm.Parent) + 35
     
 xt: Exit Sub
     
