@@ -275,10 +275,8 @@ Public Sub Demo_Monitor()
         End With
         
         mMsg.Monitor mon_title:=Title _
-                   , mon_header:=Header _
-                   , mon_step:=Step _
-                   , mon_footer:=Footer
-
+                   , mon_text:=Step
+                   
         '~~ Simmulation of a process
         lWait = 100 * i
         DoEvents
@@ -289,9 +287,7 @@ Public Sub Demo_Monitor()
     Step.Text = vbNullString
     Footer.Text = "Process finished! Close this window"
     mMsg.Monitor mon_title:=Title _
-               , mon_header:=Header _
-               , mon_step:=Step _
-               , mon_footer:=Footer
+               , mon_text:=Step
     
 xt: Exit Sub
 
@@ -489,24 +485,19 @@ Private Sub Demo_Monitor_Instances()
     Dim sTitle      As String
     Dim Header      As TypeMsgText
     Dim Step        As TypeMsgText
-    Dim Footer        As TypeMsgText
+    Dim Footer      As TypeMsgText
     
     j = 1
     For i = 1 To 5
         '~~ Establish 5 monitoring instances
-        '~~ Note that the instances are identified by their different titles
+        '~~ Note that the instances are identified by their different titles and positioned on screen
+        '~~ along with the very first service call
         sTitle = "Instance-" & i
         Step.Text = "Process step " & j
         mMsg.Monitor mon_title:=sTitle _
-                   , mon_header:=Header _
-                   , mon_step:=Step _
-                   , mon_footer:=Footer _
-                   , mon_width_min:=15
-        With mMsg.MsgInstance(sTitle)
-            .Top = INIT_TOP + OFFSET_V * (i - 1)
-            .Left = INIT_LEFT + OFFSET_H * (i - 1)
-        End With
-        Application.Wait Now() + T_WAIT
+                   , mon_text:=Step _
+                   , mon_pos:=INIT_TOP + OFFSET_V * (i - 1) & ";" & INIT_LEFT + OFFSET_H * (i - 1)
+        Sleep 200
     Next i
     
     For j = 2 To 5
@@ -516,17 +507,15 @@ Private Sub Demo_Monitor_Instances()
             sTitle = "Instance-" & i
             Step.Text = "Process step " & j
             mMsg.Monitor mon_title:=sTitle _
-                   , mon_header:=Header _
-                   , mon_step:=Step _
-                   , mon_footer:=Footer
-            Application.Wait Now() + T_WAIT
+                   , mon_text:=Step
+            Sleep 200
         Next i
     Next j
     
     For i = 5 To 1 Step -1
         '~~ Unload the instances in reverse order
         mMsg.MsgInstance fi_key:="Instance-" & i, fi_unload:=True
-        Application.Wait Now() + (T_WAIT * 2)
+        Sleep 500
     Next i
     
 xt: Exit Sub

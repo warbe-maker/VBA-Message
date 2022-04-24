@@ -72,51 +72,51 @@ Private Sub BoP(ByVal b_proc As String, _
 #End If
 End Sub
 
-Public Sub cmdTest01_Click():   mTestServices.Test_01_mMsg_Buttons_Service:                        End Sub
+Public Sub cmdTest01_Click():   mTestServices.Test_01_mMsg_Buttons_Service:                                         End Sub
 
-Public Sub cmdTest02_Click():   mTestServices.Test_02_mMsg_ErrMsg_Service:                          End Sub
+Public Sub cmdTest02_Click():   mTestServices.Test_02_mMsg_ErrMsg_Service:                                          End Sub
 
-Public Sub cmdTest03_Click():   mTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth:                End Sub
+Public Sub cmdTest03_Click():   mTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth:             End Sub
 
-Public Sub cmdTest04_Click():   mTestServices.Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle:                       End Sub
+Public Sub cmdTest04_Click():   mTestServices.Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle:                    End Sub
 
-Public Sub cmdTest05_Click():   mTestServices.Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection:    End Sub
+Public Sub cmdTest05_Click():   mTestServices.Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection: End Sub
 
-Public Sub cmdTest06_Click():   mTestServices.Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons:                End Sub
+Public Sub cmdTest06_Click():   mTestServices.Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons:             End Sub
 
-Public Sub cmdTest07_Click():   mTestServices.Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgWidth:     End Sub
+Public Sub cmdTest07_Click():   mTestServices.Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgWidth:  End Sub
 
-Public Sub cmdTest08_Click():   mTestServices.Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHeight:     End Sub
+Public Sub cmdTest08_Click():   mTestServices.Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHeight:  End Sub
 
-Public Sub cmdTest09_Click():   mTestServices.Test_09_mMsg_Dsply_Service_ButtonsOnly:                                  End Sub
+Public Sub cmdTest09_Click():   mTestServices.Test_09_mMsg_Dsply_Service_ButtonsOnly:                               End Sub
 
-Public Sub cmdTest10_Click():   mTestServices.Test_10_mMsg_Dsply_Service_ButtonsMatrix:                                End Sub
+Public Sub cmdTest10_Click():   mTestServices.Test_10_mMsg_Dsply_Service_ButtonsMatrix:                             End Sub
 
-Public Sub cmdTest11_Click():   mTestServices.Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical:                      End Sub
+Public Sub cmdTest11_Click():   mTestServices.Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical:                   End Sub
 
-Public Sub cmdTest12_Click():   mTestServices.Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal:                    End Sub
+Public Sub cmdTest12_Click():   mTestServices.Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal:                 End Sub
 
-Public Sub cmdTest13_Click():   mTestServices.Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars:          End Sub
+Public Sub cmdTest13_Click():   mTestServices.Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars:       End Sub
 
-Public Sub cmdTest16_Click():   mTestServices.Test_16_mMsg_Dsply_Service_ButtonByDictionary:                           End Sub
+Public Sub cmdTest16_Click():   mTestServices.Test_16_mMsg_Dsply_Service_ButtonByDictionary:                        End Sub
 
-Public Sub cmdTest17_Click():   mTestServices.Test_17_mMsg_Box_Service_MessageAsString:                              End Sub
+Public Sub cmdTest17_Click():   mTestServices.Test_17_mMsg_Box_Service_MessageAsString:                             End Sub
 
-Public Sub cmdTest20_Click():   mTestServices.Test_20_mMsg_Dsply_Service_ButtonByValue:                                End Sub
+Public Sub cmdTest20_Click():   mTestServices.Test_20_mMsg_Dsply_Service_ButtonByValue:                             End Sub
 
-Public Sub cmdTest21_Click():   mTestServices.Test_21_mMsg_Dsply_Service_ButtonByString:                               End Sub
+Public Sub cmdTest21_Click():   mTestServices.Test_21_mMsg_Dsply_Service_ButtonByString:                            End Sub
 
-Public Sub cmdTest22_Click():   mTestServices.Test_22_mMsg_Dsply_Service_ButtonByCollection:                           End Sub
+Public Sub cmdTest22_Click():   mTestServices.Test_22_mMsg_Dsply_Service_ButtonByCollection:                        End Sub
 
-Public Sub cmdTest23_Click():   mTestServices.Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly:                        End Sub
+Public Sub cmdTest23_Click():   mTestServices.Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly:                     End Sub
 
-Public Sub cmdTest30_Click():   mTestServices.Test_30_mMsg_Monitor_Service:                                      End Sub
+Public Sub cmdTest30_Click():   mTestServices.Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service:   End Sub
 
-Public Sub cmdTest90_Click():   mTestServices.Test_90_mMsg_Dsply_Service_AllInOne:                                     End Sub
+Public Sub cmdTest90_Click():   mTestServices.Test_90_mMsg_Dsply_Service_AllInOne:                                  End Sub
 
-Public Sub cmdTest91_Click():   mTestServices.Test_91_mMsg_Dsply_Service_MinimumMessage:                               End Sub
+Public Sub cmdTest91_Click():   mTestServices.Test_91_mMsg_Dsply_Service_MinimumMessage:                            End Sub
 
-Public Sub cmdTest92_Click():   mTestServices.Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL:                       End Sub
+Public Sub cmdTest92_Click():   mTestServices.Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL:                    End Sub
 
 Private Sub EoP(ByVal e_proc As String, _
        Optional ByVal e_inf As String = vbNullString)
@@ -455,9 +455,10 @@ Private Function Readable(ByVal s As String) As String
             sResult = sResult & Mid(s, i, 1)
         End If
     Next i
-    sResult = Replace(sResult, "m Msg ", "(mMsg.")
+    sResult = Replace(sResult, "m Msg ", "(mMsg.", 1, 1)
+    sResult = Replace(sResult, " m Msg ", ", mMsg.")
     sResult = Right(sResult, Len(sResult) - 1)
-    Readable = Replace(sResult, " Service ", " Service) ")
+    Readable = Replace(sResult, " Service", " Service)")
 End Function
 
 Private Function Repeat(repeat_string As String, repeat_n_times As Long)
@@ -906,6 +907,7 @@ Private Function TestForm() As fMsg
     End If
     
 End Function
+
 Public Function Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle() As Variant
 ' ------------------------------------------------------------------------------
 '
@@ -1295,7 +1297,6 @@ Public Function Test_09_mMsg_Dsply_Service_ButtonsOnly() As Variant
                  , dsply_buttons:=MsgButtons _
                  , dsply_modeless:=wsTest.TestOptionDisplayModeless _
                  , dsply_button_default:=BTTN_PASSED _
-                 , dsply_button_width_min:=40 _
                  , dsply_width_min:=TestMsgWidthMin _
                  , dsply_width_max:=TestMsgWidthMax _
                  , dsply_height_max:=TestMsgHeightMax _
@@ -1365,7 +1366,6 @@ Public Function Test_10_mMsg_Dsply_Service_ButtonsMatrix() As Variant
                  , dsply_buttons:=MsgButtons _
                  , dsply_button_reply_with_index:=False _
                  , dsply_button_default:=BTTN_PASSED _
-                 , dsply_button_width_min:=40 _
                  , dsply_width_min:=TestMsgWidthMin _
                  , dsply_width_max:=TestMsgWidthMax _
                  , dsply_height_max:=TestMsgHeightMax _
@@ -1585,7 +1585,6 @@ Public Function Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars()
                  , dsply_buttons:=MsgButtons _
                  , dsply_button_reply_with_index:=False _
                  , dsply_button_default:=BTTN_PASSED _
-                 , dsply_button_width_min:=40 _
                  , dsply_width_min:=TestMsgWidthMin _
                  , dsply_width_max:=TestMsgWidthMax _
                  , dsply_height_max:=TestMsgHeightMax _
@@ -1916,11 +1915,11 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_30_mMsg_Monitor_Service() As Variant
+Public Function Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC = "Test_30_mMsg_Monitor_Service"
+    Const PROC = "Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service"
     
     On Error GoTo eh
     Dim i           As Long
@@ -1938,62 +1937,57 @@ Public Function Test_30_mMsg_Monitor_Service() As Variant
     TestMsgHeightMax = wsTest.MsgHeightMax
     
     With Header
-        .Text = "Step Status"
+        .Text = "Step Status (steps 1 to 10)"
         .MonoSpaced = True
-        .FontColor = rgbRed
+        .FontColor = rgbBlue
     End With
+    With Footer
+        .Text = "Please wait! Process in progress"
+        .FontBold = True
+        .FontColor = rgbGreen
+    End With
+    
     iLoops = 15
     lWait = 300
-    
-    
+       
     MsgForm.VisualizeForTest = wsTest.VisualizeForTest
+    '~~ Because this is the very first service call the size of the monitoring window is initialized
+    mMsg.MonitorHeader mon_title:=MsgTitle, mon_text:=Header, mon_width_max:=50
+    mMsg.MonitorFooter MsgTitle, Footer
     
     For i = 1 To iLoops
+        '~~ The Header may be changed at any point in time
+        If i = 10 Then
+            With Header
+                .Text = "Step Status (steps 11 to " & iLoops & ")"
+                .MonoSpaced = True
+                .FontColor = rgbDarkBlue
+            End With
+            mMsg.MonitorHeader MsgTitle, Header
+        End If
+        
         With Step
             .Text = Format(i, "00") & ". Follow-Up line after " & Format(lWait, "0000") & " Milliseconds."
             .Text = Repeat(.Text & " ", Int(i / 5) + 1) & vbLf & "    Second line just for test " & Repeat(".", i)
             .MonoSpaced = True
         End With
         mMsg.Monitor mon_title:=MsgTitle _
-                   , mon_header:=Header _
-                   , mon_step:=Step _
-                   , mon_steps_visible:=10 _
-                   , mon_footer:=Footer _
-                   , mon_width_max:=TestMsgWidthMax _
-                   , mon_width_min:=TestMsgWidthMin _
-                   , mon_height_max:=TestMsgHeightMax
+                   , mon_text:=Step
                    
         '~~ Simmulation of a process
         DoEvents
         Sleep lWait
     Next i
-    Step.Text = vbNullString
+    
     With Footer
         .Text = "Process finished! Close this window"
         .FontBold = True
-        .FontColor = rgbBlue
+        .FontColor = rgbRed
     End With
-    mMsg.Monitor mon_title:=MsgTitle _
-               , mon_header:=Header _
-               , mon_step:=Step _
-               , mon_footer:=Footer _
-               , mon_width_max:=wsTest.MsgWidthMax _
-               , mon_width_min:=wsTest.MsgWidthMin _
-               , mon_height_max:=wsTest.MsgHeightMax
+    mMsg.MonitorFooter MsgTitle, Footer
     
-    '~~ Obtain the test result
-    MsgTitle = "Test result of: " & Readable(PROC)
-    Set MsgButtons = mMsg.Buttons(BTTN_PASSED, BTTN_FAILED)
-    Select Case mMsg.Box(Title:=MsgTitle _
-                       , Prompt:=vbNullString _
-                       , Buttons:=MsgButtons _
-                        )
-        Case BTTN_PASSED:       wsTest.TestPassed
-        Case BTTN_FAILED:       wsTest.TestFailed
-        Case BTTN_TERMINATE:    wsTest.TerminateRegressionTest = True
-    End Select
-    TestForm
-    
+    ObtainTestResult "Test result of: " & Readable(PROC)
+        
 xt: EoP ErrSrc(PROC)
     Exit Function
 
@@ -2002,6 +1996,26 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
         Case Else:      GoTo xt
     End Select
 End Function
+
+Private Sub ObtainTestResult(ByVal otr_title As String)
+' ------------------------------------------------------------------------------
+' Obtain the test result
+' ------------------------------------------------------------------------------
+    Dim f   As fMsg
+    
+    Set f = mMsg.MsgInstance(otr_title)
+    f.VisualizeForTest = False
+    Set MsgButtons = mMsg.Buttons(BTTN_PASSED, BTTN_FAILED)
+    Select Case mMsg.Box(Title:=otr_title _
+                       , Prompt:=vbNullString _
+                       , Buttons:=MsgButtons _
+                        )
+        Case BTTN_PASSED:       wsTest.TestPassed
+        Case BTTN_FAILED:       wsTest.TestFailed
+        Case BTTN_TERMINATE:    wsTest.TerminateRegressionTest = True
+    End Select
+    TestForm
+End Sub
 
 Public Function Test_90_mMsg_Dsply_Service_AllInOne() As Variant
     Const PROC      As String = "Test_90_mMsg_Dsply_Service_AllInOne"

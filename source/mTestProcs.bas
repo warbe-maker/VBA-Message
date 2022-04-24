@@ -482,66 +482,59 @@ Private Sub IsValidMsgButtonsArg_Test()
     Set ValidDictionary = Nothing
 End Sub
 
-Public Function Monitor(ByVal mon_title As String, _
-                   ByVal mon_visible_steps As Long, _
-          Optional ByVal mon_monospaced As Boolean = False, _
-          Optional ByVal mon_header As String = vbNullString, _
-          Optional ByVal mon_footer As String = vbNullString, _
-          Optional ByVal mon_step As String = vbNullString, _
-          Optional ByVal mon_step_monospaced As Boolean = False) As fMsgProcTest
-' ------------------------------------------------------------------------------
-'
-' ------------------------------------------------------------------------------
-    Dim fMon    As fMsgProcTest
-            
-    If fMon Is Nothing _
-    Then Set fMon = MonitorInitialize(mon_title:=mon_title _
-                                    , mon_steps_displayed:=mon_visible_steps _
-                                    , mon_header:=mon_header _
-                                    , mon_footer:=mon_footer)
-    If mon_step <> vbNullString Then
-        fMon.MonitorStep mon_step:=mon_step _
-                       , mon_footer:=mon_footer
-    End If
-    Set Monitor = fMon
-    
-End Function
-
-Private Function MonitorInitialize(ByVal mon_title As String, _
-                                   ByVal mon_steps_displayed As Long, _
-                          Optional ByVal mon_monospaced As Boolean = False, _
-                          Optional ByVal mon_header As String = vbNullString, _
-                          Optional ByVal mon_footer As String = vbNullString) As fMsgProcTest
-' ------------------------------------------------------------------------------
-' Establish a monitor window for n (mon_steps) steps by creating the
-' corresponding number of - st first invisible - text boxes
-' ------------------------------------------------------------------------------
-    Dim fMon    As fMsgProcTest
-        
-    Set fMon = TestInstance(mon_title)
-    fMon.MonitorInitialize mon_title:=mon_title _
-                         , mon_steps_displayed:=mon_steps_displayed _
-                         , mon_header:=mon_header _
-                         , mon_footer:=mon_footer
-    fMon.Show False
-    Set MonitorInitialize = fMon
-        
-End Function
-
 Private Sub Monitor_Test()
     Dim i       As Long
-    Dim fMon    As fMsgProcTest
+    Dim fMon    As fMsg
+    Dim Text    As TypeMsgText
+    Dim Title   As String
+    Dim Footer  As TypeMsgText
+    Dim Step    As TypeMsgText
+    Dim Header  As TypeMsgText
+    
+    Title = "Test of the services:  MonitorHeader, MsgMonitor, and MonitorFooter"
+    With Header
+        .Text = "Process steps 1 to 10"
+        .FontColor = rgbBlue
+    End With
+    With Footer
+        .Text = "Process (steps 1 to 10) in progress, please hang on."
+        .FontColor = rgbBlue
+    End With
+    Set fMon = mMsg.MsgInstance(Title)
+    fMon.VisualizeForTest = wsTest.VisualizeForTest
+    
+    mMsg.MonitorHeader Title, Header
+    mMsg.MonitorFooter Title, Footer
     
     For i = 1 To 20
+        If i = 11 Then
+            With Header
+                .Text = "Process steps 11 to 20"
+                .FontColor = rgbRed
+            End With
+            mMsg.MonitorHeader Title, Header
+            With Footer
+                .Text = "Process (steps 10 to 20) in progress, please hang on."
+                .FontColor = rgbBlue
+            End With
+            mMsg.MonitorFooter Title, Footer
+        End If
         DoEvents
-        Set fMon = mTestProcs.Monitor(mon_title:="Process monitored: xxxxxxx" _
-                                    , mon_visible_steps:=10 _
-                                    , mon_header:="Process steps" _
-                                    , mon_footer:="Process in progress, please wait" _
-                                    , mon_step:=Format(i, "00 ") & "Step")
-        Sleep 250
+        With Step
+            .Text = Format(i, "00 ") & "Step"
+            .MonoSpaced = True
+        End With
+        mMsg.Monitor mon_title:=Title _
+                   , mon_text:=Step
+        DoEvents
+        Sleep 150
     Next i
-    fMon.MonitorStep , "Process finished! Close window."
+    
+    With Footer
+        .Text = "Process finished! Close window."
+        .FontColor = rgbDarkGreen
+    End With
+    mMsg.MonitorFooter Title, Footer
 
 End Sub
 

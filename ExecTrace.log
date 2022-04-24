@@ -1,55 +1,7 @@
-22-04-15 11:34:48 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-04-15 11:34:48                 >> Begin execution trace 
-22-04-15 11:34:48 00,0000         |  >> mTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth
-22-04-15 11:35:17 00,1559 00,1559 |  << mTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth
-22-04-15 11:35:17 00,1559 00,1559 << End execution trace 
-22-04-15 11:35:17                 Impact on the overall performance (caused by the trace itself): 00,0066 seconds!
-22-04-15 11:35:17 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-
-22-04-15 11:36:15 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-04-15 11:36:15                 >> Begin execution trace 
-22-04-15 11:36:15 00,0000         |  >> mTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth
-22-04-15 11:37:01 00,0809 00,0809 |  << mTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth
-22-04-15 11:37:01 00,0809 00,0809 << End execution trace 
-22-04-15 11:37:01                 Impact on the overall performance (caused by the trace itself): 00,0036 seconds!
-22-04-15 11:37:01 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-
-22-04-15 11:38:48 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-04-15 11:38:48                 >> Begin execution trace 
-22-04-15 11:38:48 00,0000         |  >> mTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth
-22-04-15 11:39:00 00,1637 00,1637 |  << mTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth
-22-04-15 11:39:00 00,1637 00,1637 << End execution trace 
-22-04-15 11:39:00                 Impact on the overall performance (caused by the trace itself): 00,0041 seconds!
-22-04-15 11:39:00 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-
-22-04-15 11:39:03 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-04-15 11:39:03                 >> Begin execution trace 
-22-04-15 11:39:03 00,0000         |  >> mTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth
-22-04-15 11:39:08 00,0773 00,0773 |  << mTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth
-22-04-15 11:39:08 00,0773 00,0773 << End execution trace 
-22-04-15 11:39:08                 Impact on the overall performance (caused by the trace itself): 00,0039 seconds!
-22-04-15 11:39:08 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-
-22-04-15 11:39:23 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-04-15 11:39:23                 >> Begin execution trace 
-22-04-15 11:39:23 00,0000         |  >> mTestServices.Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle
-22-04-15 11:40:31 18,0516 18,0516 |  << mTestServices.Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle
-22-04-15 11:40:31 18,0516 18,0516 << End execution trace 
-22-04-15 11:40:31                 Impact on the overall performance (caused by the trace itself): 00,0042 seconds!
-22-04-15 11:40:31 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-
-22-04-15 11:40:50 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-04-15 11:40:50                 >> Begin execution trace 
-22-04-15 11:40:50 00,0000         |  >> mTestServices.Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection
-22-04-15 11:42:08 00,1054 00,1054 |  << mTestServices.Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection
-22-04-15 11:42:08 00,1054 00,1054 << End execution trace 
-22-04-15 11:42:08                 Impact on the overall performance (caused by the trace itself): 00,0052 seconds!
-22-04-15 11:42:08 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-
-22-04-15 11:42:13 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-04-15 11:42:13                 >> Begin execution trace 
-22-04-15 11:42:13 00,0000         |  >> mTestServices.Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection
-22-04-15 11:42:51 00,0771 00,0771 |  << mTestServices.Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection
-22-04-15 11:42:51 00,0771 00,0771 << End execution trace 
-22-04-15 11:42:51                 Impact on the overall performance (caused by the trace itself): 00,0036 seconds!
-22-04-15 11:42:51 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-04-24 12:06:08 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-04-24 12:06:08                 >> Begin execution trace 
+22-04-24 12:06:08 00,0000         |  >> mTestServices.Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service
+22-04-24 12:06:28 20,1580 20,1580 |  << mTestServices.Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service
+22-04-24 12:06:28 20,1580 20,1580 << End execution trace 
+22-04-24 12:06:28                 Impact on the overall performance (caused by the trace itself): 00,0062 seconds!
+22-04-24 12:06:28 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)

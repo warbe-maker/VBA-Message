@@ -17,7 +17,7 @@ Option Explicit
 Const SCROLL_V_WIDTH            As Single = 18              ' Additional horizontal space required for a frame with a vertical scrollbar
 Const SCROLL_H_HEIGHT           As Single = 18              ' Additional vertical space required for a frame with a horizontal scroll barr
 
-Private lMonitorSteps           As Long
+Private lMonitorStepsDisplayed           As Long
 Private cllSteps                As Collection
 Private lStepsDisplayed         As Long
 Private tbxHeader               As MSForms.TextBox
@@ -486,7 +486,7 @@ Public Sub MonitorInitialize(ByVal mon_title As String, _
     Dim tbx     As MSForms.TextBox
     
     If Not bMonitorInitialized Then
-        lMonitorSteps = mon_steps_displayed
+        lMonitorStepsDisplayed = mon_steps_displayed
         For Each ctl In Me.Controls
             ctl.Visible = False
         Next ctl
@@ -512,7 +512,7 @@ Public Sub MonitorInitialize(ByVal mon_title As String, _
                 End With
             End If
         
-            For i = 1 To lMonitorSteps
+            For i = 1 To lMonitorStepsDisplayed
                 '~~ Initialize Steps
                 Set tbx = .Controls.Add("Forms.TextBox.1")
                 With tbx
@@ -565,7 +565,7 @@ Public Sub MonitorStep(Optional ByVal mon_step As String = vbNullString, _
     Dim lTop    As Long
     
     If mon_step <> vbNullString Then
-        If lStepsDisplayed < lMonitorSteps Then
+        If lStepsDisplayed < lMonitorStepsDisplayed Then
             Set tbx = cllSteps(lStepsDisplayed + 1)
             With tbx
                 .Visible = True
@@ -584,7 +584,7 @@ Public Sub MonitorStep(Optional ByVal mon_step As String = vbNullString, _
                 End With
             End If
             
-            For i = 1 To lMonitorSteps
+            For i = 1 To lMonitorStepsDisplayed
                 Set tbx = cllSteps(i)
                 tbx.Top = lTop + (18 * (i - 1))
             Next i

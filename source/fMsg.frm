@@ -59,7 +59,7 @@ Const DFLT_TXT_MONOSPACED_FONT_SIZE As Single = 10              ' Default monosp
 Const DFLT_TXT_PROPSPACED_FONT_NAME As String = "Tahoma"        ' Default proportional spaced font name
 Const DFLT_TXT_PROPSPACED_FONT_SIZE As Single = 10              ' Default proportional spaced font size
 Const HSPACE_BTTN_AREA              As Single = 15              ' Minimum left and right margin for the centered buttons area
-Const HSPACE_BUTTONS                As Single = 4               ' Horizontal space between reply buttons
+Const HSPACE_BTTNS                As Single = 4               ' Horizontal space between reply buttons
 Const HSPACE_LEFT                   As Single = 0               ' Left margin for labels and text boxes
 Const HSPACE_RIGHT                  As Single = 15              ' Horizontal right space for labels and text boxes
 Const HSPACE_LEFTRIGHT_BUTTONS      As Long = 8                 ' The margin before the left most and after the right most button
@@ -145,13 +145,6 @@ Private Declare PtrSafe Function getTickCount Lib "kernel32" _
 Alias "QueryPerformanceCounter" (cyTickCount As Currency) As Long
 ' -------------------------------------------------------------------------------
 
-Private Enum enStartupPosition      ' ---------------------------
-    sup_Manual = 0                  ' Used to position the
-'    sup_CenterOwner = 1             ' final setup message form
-'    sup_CenterScreen = 2            ' horizontally and vertically
-'    sup_WindowsDefault = 3          ' centered on the screen
-End Enum                            ' ---------------------------
-
 Private Enum enMsgFormUsage
     usage_progress_display = 1
 '    usage_message_display = 2
@@ -206,17 +199,14 @@ Private dctMsectsTbxFrm         As New Dictionary   ' Established/created Messag
 Private dctSectsLabel           As New Dictionary   ' MsectFrm specific label either provided via properties MsgLabel or Msg
 Private dctSectsMonoSpaced      As Dictionary   ' MsectFrm specific monospace option either provided via properties MsgMonospaced or Msg
 Private dctSectsText            As New Dictionary
-Private DfltMnSpcdLblFontName   As String
-Private DfltMnSpcdLblFontSize   As Single
-Private DfltMnSpcdTxtFontName   As String
-Private DfltMnSpcdTxtFontSize   As Single
 Private frmBttnsArea            As MSForms.Frame
 Private frmBttnsFrm             As MSForms.Frame    ' Set with CollectDesignControls
 Private frmMsectsArea           As MSForms.Frame
 Private frmSteps                As MSForms.Frame
 Private lBackColor              As Long
-Private lMonitorSteps           As Long
+Private sMonitorProcess         As String
 Private lNoOfDesignedMsgSects   As Long             ' Set with CollectDesignControls (number of message sections designed)
+Private lMonitorStepsDisplayed  As Long
 Private lSetupRowButtons        As Long             ' number of buttons setup in a row
 Private lSetupRows              As Long             ' number of setup button rows
 Private lStepsDisplayed         As Long
@@ -226,16 +216,13 @@ Private MsectTbx                As MSForms.TextBox  ' Set with ProvideSectionIte
 Private MsectTbxFrm             As MSForms.Frame    ' Set with ProvideSectionItems for a certain section
 Private MsgSectLbl              As TypeMsgLabel     ' Label section of the TypeMsg UDT
 Private MsgSectTxt              As TypeMsgText      ' Text section of the TypeMsg UDT
-Private siHmarginButtons        As Single           ' Horizontal space between buttons
 Private siHmarginFrames         As Single           ' Test property, value defaults to 0
 Private siMaxButtonHeight       As Single
 Private siMaxButtonWidth        As Single
-Private siMinButtonWidth        As Single
 Private siMsgHeightMax          As Single       ' Maximum message height in pt
 Private siMsgHeightMin          As Single       ' Minimum message height in pt
 Private siMsgWidthMax           As Single       ' Maximum message width in pt
 Private siMsgWidthMin           As Single       ' Minimum message width in pt
-Private siVmarginButtons        As Single
 Private siVmarginFrames         As Single       ' Test property, value defaults to 0
 Private sMsgTitle               As String
 Private tbxFooter               As MSForms.TextBox
@@ -265,20 +252,25 @@ Private Sub UserForm_Initialize()
                    , VirtualScreenTopPts _
                    , VirtualScreenWidthPts _
                    , VirtualScreenHeightPts
+    Initialize
+    CollectDesignControls
+
+xt: Exit Sub
+    
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Private Sub Initialize()
+    Const PROC = "Initialize"
+    
+    On Error GoTo eh
     
     If bSetUpDone Then GoTo xt
     Set dctMonoSpaced = New Dictionary
     Set dctMonoSpacedTbx = New Dictionary
     
-    siMinButtonWidth = DFLT_BTTN_MIN_WIDTH
-    siHmarginButtons = HSPACE_BUTTONS
-    siVmarginButtons = VSPACE_BTTN_ROWS
     bFormEvents = False
-    siMsgWidthMin = 20
-    DfltMnSpcdTxtFontName = DFLT_TXT_MONOSPACED_FONT_NAME
-    DfltMnSpcdTxtFontSize = DFLT_TXT_MONOSPACED_FONT_SIZE
-    DfltMnSpcdLblFontName = DFLT_LBL_MONOSPACED_FONT_NAME
-    DfltMnSpcdLblFontSize = DFLT_LBL_MONOSPACED_FONT_SIZE
+    siMsgWidthMin = 20      ' Default minimum message window width
     siHmarginFrames = 0     ' Ensures proper command buttons framing, may be used for test purpose
     Me.VmarginFrames = 0    ' Ensures proper command buttons framing and vertical positioning of controls
     SetupDone = False
@@ -287,7 +279,6 @@ Private Sub UserForm_Initialize()
     bDonePropSpacedSects = False
     bDoneMsgArea = False
     vMsgButtonDefault = 1
-    CollectDesignControls
 
 xt: Exit Sub
     
@@ -311,6 +302,8 @@ Private Sub UserForm_Terminate()
     Set dctSectsMonoSpaced = Nothing
     Set dctSectsText = Nothing
 End Sub
+
+Public Property Get MonitorIsInitialized() As Boolean: MonitorIsInitialized = Not cllSteps Is Nothing:  End Property
 
 Private Property Get AppliedButtonRetVal(Optional ByVal Button As MSForms.CommandButton) As Variant
     AppliedButtonRetVal = AppliedBttnsRetVal(Button)
@@ -366,8 +359,6 @@ Private Property Get MaxWidthMsgArea() As Single
 ' ------------------------------------------------------------------------------
     MaxWidthMsgArea = Me.InsideWidth
 End Property
-
-Public Property Let MinButtonWidth(ByVal si As Single):                                     siMinButtonWidth = si:                                                          End Property
 
 Private Property Get MonitorHeightExSteps() As Single
     MonitorHeightExSteps = ContentHeight(frmSteps.Parent) - frmSteps.Height
@@ -451,11 +442,11 @@ Private Property Get MSFormsProgID(Optional mfc As MSFormControls) As String
     End Select
 End Property
 
+Public Property Let MsgBttns(ByVal cll As Collection):  Set cllMsgBttns = cll:          End Property
+
 Public Property Let MsgButtonDefault(ByVal v As Variant)
     vMsgButtonDefault = v
 End Property
-
-Public Property Let MsgBttns(ByVal cll As Collection):  Set cllMsgBttns = cll:          End Property
 
 Public Property Get MsgHeightMax() As Single:           MsgHeightMax = siMsgHeightMax:  End Property
 
@@ -635,6 +626,7 @@ Public Property Get Text(Optional ByVal txt_kind_of_text As KindOfText, _
 ' -footer, or -step.
 ' ------------------------------------------------------------------------------
     Dim vArry() As Variant
+    
     Select Case txt_kind_of_text
         Case enMonHeader:    Text = TextMonitorHeader
         Case enMonFooter:    Text = TextMonitorFooter
@@ -694,12 +686,8 @@ Public Property Get VisualizeForTest() As Boolean:          VisualizeForTest = b
 
 Public Property Let VisualizeForTest(ByVal b As Boolean)
     bVisualizeForTest = b
-    If bVisualizeForTest Then CollectDesignControls ' do again to ensure visualization
+    If b Then CollectDesignControls ' do again to ensure visualization
 End Property
-
-Public Property Get VmarginButtons() As Single:             VmarginButtons = siVmarginButtons:                          End Property
-
-Public Property Let VmarginButtons(ByVal si As Single):     siVmarginButtons = si:                                      End Property
 
 Public Property Get VmarginFrames() As Single:              VmarginFrames = siVmarginFrames:                            End Property
 
@@ -938,26 +926,6 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Private Function MsectsArea() As MSForms.Frame
-' ------------------------------------------------------------------------------
-' Returns the Frame of the message area section, created if yet not existing.
-' ------------------------------------------------------------------------------
-    
-    If frmMsectsArea Is Nothing Then
-        Set frmMsectsArea = Me.AddControl(ac_ctl:=Frame, ac_visible:=True)
-        With frmMsectsArea
-            .Top = 0
-            .Left = 0
-            .Height = 50
-            .Width = Me.InsideWidth
-            .Visible = True
-        End With
-        VisualizeCtl frmMsectsArea, VISLZE_BCKCLR_AREA
-    End If
-    Set MsectsArea = frmMsectsArea
-
-End Function
-
 Public Sub AutoSizeTextBox(ByRef as_tbx As MSForms.TextBox, _
                            ByVal as_text As String, _
                   Optional ByVal as_width_limit As Single = 0, _
@@ -1073,8 +1041,8 @@ Private Function BttnsRowBttn(ByVal brb_row As Long, _
         With cmb
             .Top = 0
             .Height = 18
-            .Width = siMinButtonWidth
-            .Left = (.Width * (brb_bttn - 1)) + (HSPACE_BUTTONS * (brb_bttn - 1))
+            .Width = DFLT_BTTN_MIN_WIDTH
+            .Left = (.Width * (brb_bttn - 1)) + (HSPACE_BTTNS * (brb_bttn - 1))
         End With
         dctBttnsRowBttns.Add brb_row & "-" & brb_bttn, cmb
     End If
@@ -1258,7 +1226,6 @@ Private Sub Collect(ByRef col_into As Variant, _
                         End With
                         i = col_into.Count + 1
                         col_into.Add i, ctl
-'                        Debug.Print col_into.Count & ": " & ctl.Name
                     End If
                Next ctl
             Next v
@@ -1295,27 +1262,25 @@ Private Sub CollectDesignControls()
     Const PROC = "CollectDesignControls"
     
     On Error GoTo eh
-    Dim v       As Variant
-    Dim frm     As MSForms.Frame
-    Dim lRow    As Long
-    Dim lBttn   As Long
-    Dim cmb     As MSForms.CommandButton
-    Dim sKey    As String
-    Dim siWidth As Single:  siWidth = mMsg.Pnts(Me.MsgWidthMin - (Me.Width - Me.InsideWidth), "W")
+    Dim v           As Variant
+    Dim frm         As MSForms.Frame
+    Dim lRow        As Long
+    Dim lBttn       As Long
+    Dim cmb         As MSForms.CommandButton
+    Dim sKey        As String
+    Dim PntsWidth   As Single:  PntsWidth = mMsg.Pnts(Me.MsgWidthMin - mMsg.Prcnt(Me.Width - Me.InsideWidth, "W"), "W")
     
-    ProvideDict dctAreas
-    Collect col_into:=dctAreas _
+    Collect col_into:=NewDict(dctAreas) _
           , col_cntrl_type:="Frame" _
           , col_with_parent:=Me _
           , col_set_height:=10 _
-          , col_set_width:=siWidth
+          , col_set_width:=PntsWidth
     Set frmMsectsArea = dctAreas(1)
     Set frmBttnsArea = dctAreas(2)
     VisualizeCtl frmMsectsArea, VISLZE_BCKCLR_AREA
     VisualizeCtl frmBttnsArea, VISLZE_BCKCLR_AREA
     
-    ProvideDict dctMsectsFrm
-    Collect col_into:=dctMsectsFrm _
+    Collect col_into:=NewDict(dctMsectsFrm) _
           , col_cntrl_type:="Frame" _
           , col_with_parent:=frmMsectsArea _
           , col_set_height:=50 _
@@ -1323,9 +1288,9 @@ Private Sub CollectDesignControls()
     For Each v In dctMsectsFrm
         VisualizeCtl dctMsectsFrm(v), VISLZE_BCKCLR_MSEC_FRM
     Next v
+    NoOfDesignedMsgSects = dctMsectsFrm.Count
     
-    ProvideDict dctMsectsLbl
-    Collect col_into:=dctMsectsLbl _
+    Collect col_into:=NewDict(dctMsectsLbl) _
           , col_cntrl_type:="Label" _
           , col_with_parent:=dctMsectsFrm _
           , col_set_height:=15 _
@@ -1334,8 +1299,7 @@ Private Sub CollectDesignControls()
         VisualizeCtl dctMsectsLbl(v), VISLZE_BCKCLR_MSEC_LBL
     Next v
     
-    ProvideDict dctMsectsTbxFrm
-    Collect col_into:=dctMsectsTbxFrm _
+    Collect col_into:=NewDict(dctMsectsTbxFrm) _
           , col_cntrl_type:="Frame" _
           , col_with_parent:=dctMsectsFrm _
           , col_set_height:=20 _
@@ -1344,8 +1308,7 @@ Private Sub CollectDesignControls()
         VisualizeCtl dctMsectsTbxFrm(v), VISLZE_BCKCLR_MSEC_TBX_FRM
     Next v
     
-    ProvideDict dctMsectsTbx
-    Collect col_into:=dctMsectsTbx _
+    Collect col_into:=NewDict(dctMsectsTbx) _
           , col_cntrl_type:="TextBox" _
           , col_with_parent:=dctMsectsTbxFrm _
           , col_set_height:=20 _
@@ -1362,8 +1325,7 @@ Private Sub CollectDesignControls()
           , col_set_visible:=True ' minimum is one button
     VisualizeCtl frmBttnsFrm, VISLZE_BCKCLR_BTTNS_FRM
     
-    ProvideDict dctBttnsRow
-    Collect col_into:=dctBttnsRow _
+    Collect col_into:=NewDict(dctBttnsRow) _
           , col_cntrl_type:="Frame" _
           , col_with_parent:=frmBttnsFrm _
           , col_set_height:=10 _
@@ -1373,7 +1335,7 @@ Private Sub CollectDesignControls()
         VisualizeCtl dctBttnsRow(v), VISLZE_BCKCLR_BTTNS_ROW_FRM
     Next v
         
-    ProvideDict dctBttns
+    NewDict dctBttns
     For lRow = 1 To dctBttnsRow.Count
         Set frm = dctBttnsRow(lRow)
         For lBttn = 0 To frm.Controls.Count - 1
@@ -1384,10 +1346,8 @@ Private Sub CollectDesignControls()
         Next lBttn
     Next lRow
     
-    ProvideDict AppliedBttns
-    ProvideDict AppliedBttnsRetVal
-
-    NoOfDesignedMsgSects = dctMsectsFrm.Count
+    NewDict AppliedBttns
+    NewDict AppliedBttnsRetVal
        
 xt: Exit Sub
     
@@ -1583,74 +1543,6 @@ Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "fMsg." & sProc
 End Function
 
-Private Sub MonitorEstablishFooter(ByVal mf_top As Single)
-' ------------------------------------------------------------------------------
-'
-' ------------------------------------------------------------------------------
-    If tbxFooter Is Nothing Then
-        Set tbxFooter = AddControl(ac_ctl:=TextBox, ac_visible:=True, ac_name:="tbMonitorFooter")
-        SetupTextFont tbxFooter, enMonFooter
-        With tbxFooter
-            .Top = mf_top + 6
-            .Left = 0
-            .Value = TextMonitorFooter.Text
-            .Height = 18
-            .Width = Me.InsideWidth
-            Me.Height = .Top + .Height + 30 + ScrollHscrollHeight(frmSteps)
-        End With
-        VisualizeCtl tbxFooter, VISLZE_BCKCLR_MSEC_TBX
-    End If
-    tbxFooter.Value = TextMonitorFooter.Text
-
-End Sub
-
-Private Sub MonitorEstablishHeader(ByRef mh_top As Single)
-' ------------------------------------------------------------------------------
-'
-' ------------------------------------------------------------------------------
-    If tbxHeader Is Nothing Then
-        Set tbxHeader = AddControl(ac_ctl:=TextBox, ac_visible:=False, ac_name:="tbMonitorHeader")
-        SetupTextFont tbxHeader, enMonHeader
-        With tbxHeader
-            .Top = mh_top
-            .Left = 0
-            .Value = TextMonitorHeader.Text
-            .Height = 18
-            .Width = Me.InsideWidth
-            .Visible = True
-            mh_top = AdjustToVgrid(.Top + .Height)
-        End With
-        VisualizeCtl tbxHeader, VISLZE_BCKCLR_MSEC_TBX
-    End If
-    tbxHeader.Value = TextMonitorHeader.Text
-
-End Sub
-
-Private Sub MonitorEstablishStep(ByRef ms_top As Single)
-' ------------------------------------------------------------------------------
-' Adds a monitor step TextBox to the frmSteps Frame, enqueues it into the
-' cllSteps queue and adjusts the top position to (ms_top).
-' ------------------------------------------------------------------------------
-    Const CTL_NAME As String = "tbMonitorStep"
-    
-    Set tbxStep = AddControl(ac_ctl:=TextBox _
-                           , ac_in:=frmSteps _
-                           , ac_visible:=False _
-                           , ac_name:=CTL_NAME & cllSteps.Count + 1)
-    SetupTextFont tbxStep, enMonStep
-    With tbxStep
-        .Top = ms_top
-        .Left = 0
-        .Visible = True
-        .Height = 18
-        .Width = Me.InsideWidth
-         ms_top = AdjustToVgrid(.Top + .Height)
-    End With
-    VisualizeCtl tbxStep, VISLZE_BCKCLR_MON_STEPS_FRM
-    Qenqueue cllSteps, tbxStep
-
-End Sub
-
 Private Sub FrameCenterHorizontal(ByVal center_frame As MSForms.Frame, _
                          Optional ByVal within_frame As MSForms.Frame = Nothing, _
                          Optional ByVal left_margin As Single = 0)
@@ -1839,13 +1731,122 @@ Private Function Min(ParamArray va() As Variant) As Variant
     
 End Function
 
-Public Sub MonitorInitialize(ByVal mon_title As String, _
-                             ByVal mon_steps_displayed As Long)
+Public Sub MonitorHeader()
 ' ------------------------------------------------------------------------------
-' Setup header (mon_header), steps to be displayed (mon_steps_displayed) - at
-' first invisible - and the footer (mon_footer).
+' Establishes an (optional) header in the monitor window.
 ' ------------------------------------------------------------------------------
-    Const PROC = "MonitorInitialize"
+    Const PROC = "MonitorHeader"
+    
+    Dim top_pos As Single
+    
+    On Error GoTo eh
+    If cllSteps Is Nothing Then Me.MonitorInit
+    
+    If tbxHeader Is Nothing Then
+        Set tbxHeader = AddControl(ac_ctl:=TextBox, ac_visible:=False, ac_name:="tbMonitorHeader")
+        With tbxHeader
+            .Top = 6
+            .Left = 0
+            .Height = 18
+            .Width = Me.InsideWidth
+            .Visible = True
+        End With
+        VisualizeCtl tbxHeader, VISLZE_BCKCLR_MSEC_TBX
+    End If
+    SetupTextFont tbxHeader, enMonHeader
+    With tbxHeader
+        .Value = TextMonitorHeader.Text
+        top_pos = AdjustToVgrid(.Top + .Height)
+    End With
+    
+    '~~ Adjust the subsequent steps' top position
+    With frmSteps
+        .Top = top_pos
+        top_pos = AdjustToVgrid(.Top + .Height)
+    End With
+    
+    If Not tbxFooter Is Nothing Then tbxFooter.Top = top_pos
+    Me.Height = ContentHeight(frmSteps.Parent) + 35
+
+xt: Exit Sub
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Private Sub MonitorEstablishStep(ByRef ms_top As Single)
+' ------------------------------------------------------------------------------
+' Adds a monitor step TextBox to the frmSteps Frame, enqueues it into the
+' cllSteps queue and adjusts the top position to (ms_top).
+' ------------------------------------------------------------------------------
+    Const CTL_NAME As String = "tbMonitorStep"
+    
+    Set tbxStep = AddControl(ac_ctl:=TextBox _
+                           , ac_in:=frmSteps _
+                           , ac_visible:=False _
+                           , ac_name:=CTL_NAME & cllSteps.Count + 1)
+    SetupTextFont tbxStep, enMonStep
+    With tbxStep
+        .Top = ms_top
+        .Left = 0
+        .Visible = True
+        .Height = 12
+        .Width = Me.InsideWidth
+         ms_top = AdjustToVgrid(.Top + .Height)
+    End With
+    VisualizeCtl tbxStep, VISLZE_BCKCLR_MON_STEPS_FRM
+    Qenqueue cllSteps, tbxStep
+    DoEvents
+    
+End Sub
+
+Public Property Let MonitorProcess(ByVal s As String):          sMonitorProcess = s:            End Property
+Public Property Let MonitorStepsDisplayed(ByVal l As Long):     lMonitorStepsDisplayed = l:     End Property
+
+Public Sub MonitorFooter()
+' ------------------------------------------------------------------------------
+' Establishes a footer in the monitor window when none has yet been established
+' and displays the provided text.
+' ------------------------------------------------------------------------------
+    Const PROC = "MonitorFooter"
+    
+    On Error GoTo eh
+    Dim top_pos As Single
+    
+    If cllSteps Is Nothing _
+    Then Err.Raise ErrSrc(PROC), AppErr(1), "A monitor message window has yet not been initialized!"
+    
+    '~~ Establsh monitor footer
+    If TextMonitorFooter.Text <> vbNullString Then
+        top_pos = AdjustToVgrid(frmSteps.Top + frmSteps.Height) + 6
+        If tbxFooter Is Nothing Then
+            Set tbxFooter = AddControl(ac_ctl:=TextBox, ac_visible:=True, ac_name:="tbMonitorFooter")
+            With tbxFooter
+                .Left = 0
+                .Height = 18
+                .Width = Me.InsideWidth
+            End With
+            VisualizeCtl tbxFooter, VISLZE_BCKCLR_MSEC_TBX
+        End If
+        SetupTextFont tbxFooter, enMonFooter
+        With tbxFooter
+            .Top = AdjustToVgrid(frmSteps.Top + frmSteps.Height + 6)
+            .Value = TextMonitorFooter.Text
+        End With
+        Me.Height = ContentHeight(tbxFooter.Parent) + 35
+    End If
+
+xt: Exit Sub
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Public Sub MonitorInit()
+' ------------------------------------------------------------------------------
+' Setup the number of monitored steps to be displayed (mon_steps_displayed) - at
+' first invisible - and the footer (mon_footer). The fMsg instance is identified
+' through the title (mon_title).
+' ------------------------------------------------------------------------------
+    Const PROC = "MonitorInit"
     
     On Error GoTo eh
     Dim ctl                 As MSForms.Control
@@ -1853,34 +1854,29 @@ Public Sub MonitorInitialize(ByVal mon_title As String, _
     Dim i                   As Long
     Dim siStepsHeightMax    As Single
     Dim siNetHeight         As Single           ' The height of the setup header and footer
-    
-    
+        
     If Not bMonitorInitialized Then
         Set cllSteps = Nothing
         Set cllSteps = New Collection
-        lMonitorSteps = mon_steps_displayed
         For Each ctl In Me.Controls
             ctl.Visible = False
         Next ctl
         siTop = 6
         
         With Me
-            .Caption = mon_title
+            .Caption = sMonitorProcess
             .Width = .MsgWidthMin
-            
-            '~~ Estblsh monitor header
-            If TextMonitorHeader.Text <> vbNullString _
-            Then MonitorEstablishHeader mh_top:=siTop
-            
+                        
             '~~ Establish the number of visualized monitor steps in its dedicated frame
             Set frmSteps = AddControl(ac_ctl:=Frame, ac_name:="frMonitorSteps")
             With frmSteps
                 .Top = siTop
                 .Visible = True
+                .Width = Me.InsideWidth
                 .BorderColor = Me.BackColor
                 .BorderStyle = fmBorderStyleSingle
                 siTop = 0
-                For i = 1 To lMonitorSteps
+                For i = 1 To lMonitorStepsDisplayed
                     MonitorEstablishStep siTop
                 Next i
                 .Height = ContentHeight(frmSteps, False)
@@ -1888,11 +1884,6 @@ Public Sub MonitorInitialize(ByVal mon_title As String, _
                 siNetHeight = ContentHeight(frmSteps.Parent) - frmSteps.Height
                 siStepsHeightMax = Me.MsgHeightMax - siNetHeight
                 NewHeight(frmSteps, False) = Min(siStepsHeightMax, .Height)
-                '~~ Estblsh monitor footer
-                If TextMonitorFooter.Text <> vbNullString Then
-                    siTop = AdjustToVgrid(frmSteps.Top + .Height)
-                    MonitorEstablishFooter mf_top:=siTop + 6
-                End If
             End With
             VisualizeCtl frmSteps, VISLZE_BCKCLR_MON_STEPS_FRM
             NewHeight(frmSteps.Parent) = Min(.MsgHeightMax, ContentHeight(frmSteps.Parent))
@@ -1901,10 +1892,6 @@ Public Sub MonitorInitialize(ByVal mon_title As String, _
         bMonitorInitialized = True
     End If
 
-'    Debug.Print "Me.MsgHeightMax = " & Me.MsgHeightMax & " (" & mMsg.Prcnt(Me.MsgHeightMax, "H") & "%)"
-'    Debug.Print "Me.MsgWidthMax  = " & Me.MsgWidthMax & " (" & mMsg.Prcnt(Me.MsgWidthMax, "W") & "%)"
-
-
 xt: Exit Sub
 
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
@@ -1912,11 +1899,11 @@ End Sub
 
 Public Sub MonitorStep()
 ' ------------------------------------------------------------------------------
-' Display a step. Note that the height of the steps frame (frmSteps) is already
-' adjusted to the number of steps to be displayed. However, when one or another
-' step's height is more than one line the height needs to be ajusted.
+' Displays a monitored step. Note that the height of the steps frame (frmSteps)
+' is already adjusted to the number of steps to be displayed. However, when one
+' or another step's height is more than one line the height needs to be ajusted.
 ' ------------------------------------------------------------------------------
-    Const PROC = "MonitirStep"
+    Const PROC = "MonitorStep"
     
     On Error GoTo eh
     Dim siMaxWidth          As Single
@@ -1928,7 +1915,7 @@ Public Sub MonitorStep()
     
     siTop = 0
     If TextMonitorStep.Text <> vbNullString Then
-        If lStepsDisplayed < lMonitorSteps Then
+        If lStepsDisplayed < lMonitorStepsDisplayed Then
             If lStepsDisplayed > 0 Then
                 Set tbx = cllSteps(lStepsDisplayed)
                 siTop = AdjustToVgrid(tbx.Top + tbx.Height)
@@ -1956,27 +1943,28 @@ Public Sub MonitorStep()
             NewHeight(frmSteps, False, fmScrollActionBegin) = Min(MonitorHeightMaxSteps, ContentHeight(frmSteps, False))
             
             lStepsDisplayed = lStepsDisplayed + 1
+            
             If Not tbxFooter Is Nothing Then
-                siTop = AdjustToVgrid(frmSteps.Top + frmSteps.Height + 6)
-                If siTop > tbxFooter.Top Then
-                    tbxFooter.Top = siTop
-                    Me.Height = ContentHeight(frmSteps.Parent)
-                End If
+                tbxFooter.Top = AdjustToVgrid(frmSteps.Top + frmSteps.Height + 6)
+                Me.Height = tbxFooter.Top + tbxFooter.Height + 35
+            Else
+                Me.Height = ContentHeight(frmSteps.Parent) + 35
             End If
-        
         Else
-            '~~ All steps are displayed
+            '~~ All steps are displayed each display of a new process step
+            '~~ scrolls the displayed steps by dequeueing the top item and
+            '~~ enqueueing as the new step
             siTop = 0
             Set tbx = Qdequeue(cllSteps)
             tbx.Value = vbNullString
-                        
             Qenqueue cllSteps, tbx
             
-            For i = 1 To lMonitorSteps
+            For i = 1 To lMonitorStepsDisplayed
                 Set tbx = cllSteps(i)
                 tbx.Top = siTop
                 siTop = AdjustToVgrid(tbx.Top + tbx.Height)
                 siMaxWidth = Max(siMaxWidth, tbx.Width)
+                DoEvents
             Next i
             
             If TextMonitorStep.MonoSpaced Then
@@ -1995,21 +1983,20 @@ Public Sub MonitorStep()
             siNetHeight = Me.Height - (frmSteps.Height - frmSteps.Top)
             siStepsHeightMax = Me.MsgHeightMax - siNetHeight
             NewHeight(frmSteps, False, fmScrollActionEnd) = Min(MonitorHeightMaxSteps, ContentHeight(frmSteps, False)) + ScrollHscrollHeight(frmSteps)
+        
+            If Not tbxFooter Is Nothing Then
+                tbxFooter.Top = AdjustToVgrid(frmSteps.Top + frmSteps.Height + 6)
+                Me.Height = tbxFooter.Top + tbxFooter.Height + 35
+            Else
+                Me.Height = ContentHeight(frmSteps.Parent) + 35
+            End If
         End If
     End If
-    
-    If TextMonitorFooter.Text <> vbNullString Then
-        siTop = AdjustToVgrid(frmSteps.Top + frmSteps.Height + 6)
-        MonitorEstablishFooter mf_top:=siTop
-    End If
-    
+        
     DoEvents
 '    NewHeight(frmSteps.Parent) = Min(.MsgHeightMax, ContentHeight(frmSteps.Parent))
     NewWidth(frmSteps) = Min(Me.MsgWidthMax, ContentWidth(frmSteps.Parent) + 15)
-  
-    If tbxFooter Is Nothing _
-    Then Me.Height = ContentHeight(frmSteps.Parent) + 35 _
-    Else Me.Height = ContentHeight(tbxFooter.Parent) + 35
+    Me.Height = ContentHeight(frmSteps.Parent) + 35
     
 xt: Exit Sub
 
@@ -2038,6 +2025,26 @@ xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
+
+Private Function MsectsArea() As MSForms.Frame
+' ------------------------------------------------------------------------------
+' Returns the Frame of the message area section, created if yet not existing.
+' ------------------------------------------------------------------------------
+    
+    If frmMsectsArea Is Nothing Then
+        Set frmMsectsArea = Me.AddControl(ac_ctl:=Frame, ac_visible:=True)
+        With frmMsectsArea
+            .Top = 0
+            .Left = 0
+            .Height = 50
+            .Width = Me.InsideWidth
+            .Visible = True
+        End With
+        VisualizeCtl frmMsectsArea, VISLZE_BCKCLR_AREA
+    End If
+    Set MsectsArea = frmMsectsArea
+
+End Function
 
 Private Function MsectsFrm(ByVal est_section As Long) As MSForms.Frame
 ' ------------------------------------------------------------------------------
@@ -2181,24 +2188,50 @@ Private Sub OpenClickedLabelItem(ByVal oc_section As Long)
     mMsg.ShellRun sItem, WIN_NORMAL
 End Sub
 
-Public Sub PositionMessageOnScreen( _
-           Optional ByVal pos_top_left As Boolean = False)
+Public Sub PositionOnScreen(Optional ByVal pos_top_left As Variant = 3)
 ' ------------------------------------------------------------------------------
-'
+' Positions the form on the display, defaults to "Windows Default" and may be
+' the following: - enmanual (0)         = No initial setting specified
+'                - enCenterOwner (1)    = Center on the item to which the
+'                                           UserForm belongs
+'                - enCenterScreen (2)   = Center on the whole screen.
+'                - enWindowsDefault (3) = Position in upper-left corner of
+'                                           screen (default)
+'                - a range object specifying top and left
+'                - a string in the form <top>;<left>
 ' ------------------------------------------------------------------------------
+    Const PROC = "PositionOnScreen"
+    
+    On Error GoTo eh
+    Dim pos_top     As Long
+    Dim pos_left    As Long
     
     On Error Resume Next
+    Select Case True
+        Case IsNumeric(pos_top_left)
+            Me.StartUpPosition = pos_top_left
+        Case TypeName(pos_top_left) = "String"
+            If InStr(pos_top_left, ";") = 0 _
+            Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is not a string with two values seperated with a comma!"
+            If Not IsNumeric(Trim(Split(pos_top_left, ";")(0))) _
+            Then Err.Raise AppErr(1), ErrSrc(PROC), "In the provided string argument the value preceeding the comma is not a numeric value!"
+            If Not IsNumeric(Trim(Split(pos_top_left, ";")(1))) _
+            Then Err.Raise AppErr(1), ErrSrc(PROC), "In the provided string argument the value following the comma is not a numeric value!"
+            pos_top = CLng(Trim(Split(pos_top_left, ";")(0)))
+            pos_left = CLng(Trim(Split(pos_top_left, ";")(1)))
+            With Me
+                .StartUpPosition = enManual
+                .Left = pos_left
+                .Top = pos_top
+            End With
         
-    With Me
-        .StartUpPosition = sup_Manual
-        If pos_top_left Then
-            .Left = 5
-            .Top = 5
-        Else
-            .Left = (VirtualScreenWidthPts - .Width) / 2
-            .Top = (VirtualScreenHeightPts - .Height) / 4
-        End If
-    End With
+        Case TypeName(pos_top_left) = "Range"
+            With Me
+                .StartUpPosition = enManual
+                .Left = pos_top_left.Left
+                .Top = pos_top_left.Top
+            End With
+    End Select
     
     '~~ First make sure the bottom right fits,
     '~~ then check if the top-left is still on the screen (which gets priority).
@@ -2209,15 +2242,19 @@ Public Sub PositionMessageOnScreen( _
         If (.Top < VirtualScreenTopPts) Then .Top = VirtualScreenTopPts
     End With
     
+xt: Exit Sub
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Sub ProvideDict(ByRef dct As Dictionary)
-' ----------------------------------------------------
+Private Function NewDict(ByRef dct As Dictionary) As Dictionary
+' ------------------------------------------------------------------------------
 ' Returns the Dictionary (dct), getting rid of an old.
-' ----------------------------------------------------
+' ------------------------------------------------------------------------------
     Set dct = Nothing
     Set dct = New Dictionary
-End Sub
+    Set NewDict = dct
+End Function
 
 Private Sub ProvideSectionItems(ByVal i As Long)
 ' ------------------------------------------------------------------------------
@@ -2333,6 +2370,35 @@ Private Function ScrollHscrollHeight(ByVal sh_frame_form As Variant) As Single
     End If
 End Function
 
+Private Sub ScrollHscrollRemove(ByRef shr_frame_form As Variant)
+' ------------------------------------------------------------------------------
+' Removes a vertical scroll-bar.
+' ------------------------------------------------------------------------------
+    Const PROC = "ScrollHscrollRemove"
+    
+    On Error GoTo eh
+    If Not IsFrameOrForm(shr_frame_form) _
+    Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form!"
+    
+    With shr_frame_form
+        If ScrollHscrollApplied(shr_frame_form) Then
+            '~~ Establish the vertical scroll-bar, added to the horizontal scroll-bar when one is already applied
+            Select Case .ScrollBars
+                Case fmScrollBarsBoth, fmScrollBarsVertical
+                    .KeepScrollBarsVisible = fmScrollBarsHorizontal
+                    .ScrollBars = fmScrollBarsHorizontal
+                Case fmScrollBarsHorizontal
+                    .KeepScrollBarsVisible = fmScrollBarsNone
+                    .ScrollBars = fmScrollBarsNone
+            End Select
+        End If
+    End With
+    
+xt: Exit Sub
+    
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
 Private Function ScrollVscrollApplied(Optional ByVal sa_frame_form As Variant = Nothing) As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns True when the control (sa_frame_form) has a vertical scrollbar applied. When no
@@ -2385,64 +2451,6 @@ Private Sub ScrollVscrollApply(ByRef sva_frame_form As Variant, _
     Debug.Print "Height Frame   = " & sva_frame_form.Height
     Debug.Print "Height Scroll  = " & sva_content_height
 
-xt: Exit Sub
-    
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
-End Sub
-
-Private Sub ScrollVscrollRemove(ByRef sr_frame_form As Variant)
-' ------------------------------------------------------------------------------
-' Removes a vertical scroll-bar.
-' ------------------------------------------------------------------------------
-    Const PROC = "ScrollVscrollRemove"
-    
-    On Error GoTo eh
-    If Not IsFrameOrForm(sr_frame_form) _
-    Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form!"
-    
-    With sr_frame_form
-        If Not ScrollVscrollApplied(sr_frame_form) Then
-            '~~ Establish the vertical scroll-bar, added to the horizontal scroll-bar when one is already applied
-            Select Case .ScrollBars
-                Case fmScrollBarsBoth, fmScrollBarsHorizontal
-                    .KeepScrollBarsVisible = fmScrollBarsHorizontal
-                    .ScrollBars = fmScrollBarsHorizontal
-                Case fmScrollBarsVertical
-                    .KeepScrollBarsVisible = fmScrollBarsNone
-                    .ScrollBars = fmScrollBarsNone
-            End Select
-        End If
-    End With
-    
-xt: Exit Sub
-    
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
-End Sub
-
-Private Sub ScrollHscrollRemove(ByRef shr_frame_form As Variant)
-' ------------------------------------------------------------------------------
-' Removes a vertical scroll-bar.
-' ------------------------------------------------------------------------------
-    Const PROC = "ScrollHscrollRemove"
-    
-    On Error GoTo eh
-    If Not IsFrameOrForm(shr_frame_form) _
-    Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form!"
-    
-    With shr_frame_form
-        If ScrollHscrollApplied(shr_frame_form) Then
-            '~~ Establish the vertical scroll-bar, added to the horizontal scroll-bar when one is already applied
-            Select Case .ScrollBars
-                Case fmScrollBarsBoth, fmScrollBarsVertical
-                    .KeepScrollBarsVisible = fmScrollBarsHorizontal
-                    .ScrollBars = fmScrollBarsHorizontal
-                Case fmScrollBarsHorizontal
-                    .KeepScrollBarsVisible = fmScrollBarsNone
-                    .ScrollBars = fmScrollBarsNone
-            End Select
-        End If
-    End With
-    
 xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
@@ -2501,6 +2509,35 @@ Private Sub ScrollVscrollMsgSectionOrArea(ByVal exceeding_height As Single)
 
 xt: Exit Sub
 
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Private Sub ScrollVscrollRemove(ByRef sr_frame_form As Variant)
+' ------------------------------------------------------------------------------
+' Removes a vertical scroll-bar.
+' ------------------------------------------------------------------------------
+    Const PROC = "ScrollVscrollRemove"
+    
+    On Error GoTo eh
+    If Not IsFrameOrForm(sr_frame_form) _
+    Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form!"
+    
+    With sr_frame_form
+        If Not ScrollVscrollApplied(sr_frame_form) Then
+            '~~ Establish the vertical scroll-bar, added to the horizontal scroll-bar when one is already applied
+            Select Case .ScrollBars
+                Case fmScrollBarsBoth, fmScrollBarsHorizontal
+                    .KeepScrollBarsVisible = fmScrollBarsHorizontal
+                    .ScrollBars = fmScrollBarsHorizontal
+                Case fmScrollBarsVertical
+                    .KeepScrollBarsVisible = fmScrollBarsNone
+                    .ScrollBars = fmScrollBarsNone
+            End Select
+        End If
+    End With
+    
+xt: Exit Sub
+    
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
@@ -2568,7 +2605,7 @@ Public Sub Setup()
     Me.Height = 200                             ' just to start with - specifically for test purpose
     Me.Width = siMsgWidthMin
     
-'    PositionMessageOnScreen pos_top_left:=True  ' in case of test best pos to start with
+'    PositionOnScreen pos_top_left:=True  ' in case of test best pos to start with
     frmMsectsArea.Visible = False
     frmBttnsArea.Top = VSPACE_AREAS
     
@@ -2626,13 +2663,11 @@ Public Sub Setup()
     '~~ the message form width is extended (over the specified maximum) in order to have
     '~~ the vertical scrollbar visible
     AdjustTopPositions
-    If Not (ScrollHscrollApplied(BttnsArea) Or ScrollHscrollApplied(MsectsArea)) Then
-        Me.Width = Max(Me.Width, BttnsArea.Width, MsectsArea.Width) + 5 + (Me.Width - Me.InsideWidth)
-    End If
-    If Not (ScrollVscrollApplied(BttnsArea) Or ScrollVscrollApplied(MsectsArea)) Then
-        Me.Height = Max(Me.Height, ContentHeight(BttnsArea.Parent), ContentHeight(MsectsArea.Parent)) + 20 + (Me.Width - Me.InsideWidth)
-    End If
-    PositionMessageOnScreen
+    
+    Me.Width = Max(ContentWidth(BttnsArea.Parent), ContentWidth(MsectsArea.Parent)) + 15
+    Me.Height = Max(ContentHeight(BttnsArea.Parent), ContentHeight(MsectsArea.Parent)) + 35
+    
+    PositionOnScreen
     bSetUpDone = True ' To indicate for the Activate event that the setup had already be done beforehand
     
     VisualizeSetupStep "Setup finalized"
@@ -2714,44 +2749,37 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Sub VisualizeSetupStep(ByVal vss_status As String)
+Private Sub Setup3_Bttn(ByVal sb_row As Long, _
+                        ByVal sb_button As Long, _
+                        ByVal sb_caption As String, _
+                        ByVal sb_ret_value As Variant)
 ' -------------------------------------------------------------------------------
-' Display the Message form with visualized controls at the top left.
+' Setup an applied reply button's (sb_row, sb_button) visibility and caption,
+' calculate the maximum width and height, keep a record of the setup
+' reply sb_index's return value.
 ' -------------------------------------------------------------------------------
-    With Me
-        If .VisualizeForTest Then
-            .Top = 10
-            .Left = 10
-            Application.StatusBar = "Setup step visualization for debug and test: " & vss_status
-            Stop
-        End If
-    End With
-End Sub
-
-Private Sub Setup4_MsgSectsPropSpaced()
-' -------------------------------------------------------------------------------
-' Loop through all provided message sections for which a text is provided and is
-' not Monospaced and setup the section.
-' Note: The number of message sections is only determined by the number of elements in
-'       MsgText.
-' -------------------------------------------------------------------------------
-    Const PROC = "Setup4_MsgSectsPropSpaced"
+    Const PROC = "Setup3_Bttn"
     
     On Error GoTo eh
-    Dim i           As Long
-
-    For i = i To UBound(TextSection.Section)
-        With Me.Text(enSectText, i)
-            If .Text <> vbNullString And Not .MonoSpaced Then
-                ProvideSectionItems i
-                SetupMsgSect
-                iSectionsPropSpaced = iSectionsPropSpaced + 1
-            End If
-        End With
-    Next i
-    bDonePropSpacedSects = True
-    bDoneMsgArea = True
-
+    Dim cmb As MSForms.CommandButton
+    
+    If sb_row = 0 Then sb_row = 1
+    Set cmb = dctBttns(sb_row & "-" & sb_button)
+    
+    With cmb
+        .AutoSize = True
+        .WordWrap = False ' the longest line determines the sb_index's width
+        .Caption = sb_caption
+        .AutoSize = False
+        .Height = .Height + 1 ' safety margin to ensure proper multilin caption display
+        siMaxButtonHeight = Max(siMaxButtonHeight, .Height)
+        siMaxButtonWidth = Max(siMaxButtonWidth, .Width, DFLT_BTTN_MIN_WIDTH)
+    End With
+    AppliedBttns.Add cmb, sb_row
+    AppliedButtonRetVal(cmb) = sb_ret_value ' keep record of the setup sb_index's reply value
+    cmb.Visible = True
+    BttnsRowFrm(sb_row).Visible = True
+    
 xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
@@ -2888,37 +2916,30 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Sub Setup3_Bttn(ByVal sb_row As Long, _
-                        ByVal sb_button As Long, _
-                        ByVal sb_caption As String, _
-                        ByVal sb_ret_value As Variant)
+Private Sub Setup4_MsgSectsPropSpaced()
 ' -------------------------------------------------------------------------------
-' Setup an applied reply button's (sb_row, sb_button) visibility and caption,
-' calculate the maximum width and height, keep a record of the setup
-' reply sb_index's return value.
+' Loop through all provided message sections for which a text is provided and is
+' not Monospaced and setup the section.
+' Note: The number of message sections is only determined by the number of elements in
+'       MsgText.
 ' -------------------------------------------------------------------------------
-    Const PROC = "Setup3_Bttn"
+    Const PROC = "Setup4_MsgSectsPropSpaced"
     
     On Error GoTo eh
-    Dim cmb As MSForms.CommandButton
-    
-    If sb_row = 0 Then sb_row = 1
-    Set cmb = dctBttns(sb_row & "-" & sb_button)
-    
-    With cmb
-        .AutoSize = True
-        .WordWrap = False ' the longest line determines the sb_index's width
-        .Caption = sb_caption
-        .AutoSize = False
-        .Height = .Height + 1 ' safety margin to ensure proper multilin caption display
-        siMaxButtonHeight = Max(siMaxButtonHeight, .Height)
-        siMaxButtonWidth = Max(siMaxButtonWidth, .Width, siMinButtonWidth)
-    End With
-    AppliedBttns.Add cmb, sb_row
-    AppliedButtonRetVal(cmb) = sb_ret_value ' keep record of the setup sb_index's reply value
-    cmb.Visible = True
-    BttnsRowFrm(sb_row).Visible = True
-    
+    Dim i As Long
+
+    For i = i To UBound(TextSection.Section)
+        With Me.Text(enSectText, i)
+            If .Text <> vbNullString And Not .MonoSpaced Then
+                ProvideSectionItems i
+                SetupMsgSect
+                iSectionsPropSpaced = iSectionsPropSpaced + 1
+            End If
+        End With
+    Next i
+    bDonePropSpacedSects = True
+    bDoneMsgArea = True
+
 xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
@@ -3187,7 +3208,7 @@ Private Sub SizeAndPosition2Bttns1()
                             .Width = siMaxButtonWidth
                             .Height = siMaxButtonHeight
                             .Top = siVmarginFrames
-                            siLeft = .Left + .Width + siHmarginButtons
+                            siLeft = .Left + .Width + HSPACE_BTTNS
                             If IsNumeric(vMsgButtonDefault) Then
                                 If lButton = vMsgButtonDefault Then .Default = True
                             Else
@@ -3196,7 +3217,7 @@ Private Sub SizeAndPosition2Bttns1()
                         End With
                     End If
                 End If
-                HeightfrmBttnsArea = HeightfrmBttnsArea + siMaxButtonHeight + siHmarginButtons
+                HeightfrmBttnsArea = HeightfrmBttnsArea + siMaxButtonHeight + HSPACE_BTTNS
             Next v
         End If
         frmRow.Width = frmRow.Width + HSPACE_LEFTRIGHT_BUTTONS
@@ -3212,7 +3233,7 @@ Private Sub SizeAndPosition2Bttns2Rows()
 ' ------------------------------------------------------------------------------
 ' Adjust all applied/visible button rows height to the maximum buttons height
 ' and the row frames width to the number of the displayed buttons considering a
-' certain margin between the buttons (siHmarginButtons) and a margin at the
+' certain margin between the buttons (HSPACE_BTTNS) and a margin at the
 ' left and the right.
 ' ------------------------------------------------------------------------------
     Const PROC = "SizeAndPosition2Bttns2Rows"
@@ -3238,10 +3259,10 @@ Private Sub SizeAndPosition2Bttns2Rows()
                 .Height = siHeight
                 '~~ Provide some extra space for the button's design
                 BttnsFrmWidth = CInt((siMaxButtonWidth * lButtons) _
-                               + (siHmarginButtons * (lButtons - 1)) _
-                               + (siHmarginFrames * 2)) - siHmarginButtons + 7
+                               + (HSPACE_BTTNS * (lButtons - 1)) _
+                               + (siHmarginFrames * 2)) - HSPACE_BTTNS + 7
                 .Width = BttnsFrmWidth + (HSPACE_LEFTRIGHT_BUTTONS * 2)
-                siTop = .Top + .Height + siVmarginButtons
+                siTop = .Top + .Height + VSPACE_BTTN_ROWS
             End With
         End If
     Next v
@@ -3385,5 +3406,19 @@ Private Sub VisualizeCtl(ByVal vc_ctl As MSForms.Control, _
         End If
     End With
     
+End Sub
+
+Private Sub VisualizeSetupStep(ByVal vss_status As String)
+' -------------------------------------------------------------------------------
+' Display the Message form with visualized controls at the top left.
+' -------------------------------------------------------------------------------
+    With Me
+        If .VisualizeForTest Then
+            .Top = 10
+            .Left = 10
+            Application.StatusBar = "Setup step visualization for debug and test: " & vss_status
+            Stop
+        End If
+    End With
 End Sub
 
