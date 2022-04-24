@@ -67,14 +67,15 @@ The _Box_ service has these named arguments:
 | ----------------------- | -----------------------------------------------------|
 | `Title`                 | String expression displayed in the window handle bar |
 | `Prompt`                | String expression displayed |
-| `Buttons`               | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, or a Dictionary, with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row. || `box_monospaced`       | Boolean expression, defaults to False, displays the `box_msg` with a monospaced font |
+| `Buttons`               | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, or a Dictionary, with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row. |
+| `box_monospaced`       | Boolean expression, defaults to False, displays the `box_msg` with a monospaced font |
 | `box_button_default`    | Optional, numeric expression, defaults to 1, identifies the default button, i.e. the nth button which has the focus
 | `box_return_index`      | Optional, Boolean expression, default to False, indicates that the return value for the clicked button will be the index rather than its caption string.
 | `box_width_min`         | Optional, numeric expression, defaults to 400, the minimum width in pt for the display of the message. A value < 100 is interpreted as % of the screen size, a value > 100 as pt
 | `box_width_max`         | Optional, numeric expression, defaults to 80, specifies the maximum message window width as % of the screen size. A value < 100 is interpreted as % of the screen size, a value > 100 as pt |
 | `box_height_max`        | Optional, numeric expression, defaults to 70, specifies the maximum message window height of the screen size. A value < 100 is interpreted as % of the screen size, a value > 100 as pt
 | `box_buttons_width_min` | Optional, numeric expression, defaults to 70, specifies the minimum button width in pt |
-
+| `box_pos`              | Variant expression, specifying the position of the message on screen, defaults to 3.<br>- enManual (0)         = No initial setting specified<br>- enCenterOwner (1)    = Center on the item to which the UserForm belongs<br>- enCenterScreen (2)   = Center on the whole screen<br>- enWindowsDefault (3) = Position in upper-left corner of screen (default)<br>- a range object specifying top and left<br>- a string in the form "\<top>;\<left>" (mind the semicolon separator!) |
 
 #### _Box_ service usage example
 The below example uses [the _Buttons_ service](#the-buttons-service) to specify the displayed buttons and their order. 
@@ -141,6 +142,7 @@ The _Dsply_ service has these named arguments:
 | `dsply_width_max`        | Optional, _Single_ expression, Defaults to 80 which interpreted as % of the screen's width. |
 | `dsply_height_max`       | Optional, _Single_ expression, defaults to 75 which is interpreted as % of the screen's height.|
 | `dsply_button_width_min` | Optional,  _Single_ expression, defaults to 70 pt. Specifies the minimum width of the reply buttons, i.e. even when the displayed string is just Ok, Yes, etc. which would result in a button with much less width. |
+| `dsply_pos`              | Variant expression, specifying the position of the message on screen, defaults to 3.<br>- enManual (0)         = No initial setting specified<br>- enCenterOwner (1)    = Center on the item to which the UserForm belongs<br>- enCenterScreen (2)   = Center on the whole screen<br>- enWindowsDefault (3) = Position in upper-left corner of screen (default)<br>- a range object specifying top and left<br>- a string in the form "\<top>;\<left>" (mind the semicolon separator!) |
 
 #### Syntax of the _TypeMsg_ UDT
 The syntax is described best as a code snippet using all options 
@@ -302,65 +304,49 @@ The _Monitor_ service has the following named arguments
 | `mon_width_min`      | _Long_ expression, defaults to 400, which interpreted as pt. |
 | `mon_width_max`      | _Long_ expression, defaults to 80, which is interpreted as % of the screen's width. |
 | `mon_height_max`     | _Single_ expression specifying the maximum message window height. When the number of to be displayed steps exceed this height a vertical scroll-bar is displayed.|
-| `mon_pos`            | Variant expression. When a Range the monitor window will be displayed at its window/screen position. |
+| `mon_pos`            | Variant expression, specifying the position of the monitoring window on screen, defaults to 3.<br>- enManual (0)         = No initial setting specified<br>- enCenterOwner (1)    = Center on the item to which the UserForm belongs<br>- enCenterScreen (2)   = Center on the whole screen<br>- enWindowsDefault (3) = Position in upper-left corner of screen (default)<br>- a range object specifying top and left<br>- a string in the form "\<top>;\<left>" (mind the semicolon separator!) |
 
-
-#### Usage of the _Monitor_ service
-The code below
+#### Usage of the _Monitor_ services
+The module/code below
 ```vb
-Public Sub Demo_Monitor_Service()
-    Const PROC              As String = "Demo_Monitor_Service"
-    Const MONITOR_HEADER    As String = " No. Status   Step"
-    Const MONITOR_FOOTER    As String = "Process finished! Close this window"
-    Const PROCESS_STEPS     As Long = 12
+Option Explicit
+#If VBA7 Then
+    Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As LongPtr)
+#Else
+    Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
+#End If
+
+Public Sub Demo_Monitor()
     
-    On Error GoTo eh
-    Dim i               As Long
-    Dim lWait           As Long
-    Dim MonitorTitle    As String
-    Dim ProgressStep    As String
-    
-    MonitorTitle = "Demonstration of the monitoring of a process step by step"
-    mMsg.Form MonitorTitle, frm_unload:=True ' Ensure there is no process monitoring with this title still displayed
+    Dim i       As Long
+    Dim Title   As String
+    Dim Step    As TypeMsgText
+    Dim Footer  As TypeMsgText
+       
+    Title = "Demonstration of process monitoring by fisplaying the last 10 steps"
+    Footer.FontColor = rgbBlue
+    Footer.Text = "Process in progress! Please wait."
         
-    For i = 1 To PROCESS_STEPS
-        '~~ Preparing a process step message string
-        ProgressStep = mBasic.Align(i, 4, AlignRight, " ") & _
-                   mBasic.Align("Passed", 8, AlignCentered, " ") & _
-                   Repeat(repeat_n_times:=Int(((i - 1) / 10)) + 1, repeat_string:="  " & _
-                   mBasic.Align(i, 2, AlignRight) & _
-                   ".  Follow-Up line after " & _
-                   Format(lWait, "0000") & _
-                   " Milliseconds.")
-        
-        If i < PROCESS_STEPS Then
-            '~~ Steps 1 to n - 1
-            mMsg.Monitor mon_title:=MonitorTitle _
-                       , mon_msg:=ProgressStep _
-                       , mon_msg_monospaced:=True _
-                       , mon_header:=MONITOR_HEADER
-            
-            '~~ Simmulation of a process
-            lWait = 100 * i
-            DoEvents
-            Sleep 200
-        
-        Else
-            '~~ The last step, separated in order to display the footer along with it
-            mMsg.Monitor mon_title:=MonitorTitle _
-                       , mon_msg:=ProgressStep _
-                       , mon_header:=MONITOR_HEADER _
-                       , mon_footer:=MONITOR_FOOTER
-        End If
+    For i = 1 To 12
+        Step.Text = "Step " & Format(i, 0) & " Passed: Process follow-Up after " & 200 * (i - 1) & " Milliseconds (line length triggers horizontal scroll-bar)."
+        Step.MonoSpaced = True
+        mMsg.Monitor mon_title:=Title _
+                   , mon_width_max:=30 _
+                   , mon_text:=Step
+                   
+        mMsg.MonitorFooter Title, Footer
+        Sleep 300 ' Simmulation of some process time
     Next i
     
-xt: Exit Sub
-
-eh: If mMsg.ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+    Footer.Text = "Process finished! Close this window"
+    mMsg.MonitorFooter Title, Footer
+     
 End Sub
 ```
 displays:<br>
 ![](images/Demo-Monitor-Service.gif)
+
+Note that the `mMsg.MonitorFooter` (as is the `mMsg.MonitorHeader`) service is optional.
 
 ### The _Buttons_ service
 Provides buttons as Collection. Example:<br>
@@ -376,14 +362,12 @@ The service may be used directly as buttons argument. Example:
 ```
 
 ### The _MsgInstance_ service
-All services create an instance of the _fMsg_ userForm with the title as the key.<br>
+All services create/use an instance of the _fMsg_ userForm with the title as the id/key.<br>
 Syntax: `MsgInstance(title, unload)`<br>
 `unload` defaults to False. When True an already existing instance is unloaded.
-The instance object is kept in a Dictionary with the title as the key and the instance object as the item. When no item with the given title exists the instance is created, stored in the Dictionary and returned.
+The instance object is kept in a Dictionary with the title as the key and the instance object as the item. When no item with the given title exists the instance is created, stored in the Dictionary and returned. When an item exists in the Dictionary which is no longer loaded it is removed from the Dictionary.
 
-If an item exists in the Dictionary which is no longer loaded it is removed from the Dictionary.
-
-Example:<br>`Set msg = mMsg.MsgInstasnce("This title")`<br> returns an already existing  _fMsg_ object, when none exists a new created one.
+Example:<br>`Set msg = mMsg.MsgInstasnce("This title")`<br> returns an already existing, or when none exists a new one UserForm (fMsg) object.
 
 ## Miscellaneous aspects
 ### Min/Max Message Width/Height

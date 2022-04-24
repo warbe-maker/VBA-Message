@@ -236,65 +236,30 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
 End Sub
 
 Public Sub Demo_Monitor()
-    Const PROC          As String = "Demo_Monitor"
-    Const PROCESS_STEPS As Long = 12
-
-    On Error GoTo eh
-    Dim Header          As TypeMsgText
-    Dim Footer          As TypeMsgText
-    Dim i               As Long
-    Dim lWait           As Long
-    Dim Title           As String
-    Dim Step            As TypeMsgText
     
-    With Header
-        .Text = " No. Status   Step"
-        .MonoSpaced = True
-        .FontColor = rgbBlue
-    End With
-    
-    With Footer
-        .Text = "Process in progress! Please wait."
-        .FontBold = True
-    End With
-    
-    Title = "Demonstration of the monitoring of a process step by step"
-    mMsg.MsgInstance Title, fi_unload:=True ' Ensure there is no process monitoring with this title still displayed
+    Dim i       As Long
+    Dim Title   As String
+    Dim Step    As TypeMsgText
+    Dim Footer  As TypeMsgText
+       
+    Title = "Demonstration of process monitoring by fisplaying the last 10 steps"
+    Footer.FontColor = rgbBlue
+    Footer.Text = "Process in progress! Please wait."
         
-    For i = 1 To PROCESS_STEPS
-        '~~ Preparing a process step message string
-        With Step
-            .Text = mBasic.Align(i, 4, AlignRight, " ") & _
-                            mBasic.Align("Passed", 8, AlignCentered, " ") & _
-                            Repeat(repeat_n_times:=Int(((i - 1) / 10)) + 1, repeat_string:="  " & _
-                            mBasic.Align(i, 2, AlignRight) & _
-                            ".  Follow-Up line after " & _
-                            Format(lWait, "0000") & _
-                            " Milliseconds.")
-            .MonoSpaced = True
-        End With
-        
+    For i = 1 To 12
+        Step.Text = "Step " & Format(i, 0) & " Passed: Process follow-Up after " & 200 * (i - 1) & " Milliseconds (line length triggers horizontal scroll-bar)."
+        Step.MonoSpaced = True
         mMsg.Monitor mon_title:=Title _
+                   , mon_width_max:=30 _
                    , mon_text:=Step
                    
-        '~~ Simmulation of a process
-        lWait = 100 * i
-        DoEvents
-        Sleep 200
-        
+        mMsg.MonitorFooter Title, Footer
+        Sleep 300 ' Simmulation of some process time
     Next i
     
-    Step.Text = vbNullString
     Footer.Text = "Process finished! Close this window"
-    mMsg.Monitor mon_title:=Title _
-               , mon_text:=Step
-    
-xt: Exit Sub
-
-eh: Select Case ErrMsg(ErrSrc(PROC))
-        Case vbResume:      Stop: Resume
-        Case Else:          GoTo xt
-    End Select
+    mMsg.MonitorFooter Title, Footer
+     
 End Sub
 
 Private Function ErrMsg(ByVal err_source As String, _
