@@ -9,14 +9,14 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[_Box_ service usage example](#box-service-usager-example)<br>
 &nbsp;&nbsp;&nbsp;[The Dsply service](#the-dsply-service)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax](#syntax-1)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax of the TypeMsg UDT](#syntax-of-the-typemsg-udt)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax of the TypeMsgText UDT](#syntax-of-the-typemsgtext-udt)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax of the Type _TypeMsgLabel_](#syntax-of-the-type-typemsglabel)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax of the Type _TypeMsgText_](#syntax-of-the-type-typemsgtext)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[_Dsply_ service usage example](#dsply-service-usage-example)<br>
 &nbsp;&nbsp;&nbsp;[The ErrMsg service](#the-errmsg-service)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax](#syntax-2)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Usage example](#usage-example)<br>
 &nbsp;&nbsp;&nbsp;[The Monitor service](#the-monitor-service)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Usage of the Monitor service](#usage-of-the-monitor-service)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Usage of the _Monitor_ service](#usage-of-the-monitor-service)<br>
 &nbsp;&nbsp;&nbsp;[The Buttons service](#the-buttons-service)<br>
 &nbsp;&nbsp;&nbsp;[The MsgInstance service](#the-msginstance-service)<br>
 [Miscellaneous aspects](#miscellaneous-aspects)<br>
@@ -144,115 +144,94 @@ The _Dsply_ service has these named arguments:
 | `dsply_button_width_min` | Optional,  _Single_ expression, defaults to 70 pt. Specifies the minimum width of the reply buttons, i.e. even when the displayed string is just Ok, Yes, etc. which would result in a button with much less width. |
 | `dsply_pos`              | Variant expression, specifying the position of the message on screen, defaults to 3.<br>- enManual (0)         = No initial setting specified<br>- enCenterOwner (1)    = Center on the item to which the UserForm belongs<br>- enCenterScreen (2)   = Center on the whole screen<br>- enWindowsDefault (3) = Position in upper-left corner of screen (default)<br>- a range object specifying top and left<br>- a string in the form "\<top>;\<left>" (mind the semicolon separator!) |
 
-#### Syntax of the _TypeMsg_ UDT
-The syntax is described best as a code snippet using all options 
-```
-Dim Message As TypeMsg
-With Message.Section(n)
-    With .Label
-        .FontBold = True
-        .FontColor = rgbRed
-        .FontItalic = True
-        .FontName = "Tahoma"
-        .FontSize = 9
-        .FontUnderline = True
-        .Monospaced = True          ' FontName defaults to "Courier New" (FontName is ignored)
-        .Text = "......"
-        .OpenWhenClicked = "......" ' anything which can be opened
-    End With
-    With .Text
-         .FontBold = True
-        .FontColor = rgbRed
-        .FontItalic = True
-        .FontName = "Tahoma"
-        .FontSize = 9
-        .FontUnderline = True
-        .Monospaced = True ' FontName will be ignored and default to "Courier New"
-        .Text = "...."
-    End With
-```
-Going with the defaults the minimum message text assignment (without a label) would be `Message.Section(1).Text.Text = "......"`
-
-#### Syntax of the _TypeMsgText_ UDT
-The syntax is described best as a code snippet using all options 
+#### Syntax of the Type _TypeMsgLabel_
 ```vb
-Dim Message As TypeMsgText
-    With Message
-        .FontBold = True
-        .FontColor = rgbRed
-        .FontItalic = True
-        .FontName = "Tahoma"
-        .FontSize = 9
-        .FontUnderline = True
-        .Monospaced = True          ' FontName defaults to "Courier New" (FontName is ignored)
-        .Text = "......"
-    End With
+Public Type TypeMsgLabel
+        FontBold        As Boolean
+        FontColor       As XlRgbColor
+        FontItalic      As Boolean
+        FontName        As String
+        FontSize        As Long
+        FontUnderline   As Boolean
+        MonoSpaced      As Boolean  ' FontName defaults to "Courier New"
+        Text            As String
+        OpenWhenClicked As String   ' this extra option is the purpose of this sepcific Type
+End Type
 ```
-Going with the defaults the minimum message text assignment would be `Message.Text = "......"`
+#### Syntax of the Type _TypeMsgText_
+```vb
+Public Type TypeMsgText
+        FontBold        As Boolean
+        FontColor       As XlRgbColor
+        FontItalic      As Boolean
+        FontName        As String
+        FontSize        As Long
+        FontUnderline   As Boolean
+        MonoSpaced      As Boolean  ' FontName defaults to "Courier New"
+        Text            As String
+End Type
+```
 
 #### _Dsply_ service usage example
-The below code demonstrates most of the available features and message window properties.
+The below code demonstrates most of the available features and properties.
 ```
-Public Sub DemoMsgDsplyService_1()
-    Const MAX_WIDTH     As Long = 50
-    Const MAX_HEIGHT    As Long = 60
-    
-    Dim cll             As New Collection
+Public Sub Demo_Dsply_1()
+    Const WIDTH_MAX     As Long = 35
+    Const MAX_HEIGHT    As Long = 50
+
+    Dim sTitle          As String
+    Dim cllBttns        As New Collection
     Dim i, j            As Long
     Dim Message         As TypeMsg
    
+    sTitle = "Usage demo: Full featured multiple choice message"
     With Message.Section(1)
-        .Label.Text = "Demonstration overview:"
+        .Label.Text = "Service features used by this displayed message:"
         .Label.FontColor = rgbBlue
-        .Text.Text = "- Use of all 4 message sections" & vbLf _
-                   & "- All sections with a label" & vbLf _
-                   & "- One section mono-spaced exceeding the specified maximum message form width" & vbLf _
-                   & "- Use of some of the 7 x 7 reply buttons in a 4-4-1 order" & vbLf _
-                   & "- An an example for available text font options all labels in blue"
+        .Text.Text = "All 4 message sections, and all with a label, monospaced option for the second section, " _
+                   & "some of the 7 x 7 reply buttons in a 4-4-1 order, font color option for all labels."
     End With
     With Message.Section(2)
-        .Label.Text = "Unlimited message width!:"
+        .Label.Text = "Demonstration of the unlimited message width:"
         .Label.FontColor = rgbBlue
-        .Text.Text = "Because this section's text is mono-spaced (which is not word-wrapped) and the maximum message form width" & vbLf _
-                   & "for this demo has been specified " & MAX_WIDTH & "% of the screen width (the default would be 80%)" & vbLf _
-                   & "the text is displayed with a horizontal scroll-bar. There is no message size limit for the display despite the" & vbLf & vbLf _
-                   & "limit of VBA for text strings  which is about 1GB!"
-        .Text.Monospaced = True
+        .Text.Text = "Because this section's text is mono-spaced (which by definition is not word-wrapped)" & vbLf _
+                   & "the message width is determined by:" & vbLf _
+                   & "a) the for this demo specified maximum width of " & WIDTH_MAX & "% of the screen size" & vbLf _
+                   & "   (defaults to 80% when not specified)" & vbLf _
+                   & "b) the longest line of this section" & vbLf _
+                   & "Because the text exceeds the specified maximum message width, a horizontal scroll-bar is displayed." & vbLf _
+                   & "Due to this feature there is no message size limit other than the system's limit which for a string is about 1GB !!!!"
+        .Text.MonoSpaced = True
     End With
     With Message.Section(3)
-        .Label.Text = "Unlimited message height!:"
+        .Label.Text = "Unlimited message height (not the fact with this message):"
         .Label.FontColor = rgbBlue
-        .Text.Text = "Because this section text has many lines (line breaks)" & vbLf _
-                   & "the default word-wrapping for this proportional-spaced text" & vbLf _
-                   & "has not the otherwise usual effect. The message area thus" & vbLf _
-                   & "exceeds the for this demo specified " & MAX_HEIGHT & "% of the screen size" & vbLf _
-                   & "(defaults to 80%) it is displayed with a vertical scroll-bar." & vbLf _
-                   & "So even a proportional spaced text's size - which usually is word-wrapped -" & vbLf _
-                   & "is only limited by the system's limit for a String which is abut 1GB !!!"
+        .Text.Text = "As with the message width, the message height is unlimited. When the maximum height (explicitly specified or the default) " _
+                   & "is exceeded a vertical scroll-bar is displayed. Due to this feature there is no message size limit other than the system's " _
+                   & "limit which for a string is about 1GB !!!!"
     End With
     With Message.Section(4)
-        .Label.Text = "Great reply buttons flexibility:"
+        .Label.Text = "Flexibility regarding the displayed reply buttons:"
         .Label.FontColor = rgbBlue
-        .Text.Text = "This demo displays only some of the 49 possible reply buttons (7 rows by 7 buttons). " _
-                   & "It also shows that a reply button can have any caption text and the buttons can be " _
-                   & "displayed in any order within the 7 x 7 limit. Of course the VBA.MsgBox classic " _
-                   & "vbOkOnly, vbYesNoCancel, etc. are also possible - even in a mixture." & vbLf & vbLf _
-                   & "By the way: This demo ends only with the Ok button clicked and loops with all the other."
+        .Text.Text = "This demo displays only some of the 7 x 7 = 49 possible reply buttons which may have any caption text " _
+                   & "including the classic VBA.MsgBox values (vbOkOnly, vbYesNoCancel, etc.) - even in a mixture." & vbLf & vbLf _
+                   & "!! This demo ends only with the Ok button and loops with any other."
     End With
     '~~ Prepare the buttons collection
+    mMsg.Buttons cllBttns, vbOKOnly, vbLf ' The reply when clicked will be vbOK though
     For j = 1 To 2
         For i = 1 To 4
-            cll.Add "Multiline reply" & vbLf & "button caption" & vbLf & "Button-" & j & "-" & i
+            cllBttns.Add "Multiline reply" & vbLf & "button caption" & vbLf & "Button-" & j & "-" & i
         Next i
-        cll.Add vbLf
+        If j < 2 Then cllBttns.Add vbLf
     Next j
-    cll.Add vbOKOnly ' The reply when clicked will be vbOK though
+    cllBttns.Add vbOKOnly
     
-    While mMsg.Dsply(dsply_title:="Usage demo: Full featured multiple choice message" _
+    While mMsg.Dsply(dsply_title:=sTitle _
                    , dsply_msg:=Message _
-                   , dsply_buttons:=cll _
+                   , dsply_buttons:=cllBttns _
                    , dsply_height_max:=MAX_HEIGHT _
-                   , dsply_width_max:=MAX_WIDTH _
+                   , dsply_width_max:=WIDTH_MAX _
                     ) <> vbOK
     Wend
     
@@ -260,7 +239,7 @@ End Sub
 ```
 which displays:
 
-![](images/demo-1.png)
+![](images/Demo-Dsply-service.png)
 
 ### The _ErrMsg_ service
 Provides the display of a well designed error message by supporting a debugging option enabled with _Conditional Compile Argument_  `Debugging = 1` which displays an extra ***Resume Error Line*** button.
@@ -289,25 +268,32 @@ End Sub
 Displays:<br>
 ![](images/Demo-ErrMsg-Service.jpg)
 
-Only when the Conditional Compile Argument 'Debugging = 1' the ErrMsg is displayed with Yes/No buttons and thus may return vbYes which means that the line which caused the error may be resumed by F8, F8.
-
 ### The _Monitor_ service
-The _Monitor_ service has the following named arguments
+Provides the means to monitor the progress of a process by displaying progress steps. Because each process is specified by the title displayed in the window handle bar, there may be any number of processes and sub-processes monitored at the same time.
+
+The _Monitor_, _MonitorHeader_,  and _MonitorFooter_ service has the following named arguments. Any of the optional arguments is only relevant with the whichever very first service call for a specific process(title).  
 
 | Part                  | Description             |
 |-----------------------|-------------------------|
-| `mon_title`          | _String_ expression, displayed as title in the message window handle bar. When the service is called with different titles each of them open its dedicated monitor window. |
-| `mon_step`            | Type `TypeMsgText` expression (see [Syntax of the _TypeMsgText_ UDT](#syntax-of-the-typemsgtext-udt)), displayed as the process step. |
-| `mon_header`         |Type `TypeMsgText` expression (see [Syntax of the _TypeMsgText_ UDT](#syntax-of-the-typemsgtext-udt)), obligatory, may be a vbNullString if not desired displayed above the first `mon_step`,  |
-| `mon_footer`         |Type `TypeMsgText` expression (see [Syntax of the _TypeMsgText_ UDT](#syntax-of-the-typemsgtext-udt)), obligatory, displayed below the last `mon_step`, maybe a vbNullString when not desired, may be specified with an extra service call when the process has ended. |
-| `mon_steps_visible`| _Long_ expression, defaults to 10, specifies the number of steps to be displayed. When more steps are provided the displayed steps are scrolled.|
-| `mon_width_min`      | _Long_ expression, defaults to 400, which interpreted as pt. |
-| `mon_width_max`      | _Long_ expression, defaults to 80, which is interpreted as % of the screen's width. |
-| `mon_height_max`     | _Single_ expression specifying the maximum message window height. When the number of to be displayed steps exceed this height a vertical scroll-bar is displayed.|
-| `mon_pos`            | Variant expression, specifying the position of the monitoring window on screen, defaults to 3.<br>- enManual (0)         = No initial setting specified<br>- enCenterOwner (1)    = Center on the item to which the UserForm belongs<br>- enCenterScreen (2)   = Center on the whole screen<br>- enWindowsDefault (3) = Position in upper-left corner of screen (default)<br>- a range object specifying top and left<br>- a string in the form "\<top>;\<left>" (mind the semicolon separator!) |
+| `mon_title`           | _String_ expression, displayed as title in the message window handle bar. When the service is called with different titles each of them open its dedicated monitor window. |
+| `mon_text`            | Type `TypeMsgText` expression (see [Syntax of the Type _TypeMsgText_ UDT](#syntax-of-the-type-typemsgtext)), displayed as the process header, step, or footer. |
+| `mon_steps_visible`   | _Long_ expression, optional, defaults to 10, specifies the number of steps to be displayed. When more steps are provided the displayed steps are scrolled.|
+| `mon_width_min`       | _Long_ expression, optional, defaults to 30% of the screen's width. |
+| `mon_width_max`       | _Long_ expression, optional, defaults to 80% of the screen's width. When the length of a line (when specified mono-spaced!) exceeds the maximum width, a horizontal scroll-bar is displayed.|
+| `mon_height_max`      | _Long_ expression, optional, defaults to 80% if the screen's height. When the number of to be displayed steps exceed this height a vertical scroll-bar is displayed.|
+| `mon_pos`             | Variant expression, optional, defaults to _WindowsDefault_, specifies the position of the monitoring window on screen.<br>- enManual (0)         = No initial setting specified<br>- enCenterOwner (1)    = Center on the item to which the UserForm belongs<br>- enCenterScreen (2)   = Center on the whole screen<br>- enWindowsDefault (3) = Position in upper-left corner of screen (default)<br>- a range object specifying top and left<br>- a string in the form "\<top>;\<left>" (mind the semicolon separator!) |
 
-#### Usage of the _Monitor_ services
-The module/code below
+#### Usage of the _Monitor_ service
+Thanks to the defaults for all optional arguments the service requires only the following four code lines:
+```vb   
+        Dim Step    As TypeMsgText
+        Dim Process As String:      Process = "The title for the process"
+        ' .... begin of a process or loop
+        Step.Text = "the process step text"
+        mMsg.Monitor Process, Step
+        ' .... end of a process or loop
+```
+The code below demonstrates a slightly more elaborated approach by using the optional `mMsg.MonitorHeader` and `mMsg.MonitorFooter` service:
 ```vb
 Option Explicit
 #If VBA7 Then
@@ -317,36 +303,50 @@ Option Explicit
 #End If
 
 Public Sub Demo_Monitor()
-    
-    Dim i       As Long
-    Dim Title   As String
-    Dim Step    As TypeMsgText
-    Dim Footer  As TypeMsgText
+    Const WIDTH_MAX As Long = 30
+    Dim i           As Long
+    Dim Title       As String
+    Dim Header      As TypeMsgText
+    Dim Step        As TypeMsgText
+    Dim Footer      As TypeMsgText
        
-    Title = "Demonstration of process monitoring by fisplaying the last 10 steps"
+    Title = "Process monitoring demo (displaying the last 10 steps)"
+    With Header
+        .Text = "Note: - The steps' line length exceeds the max message window width" & vbLf & _
+                "        (for this dem specified " & WIDTH_MAX & "% of the sreen width)" & vbLf & _
+                "        which triggers the display of a horizontal scroll-bar" & vbLf & _
+                "      - The mMsg.MonitorHeader service is used to display this information."
+        .FontColor = rgbRed
+        .MonoSpaced = True
+        .FontSize = 8
+    End With
     Footer.FontColor = rgbBlue
     Footer.Text = "Process in progress! Please wait."
-        
+    
+    '~~ With the very first service call the monitoring message window is initialized
+    '~~ For this demo the max window with is liited to 30% of the screen width in order to demonstrate a horizontal scroll-bar
+    mMsg.MonitorHeader mon_title:=Title _
+                     , mon_text:=Header _
+                     , mon_width_max:=WIDTH_MAX _
+                     , mon_pos:="100;50"
+    mMsg.MonitorFooter Title, Footer
+
     For i = 1 To 12
-        Step.Text = "Step " & Format(i, 0) & " Passed: Process follow-Up after " & 200 * (i - 1) & " Milliseconds (line length triggers horizontal scroll-bar)."
+        Step.Text = Format(i, "00") & ". Process follow-Up after " & 200 * (i - 1) & " Milliseconds (the line length exceeds the max message window width)."
         Step.MonoSpaced = True
         mMsg.Monitor mon_title:=Title _
-                   , mon_width_max:=30 _
                    , mon_text:=Step
                    
-        mMsg.MonitorFooter Title, Footer
         Sleep 300 ' Simmulation of some process time
     Next i
     
-    Footer.Text = "Process finished! Close this window"
+    Footer.Text = "Process finished! Close this window (displayed by the mMsg.MonitorFooter service)"
     mMsg.MonitorFooter Title, Footer
      
 End Sub
 ```
-displays:<br>
+The above code/module displays:<br>
 ![](images/Demo-Monitor-Service.gif)
-
-Note that the `mMsg.MonitorFooter` (as is the `mMsg.MonitorHeader`) service is optional.
 
 ### The _Buttons_ service
 Provides buttons as Collection. Example:<br>

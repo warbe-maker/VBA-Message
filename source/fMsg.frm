@@ -686,7 +686,7 @@ Public Property Get VisualizeForTest() As Boolean:          VisualizeForTest = b
 
 Public Property Let VisualizeForTest(ByVal b As Boolean)
     bVisualizeForTest = b
-    If b Then CollectDesignControls ' do again to ensure visualization
+    CollectDesignControls ' do again to ensure visualization
 End Property
 
 Public Property Get VmarginFrames() As Single:              VmarginFrames = siVmarginFrames:                            End Property
@@ -1737,7 +1737,7 @@ Public Sub MonitorHeader()
 ' ------------------------------------------------------------------------------
     Const PROC = "MonitorHeader"
     
-    Dim top_pos As Single
+    Dim siTop As Single
     
     On Error GoTo eh
     If cllSteps Is Nothing Then Me.MonitorInit
@@ -1754,18 +1754,26 @@ Public Sub MonitorHeader()
         VisualizeCtl tbxHeader, VISLZE_BCKCLR_MSEC_TBX
     End If
     SetupTextFont tbxHeader, enMonHeader
+    If TextMonitorHeader.MonoSpaced Then
+        AutoSizeTextBox as_tbx:=tbxHeader _
+                      , as_text:=TextMonitorHeader.Text
+    Else
+        AutoSizeTextBox as_tbx:=tbxHeader _
+                      , as_text:=TextMonitorHeader.Text _
+                      , as_width_limit:=Me.InsideWidth
+    End If
+    
     With tbxHeader
-        .Value = TextMonitorHeader.Text
-        top_pos = AdjustToVgrid(.Top + .Height)
+        siTop = AdjustToVgrid(.Top + .Height)
     End With
     
     '~~ Adjust the subsequent steps' top position
     With frmSteps
-        .Top = top_pos
-        top_pos = AdjustToVgrid(.Top + .Height)
+        .Top = siTop
+        siTop = AdjustToVgrid(.Top + .Height)
     End With
     
-    If Not tbxFooter Is Nothing Then tbxFooter.Top = top_pos
+    If Not tbxFooter Is Nothing Then tbxFooter.Top = siTop
     Me.Height = ContentHeight(frmSteps.Parent) + 35
 
 xt: Exit Sub
@@ -1810,14 +1818,13 @@ Public Sub MonitorFooter()
     Const PROC = "MonitorFooter"
     
     On Error GoTo eh
-    Dim top_pos As Single
+    Dim siTop As Single
     
-    If cllSteps Is Nothing _
-    Then Err.Raise ErrSrc(PROC), AppErr(1), "A monitor message window has yet not been initialized!"
+    If cllSteps Is Nothing Then Me.MonitorInit
     
     '~~ Establsh monitor footer
     If TextMonitorFooter.Text <> vbNullString Then
-        top_pos = AdjustToVgrid(frmSteps.Top + frmSteps.Height) + 6
+        siTop = AdjustToVgrid(frmSteps.Top + frmSteps.Height) + 6
         If tbxFooter Is Nothing Then
             Set tbxFooter = AddControl(ac_ctl:=TextBox, ac_visible:=True, ac_name:="tbMonitorFooter")
             With tbxFooter
@@ -1911,7 +1918,8 @@ Public Sub MonitorStep()
     Dim i                   As Long
     Dim siTop               As Single
     Dim siNetHeight         As Single
-    Dim siStepsHeightMax    As Single
+    
+    If cllSteps Is Nothing Then Me.MonitorInit
     
     siTop = 0
     If TextMonitorStep.Text <> vbNullString Then
@@ -1939,7 +1947,6 @@ Public Sub MonitorStep()
             NewWidth(frmSteps.Parent) = ContentWidth(frmSteps.Parent)
             
             siNetHeight = Me.Height - (frmSteps.Height - frmSteps.Top)
-            siStepsHeightMax = Me.MsgHeightMax - siNetHeight
             NewHeight(frmSteps, False, fmScrollActionBegin) = Min(MonitorHeightMaxSteps, ContentHeight(frmSteps, False))
             
             lStepsDisplayed = lStepsDisplayed + 1
@@ -1981,7 +1988,6 @@ Public Sub MonitorStep()
             NewWidth(frmSteps.Parent) = ContentWidth(frmSteps.Parent) + 20
             
             siNetHeight = Me.Height - (frmSteps.Height - frmSteps.Top)
-            siStepsHeightMax = Me.MsgHeightMax - siNetHeight
             NewHeight(frmSteps, False, fmScrollActionEnd) = Min(MonitorHeightMaxSteps, ContentHeight(frmSteps, False)) + ScrollHscrollHeight(frmSteps)
         
             If Not tbxFooter Is Nothing Then
@@ -1994,7 +2000,6 @@ Public Sub MonitorStep()
     End If
         
     DoEvents
-'    NewHeight(frmSteps.Parent) = Min(.MsgHeightMax, ContentHeight(frmSteps.Parent))
     NewWidth(frmSteps) = Min(Me.MsgWidthMax, ContentWidth(frmSteps.Parent) + 15)
     Me.Height = ContentHeight(frmSteps.Parent) + 35
     
@@ -2191,7 +2196,7 @@ End Sub
 Public Sub PositionOnScreen(Optional ByVal pos_top_left As Variant = 3)
 ' ------------------------------------------------------------------------------
 ' Positions the form on the display, defaults to "Windows Default" and may be
-' the following: - enmanual (0)         = No initial setting specified
+' the following: - enManual (0)         = No initial setting specified
 '                - enCenterOwner (1)    = Center on the item to which the
 '                                           UserForm belongs
 '                - enCenterScreen (2)   = Center on the whole screen.

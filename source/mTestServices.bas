@@ -528,9 +528,10 @@ Private Sub SetupMsgTitleInstasnceAndNo(ByVal test_no As Long, ByVal test_title 
     Else Set TestButtons = mMsg.Buttons(BTTN_PASSED, BTTN_FAILED)
         
     Set MsgButtons = New Collection
-    MsgTitle = Readable(test_title)
+    MsgTitle = test_title
     MessageInit msg_form:=MsgForm, msg_title:=MsgTitle ' set test-global message specifications
-
+    MsgForm.VisualizeForTest = wsTest.VisualizeForTest
+    
 End Sub
 
 Public Sub Test_00_Regression()
@@ -744,7 +745,7 @@ Public Function Test_01_mMsg_Box_Service_Buttons_7_By_7_Matrix() As Variant
     Dim i As Long
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 1, PROC
+    SetupMsgTitleInstasnceAndNo 1, Readable(PROC)
     
     For i = 1 To 49
         MsgButtons.Add "B" & Format(i, "00")
@@ -792,28 +793,23 @@ Public Sub Test_02_mMsg_ErrMsg_Service()
 ' For the last testing variant the mErH component is installed!
 ' ------------------------------------------------------------------------------
     Const PROC = "Test_02_mMsg_ErrMsg_Service"
+    Const EXPECTED_TITLE = "Application Error  5 in: 'mTestServices.Test_02_mMsg_ErrMsg_Service'"
     
     On Error GoTo eh
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 2, PROC
+    SetupMsgTitleInstasnceAndNo 2, EXPECTED_TITLE
     
-    mErH.Asserted AppErr(5) ' skip error message display when mErH.Regression = True
+    mErH.Asserted AppErr(5) ' skips the display of the error message when mErH.Regression = True
     
-    Err.Raise Number:=AppErr(5), source:=ErrSrc(PROC), _
-              Description:="This is a test error description!||This is part of the error description, " & _
+    Err.Raise Number:=AppErr(5) _
+            , source:=ErrSrc(PROC) _
+            , Description:="This is a test error description!||This is part of the error description, " & _
                            "concatenated by a double vertical bar and therefore displayed as an additional 'About the error' section " & _
                            "- one of the specific features of the mMsg.ErrMsg service."
         
 xt: EoP ErrSrc(PROC)
-    Select Case mMsg.Box(Title:=MsgTitle _
-                       , Prompt:=vbNullString _
-                       , Buttons:=mMsg.Buttons(TestButtons) _
-                        )
-        Case BTTN_PASSED:       wsTest.TestPassed
-        Case BTTN_FAILED:       wsTest.TestFailed
-        Case BTTN_TERMINATE:    wsTest.TerminateRegressionTest = True
-    End Select
+    ObtainTestResult MsgTitle
     Exit Sub
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -831,7 +827,7 @@ Public Function Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth() As Va
     On Error GoTo eh
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 3, PROC
+    SetupMsgTitleInstasnceAndNo 3, Readable(PROC)
         
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -903,7 +899,7 @@ Private Function TestForm() As fMsg
     
     If Not MsgForm Is Nothing And wsTest.VisualizeForTest Then
         Debug.Print "The displayed message form is available as 'MsgForm' object for debugging!."
-        Stop
+'        Stop
     End If
     
 End Function
@@ -918,7 +914,7 @@ Public Function Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle() As Variant
     
     BoP ErrSrc(PROC)
 
-    SetupMsgTitleInstasnceAndNo 4, PROC & "  (This title uses more space than the minimum specified message form width and thus the width is determined by the title)"
+    SetupMsgTitleInstasnceAndNo 4, Readable(PROC) & "  (This title uses more space than the minimum specified message form width and thus the width is determined by the title)"
 
     '~~ Obtain initial test values from the Test Worksheet
     MsgForm.VisualizeForTest = wsTest.VisualizeForTest
@@ -979,7 +975,7 @@ Public Function Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSec
     Dim BttnRepeatMaxHeightDecreased    As String
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 5, PROC
+    SetupMsgTitleInstasnceAndNo 5, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1077,7 +1073,7 @@ Public Function Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons() As Va
     
     BoP ErrSrc(PROC)
     
-    SetupMsgTitleInstasnceAndNo 6, PROC
+    SetupMsgTitleInstasnceAndNo 6, Readable(PROC)
     
     ' Initializations for this test
     MsgForm.VisualizeForTest = wsTest.VisualizeForTest
@@ -1142,7 +1138,7 @@ Public Function Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgWi
     
     BoP ErrSrc(PROC)
     
-    SetupMsgTitleInstasnceAndNo 7, PROC
+    SetupMsgTitleInstasnceAndNo 7, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1202,7 +1198,7 @@ Public Function Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHei
     
     BoP ErrSrc(PROC)
     
-    SetupMsgTitleInstasnceAndNo 8, PROC
+    SetupMsgTitleInstasnceAndNo 8, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1267,7 +1263,7 @@ Public Function Test_09_mMsg_Dsply_Service_ButtonsOnly() As Variant
     Dim bMonospaced As Boolean: bMonospaced = True ' initial test value
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 9, PROC & ": No message, just buttons (finish with " & BTTN_PASSED & " or " & BTTN_FAILED & ")"
+    SetupMsgTitleInstasnceAndNo 9, Readable(PROC) & ": No message, just buttons (finish with " & BTTN_PASSED & " or " & BTTN_FAILED & ")"
     
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
     '~~ for this test  from the Test Worksheet
@@ -1335,7 +1331,7 @@ Public Function Test_10_mMsg_Dsply_Service_ButtonsMatrix() As Variant
         
     BoP ErrSrc(PROC)
     MsgTitle = "Just to demonstrate what's theoretically possible: Buttons only! Finish with " & BTTN_PASSED & " (default) or " & BTTN_FAILED
-    SetupMsgTitleInstasnceAndNo 10, PROC
+    SetupMsgTitleInstasnceAndNo 10, Readable(PROC)
     
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
     '~~ for this test  from the Test Worksheet
@@ -1403,7 +1399,7 @@ Public Function Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical() As Variant
     
     BoP ErrSrc(PROC)
     
-    SetupMsgTitleInstasnceAndNo 11, PROC
+    SetupMsgTitleInstasnceAndNo 11, Readable(PROC)
     
     With wsTest
         TestMsgWidthMin = .MsgWidthMin:   lChangeMinWidthPt = .MsgWidthIncrDecr
@@ -1481,7 +1477,7 @@ Public Function Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal() As Varian
     
     BoP ErrSrc(PROC)
     
-    SetupMsgTitleInstasnceAndNo 12, PROC
+    SetupMsgTitleInstasnceAndNo 12, Readable(PROC)
     
     TestMsgWidthMax = INIT_WIDTH
     With wsTest
@@ -1557,7 +1553,7 @@ Public Function Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars()
     Dim TestMsgHeightMax        As Long
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 13, PROC
+    SetupMsgTitleInstasnceAndNo 13, Readable(PROC)
     
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
     '~~ for this test  from the Test Worksheet
@@ -1618,7 +1614,7 @@ Public Function Test_16_mMsg_Dsply_Service_ButtonByDictionary()
     Dim dct         As New Collection
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 16, PROC
+    SetupMsgTitleInstasnceAndNo 16, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1673,7 +1669,7 @@ Public Function Test_17_mMsg_Box_Service_MessageAsString() As Variant
     On Error GoTo eh
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 17, PROC
+    SetupMsgTitleInstasnceAndNo 17, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1719,7 +1715,7 @@ Public Function Test_20_mMsg_Dsply_Service_ButtonByValue()
     On Error GoTo eh
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 20, PROC
+    SetupMsgTitleInstasnceAndNo 20, Readable(PROC)
         
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1766,7 +1762,7 @@ Public Function Test_21_mMsg_Dsply_Service_ButtonByString()
     On Error GoTo eh
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 21, PROC
+    SetupMsgTitleInstasnceAndNo 21, Readable(PROC)
         
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1813,7 +1809,7 @@ Public Function Test_22_mMsg_Dsply_Service_ButtonByCollection()
     On Error GoTo eh
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 22, PROC
+    SetupMsgTitleInstasnceAndNo 22, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1866,7 +1862,7 @@ Public Function Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly()
     Dim i           As Long
 
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 23, PROC
+    SetupMsgTitleInstasnceAndNo 23, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1930,7 +1926,7 @@ Public Function Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Servi
     Dim lWait       As Long
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 30, PROC
+    SetupMsgTitleInstasnceAndNo 30, Readable(PROC)
     
     TestMsgWidthMin = wsTest.MsgWidthMin
     TestMsgWidthMax = wsTest.MsgWidthMax
@@ -2002,11 +1998,13 @@ Private Sub ObtainTestResult(ByVal otr_title As String)
 ' Obtain the test result
 ' ------------------------------------------------------------------------------
     Dim f   As fMsg
+    Dim s   As String
     
-    Set f = mMsg.MsgInstance(otr_title)
+    s = "Test result for: """ & otr_title & """"
+    Set f = mMsg.MsgInstance(s)
     f.VisualizeForTest = False
     Set MsgButtons = mMsg.Buttons(BTTN_PASSED, BTTN_FAILED)
-    Select Case mMsg.Box(Title:=otr_title _
+    Select Case mMsg.Box(Title:=s _
                        , Prompt:=vbNullString _
                        , Buttons:=MsgButtons _
                         )
@@ -2024,7 +2022,7 @@ Public Function Test_90_mMsg_Dsply_Service_AllInOne() As Variant
     Dim Msg         As TypeMsg
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 9, PROC
+    SetupMsgTitleInstasnceAndNo 9, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -2103,7 +2101,7 @@ Public Function Test_91_mMsg_Dsply_Service_MinimumMessage() As Variant
     On Error GoTo eh
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 9, PROC
+    SetupMsgTitleInstasnceAndNo 9, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -2160,7 +2158,7 @@ Public Function Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL() As Variant
     On Error GoTo eh
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 9, PROC
+    SetupMsgTitleInstasnceAndNo 9, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -2198,7 +2196,7 @@ Public Function Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL() As Variant
                                                                                               
     Select Case mMsg.Dsply(dsply_title:=MsgTitle _
                          , dsply_msg:=Message _
-                         , dsply_buttons:=mMsg.Buttons() _
+                         , dsply_buttons:=mMsg.Buttons(vbOKOnly) _
                          , dsply_width_min:=TestMsgWidthMin _
                          , dsply_width_max:=TestMsgWidthMax _
                          , dsply_height_max:=TestMsgHeightMax _

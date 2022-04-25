@@ -94,43 +94,39 @@ Public Const vbResume                           As Long = 6 ' return value (equa
 Public ProgressText As String
 
 Public Type TypeMsgLabel
-        FontBold As Boolean
-        FontColor As XlRgbColor
-        FontItalic As Boolean
-        FontName As String
-        FontSize As Long
-        FontUnderline As Boolean
-        MonoSpaced As Boolean ' overwrites any FontName
-        Text As String
-        OpenWhenClicked As String
+        FontBold        As Boolean
+        FontColor       As XlRgbColor
+        FontItalic      As Boolean
+        FontName        As String
+        FontSize        As Long
+        FontUnderline   As Boolean
+        MonoSpaced      As Boolean  ' FontName defaults to "Courier New"
+        Text            As String
+        OpenWhenClicked As String   ' this extra option is the purpose of this sepcific Type
 End Type
 
 Public Type TypeMsgText
-        FontBold As Boolean
-        FontColor As XlRgbColor
-        FontItalic As Boolean
-        FontName As String
-        FontSize As Long
-        FontUnderline As Boolean
-        MonoSpaced As Boolean ' overwrites any FontName
-        Text As String
-End Type
-Public Type TypeMsgSect
-       Label As TypeMsgLabel
-       Text As TypeMsgText
-End Type
-Public Type TypeMsg
-    Section(1 To 4) As TypeMsgSect
+        FontBold        As Boolean
+        FontColor       As XlRgbColor
+        FontItalic      As Boolean
+        FontName        As String
+        FontSize        As Long
+        FontUnderline   As Boolean
+        MonoSpaced      As Boolean  ' FontName defaults to "Courier New"
+        Text            As String
 End Type
 
-Public Enum enStartupPosition       ' ---------------------------
+Public Type TypeMsgSect:    Label As TypeMsgLabel:  Text As TypeMsgText:    End Type
+Public Type TypeMsg:        Section(1 To 4) As TypeMsgSect:                 End Type
+
+Public Enum enStartupPosition     ' ---------------------------
     enManual = 0                  ' Used to position the
     enCenterOwner = 1             ' final setup message form
     enCenterScreen = 2            ' horizontally and vertically
     enWindowsDefault = 3          ' centered on the screen
-End Enum                            ' ---------------------------
+End Enum                          ' ---------------------------
 
-Public Enum KindOfText  ' Used with Property Text Get/LET
+Public Enum KindOfText  ' Used with the Get/Let Text Property
     enMonHeader
     enMonFooter
     enMonStep
@@ -176,7 +172,7 @@ Private Function AppErr(ByVal app_err_no As Long) As Long
 End Function
 
 Public Sub AssertWidthAndHeight(Optional ByRef width_min As Long = 0, _
-                                Optional ByRef width_max As Long = 0, _
+                                Optional ByRef WIDTH_MAX As Long = 0, _
                                 Optional ByRef height_min As Long = 0, _
                                 Optional ByRef height_max As Long = 0)
 ' ------------------------------------------------------------------------------
@@ -197,17 +193,17 @@ Public Sub AssertWidthAndHeight(Optional ByRef width_min As Long = 0, _
     Dim MsgHeightMinLimitPt As Long:    MsgHeightMinLimitPt = Pnts(MSG_HEIGHT_MIN_LIMIT_PERCENTAGE, "h")
     
     '~~ Convert all percentage arguments into pt arguments
-    If width_max <> 0 And width_max <= 100 Then width_max = Pnts(width_max, "w")
+    If WIDTH_MAX <> 0 And WIDTH_MAX <= 100 Then WIDTH_MAX = Pnts(WIDTH_MAX, "w")
     If width_min <> 0 And width_min <= 100 Then width_min = Pnts(width_min, "w")
     If height_max <> 0 And height_max <= 100 Then height_max = Pnts(height_max, "h")
     If height_min <> 0 And height_min <= 100 Then height_min = Pnts(height_min, "h")
         
     '~~ Provide sensible values for all invalid, improper, or useless
-    If width_min > width_max Then width_min = width_max
+    If width_min > WIDTH_MAX Then width_min = WIDTH_MAX
     If height_min > height_max Then height_min = height_max
     If width_min < MsgWidthMinLimitPt Then width_min = MsgWidthMinLimitPt
-    If width_max <= width_min Then width_max = width_min
-    If width_max > MsgWidthMaxLimitPt Then width_max = MsgWidthMaxLimitPt
+    If WIDTH_MAX <= width_min Then WIDTH_MAX = width_min
+    If WIDTH_MAX > MsgWidthMaxLimitPt Then WIDTH_MAX = MsgWidthMaxLimitPt
     If height_min < MsgHeightMinLimitPt Then height_min = MsgHeightMinLimitPt
     If height_max = 0 Or height_max < height_min Then height_max = height_min
     If height_max > MsgHeightMaxLimitPt Then height_max = MsgHeightMaxLimitPt
@@ -715,12 +711,11 @@ Public Function ErrMsg(ByVal err_source As String, _
 #If Debugging = 1 Then
     With ErrMsgText.Section(4)
         With .Label
-            .Text = "About Debugging:"
+            .Text = "About 'Resume Error Line':"
             .FontColor = rgbBlue
         End With
         .Text.Text = "The additional debugging option button is displayed because the " & _
                      "Conditional Compile Argument 'Debugging = 1'."
-        .Text.FontSize = 8
     End With
 #End If
     mMsg.Dsply dsply_title:=ErrTitle _
@@ -832,7 +827,7 @@ Public Sub Monitor(ByVal mon_title As String, _
     With fMonitor
         If Not .MonitorIsInitialized Then
             AssertWidthAndHeight width_min:=mon_width_min _
-                               , width_max:=mon_width_max _
+                               , WIDTH_MAX:=mon_width_max _
                                , height_max:=mon_height_max
             .MonitorProcess = mon_title
             .MonitorStepsDisplayed = mon_steps_displayed
@@ -873,7 +868,7 @@ Public Sub MonitorFooter(ByVal mon_title As String, _
     With fMonitor
         If Not .MonitorIsInitialized Then
             AssertWidthAndHeight width_min:=mon_width_min _
-                               , width_max:=mon_width_max _
+                               , WIDTH_MAX:=mon_width_max _
                                , height_max:=mon_height_max
             .MonitorProcess = mon_title
             .MonitorStepsDisplayed = mon_steps_displayed
@@ -913,7 +908,7 @@ Public Sub MonitorHeader(ByVal mon_title As String, _
     With fMonitor
         If Not .MonitorIsInitialized Then
             AssertWidthAndHeight width_min:=mon_width_min _
-                               , width_max:=mon_width_max _
+                               , WIDTH_MAX:=mon_width_max _
                                , height_max:=mon_height_max
             .MonitorProcess = mon_title
             .MonitorStepsDisplayed = mon_steps_displayed
@@ -951,7 +946,7 @@ Public Function MonitorInit(ByVal mon_title As String, _
     Dim t       As TypeMsgText
     
     AssertWidthAndHeight width_min:=mon_width_min _
-                       , width_max:=mon_width_max _
+                       , WIDTH_MAX:=mon_width_max _
                        , height_max:=mon_height_max
     
     Set fMonitor = mMsg.MsgInstance(mon_title)

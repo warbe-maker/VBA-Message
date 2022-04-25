@@ -110,11 +110,11 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
 End Sub
 
 Public Sub Demo_Dsply_1()
-    Const width_max     As Long = 35
+    Const WIDTH_MAX     As Long = 35
     Const MAX_HEIGHT    As Long = 50
 
     Dim sTitle          As String
-    Dim cll             As New Collection
+    Dim cllBttns        As New Collection
     Dim i, j            As Long
     Dim Message         As TypeMsg
    
@@ -130,18 +130,18 @@ Public Sub Demo_Dsply_1()
         .Label.FontColor = rgbBlue
         .Text.Text = "Because this section's text is mono-spaced (which by definition is not word-wrapped)" & vbLf _
                    & "the message width is determined by:" & vbLf _
-                   & "a) the for this demo specified maximum width of " & width_max & "% of the screen size" & vbLf _
+                   & "a) the for this demo specified maximum width of " & WIDTH_MAX & "% of the screen size" & vbLf _
                    & "   (defaults to 80% when not specified)" & vbLf _
                    & "b) the longest line of this section" & vbLf _
-                   & "Because the text exeeds the specified maximum message width, a horizontal scroll-bar is displayed." & vbLf _
-                   & "Due to this feature there is no message size limit other than the sytem's limit which for a string is about 1GB !!!!"
+                   & "Because the text exceeds the specified maximum message width, a horizontal scroll-bar is displayed." & vbLf _
+                   & "Due to this feature there is no message size limit other than the system's limit which for a string is about 1GB !!!!"
         .Text.MonoSpaced = True
     End With
     With Message.Section(3)
         .Label.Text = "Unlimited message height (not the fact with this message):"
         .Label.FontColor = rgbBlue
-        .Text.Text = "As with the message width, the message height is unlimited. When the maximum height (explicitely specified or the default) " _
-                   & "is exceeded a vertical scroll-bar is displayed. Due to this feature there is no message size limit other than the sytem's " _
+        .Text.Text = "As with the message width, the message height is unlimited. When the maximum height (explicitly specified or the default) " _
+                   & "is exceeded a vertical scroll-bar is displayed. Due to this feature there is no message size limit other than the system's " _
                    & "limit which for a string is about 1GB !!!!"
     End With
     With Message.Section(4)
@@ -152,24 +152,24 @@ Public Sub Demo_Dsply_1()
                    & "!! This demo ends only with the Ok button and loops with any other."
     End With
     '~~ Prepare the buttons collection
-    mMsg.Buttons cll, vbOKOnly, vbLf ' The reply when clicked will be vbOK though
+    mMsg.Buttons cllBttns, vbOKOnly, vbLf ' The reply when clicked will be vbOK though
     For j = 1 To 2
         For i = 1 To 4
-            cll.Add "Multiline reply" & vbLf & "button caption" & vbLf & "Button-" & j & "-" & i
+            cllBttns.Add "Multiline reply" & vbLf & "button caption" & vbLf & "Button-" & j & "-" & i
         Next i
-        If j < 2 Then cll.Add vbLf
+        If j < 2 Then cllBttns.Add vbLf
     Next j
+    cllBttns.Add vbOKOnly
     
     While mMsg.Dsply(dsply_title:=sTitle _
                    , dsply_msg:=Message _
-                   , dsply_buttons:=cll _
+                   , dsply_buttons:=cllBttns _
                    , dsply_height_max:=MAX_HEIGHT _
-                   , dsply_width_max:=width_max _
+                   , dsply_width_max:=WIDTH_MAX _
                     ) <> vbOK
     Wend
     
 End Sub
-
 Public Sub Demo_Dsply_2()
 ' ---------------------------------------------------------
 ' Displays a message with 3 sections, each with a label and
@@ -236,28 +236,45 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
 End Sub
 
 Public Sub Demo_Monitor()
-    
-    Dim i       As Long
-    Dim Title   As String
-    Dim Step    As TypeMsgText
-    Dim Footer  As TypeMsgText
+    Const WIDTH_MAX As Long = 30
+    Dim i           As Long
+    Dim Title       As String
+    Dim Header      As TypeMsgText
+    Dim Step        As TypeMsgText
+    Dim Footer      As TypeMsgText
        
-    Title = "Demonstration of process monitoring by fisplaying the last 10 steps"
+    Title = "Process monitoring demo (displaying the last 10 steps)"
+    With Header
+        .Text = "Note: - The steps' line length exceeds the max message window width" & vbLf & _
+                "        (for this dem specified " & WIDTH_MAX & "% of the sreen width)" & vbLf & _
+                "        which triggers the display of a horizontal scroll-bar" & vbLf & _
+                "      - The mMsg.MonitorHeader service is used to display this information."
+        .FontColor = rgbRed
+        .MonoSpaced = True
+        .FontSize = 8
+    End With
     Footer.FontColor = rgbBlue
     Footer.Text = "Process in progress! Please wait."
-        
+    
+    '~~ With the very first service call the monitoring message window is initialized
+    '~~ For this demo the max window with is liited to 30% of the screen width in order to demonstrate a horizontal scroll-bar
+    mMsg.MonitorHeader mon_title:=Title _
+                     , mon_text:=Header _
+                     , mon_width_max:=WIDTH_MAX _
+                     , mon_pos:="100;50"
+    mMsg.MonitorFooter Title, Footer
+
     For i = 1 To 12
-        Step.Text = "Step " & Format(i, 0) & " Passed: Process follow-Up after " & 200 * (i - 1) & " Milliseconds (line length triggers horizontal scroll-bar)."
         Step.MonoSpaced = True
-        mMsg.Monitor mon_title:=Title _
-                   , mon_width_max:=30 _
-                   , mon_text:=Step
+        
+        '~~ The below 2 lines is all what is required to monitor a process step
+        Step.Text = Format(i, "00") & ". Process follow-Up after " & 200 * (i - 1) & " Milliseconds (the line length exceeds the max message window width)."
+        mMsg.Monitor Title, Step
                    
-        mMsg.MonitorFooter Title, Footer
         Sleep 300 ' Simmulation of some process time
     Next i
     
-    Footer.Text = "Process finished! Close this window"
+    Footer.Text = "Process finished! Close this window (displayed by the mMsg.MonitorFooter service)"
     mMsg.MonitorFooter Title, Footer
      
 End Sub

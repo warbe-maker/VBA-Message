@@ -1,7 +1,23 @@
-22-04-24 12:06:08 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
-22-04-24 12:06:08                 >> Begin execution trace 
-22-04-24 12:06:08 00,0000         |  >> mTestServices.Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service
-22-04-24 12:06:28 20,1580 20,1580 |  << mTestServices.Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service
-22-04-24 12:06:28 20,1580 20,1580 << End execution trace 
-22-04-24 12:06:28                 Impact on the overall performance (caused by the trace itself): 00,0062 seconds!
-22-04-24 12:06:28 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-04-25 18:29:13 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-04-25 18:29:13                 >> Begin execution trace 
+22-04-25 18:29:13 00,0000         |  >> mTestServices.Test_02_mMsg_ErrMsg_Service
+22-04-25 18:29:23 00,1416 00,1416 |  << mTestServices.Test_02_mMsg_ErrMsg_Service
+22-04-25 18:29:23 00,1416 00,1416 << End execution trace 
+22-04-25 18:29:23                 Impact on the overall performance (caused by the trace itself): 00,0063 seconds!
+22-04-25 18:29:23 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+
+22-04-25 18:29:36 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-04-25 18:29:36                 >> Begin execution trace 
+22-04-25 18:29:36 00,0000         |  >> mTestServices.Test_02_mMsg_ErrMsg_Service
+22-04-25 18:29:59 00,0663 00,0663 |  << mTestServices.Test_02_mMsg_ErrMsg_Service
+22-04-25 18:29:59 00,0663 00,0663 << End execution trace 
+22-04-25 18:29:59                 Impact on the overall performance (caused by the trace itself): 00,0049 seconds!
+22-04-25 18:29:59 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+
+22-04-25 18:30:35 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
+22-04-25 18:30:35                 >> Begin execution trace 
+22-04-25 18:30:35 00,0000         |  >> mTestServices.Test_02_mMsg_ErrMsg_Service
+22-04-25 18:45:54 00,0635 00,0635 |  << mTestServices.Test_02_mMsg_ErrMsg_Service
+22-04-25 18:45:54 00,0635 00,0635 << End execution trace 
+22-04-25 18:45:54                 Impact on the overall performance (caused by the trace itself): 00,0041 seconds!
+22-04-25 18:45:54 Execution trace by 'Common VBA Execution Trace Service' (https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service)
