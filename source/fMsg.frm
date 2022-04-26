@@ -864,18 +864,14 @@ Public Function AdjustToVgrid(ByVal atvg_si As Single, _
                      Optional ByVal atvg_threshold As Single = 1.5, _
                      Optional ByVal atvg_grid As Single = 6) As Single
 ' -------------------------------------------------------------------------------
-' Returns an integer which is a multiple of the grid value (stvg_grid) - which
-' defaults to 6 - by considering a certain threshold (atvg_threshold) - which
-' defaults to 1.5.
-' The function is used to vertically align form controls with the grid in order
-' result vertically aligns a control in a userform to a grid value which ensures
-' to have any text within the control correctly displayed in accordance with its
-' font size. A certain threshold prevents an optically irritating large space to
-' a control abovel. Examples:
+' Returns the value (atvg_si) as a Single value which is a multiple of the grid
+' value (atvg_grid), which defaults to 6. To avoid irritating vertical spacing
+' a certain threshold (atvg_threshold) is considered which defaults to 1.5.
+' The returned value can be used to vertically align a control's top position to
+' the grid or adjust its height to the grid.
+' Examples for the function of the threshold:
 '  7.5 < si >= 0   results to 6
 ' 13.5 < si >= 7.5 results in 12
-' When the provided atvg_si is not a type single it is asumed it is a control and
-' the value is calculated .top + .height.
 ' -------------------------------------------------------------------------------
     AdjustToVgrid = (Int((atvg_si - atvg_threshold) / atvg_grid) * atvg_grid) + atvg_grid
 End Function
@@ -946,16 +942,16 @@ Public Sub AutoSizeTextBox(ByRef as_tbx As MSForms.TextBox, _
 '   > 0) is provided the size of the textbox is set correspondingly. This
 '   option is specifically usefull when text is appended to avoid much flicker.
 '
-' Uses: NewWidth, FrameContentWidth, ScrollHscrollApply,
-'       NewHeight, ContentHeight, ScrollVscrollApply
+' Uses: AdjustToVgrid
 '
-' W. Rauschenberger Berlin June 2021
+' W. Rauschenberger Berlin April 2022
 ' ------------------------------------------------------------------------------
     
     With as_tbx
         .MultiLine = True
         If as_width_limit > 0 Then
             '~~ AutoSize the height of the TextBox considering the limited width
+            '~~ (applied for proportially spaced text where the width determines the height)
             .WordWrap = True
             .AutoSize = False
             .Width = as_width_limit - 2 ' the readability space is added later
@@ -971,6 +967,8 @@ Public Sub AutoSizeTextBox(ByRef as_tbx As MSForms.TextBox, _
             End If
             .AutoSize = True
         Else
+            '~~ AutoSize the height and width of the TextBox
+            '~~ (applied for mono-spaced text where the longest line defines the width)
             .MultiLine = True
             .WordWrap = False ' the means to limit the width
             .AutoSize = True
@@ -2944,7 +2942,7 @@ Private Sub Setup4_MsgSectsPropSpaced()
     Next i
     bDonePropSpacedSects = True
     bDoneMsgArea = True
-
+    
 xt: Exit Sub
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume

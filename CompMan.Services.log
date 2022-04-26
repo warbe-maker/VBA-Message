@@ -1,197 +1,28 @@
-22-04-25 11:33:32 Update Outdated (by Addin) for Msg.xlsb: 
-22-04-25 11:33:32 -----------------------------------------
-22-04-25 11:33:33 Standard-Module    mMsg .........: DoEvents delayed continuation for 00064 msec)
-22-04-25 11:33:33                                    Workbook saved (DoEvents delayed continuation for 00002 msec)
-22-04-25 11:33:33 Standard-Module    mBasic .......: Used Common Component up-to-date
-22-04-25 11:33:33 Standard-Module    mCompManClient: Used Common Component up-to-date
-22-04-25 11:33:33 Standard-Module    mDct .........: Used Common Component up-to-date
-22-04-25 11:33:33 Standard-Module    mErH .........: Used Common Component up-to-date
-22-04-25 11:33:33 Standard-Module    mTrc .........: Used Common Component up-to-date
-22-04-25 17:53:15 ========================================
-22-04-25 17:53:15 Export Changed (by Addin) for Msg.xlsb: 
-22-04-25 17:53:15 ----------------------------------------
-22-04-25 17:53:16 UserForm           fMsgProcTest .: Unchanged component
-22-04-25 17:53:16 Standard-Module    mBasic .......: Unchanged Used Common Component
-22-04-25 17:53:16 Standard-Module    mCompManClient: Unchanged Used Common Component
-22-04-25 17:53:16 Standard-Module    mDct .........: Unchanged Used Common Component
-22-04-25 17:53:16 Standard-Module    mErH .........: Unchanged Used Common Component
-22-04-25 17:53:17 Standard-Module    mExamples ....: Unchanged component
-22-04-25 17:53:17 Standard-Module    mMsg .........: Hosted Raw Common Component code modified
-22-04-25 17:53:17                                    Code modified of Hosted Raw Common Component
-22-04-25 17:53:17                                    Exported, Revision Number increased, Export File copied to 'Common Components Folder'
-22-04-25 17:53:17 Standard-Module    mObject ......: Unchanged component
-22-04-25 17:53:17 Standard-Module    mTestDemos ...: Modified code exported
-22-04-25 17:53:17 Standard-Module    mTestProcs ...: Unchanged component
-22-04-25 17:53:17 Standard-Module    mTestServices : Unchanged component
-22-04-25 17:53:17 Standard-Module    mTrc .........: Unchanged Used Common Component
-22-04-25 17:53:17 Workbook           wbMsg ........: Unchanged component
-22-04-25 17:53:18 Worksheet CodeName wsTest .......: Unchanged component
-22-04-25 17:55:10 ========================================
-22-04-25 17:55:10 Export Changed (by Addin) for Msg.xlsb: 
-22-04-25 17:55:10 ----------------------------------------
-22-04-25 17:55:11 UserForm           fMsgProcTest .: Unchanged component
-22-04-25 17:55:11 Standard-Module    mBasic .......: Unchanged Used Common Component
-22-04-25 17:55:11 Standard-Module    mCompManClient: Unchanged Used Common Component
-22-04-25 17:55:11 Standard-Module    mDct .........: Unchanged Used Common Component
-22-04-25 17:55:11 Standard-Module    mErH .........: Unchanged Used Common Component
-22-04-25 17:55:11 Standard-Module    mExamples ....: Unchanged component
-22-04-25 17:55:11 Standard-Module    mObject ......: Unchanged component
-22-04-25 17:55:11 Standard-Module    mTestDemos ...: Modified code exported
-22-04-25 17:55:12 Standard-Module    mTestProcs ...: Unchanged component
-22-04-25 17:55:12 Standard-Module    mTestServices : Unchanged component
-22-04-25 17:55:12 Standard-Module    mTrc .........: Unchanged Used Common Component
-22-04-25 17:55:12 Workbook           wbMsg ........: Unchanged component
-22-04-25 17:55:12 Worksheet CodeName wsTest .......: Unchanged component
-22-04-25 17:59:00 ========================================
-22-04-25 17:59:00 Export Changed (by Addin) for Msg.xlsb: 
-22-04-25 17:59:00 ----------------------------------------
-22-04-25 17:59:01 UserForm           fMsgProcTest .: Unchanged component
-22-04-25 17:59:01 Standard-Module    mBasic .......: Unchanged Used Common Component
-22-04-25 17:59:01 Standard-Module    mCompManClient: Unchanged Used Common Component
-22-04-25 17:59:01 Standard-Module    mDct .........: Unchanged Used Common Component
-22-04-25 17:59:01 Standard-Module    mErH .........: Unchanged Used Common Component
-22-04-25 17:59:01 Standard-Module    mExamples ....: Unchanged component
-22-04-25 17:59:01 Standard-Module    mMsg .........: Hosted Raw Common Component code modified
-22-04-25 17:59:01                                    Code modified of Hosted Raw Common Component
-22-04-25 17:59:01                                    Exported, Revision Number increased, Export File copied to 'Common Components Folder'
-22-04-25 17:59:01 Standard-Module    mObject ......: Unchanged component
-22-04-25 17:59:01 Standard-Module    mTestDemos ...: Unchanged component
-22-04-25 17:59:01 Standard-Module    mTestProcs ...: Unchanged component
-22-04-25 17:59:01 Standard-Module    mTestServices : Unchanged component
-22-04-25 17:59:01 Standard-Module    mTrc .........: Unchanged Used Common Component
-22-04-25 17:59:01 Workbook           wbMsg ........: Unchanged component
-22-04-25 17:59:01 Worksheet CodeName wsTest .......: Unchanged component
-22-04-25 17:59:34 ========================================
-22-04-25 17:59:34 Export Changed (by Addin) for Msg.xlsb: 
-22-04-25 17:59:34 ----------------------------------------
-22-04-25 17:59:35 UserForm           fMsgProcTest .: Unchanged component
-22-04-25 17:59:35 Standard-Module    mBasic .......: Unchanged Used Common Component
-22-04-25 17:59:35 Standard-Module    mCompManClient: Unchanged Used Common Component
-22-04-25 17:59:35 Standard-Module    mDct .........: Unchanged Used Common Component
-22-04-25 17:59:35 Standard-Module    mErH .........: Unchanged Used Common Component
-22-04-25 17:59:35 Standard-Module    mExamples ....: Unchanged component
-22-04-25 17:59:35 Standard-Module    mObject ......: Unchanged component
-22-04-25 17:59:35 Standard-Module    mTestDemos ...: Unchanged component
-22-04-25 17:59:35 Standard-Module    mTestProcs ...: Unchanged component
-22-04-25 17:59:36 Standard-Module    mTestServices : Unchanged component
-22-04-25 17:59:36 Standard-Module    mTrc .........: Unchanged Used Common Component
-22-04-25 17:59:36 Workbook           wbMsg ........: Unchanged component
-22-04-25 17:59:36 Worksheet CodeName wsTest .......: Unchanged component
-22-04-25 18:22:33 ========================================
-22-04-25 18:22:33 Export Changed (by Addin) for Msg.xlsb: 
-22-04-25 18:22:33 ----------------------------------------
-22-04-25 18:22:34 UserForm           fMsg .........: Hosted Raw Common Component code modified
-22-04-25 18:22:34                                    Code modified of Hosted Raw Common Component
-22-04-25 18:22:34                                    Exported, Revision Number increased, Export File copied to 'Common Components Folder'
-22-04-25 18:22:34 UserForm           fMsgProcTest .: Unchanged component
-22-04-25 18:22:34 Standard-Module    mBasic .......: Unchanged Used Common Component
-22-04-25 18:22:34 Standard-Module    mCompManClient: Unchanged Used Common Component
-22-04-25 18:22:34 Standard-Module    mDct .........: Unchanged Used Common Component
-22-04-25 18:22:34 Standard-Module    mErH .........: Unchanged Used Common Component
-22-04-25 18:22:34 Standard-Module    mExamples ....: Unchanged component
-22-04-25 18:22:34 Standard-Module    mObject ......: Unchanged component
-22-04-25 18:22:34 Standard-Module    mTestDemos ...: Unchanged component
-22-04-25 18:22:34 Standard-Module    mTestProcs ...: Unchanged component
-22-04-25 18:22:34 Standard-Module    mTestServices : Modified code exported
-22-04-25 18:22:35 Standard-Module    mTrc .........: Unchanged Used Common Component
-22-04-25 18:22:35 Workbook           wbMsg ........: Unchanged component
-22-04-25 18:22:35 Worksheet CodeName wsTest .......: Unchanged component
-22-04-25 18:27:22 ========================================
-22-04-25 18:27:22 Export Changed (by Addin) for Msg.xlsb: 
-22-04-25 18:27:22 ----------------------------------------
-22-04-25 18:27:23 UserForm           fMsgProcTest .: Unchanged component
-22-04-25 18:27:23 Standard-Module    mBasic .......: Unchanged Used Common Component
-22-04-25 18:27:23 Standard-Module    mCompManClient: Unchanged Used Common Component
-22-04-25 18:27:23 Standard-Module    mDct .........: Unchanged Used Common Component
-22-04-25 18:27:23 Standard-Module    mErH .........: Unchanged Used Common Component
-22-04-25 18:27:23 Standard-Module    mExamples ....: Unchanged component
-22-04-25 18:27:23 Standard-Module    mObject ......: Unchanged component
-22-04-25 18:27:23 Standard-Module    mTestDemos ...: Unchanged component
-22-04-25 18:27:24 Standard-Module    mTestProcs ...: Unchanged component
-22-04-25 18:27:24 Standard-Module    mTestServices : Unchanged component
-22-04-25 18:27:24 Standard-Module    mTrc .........: Unchanged Used Common Component
-22-04-25 18:27:24 Workbook           wbMsg ........: Unchanged component
-22-04-25 18:27:24 Worksheet CodeName wsTest .......: Unchanged component
-22-04-25 18:29:01 ========================================
-22-04-25 18:29:01 Export Changed (by Addin) for Msg.xlsb: 
-22-04-25 18:29:01 ----------------------------------------
-22-04-25 18:29:02 UserForm           fMsgProcTest .: Unchanged component
-22-04-25 18:29:02 Standard-Module    mBasic .......: Unchanged Used Common Component
-22-04-25 18:29:02 Standard-Module    mCompManClient: Unchanged Used Common Component
-22-04-25 18:29:02 Standard-Module    mDct .........: Unchanged Used Common Component
-22-04-25 18:29:02 Standard-Module    mErH .........: Unchanged Used Common Component
-22-04-25 18:29:02 Standard-Module    mExamples ....: Unchanged component
-22-04-25 18:29:02 Standard-Module    mObject ......: Unchanged component
-22-04-25 18:29:02 Standard-Module    mTestDemos ...: Unchanged component
-22-04-25 18:29:02 Standard-Module    mTestProcs ...: Unchanged component
-22-04-25 18:29:02 Standard-Module    mTestServices : Unchanged component
-22-04-25 18:29:02 Standard-Module    mTrc .........: Unchanged Used Common Component
-22-04-25 18:29:02 Workbook           wbMsg ........: Unchanged component
-22-04-25 18:29:02 Worksheet CodeName wsTest .......: Unchanged component
-22-04-25 18:29:08 ========================================
-22-04-25 18:29:08 Export Changed (by Addin) for Msg.xlsb: 
-22-04-25 18:29:08 ----------------------------------------
-22-04-25 18:29:09 UserForm           fMsgProcTest .: Unchanged component
-22-04-25 18:29:09 Standard-Module    mBasic .......: Unchanged Used Common Component
-22-04-25 18:29:09 Standard-Module    mCompManClient: Unchanged Used Common Component
-22-04-25 18:29:09 Standard-Module    mDct .........: Unchanged Used Common Component
-22-04-25 18:29:09 Standard-Module    mErH .........: Unchanged Used Common Component
-22-04-25 18:29:09 Standard-Module    mExamples ....: Unchanged component
-22-04-25 18:29:09 Standard-Module    mObject ......: Unchanged component
-22-04-25 18:29:09 Standard-Module    mTestDemos ...: Unchanged component
-22-04-25 18:29:09 Standard-Module    mTestProcs ...: Unchanged component
-22-04-25 18:29:10 Standard-Module    mTestServices : Unchanged component
-22-04-25 18:29:10 Standard-Module    mTrc .........: Unchanged Used Common Component
-22-04-25 18:29:10 Workbook           wbMsg ........: Unchanged component
-22-04-25 18:29:10 Worksheet CodeName wsTest .......: Unchanged component
-22-04-25 18:30:27 ========================================
-22-04-25 18:30:27 Export Changed (by Addin) for Msg.xlsb: 
-22-04-25 18:30:27 ----------------------------------------
-22-04-25 18:30:27 UserForm           fMsgProcTest .: Unchanged component
-22-04-25 18:30:28 Standard-Module    mBasic .......: Unchanged Used Common Component
-22-04-25 18:30:28 Standard-Module    mCompManClient: Unchanged Used Common Component
-22-04-25 18:30:28 Standard-Module    mDct .........: Unchanged Used Common Component
-22-04-25 18:30:28 Standard-Module    mErH .........: Unchanged Used Common Component
-22-04-25 18:30:28 Standard-Module    mExamples ....: Unchanged component
-22-04-25 18:30:28 Standard-Module    mMsg .........: Hosted Raw Common Component code modified
-22-04-25 18:30:28                                    Code modified of Hosted Raw Common Component
-22-04-25 18:30:28                                    Exported, Revision Number increased, Export File copied to 'Common Components Folder'
-22-04-25 18:30:28 Standard-Module    mObject ......: Unchanged component
-22-04-25 18:30:28 Standard-Module    mTestDemos ...: Unchanged component
-22-04-25 18:30:28 Standard-Module    mTestProcs ...: Unchanged component
-22-04-25 18:30:28 Standard-Module    mTestServices : Unchanged component
-22-04-25 18:30:28 Standard-Module    mTrc .........: Unchanged Used Common Component
-22-04-25 18:30:28 Workbook           wbMsg ........: Unchanged component
-22-04-25 18:30:28 Worksheet CodeName wsTest .......: Unchanged component
-22-04-25 18:45:58 ========================================
-22-04-25 18:45:58 Export Changed (by Addin) for Msg.xlsb: 
-22-04-25 18:45:58 ----------------------------------------
-22-04-25 18:45:59 UserForm           fMsgProcTest .: Unchanged component
-22-04-25 18:45:59 Standard-Module    mBasic .......: Unchanged Used Common Component
-22-04-25 18:45:59 Standard-Module    mCompManClient: Unchanged Used Common Component
-22-04-25 18:45:59 Standard-Module    mDct .........: Unchanged Used Common Component
-22-04-25 18:45:59 Standard-Module    mErH .........: Unchanged Used Common Component
-22-04-25 18:45:59 Standard-Module    mExamples ....: Unchanged component
-22-04-25 18:45:59 Standard-Module    mObject ......: Unchanged component
-22-04-25 18:45:59 Standard-Module    mTestDemos ...: Unchanged component
-22-04-25 18:45:59 Standard-Module    mTestProcs ...: Unchanged component
-22-04-25 18:45:59 Standard-Module    mTestServices : Unchanged component
-22-04-25 18:45:59 Standard-Module    mTrc .........: Unchanged Used Common Component
-22-04-25 18:45:59 Workbook           wbMsg ........: Unchanged component
-22-04-25 18:45:59 Worksheet CodeName wsTest .......: Unchanged component
-22-04-25 18:46:06 ========================================
-22-04-25 18:46:06 Export Changed (by Addin) for Msg.xlsb: 
-22-04-25 18:46:06 ----------------------------------------
-22-04-25 18:46:06 UserForm           fMsgProcTest .: Unchanged component
-22-04-25 18:46:06 Standard-Module    mBasic .......: Unchanged Used Common Component
-22-04-25 18:46:06 Standard-Module    mCompManClient: Unchanged Used Common Component
-22-04-25 18:46:06 Standard-Module    mDct .........: Unchanged Used Common Component
-22-04-25 18:46:06 Standard-Module    mErH .........: Unchanged Used Common Component
-22-04-25 18:46:06 Standard-Module    mExamples ....: Unchanged component
-22-04-25 18:46:06 Standard-Module    mObject ......: Unchanged component
-22-04-25 18:46:06 Standard-Module    mTestDemos ...: Unchanged component
-22-04-25 18:46:07 Standard-Module    mTestProcs ...: Unchanged component
-22-04-25 18:46:07 Standard-Module    mTestServices : Unchanged component
-22-04-25 18:46:07 Standard-Module    mTrc .........: Unchanged Used Common Component
-22-04-25 18:46:07 Workbook           wbMsg ........: Unchanged component
-22-04-25 18:46:07 Worksheet CodeName wsTest .......: Unchanged component
+22-04-26 18:50:15 Update Outdated (by Addin) for Msg.xlsb: 
+22-04-26 18:50:15 -----------------------------------------
+22-04-26 18:50:16 Standard-Module    mMsg .........: DoEvents delayed continuation for 00168 msec)
+22-04-26 18:50:16                                    Workbook saved (DoEvents delayed continuation for 00005 msec)
+22-04-26 18:50:16 Standard-Module    mBasic .......: Used Common Component up-to-date
+22-04-26 18:50:16 Standard-Module    mCompManClient: Used Common Component up-to-date
+22-04-26 18:50:16 Standard-Module    mDct .........: Used Common Component up-to-date
+22-04-26 18:50:16 Standard-Module    mErH .........: Used Common Component up-to-date
+22-04-26 18:50:17 Standard-Module    mTrc .........: Used Common Component up-to-date
+22-04-26 19:21:26 ========================================
+22-04-26 19:21:26 Export Changed (by Addin) for Msg.xlsb: 
+22-04-26 19:21:26 ----------------------------------------
+22-04-26 19:21:27 UserForm           fMsg .........: Hosted Raw Common Component code modified
+22-04-26 19:21:27                                    Code modified of Hosted Raw Common Component
+22-04-26 19:21:27                                    Exported, Revision Number increased, Export File copied to 'Common Components Folder'
+22-04-26 19:21:27 UserForm           fMsgProcTest .: Unchanged component
+22-04-26 19:21:27 Standard-Module    mBasic .......: Unchanged Used Common Component
+22-04-26 19:21:27 Standard-Module    mCompManClient: Unchanged Used Common Component
+22-04-26 19:21:27 Standard-Module    mDct .........: Unchanged Used Common Component
+22-04-26 19:21:27 Standard-Module    mErH .........: Unchanged Used Common Component
+22-04-26 19:21:27 Standard-Module    mExamples ....: Unchanged component
+22-04-26 19:21:27 Standard-Module    mObject ......: Unchanged component
+22-04-26 19:21:27 Standard-Module    mTestDemos ...: Unchanged component
+22-04-26 19:21:27 Standard-Module    mTestProcs ...: Unchanged component
+22-04-26 19:21:28 Standard-Module    mTestServices : Unchanged component
+22-04-26 19:21:28 Standard-Module    mTrc .........: Unchanged Used Common Component
+22-04-26 19:21:28 Workbook           wbMsg ........: Unchanged component
+22-04-26 19:21:28 Worksheet CodeName wsTest .......: Unchanged component

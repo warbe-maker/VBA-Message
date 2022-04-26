@@ -389,9 +389,19 @@ End Function
 Because the _Monitor_ service displays the progress message mode-less there may be any number of instances displayed at the same time. See demo<br>
 ![](images/DemoMsgMonitorInstances.gif)
 
+# Contribution
+Any contribution is welcome, last but not least concerning the wording in the documentation which may be sub-optimal since I am not a native English man.
+
+The Excel Workbook [Msg.xlsm](#Msg.xlsm) is for development and test.
+
+When providing changes or amendments to the implementation, performing a regression test should be obligatory, if not covered yet by the test, test procedures should be added or modified accordingly.
+
+Please note: The Workbook has my "automated update of common components" implemented. This will have no effect when my [Excel-VB-Project-Component-Management-Services][5] is not installed.
+
 
 
 [1]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frm
 [2]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frx
 [3]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/mMsg.bas
 [4]:https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function
+[5]: https://github.com/warbe-maker/Excel-VB-Components-Management-Services
