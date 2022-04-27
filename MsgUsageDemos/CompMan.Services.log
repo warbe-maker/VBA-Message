@@ -1,0 +1,24 @@
+22-04-27 18:49:14 Update Outdated (by CompMan.xlsb) for MsgUsageDemos.xlsm: 
+22-04-27 18:49:14 ----------------------------------------------------------
+22-04-27 18:49:14 Standard-Module    mMsg .........: DoEvents delayed continuation for 00014 msec)
+22-04-27 18:49:15                                    Workbook saved (DoEvents delayed continuation for 00022 msec)
+22-04-27 18:49:15 UserForm           fMsg .........: Outdated Used Common Component! (Export-Files 'E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\MsgUsageDemos\source\fMsg.frm' differs from 'E:\Ablage\Excel VBA\DevAndTest\Common-Components\fMsg.frm')
+22-04-27 18:49:18                                    'fMsg' renamed to 'fMsg_RenamedByCompMan'
+22-04-27 18:49:18                                    'fMsg_RenamedByCompMan' removed (removal is postponed by Excel until process has finished)
+22-04-27 18:49:19                                    'fMsg' (re-)imported from 'E:\Ablage\Excel VBA\DevAndTest\Common-Components\fMsg.frm'
+22-04-27 18:49:19                                    'fMsg' exported to 'E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\MsgUsageDemos\source\fMsg.frm'
+22-04-27 18:49:20                                    Used Common Component renewed/updated by (re-)import of the Raw's Export File (E:\Ablage\Excel VBA\DevAndTest\Common-Components\fMsg.frm)
+22-04-27 18:49:20 Standard-Module    mCompManClient: Used Common Component up-to-date
+22-04-27 18:49:20 Standard-Module    mMsg .........: Used Common Component up-to-date
+22-04-27 18:55:13 ==================================================
+22-04-27 18:55:13 Export Changed (by Addin) for MsgUsageDemos.xlsm: 
+22-04-27 18:55:13 --------------------------------------------------
+22-04-27 18:55:13 =========================================================
+22-04-27 18:55:13 Export Changed (by CompMan.xlsb) for MsgUsageDemos.xlsm: 
+22-04-27 18:55:13 ---------------------------------------------------------
+22-04-27 18:55:13 UserForm           fMsg .........: Unchanged Used Common Component
+22-04-27 18:55:14 Standard-Module    mCompManClient: Unchanged Used Common Component
+22-04-27 18:55:14 Standard-Module    mMsg .........: Unchanged Used Common Component
+22-04-27 18:55:14 Standard-Module    mMsgUsageDemos: Unchanged component
+22-04-27 18:55:14 Workbook           wbMsgUsageDemo: Modified code exported
+22-04-27 18:55:14 Worksheet CodeName wsMsgUsageDemo: Unchanged component

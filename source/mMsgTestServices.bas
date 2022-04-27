@@ -1,8 +1,8 @@
-Attribute VB_Name = "mTestServices"
+Attribute VB_Name = "mMsgTestServices"
 Option Explicit
 Option Compare Text
 ' ------------------------------------------------------------------------------
-' Standard Module mTestServices
+' Standard Module mMsgTestServices
 ' All tests obligatory for a complete regression test performed after any code
 ' modification. Tests are to be extended when new features or functions are
 ' implemented.
@@ -72,51 +72,51 @@ Private Sub BoP(ByVal b_proc As String, _
 #End If
 End Sub
 
-Public Sub cmdTest01_Click():   mTestServices.Test_01_mMsg_Buttons_Service:                                         End Sub
+Public Sub cmdTest01_Click():   mMsgTestServices.Test_01_mMsg_Buttons_Service:                                         End Sub
 
-Public Sub cmdTest02_Click():   mTestServices.Test_02_mMsg_ErrMsg_Service:                                          End Sub
+Public Sub cmdTest02_Click():   mMsgTestServices.Test_02_mMsg_ErrMsg_Service:                                          End Sub
 
-Public Sub cmdTest03_Click():   mTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth:             End Sub
+Public Sub cmdTest03_Click():   mMsgTestServices.Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth:             End Sub
 
-Public Sub cmdTest04_Click():   mTestServices.Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle:                    End Sub
+Public Sub cmdTest04_Click():   mMsgTestServices.Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle:                    End Sub
 
-Public Sub cmdTest05_Click():   mTestServices.Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection: End Sub
+Public Sub cmdTest05_Click():   mMsgTestServices.Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection: End Sub
 
-Public Sub cmdTest06_Click():   mTestServices.Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons:             End Sub
+Public Sub cmdTest06_Click():   mMsgTestServices.Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons:             End Sub
 
-Public Sub cmdTest07_Click():   mTestServices.Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgWidth:  End Sub
+Public Sub cmdTest07_Click():   mMsgTestServices.Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgWidth:  End Sub
 
-Public Sub cmdTest08_Click():   mTestServices.Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHeight:  End Sub
+Public Sub cmdTest08_Click():   mMsgTestServices.Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHeight:  End Sub
 
-Public Sub cmdTest09_Click():   mTestServices.Test_09_mMsg_Dsply_Service_ButtonsOnly:                               End Sub
+Public Sub cmdTest09_Click():   mMsgTestServices.Test_09_mMsg_Dsply_Service_ButtonsOnly:                               End Sub
 
-Public Sub cmdTest10_Click():   mTestServices.Test_10_mMsg_Dsply_Service_ButtonsMatrix:                             End Sub
+Public Sub cmdTest10_Click():   mMsgTestServices.Test_10_mMsg_Dsply_Service_ButtonsMatrix:                             End Sub
 
-Public Sub cmdTest11_Click():   mTestServices.Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical:                   End Sub
+Public Sub cmdTest11_Click():   mMsgTestServices.Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical:                   End Sub
 
-Public Sub cmdTest12_Click():   mTestServices.Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal:                 End Sub
+Public Sub cmdTest12_Click():   mMsgTestServices.Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal:                 End Sub
 
-Public Sub cmdTest13_Click():   mTestServices.Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars:       End Sub
+Public Sub cmdTest13_Click():   mMsgTestServices.Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars:       End Sub
 
-Public Sub cmdTest16_Click():   mTestServices.Test_16_mMsg_Dsply_Service_ButtonByDictionary:                        End Sub
+Public Sub cmdTest16_Click():   mMsgTestServices.Test_16_mMsg_Dsply_Service_ButtonByDictionary:                        End Sub
 
-Public Sub cmdTest17_Click():   mTestServices.Test_17_mMsg_Box_Service_MessageAsString:                             End Sub
+Public Sub cmdTest17_Click():   mMsgTestServices.Test_17_mMsg_Box_Service_MessageAsString:                             End Sub
 
-Public Sub cmdTest20_Click():   mTestServices.Test_20_mMsg_Dsply_Service_ButtonByValue:                             End Sub
+Public Sub cmdTest20_Click():   mMsgTestServices.Test_20_mMsg_Dsply_Service_ButtonByValue:                             End Sub
 
-Public Sub cmdTest21_Click():   mTestServices.Test_21_mMsg_Dsply_Service_ButtonByString:                            End Sub
+Public Sub cmdTest21_Click():   mMsgTestServices.Test_21_mMsg_Dsply_Service_ButtonByString:                            End Sub
 
-Public Sub cmdTest22_Click():   mTestServices.Test_22_mMsg_Dsply_Service_ButtonByCollection:                        End Sub
+Public Sub cmdTest22_Click():   mMsgTestServices.Test_22_mMsg_Dsply_Service_ButtonByCollection:                        End Sub
 
-Public Sub cmdTest23_Click():   mTestServices.Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly:                     End Sub
+Public Sub cmdTest23_Click():   mMsgTestServices.Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly:                     End Sub
 
-Public Sub cmdTest30_Click():   mTestServices.Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service:   End Sub
+Public Sub cmdTest30_Click():   mMsgTestServices.Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service:   End Sub
 
-Public Sub cmdTest90_Click():   mTestServices.Test_90_mMsg_Dsply_Service_AllInOne:                                  End Sub
+Public Sub cmdTest90_Click():   mMsgTestServices.Test_90_mMsg_Dsply_Service_AllInOne:                                  End Sub
 
-Public Sub cmdTest91_Click():   mTestServices.Test_91_mMsg_Dsply_Service_MinimumMessage:                            End Sub
+Public Sub cmdTest91_Click():   mMsgTestServices.Test_91_mMsg_Dsply_Service_MinimumMessage:                            End Sub
 
-Public Sub cmdTest92_Click():   mTestServices.Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL:                    End Sub
+Public Sub cmdTest92_Click():   mMsgTestServices.Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL:                    End Sub
 
 Private Sub EoP(ByVal e_proc As String, _
        Optional ByVal e_inf As String = vbNullString)
@@ -277,7 +277,7 @@ xt: Exit Function
 End Function
 
 Private Function ErrSrc(ByVal sProc As String) As String
-    ErrSrc = "mTestServices." & sProc
+    ErrSrc = "mMsgTestServices." & sProc
 End Function
 
 Public Sub Explore(ByVal ctl As Variant, _
@@ -579,16 +579,16 @@ End Sub
 Public Sub Test_01_mMsg_Buttons_Service()
     Const PROC = "Test_01_mMsg_Buttons_Service"
     BoP ErrSrc(PROC)
-    mTestServices.Test_01_mMsg_Buttons_Service_01_Empty
-    mTestServices.Test_01_mMsg_Buttons_Service_02_Single_String
-    mTestServices.Test_01_mMsg_Buttons_Service_03_Single_Numeric_Item
-    mTestServices.Test_01_mMsg_Buttons_Service_04_String_String
-    mTestServices.Test_01_mMsg_Buttons_Service_05_Collection_String_String
-    mTestServices.Test_01_mMsg_Buttons_Service_06_String_Collection_String
-    mTestServices.Test_01_mMsg_Buttons_Service_07_String_String_Collection
-    mTestServices.Test_01_mMsg_Buttons_Service_08_Semicolon_Delimited_String_Collection
-    mTestServices.Test_01_mMsg_Buttons_Service_09_Comma_Delimited_String_Dictionary
-    mTestServices.Test_01_mMsg_Box_Service_Buttons_7_By_7_Matrix
+    mMsgTestServices.Test_01_mMsg_Buttons_Service_01_Empty
+    mMsgTestServices.Test_01_mMsg_Buttons_Service_02_Single_String
+    mMsgTestServices.Test_01_mMsg_Buttons_Service_03_Single_Numeric_Item
+    mMsgTestServices.Test_01_mMsg_Buttons_Service_04_String_String
+    mMsgTestServices.Test_01_mMsg_Buttons_Service_05_Collection_String_String
+    mMsgTestServices.Test_01_mMsg_Buttons_Service_06_String_Collection_String
+    mMsgTestServices.Test_01_mMsg_Buttons_Service_07_String_String_Collection
+    mMsgTestServices.Test_01_mMsg_Buttons_Service_08_Semicolon_Delimited_String_Collection
+    mMsgTestServices.Test_01_mMsg_Buttons_Service_09_Comma_Delimited_String_Dictionary
+    mMsgTestServices.Test_01_mMsg_Box_Service_Buttons_7_By_7_Matrix
     EoP ErrSrc(PROC)
 End Sub
 
@@ -793,7 +793,7 @@ Public Sub Test_02_mMsg_ErrMsg_Service()
 ' For the last testing variant the mErH component is installed!
 ' ------------------------------------------------------------------------------
     Const PROC = "Test_02_mMsg_ErrMsg_Service"
-    Const EXPECTED_TITLE = "Application Error  5 in: 'mTestServices.Test_02_mMsg_ErrMsg_Service'"
+    Const EXPECTED_TITLE = "Application Error  5 in: 'mMsgTestServices.Test_02_mMsg_ErrMsg_Service'"
     
     On Error GoTo eh
     

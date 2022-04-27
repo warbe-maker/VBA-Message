@@ -1,4 +1,4 @@
-Attribute VB_Name = "mTestProcs"
+Attribute VB_Name = "mMsgTestProcs"
 Option Explicit
 
 ' ------------------------------------------------------------------------------
@@ -8,7 +8,7 @@ Option Explicit
 ' ------------------------------------------------------------------------------
 Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 
-Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mTestServices." & s:  End Property
+Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mMsgTestServices." & s:  End Property
 
 Public Function AdjustToVgrid(ByVal atvg_si As Single, _
                      Optional ByVal atvg_threshold As Single = 1.5, _
