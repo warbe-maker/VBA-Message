@@ -23,7 +23,12 @@ Option Explicit
     Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
 #End If
 
-Private Message  As TypeMsg
+Private Const DEMO_STEPS_PROCESSED  As Long = 9
+Private Const DEMO_STEPS_DISPLAYED  As Long = 5
+Private Const DEMO_BOX_TITLE        As String = "Demonstration of the mMsg.Box service"
+Private Const DEMO_DSPLY_TITLE      As String = "Demonstration of the mMsg.Dsply service"
+Private Message                     As TypeMsg
+Private DemoMonitorTitle            As String
 
 Public Sub Demos()
     Demo_Service_mMsg_Box
@@ -33,6 +38,16 @@ Public Sub Demos()
     Demo_Service_mMsg_Monitor
     Sleep 1000
     Demo_Service_mMsg_MsgInstance
+    If MsgBox("Press OK to unload all demonstation message windows", vbOKOnly, "Unload modeless displayed message demo windows") = vbOK Then
+        Demo_Service_mMsg_MsgInstance True
+        Sleep 200
+        mMsg.MsgInstance fi_key:=DemoMonitorTitle, fi_unload:=True
+        Sleep 200
+        mMsg.MsgInstance fi_key:=DEMO_DSPLY_TITLE, fi_unload:=True
+        Sleep 200
+        mMsg.MsgInstance fi_key:=DEMO_BOX_TITLE, fi_unload:=True
+    End If
+
 End Sub
 
 Public Sub Demo_Service_mMsg_Box()
@@ -67,11 +82,11 @@ Public Sub Demo_Service_mMsg_Box()
         
     Select Case mMsg.Box(Prompt:=Message _
                        , Buttons:=mMsg.Buttons(BTN1, BTN2, BTN3, BTN4, vbLf, vbYesNoCancel) _
-                       , Title:="Demonstration of the mMsg.Box service" _
+                       , Title:=DEMO_BOX_TITLE _
                        , box_monospaced:=True _
                        , box_width_max:=50 _
                        , box_modeless:=True _
-                       , box_pos:="100;20")
+                       , box_pos:="120;20")
 '        Case BTN1:      MsgBox """" & BTN1 & """ pressed"
 '        Case BTN2:      MsgBox """" & BTN2 & """ pressed"
 '        Case BTN3:      MsgBox """" & BTN3 & """ pressed"
@@ -134,10 +149,10 @@ Public Sub Demo_Service_mMsg_Dsply()
     
     Select Case mMsg.Dsply(dsply_msg:=Message _
                          , dsply_buttons:=mMsg.Buttons(BTN1, BTN2, BTN3, BTN4, vbLf, vbYesNoCancel) _
-                         , dsply_title:="Demonstration of the mMsg.Dsply service" _
+                         , dsply_title:=DEMO_DSPLY_TITLE _
                          , dsply_width_max:=50 _
                          , dsply_modeless:=True _
-                         , dsply_pos:="20;150")
+                         , dsply_pos:="40;150")
 '        Case BTN1:      MsgBox """" & BTN1 & """ pressed"
 '        Case BTN2:      MsgBox """" & BTN2 & """ pressed"
 '        Case BTN3:      MsgBox """" & BTN3 & """ pressed"
@@ -178,15 +193,13 @@ Public Sub Demo_Service_mMsg_Monitor()
 ' Demonstrates monitoring a process' steps.
 ' ----------------------------------------------------------------------------
     Const WIDTH_MAX             As Long = 35
-    Const DEMO_STEPS_PROCESSED  As Long = 9
-    Const DEMO_STEPS_DISPLAYED  As Long = 5
     Dim i                       As Long
     Dim Title                   As String
     Dim Header                  As TypeMsgText
     Dim Step                    As TypeMsgText
     Dim Footer                  As TypeMsgText
        
-    Title = "Demo a process' monitoring (by displaying the last " & DEMO_STEPS_DISPLAYED & " of " & DEMO_STEPS_PROCESSED & " steps)"
+    DemoMonitorTitle = "Demo a process' monitoring (by displaying the last " & DEMO_STEPS_DISPLAYED & " of " & DEMO_STEPS_PROCESSED & " steps)"
     With Header
         .Text = "Note: - The steps' line length exceeds the max message window width" & vbLf & _
                 "        (specified for this demo to " & WIDTH_MAX & "% of the sreen width)" & vbLf & _
@@ -201,29 +214,29 @@ Public Sub Demo_Service_mMsg_Monitor()
     
     '~~ With the very first service call the monitoring message window is initialized
     '~~ For this demo the max window with is liited to 30% of the screen width in order to demonstrate a horizontal scroll-bar
-    mMsg.MonitorHeader mon_title:=Title _
+    mMsg.MonitorHeader mon_title:=DemoMonitorTitle _
                      , mon_text:=Header _
                      , mon_width_max:=WIDTH_MAX _
                      , mon_steps_displayed:=DEMO_STEPS_DISPLAYED _
-                     , mon_pos:="40;300"
-    mMsg.MonitorFooter Title, Footer
+                     , mon_pos:="60;300"
+    mMsg.MonitorFooter DemoMonitorTitle, Footer
 
     For i = 1 To DEMO_STEPS_PROCESSED
         Step.MonoSpaced = True
         
         '~~ The below 2 lines is all what is required to monitor a process step
         Step.Text = Format(i, "00") & ". Process follow-Up after " & 200 * (i - 1) & " Milliseconds (the line length exceeds the max message window width)."
-        mMsg.Monitor Title, Step
+        mMsg.Monitor DemoMonitorTitle, Step
                    
         Sleep 300 ' Simmulation of some process time
     Next i
     
     Footer.Text = "Process finished! Close this window (displayed by the mMsg.MonitorFooter service)"
-    mMsg.MonitorFooter Title, Footer
+    mMsg.MonitorFooter DemoMonitorTitle, Footer
      
 End Sub
 
-Private Sub Demo_Service_mMsg_MsgInstance()
+Private Sub Demo_Service_mMsg_MsgInstance(Optional ByVal unload_only As Boolean = False)
 ' ------------------------------------------------------------------------------
 ' Demonstration of the mMsg.MsgInstance service called by the mMsg.Monitor
 ' service for each process identified by the Title displayed at the window
@@ -247,38 +260,39 @@ Private Sub Demo_Service_mMsg_MsgInstance()
     Dim sTitle      As String
     Dim Step        As TypeMsgText
     
-    j = 1
-    For i = 1 To DEMO_PROCESSES
-        '~~ Establish 5 monitoring instances
-        '~~ Note that the instances are identified by their different titles and positioned on screen
-        '~~ along with the very first service call
-        sTitle = DEMO_PROCESS_NAME & i
-        Step.Text = "Process step " & j
-        mMsg.Monitor mon_title:=sTitle _
-                   , mon_text:=Step _
-                   , mon_steps_displayed:=DEMO_STEPS + 1 _
-                   , mon_width_min:=20 _
-                   , mon_pos:=INIT_TOP + OFFSET_V * (i - 1) & ";" & INIT_LEFT + OFFSET_H * (i - 1)
-        Sleep T_WAIT
-    Next i
-    
-    For j = 2 To DEMO_STEPS
-        '~~ Display in each of the instances an additional progress message
+    If Not unload_only Then
+        j = 1
         For i = 1 To DEMO_PROCESSES
-            '~~ Go through all instances and add a message line
+            '~~ Establish 5 monitoring instances
+            '~~ Note that the instances are identified by their different titles and positioned on screen
+            '~~ along with the very first service call
             sTitle = DEMO_PROCESS_NAME & i
             Step.Text = "Process step " & j
-            mMsg.Monitor sTitle, Step
+            mMsg.Monitor mon_title:=sTitle _
+                       , mon_text:=Step _
+                       , mon_steps_displayed:=DEMO_STEPS + 1 _
+                       , mon_width_min:=20 _
+                       , mon_pos:=INIT_TOP + OFFSET_V * (i - 1) & ";" & INIT_LEFT + OFFSET_H * (i - 1)
             Sleep T_WAIT
         Next i
-    Next j
-    
-    Stop
-    For i = DEMO_PROCESSES To 1 Step -1
-        '~~ Unload the instances in reverse order
-        mMsg.MsgInstance fi_key:=DEMO_PROCESS_NAME & i, fi_unload:=True
-        Sleep T_WAIT
-    Next i
+        
+        For j = 2 To DEMO_STEPS
+            '~~ Display in each of the instances an additional progress message
+            For i = 1 To DEMO_PROCESSES
+                '~~ Go through all instances and add a message line
+                sTitle = DEMO_PROCESS_NAME & i
+                Step.Text = "Process step " & j
+                mMsg.Monitor sTitle, Step
+                Sleep T_WAIT
+            Next i
+        Next j
+    ElseIf unload_only Then
+        For i = DEMO_PROCESSES To 1 Step -1
+            '~~ Unload the instances in reverse order
+            mMsg.MsgInstance fi_key:=DEMO_PROCESS_NAME & i, fi_unload:=True
+            Sleep T_WAIT
+        Next i
+    End If
     
 xt: Exit Sub
 

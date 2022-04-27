@@ -32,6 +32,11 @@ A flexible and powerful `VBA.MsgBox` alternative providing four specific service
 - ***[ErrMsg](#the-errmsg-service)*** for the display of a well designed error message
 - ***[Monitor](#the-monitor-service)*** as a service to display the ongoing progress of a process.
 
+Below is a short demonstration of the services capability available in the [MsgUsageDemo.xlsm][6] Workbook for download.
+
+The above code/module displays:<br>
+![](images/Demo-Msg-Services.gif)
+
 ## Why an alternative MsgBox?
 The alternative implementation addresses many of the MsgBox's deficiencies - without re-implementing it to 100%.
 
@@ -404,4 +409,5 @@ Please note: The Workbook has my "automated update of common components" impleme
 [2]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frx
 [3]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/mMsg.bas
 [4]:https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function
-[5]: https://github.com/warbe-maker/Excel-VB-Components-Management-Services
+[5]:https://github.com/warbe-maker/Excel-VB-Components-Management-Services
+[6]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/master/MsgUsageDemos/MsgUsageDemos.xlsm
