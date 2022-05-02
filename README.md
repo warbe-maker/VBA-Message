@@ -403,9 +403,9 @@ Please note: The Workbook uses my "automated update of common components". This 
 
 
 
-[1]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frm
-[2]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/fMsg.frx
-[3]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/edit/master/source/mMsg.bas
+[1]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/master/source/fMsg.frm
+[2]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/master/source/fMsg.frx
+[3]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/master/source/mMsg.bas
 [4]:https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function
 [5]:https://github.com/warbe-maker/Excel-VB-Components-Management-Services
 [6]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/master/MsgUsageDemos/MsgUsageDemos.xlsm
