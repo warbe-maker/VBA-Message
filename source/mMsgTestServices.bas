@@ -23,21 +23,22 @@ Public Const BTTN_FINISH        As String = "Test Done"
 Public Const BTTN_PASSED        As String = "Passed"
 Public Const BTTN_FAILED        As String = "Failed"
 
-Dim Message                 As TypeMsg
-Dim MsgButtons              As Collection
-Dim MsgForm                 As fMsg
-Dim MsgTitle                As String
-Dim TestButtons             As Collection
-Dim TestMsgHeightIncrDecr   As Long
-Dim TestMsgHeightMax        As Long
-Dim TestMsgHeightMin        As Long
-Dim TestMsgWidthIncrDecr    As Long
-Dim TestMsgWidthMax         As Long
-Dim TestMsgWidthMin         As Long
-Dim vButton4                As Variant
-Dim vButton5                As Variant
-Dim vButton6                As Variant
-Dim vButton7                As Variant
+Private Message                 As TypeMsg
+Private MsgButtons              As Collection
+Private MsgForm                 As fMsg
+Private MsgTitle                As String
+Private TestButtons             As Collection
+Private TestMsgHeightIncrDecr   As Long
+Private TestMsgHeightMax        As Long
+Private TestMsgHeightMin        As Long
+Private TestMsgWidthIncrDecr    As Long
+Private TestMsgWidthMax         As Long
+Private TestMsgWidthMin         As Long
+Private vButton4                As Variant
+Private vButton5                As Variant
+Private vButton6                As Variant
+Private vButton7                As Variant
+Private sReadableTestProc       As String
 
 Private Property Get BTTN_TERMINATE() As String ' composed constant
     BTTN_TERMINATE = "Terminate" & vbLf & "Regression" & vbLf & "Test"
@@ -458,7 +459,9 @@ Private Function Readable(ByVal s As String) As String
     sResult = Replace(sResult, "m Msg ", "(mMsg.", 1, 1)
     sResult = Replace(sResult, " m Msg ", ", mMsg.")
     sResult = Right(sResult, Len(sResult) - 1)
-    Readable = Replace(sResult, " Service", " Service)")
+    sReadableTestProc = Replace(sResult, " Service", " Service)")
+    Readable = sReadableTestProc
+    
 End Function
 
 Private Function Repeat(repeat_string As String, repeat_n_times As Long)
@@ -742,7 +745,8 @@ Public Function Test_01_mMsg_Box_Service_Buttons_7_By_7_Matrix() As Variant
 ' ------------------------------------------------------------------------------
     Const PROC = "Test_01_Box_Service_Buttons_7_By_7_Matrix"
     
-    Dim i As Long
+    Dim i                   As Long
+    Dim dctButtonsAppRun    As New Dictionary
     
     BoP ErrSrc(PROC)
     SetupMsgTitleInstasnceAndNo 1, Readable(PROC)
@@ -759,11 +763,15 @@ Public Function Test_01_mMsg_Box_Service_Buttons_7_By_7_Matrix() As Variant
     Debug.Assert MsgButtons(40) = vbLf
     Debug.Assert MsgButtons(48) = vbLf
     
-    Test_01_mMsg_Box_Service_Buttons_7_By_7_Matrix = _
-    mMsg.Box(Prompt:=vbNullString _
-           , Buttons:=MsgButtons _
-           , Title:=MsgTitle)
-    Select Case Test_01_mMsg_Box_Service_Buttons_7_By_7_Matrix
+    '~~ This only becomes effective when the form is displayed modeless!
+    mMsg.ButtonAppRun dctButtonsAppRun, "Passed", ThisWorkbook, "mMsgTestServices.Passed"
+    mMsg.ButtonAppRun dctButtonsAppRun, "Failed", ThisWorkbook, "mMsgTestServices.Failed"
+    
+    Select Case mMsg.Box(Prompt:=vbNullString _
+                       , Buttons:=MsgButtons _
+                       , Title:=MsgTitle _
+                       , box_modeless:=True _
+                       , box_buttons_app_run:=dctButtonsAppRun)
         Case BTTN_PASSED:       wsTest.TestPassed
         Case BTTN_FAILED:       wsTest.TestFailed
         Case BTTN_TERMINATE:    wsTest.TerminateRegressionTest = True
@@ -772,6 +780,28 @@ Public Function Test_01_mMsg_Box_Service_Buttons_7_By_7_Matrix() As Variant
 xt: EoP ErrSrc(PROC)
     
 End Function
+
+Public Sub Passed()
+' ------------------------------------------------------------------------------
+' This "service" may be called from a "Passed" button when the message has been
+' displayed modeless.
+' ------------------------------------------------------------------------------
+    wsTest.TestPassed
+    mMsg.Box Prompt:="The test '" & sReadableTestProc & "' has been indicated 'Passed'. Because the test obviously " & _
+                     "displayed the message ""Modeless"" the window needs to be closed manually!" _
+           , Title:="Modeless test display"
+End Sub
+
+Public Sub Failed()
+' ------------------------------------------------------------------------------
+' This "service" may be called from a "Failed" button when the message has been
+' displayed modeless.
+' ------------------------------------------------------------------------------
+    wsTest.TestFailed
+    mMsg.Box Prompt:="The test '" & sReadableTestProc & "' has been indicated 'Failed'. Because the test obviously " & _
+                     "displayed the message ""Modeless"" the window needs to be closed manually!" _
+           , Title:="Modeless test display"
+End Sub
 
 Public Sub Test_02_mMsg_ErrMsg_Service()
 ' ------------------------------------------------------------------------------

@@ -18,6 +18,8 @@
 &nbsp;&nbsp;&nbsp;[The Monitor service](#the-monitor-service)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Usage of the _Monitor_ service](#usage-of-the-monitor-service)<br>
 &nbsp;&nbsp;&nbsp;[The Buttons service](#the-buttons-service)<br>
+&nbsp;&nbsp;&nbsp;[The _ButtonAppRun_ service](#the-buttonsapprun-service)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Usage of the _ButtonAppRun_ service](#usage-of-the-buttonsapprun-service)<br>
 &nbsp;&nbsp;&nbsp;[The MsgInstance service](#the-msginstance-service)<br>
 [Miscellaneous aspects](#miscellaneous-aspects)<br>
 &nbsp;&nbsp;&nbsp;[Min/Max Message Width/Height](#minmax-message-widthheight)<br>
@@ -44,7 +46,7 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 | When a message exceeds its size limit ("approximately 1024 characters, depending on the width of the characters used") it is truncated | In practice there's no size limit but the systems limit for a `String` type which is about 1GB (and the _Dsply_ service displays up to 4 strings!|
 | The message is displayed with a proportional font | A message (section) string may optionally be displayed mono-spaced |
 | Composing a fair designed message is time consuming and it is difficult to come up with a satisfying result | Up&nbsp;to&nbsp;3&nbsp; _Message&nbsp;Sections_ each with an optional _Message Text Label_ and a _Mono-spaced_ option allow an appealing design without any extra  effort |
-| The maximum reply _Buttons_ is 3 | Up to 7 reply _Buttons_ may be displayed in up to 7 reply _Button Rows_ in any order (=49 buttons in total) |
+| The maximum reply _Buttons_ is 3 | All services provide 7 x 7 (49) reply _Buttons_ (7 rows by 7 buttons) in any order. When the message is displayed mode-less displayed buttons may be provided with `Application.Run` information performed when the button is clicked.   |
 | The caption of the reply _Buttons_ is specified by a [value](<https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function#settings>) which results in 1 to 3 reply _Buttons_ with corresponding untranslated! native English captions | The caption of the reply _Buttons_ may be specified by the [VB MsgBox values](<https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function#settings>) **and** additionally by any multi-line text (see [Syntax of the _buttons_ argument](#syntax-of-the-buttons-argument) |
 | vbApplicationModal or vbSystemModal, no vbModeless option | The message can be displayed both ways which _modal_ (the default) or _modeless_. _modal_ equals to vbApplicationModal, there is (yet) no vbSystemModal option.|
 | Specifying the default button | The default button may be specified as index or as the displayed caption. However, it cannot be specified as vbOk, vbYes, vbNo, etc. |
@@ -71,6 +73,7 @@ The _Box_ service has these named arguments:
 | `Title`                 | String expression displayed in the window handle bar |
 | `Prompt`                | String expression displayed |
 | `Buttons`               | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, or a Dictionary, with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row. |
+| `box_buttons_app_run`  | Dictionary expression, provides information for buttons when displayed ***mode-less** which `Application.Run` service to be performed when clicked. See [The _ButtonAppRun_ service](#the-buttonapprun-service) |
 | `box_monospaced`       | Boolean expression, defaults to False, displays the `box_msg` with a monospaced font |
 | `box_button_default`    | Optional, numeric expression, defaults to 1, identifies the default button, i.e. the nth button which has the focus
 | `box_return_index`      | Optional, Boolean expression, default to False, indicates that the return value for the clicked button will be the index rather than its caption string. |
@@ -140,6 +143,7 @@ The _Dsply_ service has these named arguments:
 | `dsply_title`             | Required. String expression displayed in the title bar of the dialog box. If you omit title, the application name is placed in the title bar.|
 | `dsply_msg`               | Required. [UDT _TypeMsg_ ](#syntax-of-the-typemsg-udt) expression providing 4 message sections, each with a label and the message text, displayed as the message in the dialog box. The maximum length of each of the four possible message text strings is only limited by the system's limit for string expressions which is about 1GB!. When one of the 4 message text strings consists of more than one line, they can be separated by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line.|
 | `dsply_buttons`           | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, or a Dictionary, with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row.|
+| `dsply_buttons_app_run`  | Dictionary expression, provides information for buttons when displayed ***mode-less** which `Application.Run` service to be performed when clicked. See [The _ButtonAppRun_ service](#the-buttonapprun-service) || `dsply_buttons_app_run`  | |
 | `dsply_button_default`   | Optional, _Long_ expression, defaults to 1, specifies the index of the button which is the default button. |
 | `dsply_reply_with_index` | Optional, _Boolean_ expression, defaults to False. When True the index if the pressed button is returned rather than its caption. |
 | `dsply_modeless`          | Optional, _Boolean_ expression, defaults to False. When True the message is displayed modeless.  |
@@ -365,6 +369,39 @@ The service may be used directly as buttons argument. Example:
            , Buttons:=mMsg.Buttons("True", "False", vbYesNoCancel) _
            , Title:="Title"
 ```
+
+### The _ButtonAppRun_ service
+The service returns a Dictionary with `Application.Run` information for the button identified by its caption string, added with the button's caption as the key and all other provided arguments as Collection as item.
+- `Application.Run` only supports positional arguments. When only some of the optional arguments are used only those after the last one may be omitted but not those in between. The function raises an error when empty arguments are provided.
+- When Run information is provided for a button already existing in the Dictionary the information (the entry) it is replaced.
+- When the message form is displayed "Modal", which is the default, any provided Application.Run information is ignored.
+
+The service has the following named arguments
+
+| Part                  | Description             |
+|-----------------------|-------------------------|
+| `bar_dct`             | Dictionary expression, obligatory, returned with the information added |
+| `bar_button`          | String expression, obligatory, specifies the button's caption for which the `Application.Run` information is provided |
+| `bar_wb`              | Workbook expression, obligatory, specifies the ***open*** Workbook which provides the service called by `Application.Run` |
+| `bar_service_name`    | String expression, obligatory, specifies the ***Public*** service to be called in the form <module>.<procedure> |
+| `bar_arguments`       | ParamArray, optional, any ***positional*** arguments passed to the service |
+
+### Usage of the __ButtonAppRun_ service
+```vb
+    Dim dctButtonsAppRun As New Dictionary
+    
+    '~~ Note: Provided 'Application.Run' information only becomes effective
+    '~~ when the form is displayed modeless!
+    mMsg.ButtonAppRun dctButtonsAppRun, "Passed", ThisWorkbook, "mMsgTestServices.Passed"
+    mMsg.ButtonAppRun dctButtonsAppRun, "Failed", ThisWorkbook, "mMsgTestServices.Failed"
+    
+    mMsg.Box Prompt:=vbNullString _
+           , Buttons:=MsgButtons _
+           , Title:=MsgTitle _
+           , box_modeless:=True _
+           , box_buttons_app_run:=dctButtonsAppRun
+```
+Note: With the _Dsply_ service the Dictionary is provided via the dsply_buttons_app_run argument.
 
 ### The _MsgInstance_ service
 All services create/use an **instance** of the _fMsg_ UserForm with the title as the id/key.<br>
