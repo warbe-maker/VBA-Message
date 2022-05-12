@@ -217,6 +217,7 @@ Public Sub TestFailed()
                    , XPos:=.Top _
                    , YPos:=.Left _
                 )
+        Me.Activate
         Application.EnableEvents = False
         .Select
         Application.EnableEvents = True

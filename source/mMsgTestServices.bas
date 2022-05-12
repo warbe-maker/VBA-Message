@@ -1306,9 +1306,11 @@ Public Function Test_09_mMsg_Dsply_Service_ButtonsOnly() As Variant
     If TestMsgHeightIncrDecr = 0 Then Err.Raise AppErr(1), ErrSrc(PROC), "Height increment/decrement must not be 0 for this test!"
     
     '~~ Assemble the matrix of buttons as collection for  the argument buttons
-    For i = 1 To 4 ' rows
+'    For i = 1 To 4 ' rows
+    For i = 1 To 1 ' rows
         If i > 1 Then MsgButtons.Add vbLf
-        For j = 1 To 3
+'        For j = 1 To 3
+        For j = 1 To 2
             MsgButtons.Add "Click " & i & "-" & j & " in case ...." & vbLf & "(instead of a lengthy" & vbLf & "message text above)"
         Next j
     Next i

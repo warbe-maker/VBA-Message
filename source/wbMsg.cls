@@ -26,7 +26,7 @@ Option Explicit
 Const HOSTED_RAWS = "mMsg, fMsg"
 
 Private Sub Workbook_Open()
-   mCompManClient.CompManService "UpdateOutdatedCommonComponents", HOSTED_RAWS
+   mCompManClient.CompManService "UpdateOutdatedCommonComponents", HOSTED_RAWS, True
 End Sub
 
 Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
