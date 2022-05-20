@@ -1,9 +1,4 @@
-22-05-12 19:51:59 Update Outdated (by CompMan.xlsb) for Msg.xlsb: 
-22-05-12 19:51:59 ------------------------------------------------
-22-05-12 19:51:59 Standard-Module    mCompManClient .: 19:51:59:910 DoEvents paused the execution for 00003 msecs in 'mService.SaveWbk'
-22-05-12 19:52:00                                      19:52:00:740 DoEvents paused the execution for 00004 msecs in 'mService.SaveWbk'
-22-05-12 19:52:00 Standard-Module    mBasic .........: Used Common Component up-to-date
-22-05-12 19:52:00 Standard-Module    mCompManClient .: Used Common Component up-to-date
-22-05-12 19:52:00 Standard-Module    mDct ...........: Used Common Component up-to-date
-22-05-12 19:52:00 Standard-Module    mErH ...........: Used Common Component up-to-date
-22-05-12 19:52:00 Standard-Module    mTrc ...........: Used Common Component up-to-date
+22-05-20 19:32:03 Update Outdated (by CompMan.xlsb) for Msg.xlsb: 
+22-05-20 19:32:03 ------------------------------------------------
+22-05-20 19:32:03 Standard-Module    mCompManClient .: 19:32:03:370 DoEvents paused the execution for 00093 msecs in 'mService.SaveWbk'
+22-05-20 19:32:03                                      19:32:03:770 DoEvents paused the execution for 00004 msecs in 'mService.SaveWbk'
