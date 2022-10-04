@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} fMsg 
-   ClientHeight    =   11598
+   ClientHeight    =   11595
    ClientLeft      =   150
    ClientTop       =   390
    ClientWidth     =   12390
@@ -59,7 +59,7 @@ Const DFLT_TXT_MONOSPACED_FONT_SIZE As Single = 10              ' Default monosp
 Const DFLT_TXT_PROPSPACED_FONT_NAME As String = "Tahoma"        ' Default proportional spaced font name
 Const DFLT_TXT_PROPSPACED_FONT_SIZE As Single = 10              ' Default proportional spaced font size
 Const HSPACE_BTTN_AREA              As Single = 15              ' Minimum left and right margin for the centered buttons area
-Const HSPACE_BTTNS                As Single = 4               ' Horizontal space between reply buttons
+Const HSPACE_BTTNS                  As Single = 4               ' Horizontal space between reply buttons
 Const HSPACE_LEFT                   As Single = 0               ' Left margin for labels and text boxes
 Const HSPACE_RIGHT                  As Single = 15              ' Horizontal right space for labels and text boxes
 Const HSPACE_LEFTRIGHT_BUTTONS      As Long = 8                 ' The margin before the left most and after the right most button
@@ -588,9 +588,7 @@ Public Property Get NoOfDesignedMsgSects() As Long ' -----------------------
     NoOfDesignedMsgSects = lNoOfDesignedMsgSects   ' Global definition !!!!!
 End Property                                       ' -----------------------
 
-Private Property Let NoOfDesignedMsgSects(ByVal l As Long)
-    lNoOfDesignedMsgSects = l
-End Property
+Private Property Let NoOfDesignedMsgSects(ByVal l As Long):  lNoOfDesignedMsgSects = l:                             End Property
 
 Private Property Get PrcntgHeightfrmBttnsArea() As Single
     PrcntgHeightfrmBttnsArea = Round(frmBttnsArea.Height / (frmMsectsArea.Height + frmBttnsArea.Height), 2)
@@ -600,11 +598,9 @@ Private Property Get PrcntgHeightMsgArea() As Single
     PrcntgHeightMsgArea = Round(frmMsectsArea.Height / (frmMsectsArea.Height + frmBttnsArea.Height), 2)
 End Property
 
-'Public Property Get ReplyValue() As Variant:                ReplyValue = vReplyValue:                                   End Property
+Public Property Let ReplyWithIndex(ByVal b As Boolean):     bReplyWithIndex = b:                                    End Property
 
-Public Property Let ReplyWithIndex(ByVal b As Boolean):     bReplyWithIndex = b:                                        End Property
-
-Public Property Let SetupDone(ByVal b As Boolean):          bSetUpDone = b:         End Property
+Public Property Let SetupDone(ByVal b As Boolean):          bSetUpDone = b:                                         End Property
 
 Private Property Get SysFrequency() As Currency
     If TimerSystemFrequency = 0 Then getFrequency TimerSystemFrequency
@@ -1620,13 +1616,11 @@ Private Function IsUserForm(ByVal is_obj As Object) As Boolean
       IsUserForm = TypeOf is_obj Is MSForms.UserForm
 End Function
 
-Private Sub laMsgSection1Labe2_Click():     OpenClickedLabelItem 2: End Sub
-
-Private Sub laMsgSection1Labe3_Click():     OpenClickedLabelItem 3: End Sub
-
-Private Sub laMsgSection1Labe4_Click():     OpenClickedLabelItem 4: End Sub
-
 Private Sub laMsgSection1Label_Click():     OpenClickedLabelItem 1: End Sub
+Private Sub laMsgSection2Label_Click():     OpenClickedLabelItem 2: End Sub
+Private Sub laMsgSection3Label_Click():     OpenClickedLabelItem 3: End Sub
+Private Sub laMsgSection4Label_Click():     OpenClickedLabelItem 4: End Sub
+Private Sub laMsgSection5Label_Click():     OpenClickedLabelItem 5: End Sub
 
 Private Sub laMsgSection1Label_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single):        HandCursorForLink 1:    End Sub
 
@@ -1635,6 +1629,8 @@ Private Sub laMsgSection2Label_MouseMove(ByVal Button As Integer, ByVal Shift As
 Private Sub laMsgSection3Label_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single):        HandCursorForLink 3:    End Sub
 
 Private Sub laMsgSection4Label_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single):        HandCursorForLink 4:    End Sub
+
+Private Sub laMsgSection5Label_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single):        HandCursorForLink 5:    End Sub
 
 Private Function Max(ParamArray va() As Variant) As Variant
 ' ----------------------------------------------------------------------------
@@ -2185,11 +2181,11 @@ Private Sub OpenClickedLabelItem(ByVal oc_section As Long)
 End Sub
 
 Private Function GetPanesIndex(ByVal Rng As Range) As Integer
-    Dim sR As Long:          sR = ActiveWindow.SplitRow
-    Dim sc As Long:          sc = ActiveWindow.SplitColumn
-    Dim r As Long:            r = Rng.row
-    Dim c As Long:            c = Rng.Column
-    Dim Index As Integer: Index = 1
+    Dim sR As Long:            sR = ActiveWindow.SplitRow
+    Dim sc As Long:            sc = ActiveWindow.SplitColumn
+    Dim r As Long:              r = Rng.row
+    Dim c As Long:              c = Rng.Column
+    Dim Index As Integer:   Index = 1
 
     Select Case True
     Case sR = 0 And sc = 0: Index = 1
@@ -3438,7 +3434,7 @@ Private Sub VisualizeSetupStep(ByVal vss_status As String)
             .Top = 10
             .Left = 10
             Application.StatusBar = "Setup step visualization for debug and test: " & vss_status
-            Stop
+'            Stop
         End If
     End With
 End Sub
