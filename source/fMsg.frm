@@ -304,6 +304,7 @@ Private Sub UserForm_Terminate()
     Set dctSectsLabel = Nothing
     Set dctSectsMonoSpaced = Nothing
     Set dctSectsText = Nothing
+    Application.EnableEvents = True
 End Sub
 
 Public Property Get MonitorIsInitialized() As Boolean: MonitorIsInitialized = Not cllSteps Is Nothing:  End Property
