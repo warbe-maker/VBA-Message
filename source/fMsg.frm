@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 Option Explicit
 ' -------------------------------------------------------------------------------
 ' UserForm fMsg Provides all means for a message with up to 5 separated text
@@ -246,6 +247,7 @@ Private iSectionsPropSpaced     As Long             ' number of prop. spaced sec
 Private iSectionsMonoSpaced     As Long             ' number of mono-spaced sections setup
 
 Public Property Let ModeLess(ByVal b As Boolean): bModeLess = b:    End Property
+
 Private Sub UserForm_Initialize()
     Const PROC = "UserForm_Initialize"
     
@@ -304,7 +306,9 @@ Private Sub UserForm_Terminate()
     Set dctSectsLabel = Nothing
     Set dctSectsMonoSpaced = Nothing
     Set dctSectsText = Nothing
-    Application.EnableEvents = True
+    If bModeLess Then
+        Application.EnableEvents = True
+    End If
 End Sub
 
 Public Property Get MonitorIsInitialized() As Boolean: MonitorIsInitialized = Not cllSteps Is Nothing:  End Property
@@ -380,7 +384,7 @@ Private Property Let MonoSpaced( _
                  Optional ByVal var_ctl As Variant, _
                           ByVal b As Boolean)
     If b Then
-        If Not dctMonoSpaced.Exists(var_ctl) Then dctMonoSpaced.Add var_ctl, var_ctl.Name
+        If Not dctMonoSpaced.Exists(var_ctl) Then dctMonoSpaced.Add var_ctl, var_ctl.name
     Else
         If dctMonoSpaced.Exists(var_ctl) Then dctMonoSpaced.Remove var_ctl
     End If
@@ -394,7 +398,7 @@ Private Property Let MonoSpacedTbx( _
                  Optional ByVal tbx As MSForms.TextBox, _
                           ByVal b As Boolean)
     If b Then
-        If Not dctMonoSpacedTbx.Exists(tbx) Then dctMonoSpacedTbx.Add tbx, tbx.Name
+        If Not dctMonoSpacedTbx.Exists(tbx) Then dctMonoSpacedTbx.Add tbx, tbx.name
     Else
         If dctMonoSpacedTbx.Exists(tbx) Then dctMonoSpacedTbx.Remove tbx
     End If
@@ -700,7 +704,7 @@ Public Function AddControl(ByVal ac_ctl As MSFormControls _
     If ac_in Is Nothing Then
         If Not CtlExists(ac_name) Then
             Set ctl = Me.Controls.Add(bstrProgID:=MSFormsProgID(ac_ctl) _
-                                    , Name:=ac_name _
+                                    , name:=ac_name _
                                     , Visible:=ac_visible)
             Set AddControl = ctl
         End If
@@ -712,12 +716,12 @@ Public Function AddControl(ByVal ac_ctl As MSFormControls _
             If ac_ctl = Frame Then Stop
             If ac_ctl = Frame Then
                 Set frm = ac_in.Controls.Add(bstrProgID:=MSFormsProgID(ac_ctl) _
-                                           , Name:=ac_name _
+                                           , name:=ac_name _
                                            , Visible:=ac_visible)
                 Set AddControl = frm
             Else
                 Set ctl = ac_in.Controls.Add(bstrProgID:=MSFormsProgID(ac_ctl) _
-                                           , Name:=ac_name _
+                                           , name:=ac_name _
                                            , Visible:=ac_visible)
                 Set AddControl = ctl
             End If
@@ -1437,7 +1441,7 @@ End Sub
 Private Function CtlExists(ByVal ce_name As String) As Boolean
     Dim ctl As MSForms.Control
     For Each ctl In Me.Controls
-        If ctl.Name = ce_name Then
+        If ctl.name = ce_name Then
             CtlExists = True
             Exit For
         End If
@@ -1469,7 +1473,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
     If err_line = 0 Then ErrLine = Erl
-    If err_source = vbNullString Then err_source = Err.Source
+    If err_source = vbNullString Then err_source = Err.source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
     
@@ -2733,7 +2737,7 @@ Private Sub Setup1_Title(ByVal setup_title As String, _
         With .laMsgTitle
             With .Font
                 .Bold = False
-                .Name = Me.Font.Name
+                .name = Me.Font.name
                 .Size = 8    ' Value which comes to a length close to the length required
             End With
             .Caption = vbNullString
@@ -3005,10 +3009,10 @@ Private Sub SetupMsgSect()
                 .Caption = MsgSectLbl.Text
                 With .Font
                     If MsgSectLbl.MonoSpaced Then
-                        If MsgSectLbl.FontName <> vbNullString Then .Name = MsgSectLbl.FontName Else .Name = DFLT_LBL_MONOSPACED_FONT_NAME
+                        If MsgSectLbl.FontName <> vbNullString Then .name = MsgSectLbl.FontName Else .name = DFLT_LBL_MONOSPACED_FONT_NAME
                         If MsgSectLbl.FontSize <> 0 Then .Size = MsgSectLbl.FontSize Else .Size = DFLT_LBL_MONOSPACED_FONT_SIZE
                     Else
-                        If MsgSectLbl.FontName <> vbNullString Then .Name = MsgSectLbl.FontName Else .Name = DFLT_LBL_PROPSPACED_FONT_NAME
+                        If MsgSectLbl.FontName <> vbNullString Then .name = MsgSectLbl.FontName Else .name = DFLT_LBL_PROPSPACED_FONT_NAME
                         If MsgSectLbl.FontSize <> 0 Then .Size = MsgSectLbl.FontSize Else .Size = DFLT_LBL_PROPSPACED_FONT_SIZE
                     End If
                     If MsgSectLbl.FontItalic Then .Italic = True
@@ -3072,7 +3076,7 @@ Const PROC = "SetupMsgSectMonoSpaced"
   
     With MsectTbx
         With .Font
-            If MsgSectTxt.FontName <> vbNullString Then .Name = MsgSectTxt.FontName Else .Name = DFLT_LBL_MONOSPACED_FONT_NAME
+            If MsgSectTxt.FontName <> vbNullString Then .name = MsgSectTxt.FontName Else .name = DFLT_LBL_MONOSPACED_FONT_NAME
             If MsgSectTxt.FontSize <> 0 Then .Size = MsgSectTxt.FontSize Else .Size = DFLT_LBL_MONOSPACED_FONT_SIZE
             If .Bold <> MsgSectTxt.FontBold Then .Bold = MsgSectTxt.FontBold
             If .Italic <> MsgSectTxt.FontItalic Then .Italic = MsgSectTxt.FontItalic
@@ -3144,7 +3148,7 @@ Private Sub SetupMsgSectPropSpaced(Optional ByVal msg_append As Boolean = False,
     
     With MsectTbx
         With .Font
-            If MsgSectTxt.FontName <> vbNullString Then .Name = MsgSectTxt.FontName Else .Name = DFLT_LBL_PROPSPACED_FONT_NAME
+            If MsgSectTxt.FontName <> vbNullString Then .name = MsgSectTxt.FontName Else .name = DFLT_LBL_PROPSPACED_FONT_NAME
             If MsgSectTxt.FontSize <> 0 Then .Size = MsgSectTxt.FontSize Else .Size = DFLT_LBL_PROPSPACED_FONT_SIZE
             If .Bold <> MsgSectTxt.FontBold Then .Bold = MsgSectTxt.FontBold
             If .Italic <> MsgSectTxt.FontItalic Then .Italic = MsgSectTxt.FontItalic
@@ -3191,14 +3195,14 @@ Private Sub SetupTextFont(ByVal ctl As MSForms.Control, _
         If .Italic <> txt.FontItalic Then .Italic = txt.FontItalic
         If .Underline <> txt.FontUnderline Then .Underline = txt.FontUnderline
         If txt.MonoSpaced Then
-            .Name = DFLT_TXT_MONOSPACED_FONT_NAME
+            .name = DFLT_TXT_MONOSPACED_FONT_NAME
             If txt.FontSize = 0 _
             Then .Size = DFLT_TXT_MONOSPACED_FONT_SIZE _
             Else .Size = txt.FontSize
         Else
             If txt.FontName = vbNullString _
-            Then .Name = DFLT_TXT_PROPSPACED_FONT_NAME _
-            Else .Name = txt.FontName
+            Then .name = DFLT_TXT_PROPSPACED_FONT_NAME _
+            Else .name = txt.FontName
             If txt.FontSize = 0 _
             Then .Size = DFLT_TXT_PROPSPACED_FONT_SIZE _
             Else .Size = txt.FontSize
@@ -3494,7 +3498,7 @@ Private Sub ApplicationRunViaButton(ByVal ar_button As String)
         sKey = Replace(Replace(dctApplicationRunArgs.Keys()(i), vbCrLf, "|"), vbLf, "|")
         If sKey = sButton Then
             Set cll = dctApplicationRunArgs.Items()(i)
-            sService = cll(1).Name & "!" & cll(2)
+            sService = cll(1).name & "!" & cll(2)
             
             Select Case cll.Count
                 Case 2: Application.Run sService                 ' service call without arguments
