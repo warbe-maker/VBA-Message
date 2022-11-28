@@ -111,6 +111,8 @@ Public Sub cmdTest22_Click():   mMsgTestServices.Test_22_mMsg_Dsply_Service_Butt
 
 Public Sub cmdTest23_Click():   mMsgTestServices.Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly:                     End Sub
 
+Public Sub cmdTest24_Click():   mMsgTestServices.Test_24_mMsg_All_Sections:                                            End Sub
+
 Public Sub cmdTest30_Click():   mMsgTestServices.Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service:   End Sub
 
 Public Sub cmdTest90_Click():   mMsgTestServices.Test_90_mMsg_Dsply_Service_AllInOne:                                  End Sub
@@ -1918,6 +1920,65 @@ Public Function Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly()
     End With
     
     Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly = _
+    mMsg.Dsply(dsply_title:=MsgTitle _
+             , dsply_msg:=Message _
+             , dsply_buttons:=MsgButtons _
+             , dsply_width_min:=TestMsgWidthMin _
+             , dsply_width_max:=TestMsgWidthMax _
+             , dsply_height_max:=TestMsgHeightMax _
+             , dsply_modeless:=wsTest.TestOptionDisplayModeless _
+              )
+    
+    Select Case Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly
+        Case BTTN_PASSED:       wsTest.TestPassed
+        Case BTTN_FAILED:       wsTest.TestFailed
+        Case BTTN_TERMINATE:    wsTest.TerminateRegressionTest = True
+    End Select
+    TestForm
+    
+xt: EoP ErrSrc(PROC)
+    Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
+End Function
+
+Public Function Test_24_mMsg_All_Sections()
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_24_mMsg_All_Sections"
+    
+    On Error GoTo eh
+    Dim MsgSection  As String
+    Dim i           As Long
+
+    BoP ErrSrc(PROC)
+    SetupMsgTitleInstasnceAndNo 24, Readable(PROC)
+    
+    '~~ Obtain initial test values from the Test Worksheet
+    With wsTest
+        TestMsgWidthMin = .MsgWidthMin
+        TestMsgWidthMax = .MsgWidthMax
+        TestMsgHeightMax = .MsgHeightMax
+    End With
+    
+    MsgForm.VisualizeForTest = wsTest.VisualizeForTest
+    Set MsgButtons = mMsg.Buttons(TestButtons)
+            
+    MsgSection = "Message text section "
+    
+    For i = 1 To 7
+        With Message.Section(i)
+            .Label.Text = "Label section " & i
+            .Label.FontColor = rgbGreen
+            .Text.Text = MsgSection & i
+        End With
+    Next i
+    
+    Test_24_mMsg_All_Sections = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
              , dsply_buttons:=MsgButtons _

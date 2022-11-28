@@ -35,7 +35,11 @@ Private Property Let DisplayedServiceStatus(ByVal s As String)
 End Property
 
 Private Property Get IsDevInstance() As Boolean
-    IsDevInstance = ThisWorkbook.name = mCompManClient.COMPMAN_DEVLP
+    IsDevInstance = ThisWorkbook.Name = mCompManClient.COMPMAN_DEVLP
+End Property
+
+Private Property Get IsAddinInstance() As Boolean
+    IsAddinInstance = ThisWorkbook.Name = mCompManClient.COMPMAN_ADDIN
 End Property
 
 Private Function AppErr(ByVal app_err_no As Long) As Long
@@ -65,6 +69,11 @@ Public Sub CompManService(ByVal cms_name As String, _
     Dim vDone               As Variant
     Dim sWbkServicingName   As String
     
+    If IsAddinInstance Then
+        Application.StatusBar = "None of CompMan's services is applicable for CompMan's Add-in instance!"
+        GoTo xt
+    End If
+
     '~~ Avoid any trouble caused by DoEvents used throughout the execution of any service
     '~~ when a service is already currently busy. This may be the case when Workbook-Save
     '~~ is clicked twice.
@@ -285,7 +294,7 @@ Private Function WbkServicingName(ByVal csa_service As String) As String
     TestResultConfigSyncFailed = AppErr(2)
     AddinPaused = AppErr(3)
     TestResultOutsideCfgFolder = AppErr(4)
-    
+        
     '~~ Availability check CompMan Add-in
     On Error Resume Next
     ServicedByAddinTestResult = Application.Run(COMPMAN_ADDIN & "!mCompMan.RunTest", csa_service, ThisWorkbook)
@@ -309,13 +318,13 @@ Private Function WbkServicingName(ByVal csa_service As String) As String
         Case (ServiceAvailableByCompMan Or ServiceAvailableByAddin) _
          And csa_service = SRVC_SYNCHRONIZE _
          And ServicedByWrkbkTestResult = TestResultOutsideCfgFolder
-            Debug.Print "Silent service denial! 'Synchronize VB-Project' not provided because the serviced Workbook requesting it has not been opened from within the configured 'Sync-Target-Folder'!"
+            Debug.Print "Silent service denial! 'Synchronize VB-Project' not provided because Workbook has not been opened from within the configured 'Sync-Target-Folder'!"
          
         '~~ Servicing instance decision
         Case IsDevInstance And csa_service = SRVC_UPDATE_OUTDATED And ServiceAvailableByAddin:  WbkServicingName = mCompManClient.COMPMAN_ADDIN
         Case IsDevInstance _
          And csa_service = SRVC_UPDATE_OUTDATED And Not ServiceAvailableByAddin
-            DisplayedServiceStatus = "'Update outdated Common Components' service denied for " & ThisWorkbook.name & " (the CompMan Add-in instance is not available or paused)!"
+            DisplayedServiceStatus = "'Update outdated Common Components' service denied for " & ThisWorkbook.Name & " (the CompMan Add-in instance is not available or paused)!"
         Case Not IsDevInstance And ServiceAvailableByCompMan:                                   WbkServicingName = mCompManClient.COMPMAN_DEVLP
         Case Not IsDevInstance And Not ServiceAvailableByCompMan And ServiceAvailableByAddin:   WbkServicingName = mCompManClient.COMPMAN_ADDIN
         Case Not ServiceAvailableByCompMan And ServiceAvailableByAddin:                         WbkServicingName = mCompManClient.COMPMAN_ADDIN

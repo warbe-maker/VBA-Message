@@ -1,2 +1,28 @@
-22-11-22 15:30:21 UpdateOutdatedCommonComponents (by CompMan.xlsb) for Msg.xlsb: 
-22-11-22 15:30:21 ---------------------------------------------------------------
+22-11-28 17:50:55 UpdateOutdatedCommonComponents (by CompMan.xlsb) for Msg.xlsb: 
+22-11-28 17:50:55 ---------------------------------------------------------------
+22-11-28 17:50:56 Standard-Module mCompManClient .: 'mCompManClient' (re-)imported from 'D:\Ablage\Excel VBA\DevAndTest\Common-Components\mCompManClient.bas'
+22-11-28 17:50:56                                   VB-Component renewed/updated by (re-)import of the Raw's Export File (D:\Ablage\Excel VBA\DevAndTest\Common-Components\mCompManClient.bas)
+22-11-28 18:22:53 ========================================================
+22-11-28 18:22:53 ExportChangedComponents (by CompMan.xlsb) for Msg.xlsb: 
+22-11-28 18:22:53 --------------------------------------------------------
+22-11-28 18:22:53 ========================================================
+22-11-28 18:22:53 ExportChangedComponents (by CompMan.xlsb) for Msg.xlsb: 
+22-11-28 18:22:53 --------------------------------------------------------
+22-11-28 18:22:53 Standard-Module Modul1 .........: Modified code exported
+22-11-28 18:22:53 UserForm        fMsg ...........: Hosted Raw Common Component code modified
+22-11-28 18:22:53                                   Code modified of Hosted Raw Common Component
+22-11-28 18:22:53                                   Exported, Revision Number increased, Export File copied to 'Common Components Folder'
+22-11-28 18:22:53 UserForm        fMsgProcTest ...: Unchanged component
+22-11-28 18:22:53 Standard-Module mBasic .........: Unchanged Used Common Component
+22-11-28 18:22:53 Standard-Module mCompManClient .: Unchanged Used Common Component
+22-11-28 18:22:53 Standard-Module mDct ...........: Unchanged Used Common Component
+22-11-28 18:22:53 Standard-Module mErH ...........: Unchanged Used Common Component
+22-11-28 18:22:53 Standard-Module mMsg ...........: Hosted Raw Common Component code modified
+22-11-28 18:22:53                                   Code modified of Hosted Raw Common Component
+22-11-28 18:22:53                                   Exported, Revision Number increased, Export File copied to 'Common Components Folder'
+22-11-28 18:22:53 Standard-Module mMsgTestProcs ..: Unchanged component
+22-11-28 18:22:54 Standard-Module mMsgTestServices: Modified code exported
+22-11-28 18:22:54 Standard-Module mObject ........: Unchanged component
+22-11-28 18:22:54 Standard-Module mTrc ...........: Unchanged Used Common Component
+22-11-28 18:22:54 Workbook        wbMsg ..........: Unchanged component
+22-11-28 18:22:54 Worksheet       wsTest .........: Unchanged component
