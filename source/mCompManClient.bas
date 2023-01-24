@@ -21,6 +21,7 @@ Option Explicit
 Public Const SRVC_UPDATE_OUTDATED   As String = "UpdateOutdatedCommonComponents"
 Public Const SRVC_SYNCHRONIZE       As String = "SynchronizeVBProjects"
 Public Const SRVC_EXPORT_CHANGED    As String = "ExportChangedComponents"
+Public Const SRVC_EXPORT_ALL        As String = "ExportAll"
 Public Const COMPMAN_ADDIN          As String = "CompMan.xlam"
 Public Const COMPMAN_DEVLP          As String = "CompMan.xlsb"
 
@@ -54,8 +55,7 @@ Private Function AppErr(ByVal app_err_no As Long) As Long
 End Function
 
 Public Sub CompManService(ByVal cms_name As String, _
-                 Optional ByVal cms_hosted_common_components As String = vbNullString, _
-                 Optional ByVal cms_unused As Boolean)
+                 Optional ByVal cms_hosted_common_components As String = vbNullString)
 ' ----------------------------------------------------------------------------
 ' Execution of the CompMan service (cms_name) preferably via the "CompMan
 ' Development Instance" as the servicing Workbook. Only when not available the
@@ -66,7 +66,6 @@ Public Sub CompManService(ByVal cms_name As String, _
     Const PROC = "CompManService"
     
     On Error GoTo eh
-    Dim vDone               As Variant
     Dim sWbkServicingName   As String
     
     If IsAddinInstance Then
@@ -88,6 +87,12 @@ Public Sub CompManService(ByVal cms_name As String, _
         If cms_name = mCompManClient.SRVC_SYNCHRONIZE _
         Then Application.Run sWbkServicingName & "!mCompMan." & mCompManClient.SRVC_SYNCHRONIZE, ThisWorkbook _
         Else Application.Run sWbkServicingName & "!mCompMan." & cms_name, ThisWorkbook, cms_hosted_common_components
+    End If
+    If Not ThisWorkbook.Saved Then
+        Application.DisplayAlerts = False
+        Application.EnableEvents = False
+        ThisWorkbook.Save
+        Application.DisplayAlerts = True
     End If
     
 xt: Busy = False
@@ -186,7 +191,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
     If err_line = 0 Then ErrLine = Erl
-    If err_source = vbNullString Then err_source = Err.source
+    If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
     
@@ -281,50 +286,46 @@ Private Function WbkServicingName(ByVal csa_service As String) As String
 ' ----------------------------------------------------------------------------
     Const PROC = "WbkServicingName"
     
-    Dim ServicedByAddinTestResult   As Long
-    Dim ServicedByWrkbkTestResult   As Long
-    Dim ServiceAvailableByAddin     As Boolean
-    Dim ServiceAvailableByCompMan   As Boolean
-    Dim AddinPaused                 As Long
-    Dim TestResultConfigSyncFailed  As Long
-    Dim TestResultConfigServcFailed As Long
-    Dim TestResultOutsideCfgFolder  As Long
+    Dim ServicedByAddinResult           As Long
+    Dim ServicedByWrkbkResult           As Long
+    Dim ServiceAvailableByAddin         As Boolean
+    Dim ServiceAvailableByCompMan       As Boolean
+    Dim ResultRequiredAddinNotAvailable As Long
+    Dim ResultConfigInvalid             As Long
+    Dim ResultOutsideCfgFolder          As Long
     
-    TestResultConfigServcFailed = AppErr(1)
-    TestResultConfigSyncFailed = AppErr(2)
-    AddinPaused = AppErr(3)
-    TestResultOutsideCfgFolder = AppErr(4)
+    ResultConfigInvalid = AppErr(1)             ' Configuration for the service is invalid
+    ResultOutsideCfgFolder = AppErr(2)          ' Outside the for the service required folder
+    ResultRequiredAddinNotAvailable = AppErr(3) ' Required Addin for DevInstance update paused or not open
         
     '~~ Availability check CompMan Add-in
     On Error Resume Next
-    ServicedByAddinTestResult = Application.Run(COMPMAN_ADDIN & "!mCompMan.RunTest", csa_service, ThisWorkbook)
+    ServicedByAddinResult = Application.Run(COMPMAN_ADDIN & "!mCompMan.RunTest", csa_service, ThisWorkbook)
     ServiceAvailableByAddin = Err.Number = 0
     '~~ Availability check CompMan Workbook
     On Error Resume Next
-    ServicedByWrkbkTestResult = Application.Run(COMPMAN_DEVLP & "!mCompMan.RunTest", csa_service, ThisWorkbook)
+    ServicedByWrkbkResult = Application.Run(COMPMAN_DEVLP & "!mCompMan.RunTest", csa_service, ThisWorkbook)
     ServiceAvailableByCompMan = Err.Number = 0
     
     Select Case True
-         '~~ Invalid configuration for the requested service
-        Case ServicedByWrkbkTestResult = TestResultConfigSyncFailed _
-         And csa_service = SRVC_SYNCHRONIZE
-            DisplayedServiceStatus = "'Synchronize VB-Project' service denied (a valid configuration is missing)!"
-        Case ServicedByWrkbkTestResult = TestResultConfigServcFailed _
-         And csa_service = SRVC_UPDATE_OUTDATED
-            DisplayedServiceStatus = "Export Changed Components denied (a valid configuration is missing)!"
-        Case ServicedByWrkbkTestResult = TestResultConfigServcFailed _
-         And csa_service = SRVC_EXPORT_CHANGED
-             DisplayedServiceStatus = "'Update outdated Common Components' service denied (a valid configuration is missing)!"
-        Case (ServiceAvailableByCompMan Or ServiceAvailableByAddin) _
-         And csa_service = SRVC_SYNCHRONIZE _
-         And ServicedByWrkbkTestResult = TestResultOutsideCfgFolder
-            Debug.Print "Silent service denial! 'Synchronize VB-Project' not provided because Workbook has not been opened from within the configured 'Sync-Target-Folder'!"
-         
+        '~~ Display/indicate why the service cannot be provided
+        Case ServicedByWrkbkResult = ResultConfigInvalid
+            Select Case csa_service
+                Case SRVC_SYNCHRONIZE:      DisplayedServiceStatus = "'Synchronize VB-Project' service denied (a valid configuration is missing)!"
+                Case SRVC_UPDATE_OUTDATED:  DisplayedServiceStatus = "Export Changed Components denied (a valid configuration is missing)!"
+                Case SRVC_EXPORT_CHANGED:   DisplayedServiceStatus = "'Update outdated Common Components' service denied (a valid configuration is missing)!"
+            End Select
+        Case ServicedByWrkbkResult = ResultOutsideCfgFolder
+            Select Case csa_service
+                Case SRVC_SYNCHRONIZE:      Debug.Print "'Synchronize VB-Project' service silently denied! (Workbook has not been opened from within the configured 'Sync-Target-Folder')"
+                Case SRVC_UPDATE_OUTDATED:  Debug.Print "'Export Changed Components' service silently denied! (Workbook has not been opened from within the configured 'Dev-and-Test-Folder')"
+                Case SRVC_EXPORT_CHANGED:   Debug.Print "'Update outdated Common Components' service silently denied! (Workbook has not been opened from within the configured 'Dev-and-Test-Folder')"
+            End Select
+        Case ServicedByWrkbkResult = ResultRequiredAddinNotAvailable
+            DisplayedServiceStatus = "The required Add-in is not available for the 'Update' service for the Development-Instance!"
+            
         '~~ Servicing instance decision
         Case IsDevInstance And csa_service = SRVC_UPDATE_OUTDATED And ServiceAvailableByAddin:  WbkServicingName = mCompManClient.COMPMAN_ADDIN
-        Case IsDevInstance _
-         And csa_service = SRVC_UPDATE_OUTDATED And Not ServiceAvailableByAddin
-            DisplayedServiceStatus = "'Update outdated Common Components' service denied for " & ThisWorkbook.Name & " (the CompMan Add-in instance is not available or paused)!"
         Case Not IsDevInstance And ServiceAvailableByCompMan:                                   WbkServicingName = mCompManClient.COMPMAN_DEVLP
         Case Not IsDevInstance And Not ServiceAvailableByCompMan And ServiceAvailableByAddin:   WbkServicingName = mCompManClient.COMPMAN_ADDIN
         Case Not ServiceAvailableByCompMan And ServiceAvailableByAddin:                         WbkServicingName = mCompManClient.COMPMAN_ADDIN
