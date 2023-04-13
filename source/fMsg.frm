@@ -270,7 +270,7 @@ Private Sub Initialize()
     bFormEvents = False
     siMsgWidthMin = 20      ' Default minimum message window width
     siHmarginFrames = 0     ' Ensures proper command buttons framing, may be used for test purpose
-    Me.VmarginFrames = 0    ' Ensures proper command buttons framing and vertical positioning of controls
+    VmarginFrames = 0    ' Ensures proper command buttons framing and vertical positioning of controls
     SetupDone = False
     bDoneTitle = False
     bDoneMonoSpacedSects = False
@@ -349,7 +349,7 @@ Private Property Get FormWidthMaxUsable()
     FormWidthMaxUsable = siMsgWidthMax - 15
 End Property
 
-Public Property Let IndicateFrameCaptions(ByVal b As Boolean):                              bIndicateFrameCaptions = b:                                         End Property
+'Private Property Let IndicateFrameCaptions(ByVal b As Boolean):                              bIndicateFrameCaptions = b:                                         End Property
 
 Private Property Get MaxRowsHeight() As Single:                                             MaxRowsHeight = siMaxButtonHeight + (siVmarginFrames * 2):          End Property
 
@@ -678,7 +678,7 @@ End Property
 
 Private Property Get VmarginFrames() As Single:              VmarginFrames = siVmarginFrames:                            End Property
 
-Public Property Let VmarginFrames(ByVal si As Single):      siVmarginFrames = AdjustToVgrid(si):                        End Property
+Private Property Let VmarginFrames(ByVal si As Single):      siVmarginFrames = AdjustToVgrid(si):                        End Property
 
 Private Function AddControl(ByVal ac_ctl As MSFormControls _
                  , Optional ByVal ac_in As MSForms.Frame = Nothing _
@@ -3156,28 +3156,28 @@ Private Sub SetupTextFont(ByVal ctl As MSForms.Control, _
 ' corresponding TypeMsgText type (kind_of_text).
 ' ------------------------------------------------------------------------------
 
-    Dim txt As TypeMsgText
-    txt = Me.Text(kind_of_text)
+    Dim Txt As TypeMsgText
+    Txt = Me.Text(kind_of_text)
     
     With ctl.Font
-        If .Bold <> txt.FontBold Then .Bold = txt.FontBold
-        If .Italic <> txt.FontItalic Then .Italic = txt.FontItalic
-        If .Underline <> txt.FontUnderline Then .Underline = txt.FontUnderline
-        If txt.MonoSpaced Then
+        If .Bold <> Txt.FontBold Then .Bold = Txt.FontBold
+        If .Italic <> Txt.FontItalic Then .Italic = Txt.FontItalic
+        If .Underline <> Txt.FontUnderline Then .Underline = Txt.FontUnderline
+        If Txt.MonoSpaced Then
             .Name = DFLT_TXT_MONOSPACED_FONT_NAME
-            If txt.FontSize = 0 _
+            If Txt.FontSize = 0 _
             Then .Size = DFLT_TXT_MONOSPACED_FONT_SIZE _
-            Else .Size = txt.FontSize
+            Else .Size = Txt.FontSize
         Else
-            If txt.FontName = vbNullString _
+            If Txt.FontName = vbNullString _
             Then .Name = DFLT_TXT_PROPSPACED_FONT_NAME _
-            Else .Name = txt.FontName
-            If txt.FontSize = 0 _
+            Else .Name = Txt.FontName
+            If Txt.FontSize = 0 _
             Then .Size = DFLT_TXT_PROPSPACED_FONT_SIZE _
-            Else .Size = txt.FontSize
+            Else .Size = Txt.FontSize
         End If
     End With
-    ctl.ForeColor = txt.FontColor
+    ctl.ForeColor = Txt.FontColor
     If bVisualizeForTest Then ctl.BackColor = VISLZE_BCKCLR_MSEC_TBX
 End Sub
 

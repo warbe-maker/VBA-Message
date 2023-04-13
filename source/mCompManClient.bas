@@ -2,20 +2,17 @@ Attribute VB_Name = "mCompManClient"
 Option Explicit
 ' ----------------------------------------------------------------------
 ' Standard Module mCompManClient
-' ------------------------------
-' Component to be imported into any Workbook in order to enbale it for
-' being serviced by CompMan. The component is the interface between a
-' the serviced Workbook/VB-Project and CompMan as the servicing Workbook
-' for the services:
-' - "Export Changed Components"
-' - "Update Outdated Common Components"
-' - "Synchronize VB-Projects"
+' ==============================
+' CompMan client interface. To be imported into any Workbook for being
+' serviced by CompMan's: - "Export Changed Components"
+'                        - "Update Outdated Common Components"
+'                        - "Synchronize VB-Projects"
 '
-' See also the public Github repo:
-' https://github.com/warbe-maker/Excel-VB-Components-Management-Services
+' W. Rauschenberger, Berlin Apr 2023
 '
-' W. Rauschenberger, Berlin Feb 2023
+' See https://github.com/warbe-maker/Excel-VB-Components-Management-Services
 ' ----------------------------------------------------------------------
+' --- The below constants must not be changed to Private since they are used byCompMan
 Public Const COMPMAN_DEVLP              As String = "CompMan.xlsb"
 Public Const SRVC_EXPORT_ALL            As String = "ExportAll"
 Public Const SRVC_EXPORT_ALL_DSPLY      As String = "Export All Components"
@@ -25,6 +22,7 @@ Public Const SRVC_SYNCHRONIZE           As String = "SynchronizeVBProjects"
 Public Const SRVC_SYNCHRONIZE_DSPLY     As String = "Synchronize VB-Projects"
 Public Const SRVC_UPDATE_OUTDATED       As String = "UpdateOutdatedCommonComponents"
 Public Const SRVC_UPDATE_OUTDATED_DSPLY As String = "Update Outdated Common Components"
+' --- The above constants must not be changed to Private since they are used byCompMan
 
 Private Const COMPMAN_ADDIN             As String = "CompMan.xlam"
 Private Const vbResume                  As Long = 6 ' return value (equates to vbYes)

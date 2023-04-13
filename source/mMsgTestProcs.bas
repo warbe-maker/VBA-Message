@@ -6,13 +6,11 @@ Option Explicit
 '          Test of procedures - rather than fMsg/mMsg services/functions.
 '
 ' ------------------------------------------------------------------------------
-Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
-
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mMsgTestServices." & s:  End Property
 
-Public Function AdjustToVgrid(ByVal atvg_si As Single, _
-                     Optional ByVal atvg_threshold As Single = 1.5, _
-                     Optional ByVal atvg_grid As Single = 6) As Single
+Private Function AdjustToVgrid(ByVal atvg_si As Single, _
+                      Optional ByVal atvg_threshold As Single = 1.5, _
+                      Optional ByVal atvg_grid As Single = 6) As Single
 ' -------------------------------------------------------------------------------
 ' Returns an integer which is a multiple of the grid value (stvg_grid) which
 ' defaults to 6, by considering a certain threshold (atvg_threshold) which
@@ -63,10 +61,8 @@ Private Function Buttons(ParamArray bttns() As Variant) As Collection
     Static lBttnsInRow  As Long         ' buttons in a row counter (excludes break items)
     Static lBttns       As Long         ' total buttons in cllAdd
     Static lRows        As Long         ' button rows counter
-    Static SubItems     As Long
     Static SubItemsDone As Long
     Dim cll             As Collection
-    Dim v2              As Variant
     Dim i               As Long
     
     If cllResult Is Nothing Then
@@ -294,14 +290,10 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
     Const PROC = "FormNew"
     
     On Error GoTo eh
-    Dim MyUserForm          As VBComponent
     Dim NewCommandButton1   As MSForms.CommandButton
     Dim NewCommandButton2   As MSForms.CommandButton
-    Dim N                   As Long
     Dim X                   As Long
-    Dim MaxWidth            As Long
     Dim cmp                 As VBComponent
-    Dim frm                 As UserForm
     Dim LeftPos             As Single
     
     '~~ Check the form doesn't already exist
@@ -382,7 +374,6 @@ Private Sub FormRemove(ByVal wb As Workbook, _
     Const PROC = "FormRemove"
     
     On Error GoTo eh
-    Dim i As Long
     Dim cmp As VBComponent
     
     With wb.VBProject
@@ -402,23 +393,11 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
-Private Function IsForm(ByVal v As Object) As Boolean
-    Dim o As Object
-    On Error Resume Next
-    Set o = v.Parent
-    IsForm = Err.Number <> 0
-End Function
-
-Private Function IsFrameOrForm(ByVal v As Object) As Boolean
-    IsFrameOrForm = TypeOf v Is MSForms.UserForm Or TypeOf v Is MSForms.Frame
-End Function
-
 Private Function IsValidMsgButtonsArg(ByVal v_arg As Variant) As Boolean
 ' -------------------------------------------------------------------------------------
 ' Returns TRUE when the buttons argument (v_arg) is valid. When v_arg is an Array,
 ' a Collection, or a Dictionary, TRUE is returned when all items are valid.
 ' -------------------------------------------------------------------------------------
-    Dim i As Long
     Dim v As Variant
     
     Select Case VarType(v_arg)
@@ -439,108 +418,6 @@ Private Function IsValidMsgButtonsArg(ByVal v_arg As Variant) As Boolean
             End Select
     End Select
 
-End Function
-
-Private Sub IsValidMsgButtonsArg_Test()
-' -------------------------------------------------------------------------------------
-' Test of the "IsValidMsgButtonsArg" function, !! the copy from mMsg !!
-' -------------------------------------------------------------------------------------
-    Dim ValidCollection         As New Collection
-    Dim ValidDictionary         As New Dictionary
-    Dim ValidArray(1 To 3)      As Variant
-    Dim InValidCollection       As New Collection
-    Dim InValidDictionary       As New Dictionary
-    Dim InValidArray(1 To 3)    As Variant
-    
-    ValidArray(1) = vbOKCancel
-    ValidArray(2) = "xxx"
-    ValidArray(3) = "xxx,yyy"
-    
-    InValidArray(1) = vbOKCancel
-    InValidArray(2) = 2377
-    InValidArray(3) = "xxx,yyy"
-    
-    ValidCollection.Add vbOKCancel
-    ValidCollection.Add "xxx"
-    ValidCollection.Add "xxx,yyy"
-    
-    ValidDictionary.Add vbOKCancel, vbOKCancel
-    ValidDictionary.Add "xxx", "xxx"
-    ValidDictionary.Add "xxx,yyy", "xxx,yyy"
-    
-    Debug.Assert IsValidMsgButtonsArg(vbYesNo) = True
-    Debug.Assert IsValidMsgButtonsArg("xxx") = True
-    Debug.Assert IsValidMsgButtonsArg("xxx,yyy") = True
-    Debug.Assert IsValidMsgButtonsArg("xxx") = True
-    Debug.Assert IsValidMsgButtonsArg(ValidArray) = True
-    Debug.Assert IsValidMsgButtonsArg(ValidCollection) = True
-    Debug.Assert IsValidMsgButtonsArg(ValidDictionary) = True
-
-    Debug.Assert IsValidMsgButtonsArg(InValidArray) = False
-
-    Set ValidCollection = Nothing
-    Set ValidDictionary = Nothing
-End Sub
-
-Private Sub Monitor_Test()
-    Dim i       As Long
-    Dim fMon    As fMsg
-    Dim Text    As TypeMsgText
-    Dim Title   As String
-    Dim Footer  As TypeMsgText
-    Dim Step    As TypeMsgText
-    Dim Header  As TypeMsgText
-    
-    Title = "Test of the services:  MonitorHeader, MsgMonitor, and MonitorFooter"
-    With Header
-        .Text = "Process steps 1 to 10"
-        .FontColor = rgbBlue
-    End With
-    With Footer
-        .Text = "Process (steps 1 to 10) in progress, please hang on."
-        .FontColor = rgbBlue
-    End With
-    Set fMon = mMsg.MsgInstance(Title)
-    fMon.VisualizeForTest = wsTest.VisualizeForTest
-    
-    mMsg.MonitorHeader Title, Header
-    mMsg.MonitorFooter Title, Footer
-    
-    For i = 1 To 20
-        If i = 11 Then
-            With Header
-                .Text = "Process steps 11 to 20"
-                .FontColor = rgbRed
-            End With
-            mMsg.MonitorHeader Title, Header
-            With Footer
-                .Text = "Process (steps 10 to 20) in progress, please hang on."
-                .FontColor = rgbBlue
-            End With
-            mMsg.MonitorFooter Title, Footer
-        End If
-        DoEvents
-        With Step
-            .Text = Format(i, "00 ") & "Step"
-            .MonoSpaced = True
-        End With
-        mMsg.Monitor mon_title:=Title _
-                   , mon_text:=Step
-        DoEvents
-        Sleep 150
-    Next i
-    
-    With Footer
-        .Text = "Process finished! Close window."
-        .FontColor = rgbDarkGreen
-    End With
-    mMsg.MonitorFooter Title, Footer
-
-End Sub
-
-Private Function PrcPnt(ByVal pp_value As Single, _
-                        ByVal pp_dimension As String) As String
-    PrcPnt = mMsg.Prcnt(pp_value, pp_dimension) & "% (" & mMsg.Pnts(pp_value, "w") & "pt)"
 End Function
 
 Private Function Qdequeue(ByRef qu As Collection) As Variant
@@ -692,79 +569,16 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
+Public Sub Test_Regression()
+    Test_AdjustToVgrid
+End Sub
+
 Private Sub Test_AdjustToVgrid()
-    Dim i As Single
-    
-    For i = 5.8 To 8 Step 0.1
-        Debug.Print Format(i, "00.0: ") & AdjustToVgrid(i)
-    Next i
-    Debug.Print Format(fMsgProcTest.tbxFactor.Object, "00.0: ") & AdjustToVgrid(i)
+    Debug.Assert AdjustToVgrid(7.4) = 6
+    Debug.Assert AdjustToVgrid(7.5) = 12
 End Sub
 
-Public Sub Test_AssertWidthAndHeight()
-' ------------------------------------------------------------------------------
-' - All values are returned as pt
-' - All values are within their limit
-' - Any min value above its max values is set equal to the max value
-' ------------------------------------------------------------------------------
-
-    Dim WidthMin    As Long
-    Dim WidthMax    As Long
-    Dim HeightMin   As Long
-    Dim HeightMax   As Long
-    
-    '~~ Test 1: All values conform with their min/max limit
-    WidthMin = MSG_WIDTH_MIN_LIMIT_PERCENTAGE
-    WidthMax = MSG_WIDTH_MAX_LIMIT_PERCENTAGE
-    HeightMin = MSG_HEIGHT_MIN_LIMIT_PERCENTAGE
-    HeightMax = MSG_HEIGHT_MAX_LIMIT_PERCENTAGE
-    
-    mMsg.AssertWidthAndHeight WidthMin, WidthMax, HeightMin, HeightMax
-    Debug.Assert WidthMin = Pnts(MSG_WIDTH_MIN_LIMIT_PERCENTAGE, "w")
-    Debug.Assert WidthMax = Pnts(MSG_WIDTH_MAX_LIMIT_PERCENTAGE, "w")
-    Debug.Assert HeightMin = Pnts(MSG_HEIGHT_MIN_LIMIT_PERCENTAGE, "h")
-    Debug.Assert HeightMax = Pnts(MSG_HEIGHT_MAX_LIMIT_PERCENTAGE, "h")
-    
-    '~~ Test 2         : Min width > width max and height min > height max
-    '~~ Expected result: The min values are set equal with their corresponding max value
-    WidthMin = 41
-    WidthMax = 40
-    HeightMin = 31
-    HeightMax = 30
-    mMsg.AssertWidthAndHeight WidthMin, WidthMax, HeightMin, HeightMax
-    Debug.Assert WidthMin = Pnts(40, "w")
-    Debug.Assert WidthMax = Pnts(40, "w")
-    Debug.Assert HeightMin = Pnts(30, "h")
-    Debug.Assert HeightMax = Pnts(30, "h")
-    
-    '~~ Test 3          : Min values are less than their limit, max values are greater than their limit
-    '~~ Expected results: All values are reset to their corresponding limit
-    WidthMin = MSG_WIDTH_MIN_LIMIT_PERCENTAGE - 1
-    WidthMax = MSG_WIDTH_MAX_LIMIT_PERCENTAGE + 1
-    HeightMin = MSG_HEIGHT_MIN_LIMIT_PERCENTAGE - 1
-    HeightMax = MSG_HEIGHT_MAX_LIMIT_PERCENTAGE + 1
-    mMsg.AssertWidthAndHeight WidthMin, WidthMax, HeightMin, HeightMax
-    Debug.Assert WidthMin = Pnts(MSG_WIDTH_MIN_LIMIT_PERCENTAGE, "w")
-    Debug.Assert WidthMax = Pnts(MSG_WIDTH_MAX_LIMIT_PERCENTAGE, "w")
-    Debug.Assert HeightMin = Pnts(MSG_HEIGHT_MIN_LIMIT_PERCENTAGE, "h")
-    Debug.Assert HeightMax = Pnts(MSG_HEIGHT_MAX_LIMIT_PERCENTAGE, "h")
-        
-    '~~ Test 4         : All values are 0
-    '~~ Expected result: Min values are set to their corresponding limit, max values are set to the width value
-    WidthMin = 0
-    WidthMax = 0
-    HeightMin = 0
-    HeightMax = 0
-    mMsg.AssertWidthAndHeight WidthMin, WidthMax, HeightMin, HeightMax
-    Debug.Assert WidthMin = Pnts(MSG_WIDTH_MIN_LIMIT_PERCENTAGE, "w")
-    Debug.Assert WidthMax = WidthMin
-    Debug.Assert HeightMin = Pnts(MSG_HEIGHT_MIN_LIMIT_PERCENTAGE, "h")
-    Debug.Assert HeightMax = HeightMin
-
-
-End Sub
-
-Public Sub Test_AutoSizeTextBox_Width_Limited()
+Private Sub Test_AutoSizeTextBox_Width_Limited()
     Const PROC = "Test_AutoSizeTextBox_Width_Limited"
     
     Dim i                   As Long
@@ -861,7 +675,7 @@ again:
 
 End Sub
 
-Public Sub Test_AutoSizeTextBox_Width_Unlimited()
+Private Sub Test_AutoSizeTextBox_Width_Unlimited()
     Const PROC = "Test_AutoSizeTextBox_Width_Unlimited"
     
     Dim i               As Long
@@ -869,10 +683,8 @@ Public Sub Test_AutoSizeTextBox_Width_Unlimited()
     Dim iStep           As Long
     Dim iTo             As Long
     Dim TestAppend      As Boolean
-    Dim TestHeightMax   As Single
     Dim TestHeightMin   As Single
     Dim TestWidthLimit  As Single
-    Dim TestWidthtMax   As Single
     
     iFrom = 1
     iTo = 5
@@ -946,82 +758,6 @@ again:
 
 End Sub
 
-Public Sub Test_DisplayWithWithoutFrames()
-    Const PROC = "Test_DisplayWithWithoutFrames"
-    
-    Dim MsgForm     As fMsg
-    Dim MsgTitle    As String
-    
-    MsgTitle = "With frames test"
-    Set MsgForm = mMsg.MsgInstance(MsgTitle)
-    MsgForm.VisualizeForTest = True
-    mMsg.Box "Message should be displayed with visible frames", "With frames test"
-    mMsg.Box "Message should be displayed with frames invisible", "With frames test"
-           
-End Sub
-
-Private Sub Test_IsFrameOrForm()
-    Debug.Assert IsFrameOrForm(fMsgProcTest.TextBox1) = False
-    Debug.Assert IsFrameOrForm(fMsgProcTest.frm) = True
-    Debug.Assert IsFrameOrForm(fMsgProcTest.frm.Parent) = True
-    Debug.Assert IsForm(fMsgProcTest.frm) = False
-    Debug.Assert IsForm(fMsgProcTest.frm.Parent) = True
-End Sub
-
-Public Sub Test_MultipleMessageInstances()
-' ------------------------------------------------------------------------------
-' Creates a number of instance of the UserForm named fMsgProcTest and unloads them
-' in the revers order. Application.Wait is used to allow the observation of the
-' process.
-' Note: The test shows that is not required to have a variable for the instance
-'       object. It may however make sense in practise.
-' ------------------------------------------------------------------------------
-    Const INIT_TOP = 50
-    Const INIT_LEFT = 50
-    
-    Dim i   As Long
-    Dim key As String
-    Dim Obj As Object ' not required for the function but only to get the UserForm's name
-    
-    For i = 1 To 5
-        key = "Instance-" & i
-        '~~ Set obj ... will create the instance. However, this is not not required.
-        '~~ It is just used to obtain the UserForms name
-        Set Obj = TestInstance(fi_key:=key)
-        With TestInstance(fi_key:=key)
-            .Height = 80
-            .Width = 200
-            .Caption = key & " of UserForm '" & Obj.Name & "'"
-            .Show Modeless
-            .Top = INIT_TOP + (30 * i)
-            .Left = INIT_LEFT + (30 * i)
-        End With
-        Application.Wait Now() + 0.000006
-    Next i
-    
-    For i = 5 To 1 Step -1
-        key = "Instance-" & i
-        '~~ Unloading the instance this way has two advantages:
-        '~~ 1. The instance is removed from the Dictionary
-        '~~ 2. No error in case the instance no longer exists
-        TestInstance fi_key:=key, fi_unload:=True
-        Application.Wait Now() + 0.000006
-    Next i
-    
-End Sub
-
-Private Sub Test_OpenFile()
-    mMsg.ShellRun "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\ExecTrace.log", WIN_NORMAL
-End Sub
-
-Private Sub Test_OpenFile_No_Assoc()
-    mMsg.ShellRun "E:\Ablage\Excel VBA\DevAndTest\Common-VBA-Message-Service\.gitattributes", WIN_NORMAL
-End Sub
-
-Private Sub Test_OpenHyperlink()
-    mMsg.ShellRun "https://github.com/warbe-maker/Common-VBA-Message-Service", WIN_NORMAL
-End Sub
-
 Private Sub Test_Pass_TypeMsgText()
 ' ------------------------------------------------------------------------------
 ' Test of passing on any 'kind of' TypeMsgText to a UserForm and retrieving it
@@ -1067,36 +803,6 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
         Case vbResume:  Stop: Resume
         Case Else:      GoTo xt
     End Select
-End Sub
-
-Public Sub Test_SetupTitle()
-    fMsgProcTest.Show False
-End Sub
-
-Public Sub Test_SizingAndPositioning()
-
-    Dim Instance1 As String
-    Dim Instance2 As String
-    Dim Instance3 As String
-    Dim Instance4 As String
-    Dim Instance5 As String
-    Dim Title     As String
-    Dim i         As Long
-    
-    For i = 1 To 7
-        Title = RepeatStrng("Test Sizing and Positioning", i)
-        With TestInstance(Title)
-            .Top = 0
-            .Left = 0
-            .Height = Pnts(50, "h")
-            .Caption = Title
-            .Top = i * 35
-            .Left = i * 10
-            .Setup1_Title Title, 200, 800
-            .Show False
-        End With
-    Next i
-
 End Sub
 
 Private Function RepeatStrng( _

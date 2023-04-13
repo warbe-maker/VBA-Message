@@ -23,7 +23,7 @@ Private Property Get ColMsgWidthMax() As Range:             Set ColMsgWidthMax =
 
 Private Property Get ColMsgWidthMin() As Range:             Set ColMsgWidthMin = Me.Range("colMsgWidthMin"):                                            End Property
 
-Public Property Get FailedText() As String
+Private Property Get FailedText() As String
     Intersect(Range("rowTest" & wsTest.TestNumber), Range("colTestPassedFailed")).Value = "Failed"
     FailedText = Intersect(RowTest(lTestNumber).EntireRow, Range("colTestPassedFailedNote").EntireColumn).Value
 End Property
@@ -96,7 +96,7 @@ xt: Exit Property
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Property
 
-Public Property Let TestResultNote(ByVal s As String)
+Private Property Let TestResultNote(ByVal s As String)
     Intersect(Range("rowTest" & wsTest.TestNumber), Range("colTestPassedFailedNote")).Value = s
 End Property
 

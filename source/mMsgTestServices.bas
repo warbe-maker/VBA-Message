@@ -14,14 +14,13 @@ Option Compare Text
 ' W. Rauschenberger, Berlin June 2020
 ' -------------------------------------------------------------------------------
 #If VBA7 Then
-    Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As LongPtr)
+    Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As LongPtr)
 #Else
-    Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
+    Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
 #End If
 
-Public Const BTTN_FINISH        As String = "Test Done"
-Public Const BTTN_PASSED        As String = "Passed"
-Public Const BTTN_FAILED        As String = "Failed"
+Private Const BTTN_PASSED       As String = "Passed"
+Private Const BTTN_FAILED       As String = "Failed"
 
 Private Message                 As TypeMsg
 Private MsgButtons              As Collection
@@ -37,7 +36,6 @@ Private TestMsgWidthMin         As Long
 Private vButton4                As Variant
 Private vButton5                As Variant
 Private vButton6                As Variant
-Private vButton7                As Variant
 Private sReadableTestProc       As String
 
 Private Property Get BTTN_TERMINATE() As String ' composed constant
@@ -104,10 +102,6 @@ Public Sub cmdTest16_Click():   mMsgTestServices.Test_16_mMsg_Dsply_Service_Butt
 Public Sub cmdTest17_Click():   mMsgTestServices.Test_17_mMsg_Box_Service_MessageAsString:                             End Sub
 
 Public Sub cmdTest20_Click():   mMsgTestServices.Test_20_mMsg_Dsply_Service_ButtonByValue:                             End Sub
-
-Public Sub cmdTest21_Click():   mMsgTestServices.Test_21_mMsg_Dsply_Service_ButtonByString:                            End Sub
-
-Public Sub cmdTest22_Click():   mMsgTestServices.Test_22_mMsg_Dsply_Service_ButtonByCollection:                        End Sub
 
 Public Sub cmdTest23_Click():   mMsgTestServices.Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly:                     End Sub
 
@@ -283,7 +277,7 @@ Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "mMsgTestServices." & sProc
 End Function
 
-Public Sub Explore(ByVal ctl As Variant, _
+Private Sub Explore(ByVal ctl As Variant, _
           Optional ByVal applied As Boolean = True)
 ' ------------------------------------------------------------------------------
 '
@@ -520,10 +514,6 @@ Private Function RepeatString( _
     RepeatString = s
 End Function
 
-Public Sub RepeatTest()
-    Debug.Print RepeatString(10, "a", True, False, vbLf)
-End Sub
-
 Private Sub SetupMsgTitleInstasnceAndNo(ByVal test_no As Long, ByVal test_title As String)
     
     wsTest.TestNumber = test_no
@@ -539,7 +529,7 @@ Private Sub SetupMsgTitleInstasnceAndNo(ByVal test_no As Long, ByVal test_title 
     
 End Sub
 
-Public Sub Test_00_Regression()
+Private Sub Test_00_Regression()
 ' --------------------------------------------------------------------------------------
 ' Regression testing makes use of all available design means - by the way testing them.
 ' Note: Each test procedure is completely independant and thus may be executed directly.
@@ -581,7 +571,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
-Public Sub Test_01_mMsg_Buttons_Service()
+Private Sub Test_01_mMsg_Buttons_Service()
     Const PROC = "Test_01_mMsg_Buttons_Service"
     BoP ErrSrc(PROC)
     mMsgTestServices.Test_01_mMsg_Buttons_Service_01_Empty
@@ -597,7 +587,7 @@ Public Sub Test_01_mMsg_Buttons_Service()
     EoP ErrSrc(PROC)
 End Sub
 
-Public Sub Test_01_mMsg_Buttons_Service_01_Empty()
+Private Sub Test_01_mMsg_Buttons_Service_01_Empty()
     Const PROC = "Test_01_mMsg_Buttons_Service_01_Empty"
     
     BoP ErrSrc(PROC)
@@ -607,7 +597,7 @@ Public Sub Test_01_mMsg_Buttons_Service_01_Empty()
     EoP ErrSrc(PROC)
 End Sub
 
-Public Sub Test_01_mMsg_Buttons_Service_02_Single_String()
+Private Sub Test_01_mMsg_Buttons_Service_02_Single_String()
     Const PROC = "Test_01_mMsg_Buttons_Service_02_Single_String"
     
     BoP ErrSrc(PROC)
@@ -618,7 +608,7 @@ Public Sub Test_01_mMsg_Buttons_Service_02_Single_String()
     EoP ErrSrc(PROC)
 End Sub
 
-Public Function Test_01_mMsg_Buttons_Service_03_Single_Numeric_Item() As Variant
+Private Function Test_01_mMsg_Buttons_Service_03_Single_Numeric_Item() As Variant
     Const PROC = "Test_01_mMsg_Buttons_Service_03_Single_Numeric_Item"
     
     BoP ErrSrc(PROC)
@@ -629,7 +619,7 @@ Public Function Test_01_mMsg_Buttons_Service_03_Single_Numeric_Item() As Variant
     EoP ErrSrc(PROC)
 End Function
 
-Public Sub Test_01_mMsg_Buttons_Service_04_String_String()
+Private Sub Test_01_mMsg_Buttons_Service_04_String_String()
     Const PROC = "Test_01_mMsg_Buttons_Service_04_String_String"
     
     BoP ErrSrc(PROC)
@@ -641,7 +631,7 @@ Public Sub Test_01_mMsg_Buttons_Service_04_String_String()
     EoP ErrSrc(PROC)
 End Sub
 
-Public Sub Test_01_mMsg_Buttons_Service_05_Collection_String_String()
+Private Sub Test_01_mMsg_Buttons_Service_05_Collection_String_String()
     Const PROC = "Test_01_mMsg_Buttons_Service_05_Collection_String_String"
     Dim MsgButtons_1 As New Collection
     
@@ -661,7 +651,7 @@ Public Sub Test_01_mMsg_Buttons_Service_05_Collection_String_String()
     EoP ErrSrc(PROC)
 End Sub
 
-Public Sub Test_01_mMsg_Buttons_Service_06_String_Collection_String()
+Private Sub Test_01_mMsg_Buttons_Service_06_String_Collection_String()
     Const PROC = "Test_01_mMsg_Buttons_Service_06_String_Collection_String"
     Dim MsgButtons_1   As New Collection
     
@@ -681,7 +671,7 @@ Public Sub Test_01_mMsg_Buttons_Service_06_String_Collection_String()
     EoP ErrSrc(PROC)
 End Sub
 
-Public Sub Test_01_mMsg_Buttons_Service_07_String_String_Collection()
+Private Sub Test_01_mMsg_Buttons_Service_07_String_String_Collection()
     Const PROC = "Test_01_mMsg_Buttons_Service_07_String_String_Collection"
     Dim MsgButtons_1   As New Collection
     
@@ -701,7 +691,7 @@ Public Sub Test_01_mMsg_Buttons_Service_07_String_String_Collection()
     EoP ErrSrc(PROC)
 End Sub
 
-Public Sub Test_01_mMsg_Buttons_Service_08_Semicolon_Delimited_String_Collection()
+Private Sub Test_01_mMsg_Buttons_Service_08_Semicolon_Delimited_String_Collection()
     Const PROC = "Test_01_mMsg_Buttons_Service_08_Semicolon_Delimited_String_Collection"
     Dim MsgButtons_1   As New Collection
     
@@ -721,7 +711,7 @@ Public Sub Test_01_mMsg_Buttons_Service_08_Semicolon_Delimited_String_Collection
     EoP ErrSrc(PROC)
 End Sub
 
-Public Sub Test_01_mMsg_Buttons_Service_09_Comma_Delimited_String_Dictionary()
+Private Sub Test_01_mMsg_Buttons_Service_09_Comma_Delimited_String_Dictionary()
     Const PROC = "Test_01_mMsg_Buttons_Service_09_Comma_Delimited_String_Dictionary"
     Dim dct   As New Dictionary
     
@@ -741,7 +731,7 @@ Public Sub Test_01_mMsg_Buttons_Service_09_Comma_Delimited_String_Dictionary()
     EoP ErrSrc(PROC)
 End Sub
 
-Public Function Test_01_mMsg_Box_Service_Buttons_7_By_7_Matrix() As Variant
+Private Function Test_01_mMsg_Box_Service_Buttons_7_By_7_Matrix() As Variant
 ' ------------------------------------------------------------------------------
 ' The Buttons service "in action": Display a matrix of 7 x 7 buttons
 ' ------------------------------------------------------------------------------
@@ -783,7 +773,7 @@ xt: EoP ErrSrc(PROC)
     
 End Function
 
-Public Sub Passed()
+Private Sub Passed()
 ' ------------------------------------------------------------------------------
 ' This "service" may be called from a "Passed" button when the message has been
 ' displayed modeless.
@@ -794,7 +784,7 @@ Public Sub Passed()
            , Title:="Modeless test display"
 End Sub
 
-Public Sub Failed()
+Private Sub Failed()
 ' ------------------------------------------------------------------------------
 ' This "service" may be called from a "Failed" button when the message has been
 ' displayed modeless.
@@ -805,7 +795,7 @@ Public Sub Failed()
            , Title:="Modeless test display"
 End Sub
 
-Public Sub Test_02_mMsg_ErrMsg_Service()
+Private Sub Test_02_mMsg_ErrMsg_Service()
 ' ------------------------------------------------------------------------------
 ' Test of the "universal error message display which includes
 ' - the 'Debugging Option' activated by the Conditional Compile Argument
@@ -850,7 +840,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
-Public Function Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth() As Variant
+Private Function Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -936,7 +926,7 @@ Private Function TestForm() As fMsg
     
 End Function
 
-Public Function Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle() As Variant
+Private Function Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -994,7 +984,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection() As Variant
+Private Function Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1093,7 +1083,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons() As Variant
+Private Function Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1160,7 +1150,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgWidth() As Variant
+Private Function Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgWidth() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1220,7 +1210,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHeight() As Variant
+Private Function Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHeight() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1282,7 +1272,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_09_mMsg_Dsply_Service_ButtonsOnly() As Variant
+Private Function Test_09_mMsg_Dsply_Service_ButtonsOnly() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1291,7 +1281,6 @@ Public Function Test_09_mMsg_Dsply_Service_ButtonsOnly() As Variant
     On Error GoTo eh
     Dim i           As Long
     Dim j           As Long
-    Dim vReply      As Variant
     Dim bMonospaced As Boolean: bMonospaced = True ' initial test value
     
     BoP ErrSrc(PROC)
@@ -1350,7 +1339,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_10_mMsg_Dsply_Service_ButtonsMatrix() As Variant
+Private Function Test_10_mMsg_Dsply_Service_ButtonsMatrix() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1419,7 +1408,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical() As Variant
+Private Function Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1497,7 +1486,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal() As Variant
+Private Function Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1573,7 +1562,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars() As Variant
+Private Function Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1583,7 +1572,6 @@ Public Function Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars()
     Dim i, j                    As Long
     Dim bMonospaced             As Boolean: bMonospaced = True ' initial test value
     Dim TestMsgWidthMin         As Long
-    Dim TestMsgWidthMaxSpecInPt As Long
     Dim TestMsgHeightMax        As Long
     
     BoP ErrSrc(PROC)
@@ -1639,7 +1627,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_16_mMsg_Dsply_Service_ButtonByDictionary()
+Private Function Test_16_mMsg_Dsply_Service_ButtonByDictionary()
 ' ------------------------------------------------------------------------------
 ' The buttons argument is provided as Dictionary.
 ' ------------------------------------------------------------------------------
@@ -1694,7 +1682,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_17_mMsg_Box_Service_MessageAsString() As Variant
+Private Function Test_17_mMsg_Box_Service_MessageAsString() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1740,7 +1728,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_20_mMsg_Dsply_Service_ButtonByValue()
+Private Function Test_20_mMsg_Dsply_Service_ButtonByValue()
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1787,7 +1775,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_21_mMsg_Dsply_Service_ButtonByString()
+Private Function Test_21_mMsg_Dsply_Service_ButtonByString()
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1834,7 +1822,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_22_mMsg_Dsply_Service_ButtonByCollection()
+Private Function Test_22_mMsg_Dsply_Service_ButtonByCollection()
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1884,7 +1872,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly()
+Private Function Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly()
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1945,7 +1933,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_24_mMsg_All_Sections()
+Private Function Test_24_mMsg_All_Sections()
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -2004,7 +1992,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service() As Variant
+Private Function Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Service() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -2108,7 +2096,7 @@ Private Sub ObtainTestResult(ByVal otr_title As String)
     TestForm
 End Sub
 
-Public Function Test_90_mMsg_Dsply_Service_AllInOne() As Variant
+Private Function Test_90_mMsg_Dsply_Service_AllInOne() As Variant
     Const PROC      As String = "Test_90_mMsg_Dsply_Service_AllInOne"
 
     Dim i, j        As Long
@@ -2185,7 +2173,7 @@ xt: EoP ErrSrc(PROC)
     
 End Function
 
-Public Function Test_91_mMsg_Dsply_Service_MinimumMessage() As Variant
+Private Function Test_91_mMsg_Dsply_Service_MinimumMessage() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -2242,7 +2230,7 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL() As Variant
+Private Function Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -2308,4 +2296,27 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
         Case Else:      GoTo xt
     End Select
 End Function
+
+Private Sub Test_UnusedPublic()
+' ----------------------------------------------------------------
+' The test procedure is also a usage example.
+' ----------------------------------------------------------------
+    Const PROC              As String = "Test_UnusedPublic"
+    Const COMPS_EXCLUDED    As String = "mBasic,mDct,mErH,mObject,mTrc"
+    Const LINES_EXCLUDED    As String = "Select Case*ErrMsg(ErrSrc(PROC))" & vbCrLf & _
+                                        "Case vbResume:*Stop:*Resume" & vbCrLf & _
+                                        "Case Else:*GoTo xt"
+    mTrc.LogFile = Replace(ThisWorkbook.FullName, ThisWorkbook.Name, "Exec.trc")
+    
+    mBasic.BoP ErrSrc(PROC)
+    '~~ Providing the Workbook argments saves the Workbook selection dialog
+    '~~ Providing the specification of the excluded VBComponents saves the selection dialog
+    '~~ Providing excluded lines may improve the overall performance
+    Application.Run "VBPunusedPublic.xlsb!mUnused.Unused", Application.Workbooks("Msg.xlsb"), COMPS_EXCLUDED, LINES_EXCLUDED
+    mBasic.EoP ErrSrc(PROC)
+    
+    mTrc.Dsply
+
+End Sub
+
 
