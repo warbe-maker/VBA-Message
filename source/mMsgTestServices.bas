@@ -2297,25 +2297,43 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Private Sub Test_UnusedPublic()
+Private Sub UnusedPublicItems()
 ' ----------------------------------------------------------------
-' The test procedure is also a usage example.
+' Please note:
+' - Providing the Workbook argument saves the Workbook selection
+'   dialog
+' - Providing the specification of the excluded VBComponents saves
+'   the selection dialog. If explicitely none are to be excluded
+'   a vbNullString need to be provided
+' - Providing excluded lines - those which are a kind of standard
+'   and for sure will not contain any call/use of a public item -
+'   may improve the overall performance
+' - The service displays the result by means of ShellRun. In case
+'   no application is linked with the file extention .txt a dialog
+'   to determain which application to use for the open will be
+'   displayed.
+'
+' W. Rauschenberger, Berlin Apr 2023
 ' ----------------------------------------------------------------
-    Const PROC              As String = "Test_UnusedPublic"
-    Const COMPS_EXCLUDED    As String = "mBasic,mDct,mErH,mObject,mTrc"
-    Const LINES_EXCLUDED    As String = "Select Case*ErrMsg(ErrSrc(PROC))" & vbCrLf & _
+    Const COMPS_EXCLUDED As String = vbNullString ' Example: "mBasic,mDct,mErH,mObject,mTrc"
+    Const LINES_EXCLUDED As String = "Select Case*ErrMsg(ErrSrc(PROC))" & vbCrLf & _
                                         "Case vbResume:*Stop:*Resume" & vbCrLf & _
                                         "Case Else:*GoTo xt"
-    mTrc.LogFile = Replace(ThisWorkbook.FullName, ThisWorkbook.Name, "Exec.trc")
+    Const UNUSED_SERVICE As String = "VBPunusedPublic.xlsb!mUnused.Unused" ' must not be altered
     
-    mBasic.BoP ErrSrc(PROC)
-    '~~ Providing the Workbook argments saves the Workbook selection dialog
-    '~~ Providing the specification of the excluded VBComponents saves the selection dialog
-    '~~ Providing excluded lines may improve the overall performance
-    Application.Run "VBPunusedPublic.xlsb!mUnused.Unused", Application.Workbooks("Msg.xlsb"), COMPS_EXCLUDED, LINES_EXCLUDED
-    mBasic.EoP ErrSrc(PROC)
     
-    mTrc.Dsply
+    '~~ Check if the servicing Workbook is open and terminate of not.
+    Dim wbk As Workbook
+    On Error Resume Next
+    Set wbk = Application.Workbooks("VBPunusedPublic.xlsb")
+    If Err.Number <> 0 Then
+        MsgBox Title:="The Workbook VBPunusedPublic.xlsb is not open!", Prompt:="The Workbook needs to be opened before this procedure is re-executed." & vbLf & vbLf & _
+                      "The Workbook may be downloaded from the link provided in the 'Immediate Window'. Use the download button on the displayed webpage."
+        Debug.Print "https://github.com/warbe-maker/Common-Excel-VBP-Unused-Public-Items-Service/blob/main/VBPunusedPublic.xlsb?raw=true"
+        Exit Sub
+    End If
+    
+    Application.Run UNUSED_SERVICE, , COMPS_EXCLUDED, LINES_EXCLUDED
 
 End Sub
 
