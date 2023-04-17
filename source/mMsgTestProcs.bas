@@ -6,6 +6,16 @@ Option Explicit
 '          Test of procedures - rather than fMsg/mMsg services/functions.
 '
 ' ------------------------------------------------------------------------------
+Public Sub ModeLessPassed(ByVal m_title As String)
+    wsTest.TestPassed
+    mMsg.MsgInstance m_title, True
+End Sub
+
+Public Sub ModeLessFailed(ByVal m_title As String)
+    wsTest.TestFailed
+    mMsg.MsgInstance m_title, True
+End Sub
+
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mMsgTestServices." & s:  End Property
 
 Private Function AdjustToVgrid(ByVal atvg_si As Single, _
@@ -411,7 +421,7 @@ Private Function IsValidMsgButtonsArg(ByVal v_arg As Variant) As Boolean
                      Next v
                     IsValidMsgButtonsArg = True
                 Case IsNumeric(v_arg)
-                    Select Case BttnsArgs(v_arg) ' The numeric buttons argument with all additional option 'unstripped'
+                    Select Case BttnArg(v_arg) ' The numeric buttons argument with all additional option 'unstripped'
                         Case vbOKOnly, vbOKCancel, vbYesNo, vbRetryCancel, vbYesNoCancel, vbAbortRetryIgnore, vbYesNo, vbResumeOk
                             IsValidMsgButtonsArg = True
                     End Select

@@ -308,7 +308,7 @@ Public Function WsShapeExists(ByVal wse_ws As Worksheet, _
     For Each shp In wse_ws.Shapes
         If shp.Name = wse_shape_name Then
             WsShapeExists = True
-            Exit Function
+            GoTo xt
         End If
     Next shp
     

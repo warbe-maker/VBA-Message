@@ -78,18 +78,19 @@ Private Property Get TestNumbers() As Range
     Set TestNumbers = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colTestNo").EntireColumn)
 End Property
 
-Public Property Get TestOptionDisplayModeless() As Boolean
-    Const PROC          As String = "TestOptionDisplayModeless_Get"
+Public Property Get TestOptionModelessMessageDisplay() As Boolean
+    Const PROC          As String = "TestOptionModelessMessageDisplay_Get"
     Const SHAPE_NAME    As String = "optDisplayModeless"
     
     On Error GoTo eh
 
+    If wsTest.RegressionTest Then GoTo xt ' Regression and ModeLess is not supported
     If Not mObject.WsShapeExists(wse_ws:=Me, wse_shape_name:=SHAPE_NAME) _
     Then Err.Raise AppErr(1), ErrSrc(PROC), "A shape named '" & SHAPE_NAME & "' does not exist in Worksheet '" & Me.Name & "'!"
         
     If Me.Shapes("optDisplayModeless").OLEFormat.Object.Value = 1 _
-    Then TestOptionDisplayModeless = True _
-    Else TestOptionDisplayModeless = False
+    Then TestOptionModelessMessageDisplay = True _
+    Else TestOptionModelessMessageDisplay = False
 
 xt: Exit Property
 
@@ -241,5 +242,6 @@ Private Sub Worksheet_Activate()
     wsTest.Range("rngZoom").Select
     ActiveWindow.Zoom = True
     Rng.Select
+    Application.EnableEvents = True
 End Sub
 

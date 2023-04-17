@@ -93,7 +93,7 @@ Private Const SM_CYVIRTUALSCREEN                As Long = &H4F&
 Private Const LOGPIXELSX                        As Long = 88
 Private Const LOGPIXELSY                        As Long = 90
 Private Const TWIPSPERINCH                      As Long = 1440
-Private Const WIN_NORMAL = 1         'Open Normal
+Private Const WIN_NORMAL                        As Long = 1             ' Shell Open Normal
 
 Private Declare PtrSafe Function GetSystemMetrics32 Lib "user32" Alias "GetSystemMetrics" (ByVal nIndex As Long) As Long
 Private Declare PtrSafe Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
@@ -2823,7 +2823,7 @@ Private Sub Setup3_Bttns()
     Bttn.Width = DFLT_BTTN_MIN_WIDTH
     
     For Each v In cllMsgBttns
-        If IsNumeric(v) Then v = mMsg.BttnsArgs(v)
+        If IsNumeric(v) Then v = mMsg.BttnArg(v)
         Select Case v
             Case vbOKOnly, vbOKCancel, vbYesNo, vbRetryCancel, vbYesNoCancel, vbAbortRetryIgnore, vbYesNo, vbResumeOk
                 Setup3_BttnsFromValue v

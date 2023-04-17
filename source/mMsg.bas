@@ -187,11 +187,11 @@ Public Sub AssertWidthAndHeight(Optional ByRef a_width_min As Long = 0, _
     
 End Sub
 
-Public Sub ButtonAppRun(ByRef bar_dct As Dictionary, _
-                        ByVal bar_button As String, _
-                        ByVal bar_wb As Workbook, _
-                        ByVal bar_service_name As String, _
-                        ParamArray bar_arguments() As Variant)
+Public Sub BttnAppRun(ByRef bar_dct As Dictionary, _
+                      ByVal bar_button As String, _
+                      ByVal bar_wb As Workbook, _
+                      ByVal bar_service_name As String, _
+                      ParamArray bar_arguments() As Variant)
 ' --------------------------------------------------------------------------
 ' Returns a Dictionary (bar_dct) with Application.Run information for the
 ' button identified by its caption string (bar_button) added with the
@@ -208,7 +208,7 @@ Public Sub ButtonAppRun(ByRef bar_dct As Dictionary, _
 ' - When the message form is displayed "Modal", which is the default, any
 '   provided Application.Run information is ignored.
 ' --------------------------------------------------------------------------
-    Const PROC = "ButtonAppRun"
+    Const PROC = "BttnAppRun"
     
     On Error GoTo eh
     Dim v   As Variant
@@ -270,7 +270,7 @@ Public Function Box(ByVal Prompt As String, _
     Dim Message As TypeMsgText
     Dim MsgForm As fMsg
 
-    If Not IsValidMsgButtonsArg(Buttons) _
+    If Not BttnArgsAreValid(Buttons) _
     Then Err.Raise AppErr(1), ErrSrc(PROC), _
                    "The provided buttons argument is neither empty (defaults to vbOkOnly), a string " & _
                    "(optionally comma separated), a valid VBA.MsgBox value (vbYesNo, vbRetryCancel, " & _
@@ -326,85 +326,85 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function BttnsArgs(ByVal ba_arg As Long, _
-                 Optional ByRef ba_rtl_reading As Boolean, _
-                 Optional ByRef ba_box_right As Boolean, _
-                 Optional ByRef ba_set_foreground As Boolean, _
-                 Optional ByRef ba_help_button As Boolean, _
-                 Optional ByRef ba_system_modal As Boolean, _
-                 Optional ByRef ba_default_button As Long, _
-                 Optional ByRef ba_information As Boolean, _
-                 Optional ByRef ba_exclamation As Boolean, _
-                 Optional ByRef ba_question As Boolean, _
-                 Optional ByRef ba_critical As Boolean) As Long
+Public Function BttnArg(ByVal b_arg As Long, _
+                 Optional ByRef b_rtl_reading As Boolean, _
+                 Optional ByRef b_box_right As Boolean, _
+                 Optional ByRef b_set_foreground As Boolean, _
+                 Optional ByRef b_help_button As Boolean, _
+                 Optional ByRef b_system_modal As Boolean, _
+                 Optional ByRef b_default_button As Long, _
+                 Optional ByRef b_information As Boolean, _
+                 Optional ByRef b_exclamation As Boolean, _
+                 Optional ByRef b_question As Boolean, _
+                 Optional ByRef b_critical As Boolean) As Long
 ' -------------------------------------------------------------------------------------
-' Returns the Buttons argument (ba_arg) with all the options removed by returning them
+' Returns the Buttons argument (b_arg) with all the options removed by returning them
 ' as optional arguments. In order to mimic the Buttons argument of the VBA.MsgBox any
 ' values added for other options but the display of the buttons are unstripped/deducted.
 ' I.e. the values are deducted and the corresponding argument is returtned instead).
 ' -------------------------------------------------------------------------------------
     Dim l As Long
     
-    l = ba_arg - (Abs(Int(ba_arg / 16) * 16))
+    l = b_arg - (Abs(Int(b_arg / 16) * 16))
     Select Case l
         Case vbOKOnly, vbOKCancel, vbAbortRetryIgnore, vbYesNoCancel, vbYesNo, vbRetryCancel
         Case Else
-            BttnsArgs = l ' may be a wromg value and thus need to be validated further
+            BttnArg = l ' may be a wromg value and thus need to be validated further
             Exit Function
     End Select
 
-    While ba_arg >= vbCritical                          ' 16
-        Select Case ba_arg
+    While b_arg >= vbCritical                          ' 16
+        Select Case b_arg
             '~~ VBA.MsgBox Display options
             Case Is >= vbMsgBoxRtlReading               ' 1048576  not implemented
-                ba_arg = ba_arg - vbMsgBoxRtlReading
-                ba_rtl_reading = True
+                b_arg = b_arg - vbMsgBoxRtlReading
+                b_rtl_reading = True
             
             Case Is >= vbMsgBoxRight                    ' 524288   not implemented
-                ba_arg = ba_arg - vbMsgBoxRight
-                ba_box_right = True
+                b_arg = b_arg - vbMsgBoxRight
+                b_box_right = True
             
             Case Is >= vbMsgBoxSetForeground            ' 65536    not implemented
-                ba_arg = ba_arg - vbMsgBoxSetForeground
-                ba_set_foreground = True
+                b_arg = b_arg - vbMsgBoxSetForeground
+                b_set_foreground = True
             
             Case Is >= vbMsgBoxHelpButton               ' 16384    not implemented: Display of a Help button
-                ba_arg = ba_arg - vbMsgBoxHelpButton
-                ba_help_button = True
+                b_arg = b_arg - vbMsgBoxHelpButton
+                b_help_button = True
             
             Case Is >= vbSystemModal                    ' 4096     not implemented
-                ba_arg = ba_arg - vbSystemModal
-                ba_system_modal = True
+                b_arg = b_arg - vbSystemModal
+                b_system_modal = True
             
             Case Is >= vbDefaultButton4                 ' 768
-                ba_arg = ba_arg - vbDefaultButton4
-                ba_default_button = 4
+                b_arg = b_arg - vbDefaultButton4
+                b_default_button = 4
             Case Is >= vbDefaultButton3                 ' 512
-                ba_arg = ba_arg - vbDefaultButton3
-                ba_default_button = 3
+                b_arg = b_arg - vbDefaultButton3
+                b_default_button = 3
             
             Case Is >= vbDefaultButton2                 ' 256
-                ba_arg = ba_arg - vbDefaultButton2
-                ba_default_button = 2
+                b_arg = b_arg - vbDefaultButton2
+                b_default_button = 2
             
             Case Is >= vbInformation                    ' 64
-                ba_arg = ba_arg - vbInformation
-                ba_information = True
+                b_arg = b_arg - vbInformation
+                b_information = True
             
             Case Is >= vbExclamation                    ' 48
-                ba_arg = ba_arg - vbExclamation
-                ba_exclamation = True
+                b_arg = b_arg - vbExclamation
+                b_exclamation = True
             
             Case Is >= vbQuestion                       ' 32
-                ba_arg = ba_arg - vbQuestion
-                ba_question = True
+                b_arg = b_arg - vbQuestion
+                b_question = True
             
             Case Is >= vbCritical                       ' 16
-                ba_arg = ba_arg - vbCritical
-                ba_critical = True
+                b_arg = b_arg - vbCritical
+                b_critical = True
         End Select
     Wend
-    BttnsArgs = ba_arg
+    BttnArg = b_arg
 
 End Function
 
@@ -421,7 +421,7 @@ Public Function Buttons(ParamArray bttns() As Variant) As Collection
 ' Returns the provided items (bttns) as Collection. If an item is a
 ' Collection its items are extracted and included at the corresponding
 ' position. When the consequtive number of buttons exceeds 7 a vbLf is
-' included to indicate a new row. When the number of rows is exieeded any
+' included to indicate a new row. When the number of rows is exeeded any
 ' subsequent items are ignored.
 ' --------------------------------------------------------------------------
     Const PROC          As String = "Buttons"
@@ -603,7 +603,7 @@ Public Function Dsply(ByVal dsply_title As String, _
     mTrc.Pause
 #End If
     
-    If Not IsValidMsgButtonsArg(dsply_buttons) _
+    If Not BttnArgsAreValid(dsply_buttons) _
     Then Err.Raise AppErr(1), ErrSrc(PROC), _
                    "The provided buttons argument is neither empty (defaults to vbOkOnly), a string " & _
                    "(optionally comma separated), a valid VBA.MsgBox value (vbYesNo, vbRetryCancel, " & _
@@ -777,30 +777,29 @@ Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "mMsg." & sProc
 End Function
 
-Private Function IsValidMsgButtonsArg(ByVal v_arg As Variant) As Boolean
+Public Function BttnArgsAreValid(ByVal v_arg As Variant) As Boolean
 ' -------------------------------------------------------------------------------------
-' Returns TRUE when the buttons argument (v_arg) is valid. When v_arg is an Array,
-' a Collection, or a Dictionary, TRUE is returned when all items are valid.
+' Returns TRUE when all items of the argument (v_arg) are valid, i.e. a string or one
+' of the valid MsgBox button values. When the argument is an Array, a Collection, or a
+' Dictionary the function is called recursively for each item.
 ' -------------------------------------------------------------------------------------
     Dim v As Variant
     
-    Select Case VarType(v_arg)
-        Case vbString, vbEmpty
-            IsValidMsgButtonsArg = True
-        Case Else
-            Select Case True
-                Case IsArray(v_arg), TypeName(v_arg) = "Collection", TypeName(v_arg) = "Dictionary"
-                     For Each v In v_arg
-                        If Not IsValidMsgButtonsArg(v) Then Exit Function
-                     Next v
-                    IsValidMsgButtonsArg = True
-                Case IsNumeric(v_arg)
-                    Select Case BttnsArgs(v_arg) ' The numeric buttons argument with all additional option 'unstripped'
-                        Case vbOKOnly, vbOKCancel, vbYesNo, vbRetryCancel, vbYesNoCancel, vbAbortRetryIgnore, vbYesNo, vbResumeOk
-                            IsValidMsgButtonsArg = True
-                    End Select
-            End Select
-    End Select
+    BttnArgsAreValid = VarType(v_arg) = vbString Or VarType(v_arg) = vbEmpty
+    If Not BttnArgsAreValid Then
+        Select Case True
+            Case IsArray(v_arg), TypeName(v_arg) = "Collection", TypeName(v_arg) = "Dictionary"
+                 For Each v In v_arg
+                    If Not BttnArgsAreValid(v) Then Exit Function
+                 Next v
+                BttnArgsAreValid = True
+            Case IsNumeric(v_arg)
+                Select Case BttnArg(v_arg) ' The numeric buttons argument with all additional option 'unstripped'
+                    Case vbOKOnly, vbOKCancel, vbYesNo, vbRetryCancel, vbYesNoCancel, vbAbortRetryIgnore, vbYesNo, vbResumeOk
+                        BttnArgsAreValid = True
+                End Select
+        End Select
+    End If
 
 End Function
 
