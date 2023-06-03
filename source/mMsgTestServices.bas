@@ -11,7 +11,7 @@ Option Compare Text
 ' - Where applicable the test provides Application.Run arguments (AppRunArgs)
 '   for the PASSED and the FAILED button in order to support the optional
 '   ModeLess message display
-' - For the Regression test (Test_00_Regression) explicitely raised errors are
+' - For the Regression test (Test_00_Regression) explicitly raised errors are
 '   asserted beforehand in order not to interrupt the regression test procedure.
 '   To achive this, mErH.Regression = True is set and
 '   mErH.Asserted AppErr(n) is used in the test procedure for 'awaited'
@@ -1593,7 +1593,7 @@ Private Function Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal() As Varia
             .Label.Text = "Test description:"
             .Text.Text = "The button's width (determined by the longest buttons caption text line), " & _
                          "their number, and the button's order (all in one row) exceeds the form's " & _
-                         "maximum width, explicitely specified for this test as " & _
+                         "maximum width, explicitly specified for this test as " & _
                          PrcPnt(TestMsgWidthMax, "w") & " of the screen width."
         End With
         With Message.Section(2)
@@ -2270,7 +2270,7 @@ Private Function Test_90_mMsg_Dsply_Service_AllInOne() As Variant
     With Msg.Section(3)
         .Label.Text = "Unlimited message height (not the fact with this message):"
         .Label.FontColor = rgbBlue
-        .Text.Text = "As with the message width, the message height is unlimited. When the maximum height (explicitely specified or the default) " _
+        .Text.Text = "As with the message width, the message height is unlimited. When the maximum height (explicitly specified or the default) " _
                    & "is exceeded a vertical scroll-bar is displayed. Due to this feature there is no message size limit other than the sytem's " _
                    & "limit which for a string is about 1GB !!!!"
     End With
@@ -2457,7 +2457,7 @@ Private Sub UnusedPublicItems()
 ' - Providing the Workbook argument saves the Workbook selection
 '   dialog
 ' - Providing the specification of the excluded VBComponents saves
-'   the selection dialog. If explicitely none are to be excluded
+'   the selection dialog. If explicitly none are to be excluded
 '   a vbNullString need to be provided
 ' - Providing excluded lines - those which are a kind of standard
 '   and for sure will not contain any call/use of a public item -
