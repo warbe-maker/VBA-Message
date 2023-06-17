@@ -1,13 +1,31 @@
-23-04-17 16:40:28 Export Changed Components (by Add-in) for Msg.xlsb: 
-23-04-17 16:40:28 ----------------------------------------------------
-23-04-17 16:40:29 UserForm        fMsgProcTest ...: Unchanged component
-23-04-17 16:40:29 Standard-Module mBasic .........: Unchanged Used Common Component
-23-04-17 16:40:29 Standard-Module mCompManClient .: Unchanged Used Common Component
-23-04-17 16:40:29 Standard-Module mDct ...........: Unchanged Used Common Component
-23-04-17 16:40:29 Standard-Module mErH ...........: Unchanged Used Common Component
-23-04-17 16:40:29 Standard-Module mMsgTestProcs ..: Unchanged component
-23-04-17 16:40:29 Standard-Module mMsgTestServices: Unchanged component
-23-04-17 16:40:29 Standard-Module mObject ........: Unchanged component
-23-04-17 16:40:29 Standard-Module mTrc ...........: Unchanged Used Common Component
-23-04-17 16:40:29 Workbook        wbMsg ..........: Unchanged component
-23-04-17 16:40:29 Worksheet       wsTest .........: Unchanged component
+23-06-17-10:17:34  Update Outdated Common Components (by Add-in) for Msg.xlsb 
+23-06-17-10:17:34 ----------------------------------------------------------
+23-06-17-10:17:34  Standard-Module mBasic ...........: Used Common Component
+23-06-17-10:17:34  Standard-Module mCompManClient ...: Used Common Component
+23-06-17-10:17:34  Standard-Module mDct .............: Used Common Component
+23-06-17-10:17:34  Standard-Module mErH .............: Used Common Component
+23-06-17-10:17:34  Standard-Module mTrc .............: Used Common Component
+23-06-17-10:17:35  Standard-Module mCompManClient ...: Used Common Component is up-to-date
+23-06-17-10:17:35  Standard-Module mDct .............: Used Common Component is up-to-date
+23-06-17-10:17:40  Standard-Module mBasic ...........: Outdated used Common Component updated by re-import of D:\Ablage\Excel VBA\DevAndTest\Common-Components\mBasic.bas
+23-06-17-10:17:43  Standard-Module mErH .............: Outdated used Common Component updated by re-import of D:\Ablage\Excel VBA\DevAndTest\Common-Components\mErH.bas
+23-06-17-10:17:46  Standard-Module mTrc .............: Outdated used Common Component updated by re-import of D:\Ablage\Excel VBA\DevAndTest\Common-Components\mTrc.bas
+23-06-17-10:28:58 ==========================================================================
+23-06-17-10:28:58             Export Changed Components (by Add-in) for Msg.xlsb            
+23-06-17-10:28:58 --------------------------------------------------------------------------
+23-06-17-10:28:58  UserForm        fMsg .............: Unchanged hosted raw Common Component
+23-06-17-10:28:58  UserForm        fMsgProcTest .....: Unchanged VBComponent
+23-06-17-10:28:59  Standard-Module mBasic ...........: Modified used Common Component!!!!! (because this is not the hosting Workbook a "due revert allert" has been registered!)
+23-06-17-10:28:59  _______________ ___________________ Modified used Common Component e x p o r t e d !
+23-06-17-10:28:59  Standard-Module mCompManClient ...: Unchanged used Common Component
+23-06-17-10:28:59  Standard-Module mDct .............: Unchanged used Common Component
+23-06-17-10:28:59  Standard-Module mErH .............: Modified used Common Component!!!!! (because this is not the hosting Workbook a "due revert allert" has been registered!)
+23-06-17-10:28:59  _______________ ___________________ Modified used Common Component e x p o r t e d !
+23-06-17-10:28:59  Standard-Module mMsg .............: Unchanged hosted raw Common Component
+23-06-17-10:28:59  Standard-Module mMsgTestProcs ....: Unchanged VBComponent
+23-06-17-10:28:59  Standard-Module mMsgTestServices .: Modified VBComponent e x p o r t e d !
+23-06-17-10:28:59  Standard-Module mObject ..........: Unchanged VBComponent
+23-06-17-10:28:59  Standard-Module mTrc .............: Modified used Common Component!!!!! (because this is not the hosting Workbook a "due revert allert" has been registered!)
+23-06-17-10:28:59  _______________ ___________________ Modified used Common Component e x p o r t e d !
+23-06-17-10:28:59  Workbook        wbMsg ............: Unchanged VBComponent
+23-06-17-10:28:59  Worksheet       wsTest ...........: Unchanged VBComponent

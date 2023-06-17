@@ -598,19 +598,37 @@ Public Sub BoC(ByVal boc_id As String, ParamArray b_arguments() As Variant)
 #End If
 End Sub
 
-Public Sub BoP(ByVal b_proc As String, ParamArray b_arguments() As Variant)
+Private Sub BoP(ByVal b_proc As String, ParamArray b_arguments() As Variant)
 ' ------------------------------------------------------------------------------
-' (B)egin-(o)f-(P)rocedure named (b_proc). Procedure to be copied as Private
-' into any module potentially either using the Common VBA Error Service and/or
-' the Common VBA Execution Trace Service. Has no effect when Conditional Compile
-' Arguments are 0 or not set at all.
+' Common 'Begin of Procedure' interface for the 'Common VBA Error Services' and
+' the 'Common VBA Execution Trace Service' (only in case the first one is not
+' installed/activated).
+' Note 1: The services, when installed, are activated by the
+'         | Cond. Comp. Arg.        | Installed component |
+'         |-------------------------|---------------------|
+'         | XcTrc_mTrc = 1          | mTrc                |
+'         | XcTrc_clsTrc = 1        | clsTrc              |
+'         | ErHComp = 1             | mErH                |
+'         I.e. both components are independant from each other!
+' Note 2: This procedure is obligatory for any VB-Component using either the
+'         the 'Common VBA Error Services' and/or the 'Common VBA Execution
+'         Trace Service'.
 ' ------------------------------------------------------------------------------
-    Dim s As String: If UBound(b_arguments) >= 0 Then s = Join(b_arguments, ",")
+    Dim s As String
+    If Not IsError(b_arguments(UBound(b_arguments))) Then s = Join(b_arguments, ";")
+
 #If ErHComp = 1 Then
+    '~~ The error handling also hands over to the mTrc/clsTrc component when
+    '~~ either of the two is installed.
     mErH.BoP b_proc, s
-#ElseIf ExecTrace = 1 Then
+#ElseIf XcTrc_clsTrc = 1 Then
+    '~~ mErH is not installed but the mTrc is
+    Trc.BoP b_proc, s
+#ElseIf XcTrc_mTrc = 1 Then
+    '~~ mErH neither mTrc is installed but clsTrc is
     mTrc.BoP b_proc, s
 #End If
+
 End Sub
 
 Public Function Center(ByVal s1 As String, _
@@ -678,19 +696,32 @@ Public Sub EoC(ByVal eoc_id As String, ParamArray b_arguments() As Variant)
 #End If
 End Sub
 
-Public Sub EoP(ByVal e_proc As String, _
-      Optional ByVal e_inf As String = vbNullString)
-' ----------------------------------------------------------------------------
-' (E)nd-(o)f-(P)rocedure named (e_proc). Procedure to be copied as Private Sub
-' into any module potentially either using the Common VBA Error Service and/or
-' the Common VBA Execution Trace Service. Has no effect when Conditional
-' Compile Arguments are 0 or not set at all.
-' ----------------------------------------------------------------------------
+Private Sub EoP(ByVal e_proc As String, Optional ByVal e_inf As String = vbNullString)
+' ------------------------------------------------------------------------------
+' Common 'End of Procedure' interface for the 'Common VBA Error Services' and
+' the 'Common VBA Execution Trace Service' (only in case the first one is not
+' installed/activated).
+' Note 1: The services, when installed, are activated by the
+'         | Cond. Comp. Arg.        | Installed component |
+'         |-------------------------|---------------------|
+'         | XcTrc_mTrc = 1          | mTrc                |
+'         | XcTrc_clsTrc = 1        | clsTrc              |
+'         | ErHComp = 1             | mErH                |
+'         I.e. both components are independant from each other!
+' Note 2: This procedure is obligatory for any VB-Component using either the
+'         the 'Common VBA Error Services' and/or the 'Common VBA Execution
+'         Trace Service'.
+' ------------------------------------------------------------------------------
 #If ErHComp = 1 Then
+    '~~ The error handling also hands over to the mTrc component when 'ExecTrace = 1'
+    '~~ so the Else is only for the case the mTrc is installed but the merH is not.
     mErH.EoP e_proc
-#ElseIf ExecTrace = 1 Then
+#ElseIf XcTrc_clsTrc = 1 Then
+    Trc.EoP e_proc, e_inf
+#ElseIf XcTrc_mTrc = 1 Then
     mTrc.EoP e_proc, e_inf
 #End If
+
 End Sub
 
 Public Function ErrMsg(ByVal err_source As String, _

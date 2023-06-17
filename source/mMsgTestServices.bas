@@ -28,6 +28,9 @@ Option Compare Text
     Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
 #End If
 
+#If XcTrc_clsTrc = 1 Then
+    Private Trc                 As New clsTrc
+#End If
 Private Const BTTN_PASSED       As String = "Passed"
 Private Const BTTN_FAILED       As String = "Failed"
 
@@ -62,22 +65,36 @@ Private Function AppErr(ByVal app_err_no As Long) As Long
     If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
 End Function
 
-Private Sub BoP(ByVal b_proc As String, _
-           ParamArray b_arguments() As Variant)
+Private Sub BoP(ByVal b_proc As String, ParamArray b_arguments() As Variant)
 ' ------------------------------------------------------------------------------
-' Begin of Procedure stub. The service is handed over to the corresponding
-' procedures in the Common mTrc Component (Execution Trace) or the Common mErH
-' Component (Error Handler) provided the components are installed which is
-' indicated by the corresponding Conditional Compile Arguments ErHComp = 1 and
-' TrcComp = 1.
+' Common 'Begin of Procedure' interface for the 'Common VBA Error Services' and
+' the 'Common VBA Execution Trace Service' (only in case the first one is not
+' installed/activated). The services, when installed, are activated by the
+' | Cond. Comp. Arg.        | Installed component |
+' |-------------------------|---------------------|
+' | XcTrc_mTrc = 1          | mTrc                |
+' | XcTrc_clsTrc = 1        | clsTrc              |
+' | ErHComp = 1             | mErH                |
+' I.e. both components are independant from each other!
+' Note: This procedure is obligatory for any VB-Component using either the
+'       the 'Common VBA Error Services' and/or the 'Common VBA Execution Trace
+'       Service'.
 ' ------------------------------------------------------------------------------
     Dim s As String
     If UBound(b_arguments) >= 0 Then s = Join(b_arguments, ",")
+
 #If ErHComp = 1 Then
+    '~~ The error handling also hands over to the mTrc/clsTrc component when
+    '~~ either of the two is installed.
     mErH.BoP b_proc, s
-#ElseIf ExecTrace = 1 Then
+#ElseIf XcTrc_clsTrc = 1 Then
+    '~~ mErH is not installed but the mTrc is
+    Trc.BoP b_proc, s
+#ElseIf XcTrc_mTrc = 1 Then
+    '~~ mErH neither mTrc is installed but clsTrc is
     mTrc.BoP b_proc, s
 #End If
+
 End Sub
 
 Public Sub cmdTest01_Click():   mMsgTestServices.Test_01_mMsg_Buttons_Service:                                         End Sub
@@ -124,19 +141,32 @@ Public Sub cmdTest91_Click():   mMsgTestServices.Test_91_mMsg_Dsply_Service_Mini
 
 Public Sub cmdTest92_Click():   mMsgTestServices.Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL:                    End Sub
 
-Private Sub EoP(ByVal e_proc As String, _
-       Optional ByVal e_inf As String = vbNullString)
+Private Sub EoP(ByVal e_proc As String, Optional ByVal e_inf As String = vbNullString)
 ' ------------------------------------------------------------------------------
-' End of Procedure stub. Handed over to the corresponding procedures in the
-' Common Component mTrc (Execution Trace) or mErH (Error Handler) provided the
-' components are installed which is indicated by the corresponding Conditional
-' Compile Arguments.
+' Common 'End of Procedure' interface for the 'Common VBA Error Services' and
+' the 'Common VBA Execution Trace Service' (only in case the first one is not
+' installed/activated).
+' Note 1: The services, when installed, are activated by the
+'         | Cond. Comp. Arg.        | Installed component |
+'         |-------------------------|---------------------|
+'         | XcTrc_mTrc = 1          | mTrc                |
+'         | XcTrc_clsTrc = 1        | clsTrc              |
+'         | ErHComp = 1             | mErH                |
+'         I.e. both components are independant from each other!
+' Note 2: This procedure is obligatory for any VB-Component using either the
+'         the 'Common VBA Error Services' and/or the 'Common VBA Execution
+'         Trace Service'.
 ' ------------------------------------------------------------------------------
 #If ErHComp = 1 Then
+    '~~ The error handling also hands over to the mTrc component when 'ExecTrace = 1'
+    '~~ so the Else is only for the case the mTrc is installed but the merH is not.
     mErH.EoP e_proc
-#ElseIf ExecTrace = 1 Then
+#ElseIf XcTrc_clsTrc = 1 Then
+    Trc.EoP e_proc, e_inf
+#ElseIf XcTrc_mTrc = 1 Then
     mTrc.EoP e_proc, e_inf
 #End If
+
 End Sub
 
 Private Function ErrMsg(ByVal err_source As String, _
@@ -555,8 +585,14 @@ Private Sub Test_00_Regression()
     Unload fMsg
     wsTest.RegressionTest = True
     mErH.Regression = True
-    mTrc.LogFile = Replace(ThisWorkbook.FullName, ThisWorkbook.Name, "RegressionTest.log")
+
+#If XcTrc_clsTrc = 1 Then
+    Trc.FileFullName = Replace(ThisWorkbook.FullName, ThisWorkbook.Name, "ExecTrace.RegressionTest.log")
+    Trc.LogTitle = "Regression test module mMsg"
+#ElseIf XcTrc_mTrc = 1 Then
+    mTrc.FileFullName = Replace(ThisWorkbook.FullName, ThisWorkbook.Name, "ExecTrace.RegressionTest.log")
     mTrc.LogTitle = "Regression test module mMsg"
+#End If
     
     BoP ErrSrc(PROC)
     For Each Rng In wsTest.RegressionTests
@@ -571,7 +607,11 @@ Private Sub Test_00_Regression()
 xt: wsTest.RegressionTest = False
     mErH.Regression = False
     EoP ErrSrc(PROC)
+#If XcTrc_clsTrc = 1 Then
+    Trc.Dsply
+#ElseIf XcTrc_mTrc = 1 Then
     mTrc.Dsply
+#End If
     Exit Sub
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
