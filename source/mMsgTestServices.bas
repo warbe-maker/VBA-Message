@@ -2,9 +2,8 @@ Attribute VB_Name = "mMsgTestServices"
 Option Explicit
 Option Compare Text
 ' ------------------------------------------------------------------------------
-' Standard Module mMsgTestServices:
-' =================================
-' All tests obligatory for a complete regression test of all kind of message
+' Standard Module mMsgTestServices: All tests obligatory for a complete test of
+' ================================= regression test of all kind of message
 ' services and features, performed after any code modification.
 '
 ' About:
@@ -585,14 +584,8 @@ Private Sub Test_00_Regression()
     Unload fMsg
     wsTest.RegressionTest = True
     mErH.Regression = True
-
-#If XcTrc_clsTrc = 1 Then
-    Trc.FileFullName = Replace(ThisWorkbook.FullName, ThisWorkbook.Name, "ExecTrace.RegressionTest.log")
-    Trc.LogTitle = "Regression test module mMsg"
-#ElseIf XcTrc_mTrc = 1 Then
-    mTrc.FileFullName = Replace(ThisWorkbook.FullName, ThisWorkbook.Name, "ExecTrace.RegressionTest.log")
-    mTrc.LogTitle = "Regression test module mMsg"
-#End If
+    mTrc.FileName = "RegressionTest.ExecTrace.log"
+    mTrc.Title = "Regression test module mMsg"
     
     BoP ErrSrc(PROC)
     For Each Rng In wsTest.RegressionTests
