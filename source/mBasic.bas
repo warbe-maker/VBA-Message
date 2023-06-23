@@ -3,8 +3,7 @@ Option Explicit
 ' ----------------------------------------------------------------------------
 ' Standard Module mBasic: Declarations, procedures, methods and function
 ' ======================= likely to be required in any VB-Project, optionally
-' just being copied.
-'
+'                         just being copied.
 ' Note: All services run completely autonomous, i.e. do not require any other
 '       installed module. However, when the Common VBA Message Services
 '       (fMsg/mMsg) and or the Common VBA Error Services (mErH) are installed
@@ -50,13 +49,11 @@ Option Explicit
 ' ErrSrc            Unambigous identification of a procedure - used with
 '                   BoP, EoP, and ErrMsg
 '
-' Requires Reference to:
-' Microsoft Scripting Runtime
-' Microsoft Visual Basic Application Extensibility .."
+' Requires:
+' ---------
+' Reference to "Microsoft Scripting Runtime"
+' Reference to "Microsoft Visual Basic Application Extensibility .."
 '
-' May use:             fMsg, mMsg, mErH (via ErrMsg)
-'
-' ----------------------------------------------------------------------------
 ' 1) Provides a comprehensive and well designed display of an error message,
 '    provided Common VBA Error Services (mErH) and the Common VBA Message
 '    Service (fMsg/mMsg) is installed and the Conditional Compile Arguments
@@ -70,8 +67,8 @@ Option Explicit
 '    be copied into any component to use the mErH and the mTrc/clsTrc module.
 ' 3) To be copied as Private procedure into any component which raises
 '    Application Errors by means of Err.Raise.
-' 4) https://github.com/warbe-maker/Common-VBA-Error-Services
-' 5) https://github.com/warbe-maker/Common-VBA-Execution-Trace-Service
+' 4) https://github.com/warbe-maker/VBA-Error
+' 5) https://github.com/warbe-maker/VBA-Trace
 '
 ' W. Rauschenberger, Berlin Feb. 2022
 ' See https://github.com/warbe-maker/VBA-Basics (displayed with README proc)
@@ -166,9 +163,6 @@ Private cyTimerTicksBegin       As Currency
 Private cyTimerTicksEnd         As Currency
 Private TimerSystemFrequency    As Currency
 
-'Public Property Get MsgReply() As Variant:                  MsgReply = vMsgReply:                                       End Property
-'Public Property Let MsgReply(ByVal v As Variant):           vMsgReply = v:                                              End Property
-
 Private Property Get SysFrequency() As Currency
     If TimerSystemFrequency = 0 Then getFrequency TimerSystemFrequency
     SysFrequency = TimerSystemFrequency
@@ -216,11 +210,12 @@ End Function
 Public Function AppErr(ByVal app_err_no As Long) As Long
 ' ----------------------------------------------------------------------------
 ' Ensures that a programmed 'Application' error number not conflicts with the
-' number of a 'VB Runtime Error' or any other system error.
-' - Returns a given positive 'Application Error' number (app_err_no) into a
-'   negative by adding the system constant vbObjectError
-' - Returns the original 'Application Error' number when called with a negative
-'   error number.
+' number of a 'VB Runtime Error' or any other system error. Returns a given
+' positive 'Application Error' number (app_err_no) as a negative by adding the
+' system constant vbObjectError. Returns the original 'Application Error'
+' number when called with a negative error number.
+' Obligatory copy Private for any VB-Component using the service but not
+' having the mBasic common component installed.
 ' ----------------------------------------------------------------------------
     If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
 End Function
@@ -596,7 +591,8 @@ Public Sub BoC(ByVal b_id As String, _
       Optional ByVal b_args As String = vbNullString)
 ' ------------------------------------------------------------------------------
 ' Common 'Bnd-of-Code' interface for the Common VBA Execution Trace Service.
-' Obligatory for any VB-Component using the service.
+' Obligatory copy Private for any VB-Component using the service but not having
+' the mBasic common component installed.
 ' ------------------------------------------------------------------------------
 #If XcTrc_mTrc = 1 Then         ' when mTrc is installed and active
     mTrc.BoC b_id, b_args
@@ -610,7 +606,8 @@ Public Sub BoP(ByVal b_proc As String, _
 ' ------------------------------------------------------------------------------
 ' Common 'Begin of Procedure' interface serving the 'Common VBA Error Services'
 ' and - if not installed/activated the 'Common VBA Execution Trace Service'.
-' Obligatory for any VB-Component using either of the two.
+' Obligatory copy Private for any VB-Component using the service but not having
+' the mBasic common component installed.
 ' ------------------------------------------------------------------------------
 #If ErHComp = 1 Then          ' serves the mTrc/clsTrc when installed and active
     mErH.BoP b_proc, b_args
@@ -677,7 +674,8 @@ Public Sub EoC(ByVal e_id As String, _
       Optional ByVal e_args As String = vbNullString)
 ' ------------------------------------------------------------------------------
 ' Common 'End-of-Code' interface for the Common VBA Execution Trace Service.
-' Obligatory for any VB-Component using the servoce
+' Obligatory copy Private for any VB-Component using the service but not having
+' the mBasic common component installed.
 ' ------------------------------------------------------------------------------
 #If XcTrc_mTrc = 1 Then         ' when mTrc is installed and active
     mTrc.EoC e_id, e_args
@@ -691,12 +689,13 @@ Public Sub EoP(ByVal e_proc As String, _
 ' ------------------------------------------------------------------------------
 ' Common 'Begin of Procedure' interface serving the 'Common VBA Error Services'
 ' and - if not installed/activated the 'Common VBA Execution Trace Service'.
-' Obligatory for any VB-Component using either of the two.
+' Obligatory copy Private for any VB-Component using the service but not having
+' the mBasic common component installed.
 ' ------------------------------------------------------------------------------
 #If ErHComp = 1 Then          ' serves the mTrc/clsTrc when installed and active
     mErH.EoP e_proc, e_args
 #ElseIf XcTrc_clsTrc = 1 Then ' when only clsTrc is installed and active
-    Trc.RoP e_proc, e_args
+    Trc.EoP e_proc, e_args
 #ElseIf XcTrc_mTrc = 1 Then   ' when only mTrc is installed and activate
     mTrc.EoP e_proc, e_args
 #End If
@@ -707,18 +706,19 @@ Public Function ErrMsg(ByVal err_source As String, _
               Optional ByVal err_dscrptn As String = vbNullString, _
               Optional ByVal err_line As Long = 0) As Variant
 ' ------------------------------------------------------------------------------
-' Universal error message display service. Displays:
-' - a debugging option button when the Cond. Comp. Arg. 'Debugging = 1'
-' - an optional additional "About:" section when the err_dscrptn has an
-'   additional string concatenated by two vertical bars (||)
-' - the error message by means of the Common VBA Message Service (fMsg/mMsg)
-'   when installed and active (Cond. Comp. Arg. `MsgComp = 1`)
+' Universal error message display service. Obligatory copy Private for any
+' VB-Component using the common error service but not having the mBasic common
+' component installed.
+' Displays: - a debugging option button when the Cond. Comp. Arg. 'Debugging = 1'
+'           - an optional additional "About:" section when the err_dscrptn has
+'             an additional string concatenated by two vertical bars (||)
+'           - the error message by means of the Common VBA Message Service
+'             (fMsg/mMsg) when installed and active (Cond. Comp. Arg.
+'             `MsgComp = 1`)
 '
 ' Uses: AppErr  For programmed application errors (Err.Raise AppErr(n), ....)
 '               to turn them into a negative and in the error message back into
 '               its origin positive number.
-'       ErrSrc  To provide an unambiguous procedure name by prefixing is with
-'               the module name.
 '
 ' W. Rauschenberger Berlin, June 2023
 ' See: https://github.com/warbe-maker/VBA-Error

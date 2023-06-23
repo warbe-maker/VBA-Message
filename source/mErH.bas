@@ -188,7 +188,7 @@ Public Sub BoP(ByVal b_id As String, _
     End If
     StackPush ProcStack, b_id
 #If XcTrc_clsTrc = 1 Then   ' when clsTrc is installed and active
-    Trc.BoP_ErH bop_id, b_args
+    Trc.BoP_ErH b_id, b_args
 #ElseIf XcTrc_mTrc = 1 Then ' when mTrc is installed and active
     mTrc.BoP_ErH b_id, b_args
 #End If
@@ -422,9 +422,9 @@ Public Function ErrMsg(ByVal err_source As String, _
         ' !! BoP/EoP statements on the way down to the error raising procedure.           !!
         ErrPathAdd err_source
 #If XcTrc_mTrc = 1 Then
-        mTrc.EoP err_source, sType & lNo & " " & sLine
+        mTrc.EoP err_source, "!! " & sType & lNo & " " & sLine & " !!"
 #ElseIf XcTrc_clsTrc = 1 Then
-        Trc.EoP err_source, sType & lNo & " " & sLine
+        Trc.EoP err_source, "!! " & sType & lNo & " " & sLine & " !!"
 #End If
         sInitErrInfo = vbNullString
         Err.Raise err_number, err_source, err_dscrptn ' pass on erro to caller
