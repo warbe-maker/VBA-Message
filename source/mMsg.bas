@@ -767,12 +767,11 @@ Public Function ErrMsg(ByVal err_source As String, _
 #If Debugging = 1 Then
     With ErrMsgText.Section(4)
         With .Label
-            .Text = "About 'Resume Error Line':"
+            .Text = "Resume Error Line:"
             .FontColor = rgbBlue
         End With
-        .Text.Text = "The additional debugging option button is displayed because the " & _
-                     "Conditional Compile Argument 'Debugging = 1'. Pressing this button " & _
-                     "and twice F8 ends up at the code line which raised the error"
+        .Text.Text = "Pressing this button and twice F8 leads straight to the code line which raised the error. " & _
+                     "(button is displayed because the Cond. Comp. Argument 'Debugging = 1')."
     End With
 #End If
     mMsg.Dsply dsply_title:=ErrTitle _

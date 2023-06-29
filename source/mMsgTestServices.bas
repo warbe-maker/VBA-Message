@@ -586,6 +586,7 @@ Private Sub Test_00_Regression()
     mErH.Regression = True
     mTrc.FileName = "RegressionTest.ExecTrace.log"
     mTrc.Title = "Regression test module mMsg"
+    mTrc.NewFile
     
     BoP ErrSrc(PROC)
     For Each Rng In wsTest.RegressionTests

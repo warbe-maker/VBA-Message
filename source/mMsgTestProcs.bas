@@ -302,7 +302,7 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
     On Error GoTo eh
     Dim NewCommandButton1   As MSForms.CommandButton
     Dim NewCommandButton2   As MSForms.CommandButton
-    Dim X                   As Long
+    Dim x                   As Long
     Dim cmp                 As VBComponent
     Dim LeftPos             As Single
     
@@ -354,7 +354,7 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
          
     '~~ Add code on the form for the CommandButtons
     With cmp.CodeModule
-        X = .CountOfLines
+        x = .CountOfLines
         .InsertLines .CountOfLines + 1, "Option Explict"
         .InsertLines .CountOfLines + 1, vbNullString
         .InsertLines .CountOfLines + 1, "Sub CommandButton1_Click()"
