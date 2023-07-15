@@ -79,6 +79,12 @@ Public Const MSG_HEIGHT_MAX_LIMIT_PERCENTAGE    As Long = 95
 Public Const vbResumeOk                         As Long = 7 ' Buttons value in mMsg.ErrMsg (pass on not supported)
 Public Const vbResume                           As Long = 6 ' return value (equates to vbYes)
 
+Public Enum enLabelPos ' pending implementation
+    enLposTop
+    enLposLeftAlignedLeft
+    enLposLeftAlignedRight
+End Enum
+
 Public Type TypeMsgLabel
         FontBold        As Boolean
         FontColor       As XlRgbColor
@@ -126,7 +132,7 @@ Private fMonitor            As fMsg
 
 Private Property Get ModeLess() As Boolean:          ModeLess = bModeLess:   End Property
 
-Private Property Let ModeLess(ByVal b As Boolean):   bModeLess = b:          End Property
+Private Property Let ModeLess(ByVal B As Boolean):   bModeLess = B:          End Property
 
 Private Property Get ScreenHeight() As Single
     ConvertPixelsToPoints y_dpi:=GetSystemMetrics32(SM_CYVIRTUALSCREEN), y_pts:=ScreenHeight
@@ -566,6 +572,7 @@ End Sub
                      
 Public Function Dsply(ByVal dsply_title As String, _
                       ByRef dsply_msg As TypeMsg, _
+             Optional ByVal dsply_label_pos As enLabelPos, _
              Optional ByVal dsply_buttons As Variant = vbOKOnly, _
              Optional ByVal dsply_buttons_app_run As Dictionary = Nothing, _
              Optional ByVal dsply_button_default = 1, _
@@ -584,6 +591,7 @@ Public Function Dsply(ByVal dsply_title As String, _
 ' ----------------------------- + ----------------------------------------------
 ' dsply_title                   | String, Title
 ' dsply_msg                     | UDT, Message
+' dsply_label_pos               | Label position top or left (pending implementation)
 ' dsply_buttons                 | Button captions as Collection
 ' dsply_button_default          | Default button, either the index or the
 '                               | caption, defaults to 1 (= the first displayed
@@ -748,13 +756,6 @@ Public Function ErrMsg(ByVal err_source As String, _
         .Text.Text = ErrDesc
     End With
     With ErrMsgText.Section(2)
-        With .Label
-            .Text = "Error source:"
-            .FontColor = rgbBlue
-        End With
-        .Text.Text = err_source
-    End With
-    With ErrMsgText.Section(3)
         If ErrAbout = vbNullString Then
             .Label.Text = vbNullString
             .Text.Text = vbNullString
@@ -765,13 +766,14 @@ Public Function ErrMsg(ByVal err_source As String, _
         .Label.FontColor = rgbBlue
     End With
 #If Debugging = 1 Then
-    With ErrMsgText.Section(4)
+    With ErrMsgText.Section(3)
         With .Label
             .Text = "Resume Error Line:"
             .FontColor = rgbBlue
         End With
-        .Text.Text = "Pressing this button and twice F8 leads straight to the code line which raised the error. " & _
-                     "(button is displayed because the Cond. Comp. Argument 'Debugging = 1')."
+        .Text.Text = "Debugging option. Button is displayed because the " & _
+                     "Cond. Comp. Argument 'Debugging = 1'. Pressing this button " & _
+                     "and twice F8 leads straight to the code line which raised the error."
     End With
 #End If
     mMsg.Dsply dsply_title:=ErrTitle _
@@ -799,7 +801,9 @@ Public Function BttnArgsAreValid(ByVal v_arg As Variant) As Boolean
         Select Case True
             Case IsArray(v_arg), TypeName(v_arg) = "Collection", TypeName(v_arg) = "Dictionary"
                  For Each v In v_arg
-                    If Not BttnArgsAreValid(v) Then Exit Function
+                    If Not BttnArgsAreValid(v) Then
+                        Exit Function
+                    End If
                  Next v
                 BttnArgsAreValid = True
             Case IsNumeric(v_arg)

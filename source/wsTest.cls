@@ -48,7 +48,7 @@ End Property
 
 Public Property Get RegressionTest() As Boolean:            RegressionTest = bRegressionTest:                                                    End Property
 
-Public Property Let RegressionTest(ByVal b As Boolean):     bRegressionTest = b:                                                                        End Property
+Public Property Let RegressionTest(ByVal B As Boolean):     bRegressionTest = B:                                                                        End Property
 
 Public Property Get RegressionTests() As Range
     Set RegressionTests = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colRegression").EntireColumn)
@@ -58,8 +58,8 @@ Private Property Get RowTest(Optional ByVal Test As Long) As Range: Set RowTest 
 
 Public Property Get TerminateRegressionTest() As Boolean:           TerminateRegressionTest = bTerminateRegressionTest:     End Property
 
-Public Property Let TerminateRegressionTest(ByVal b As Boolean)
-    bTerminateRegressionTest = b
+Public Property Let TerminateRegressionTest(ByVal B As Boolean)
+    bTerminateRegressionTest = B
     If bTerminateRegressionTest Then bRegressionTest = False
 End Property
 
@@ -76,6 +76,14 @@ Public Property Let TestNumber(ByVal l As Long):                    lTestNumber 
 
 Private Property Get TestNumbers() As Range
     Set TestNumbers = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colTestNo").EntireColumn)
+End Property
+
+Public Property Get TestLabelPos() As enLabelPos
+    Select Case True
+        Case Me.Shapes("optLabelPosTop").OLEFormat.Object.Value = 1:                TestLabelPos = enLposTop
+        Case Me.Shapes("optLabelPosLeftAlignedLeft").OLEFormat.Object.Value = 1:    TestLabelPos = enLposLeftAlignedLeft
+        Case Me.Shapes("optLabelPosLeftAlignedRight").OLEFormat.Object.Value = 1:   TestLabelPos = enLposLeftAlignedRight
+    End Select
 End Property
 
 Public Property Get TestOptionModelessMessageDisplay() As Boolean

@@ -933,6 +933,7 @@ Private Function Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth() As V
         Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
+                 , dsply_label_pos:=wsTest.TestLabelPos _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_modeless:=bModeLess _
@@ -1016,6 +1017,7 @@ Private Function Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle() As Variant
     Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
+             , dsply_label_pos:=wsTest.TestLabelPos _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_max:=wsTest.MsgWidthMax _
@@ -1114,6 +1116,7 @@ Private Function Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSe
         Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
+                 , dsply_label_pos:=wsTest.TestLabelPos _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_modeless:=bModeLess _
@@ -1193,6 +1196,7 @@ Private Function Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons() As V
         Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
+                 , dsply_label_pos:=wsTest.TestLabelPos _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_width_max:=TestMsgWidthMax _
@@ -1264,6 +1268,7 @@ Private Function Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgW
     Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgWidth = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
+             , dsply_label_pos:=wsTest.TestLabelPos _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_min:=TestMsgWidthMin _
@@ -1331,6 +1336,7 @@ Private Function Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHe
     Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHeight = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
+             , dsply_label_pos:=wsTest.TestLabelPos _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_min:=TestMsgWidthMin _
@@ -1402,6 +1408,7 @@ Private Function Test_09_mMsg_Dsply_Service_ButtonsOnly() As Variant
         Test_09_mMsg_Dsply_Service_ButtonsOnly = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
+                 , dsply_label_pos:=wsTest.TestLabelPos _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_modeless:=bModeLess _
@@ -1479,6 +1486,7 @@ Private Function Test_10_mMsg_Dsply_Service_ButtonsMatrix() As Variant
         Test_10_mMsg_Dsply_Service_ButtonsMatrix = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
+                 , dsply_label_pos:=wsTest.TestLabelPos _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_button_reply_with_index:=False _
@@ -1568,6 +1576,7 @@ Private Function Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical() As Variant
         Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
+                 , dsply_label_pos:=wsTest.TestLabelPos _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_width_min:=TestMsgWidthMin _
@@ -1650,6 +1659,7 @@ Private Function Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal() As Varia
         Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
+                 , dsply_label_pos:=wsTest.TestLabelPos _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_width_min:=TestMsgWidthMin _
@@ -1721,6 +1731,7 @@ Private Function Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars(
         Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
+                 , dsply_label_pos:=wsTest.TestLabelPos _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_button_reply_with_index:=False _
@@ -1792,6 +1803,7 @@ Private Function Test_16_mMsg_Dsply_Service_ButtonByDictionary()
     Test_16_mMsg_Dsply_Service_ButtonByDictionary = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
+             , dsply_label_pos:=wsTest.TestLabelPos _
              , dsply_buttons:=mMsg.Buttons(TestButtons, vbLf, dct) _
              , dsply_width_min:=TestMsgWidthMin _
              , dsply_width_max:=TestMsgWidthMax _
@@ -1895,6 +1907,7 @@ Private Function Test_20_mMsg_Dsply_Service_ButtonByValue()
     Test_20_mMsg_Dsply_Service_ButtonByValue = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
+             , dsply_label_pos:=wsTest.TestLabelPos _
              , dsply_buttons:=mMsg.Buttons(TestButtons, vbLf, vbOKOnly) _
              , dsply_width_min:=TestMsgWidthMin _
              , dsply_width_max:=TestMsgWidthMax _
@@ -1946,6 +1959,7 @@ Private Function Test_21_mMsg_Dsply_Service_ButtonByString()
     Test_21_mMsg_Dsply_Service_ButtonByString = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
+             , dsply_label_pos:=wsTest.TestLabelPos _
              , dsply_buttons:="Yes," & vbLf & ",No" _
              , dsply_width_min:=TestMsgWidthMin _
              , dsply_width_max:=TestMsgWidthMax _
@@ -2000,6 +2014,7 @@ Private Function Test_22_mMsg_Dsply_Service_ButtonByCollection()
     Test_22_mMsg_Dsply_Service_ButtonByCollection = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
+             , dsply_label_pos:=wsTest.TestLabelPos _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_min:=TestMsgWidthMin _
@@ -2062,6 +2077,7 @@ Private Function Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly()
     Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
+             , dsply_label_pos:=wsTest.TestLabelPos _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_min:=TestMsgWidthMin _
@@ -2128,6 +2144,7 @@ Private Function Test_24_mMsg_All_Sections()
     Test_24_mMsg_All_Sections = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
+             , dsply_label_pos:=wsTest.TestLabelPos _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_min:=TestMsgWidthMin _
@@ -2329,6 +2346,7 @@ Private Function Test_90_mMsg_Dsply_Service_AllInOne() As Variant
     
     Select Case mMsg.Dsply(dsply_title:=MsgTitle _
                          , dsply_msg:=Msg _
+                         , dsply_label_pos:=wsTest.TestLabelPos _
                          , dsply_buttons:=MsgButtons _
                          , dsply_buttons_app_run:=AppRunArgs _
                          , dsply_width_min:=TestMsgWidthMin _
@@ -2392,6 +2410,7 @@ Private Function Test_91_mMsg_Dsply_Service_MinimumMessage() As Variant
                                                                                               
     Select Case mMsg.Dsply(dsply_title:=MsgTitle _
                          , dsply_msg:=Message _
+                         , dsply_label_pos:=wsTest.TestLabelPos _
                          , dsply_buttons:=mMsg.Buttons() _
                          , dsply_width_min:=TestMsgWidthMin _
                          , dsply_width_max:=TestMsgWidthMax _
@@ -2463,6 +2482,7 @@ Private Function Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL() As Variant
                                                                                               
     Select Case mMsg.Dsply(dsply_title:=MsgTitle _
                          , dsply_msg:=Message _
+                         , dsply_label_pos:=wsTest.TestLabelPos _
                          , dsply_buttons:=mMsg.Buttons(vbOKOnly) _
                          , dsply_width_min:=TestMsgWidthMin _
                          , dsply_width_max:=TestMsgWidthMax _
