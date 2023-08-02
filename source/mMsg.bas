@@ -132,7 +132,7 @@ Private fMonitor            As fMsg
 
 Private Property Get ModeLess() As Boolean:          ModeLess = bModeLess:   End Property
 
-Private Property Let ModeLess(ByVal B As Boolean):   bModeLess = B:          End Property
+Private Property Let ModeLess(ByVal b As Boolean):   bModeLess = b:          End Property
 
 Private Property Get ScreenHeight() As Single
     ConvertPixelsToPoints y_dpi:=GetSystemMetrics32(SM_CYVIRTUALSCREEN), y_pts:=ScreenHeight
@@ -572,7 +572,7 @@ End Sub
                      
 Public Function Dsply(ByVal dsply_title As String, _
                       ByRef dsply_msg As TypeMsg, _
-             Optional ByVal dsply_label_pos As enLabelPos, _
+             Optional ByVal dsply_label_spec As String = vbNullString, _
              Optional ByVal dsply_buttons As Variant = vbOKOnly, _
              Optional ByVal dsply_buttons_app_run As Dictionary = Nothing, _
              Optional ByVal dsply_button_default = 1, _
@@ -591,7 +591,7 @@ Public Function Dsply(ByVal dsply_title As String, _
 ' ----------------------------- + ----------------------------------------------
 ' dsply_title                   | String, Title
 ' dsply_msg                     | UDT, Message
-' dsply_label_pos               | Label position top or left (pending implementation)
+' dsply_label_spec              | Label width and position
 ' dsply_buttons                 | Button captions as Collection
 ' dsply_button_default          | Default button, either the index or the
 '                               | caption, defaults to 1 (= the first displayed
@@ -637,6 +637,7 @@ Public Function Dsply(ByVal dsply_title As String, _
     Set MsgForm = MsgInstance(dsply_title)
     
     With MsgForm
+        .LabelSpec = dsply_label_spec
         .ReplyWithIndex = dsply_button_reply_with_index
         '~~ Use dimensions when explicitly specified
         If dsply_height_max > 0 Then .MsgHeightMax = dsply_height_max   ' percentage of screen height

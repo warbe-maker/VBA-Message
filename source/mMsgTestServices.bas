@@ -552,7 +552,7 @@ Private Function RepeatString( _
     RepeatString = s
 End Function
 
-Private Sub SetupMsgTitleInstasnceAndNo(ByVal test_no As Long, ByVal test_title As String)
+Private Sub SetupMsgTitleInstanceAndNo(ByVal test_no As Long, ByVal test_title As String)
     
     wsTest.TestNumber = test_no
     
@@ -784,7 +784,7 @@ Private Function Test_01_mMsg_Box_Service_Buttons_7_By_7_Matrix() As Variant
     Dim dctButtonsAppRun    As New Dictionary
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 1, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 1, Readable(PROC)
     
     For i = 1 To 49
         MsgButtons.Add "B" & Format(i, "00")
@@ -863,7 +863,7 @@ Private Sub Test_02_mMsg_ErrMsg_Service()
     On Error GoTo eh
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 2, EXPECTED_TITLE
+    SetupMsgTitleInstanceAndNo 2, EXPECTED_TITLE
     
     mErH.Asserted AppErr(5) ' skips the display of the error message when mErH.Regression = True
     
@@ -894,7 +894,7 @@ Private Function Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth() As V
     Dim bModeLess   As Boolean:         bModeLess = wsTest.TestOptionModelessMessageDisplay
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 3, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 3, Readable(PROC)
         
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -933,7 +933,7 @@ Private Function Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth() As V
         Test_03_mMsg_Dsply_Service_WidthDeterminedByMinimumWidth = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_label_pos:=wsTest.TestLabelPos _
+                 , dsply_label_spec:=vbNullString _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_modeless:=bModeLess _
@@ -989,7 +989,7 @@ Private Function Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle() As Variant
     
     BoP ErrSrc(PROC)
 
-    SetupMsgTitleInstasnceAndNo 4, Readable(PROC) & "  (This title uses more space than the minimum specified message form width and thus the width is determined by the title)"
+    SetupMsgTitleInstanceAndNo 4, Readable(PROC) & "  (This title uses more space than the minimum specified message form width and thus the width is determined by the title)"
 
     '~~ Obtain initial test values from the Test Worksheet
     MsgForm.VisualizeForTest = wsTest.VisualizeForTest
@@ -1017,7 +1017,7 @@ Private Function Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle() As Variant
     Test_04_mMsg_Dsply_Service_WidthDeterminedByTitle = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_label_pos:=wsTest.TestLabelPos _
+             , dsply_label_spec:=vbNullString _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_max:=wsTest.MsgWidthMax _
@@ -1058,7 +1058,7 @@ Private Function Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSe
     Dim BttnRepeatMaxHeightDecreased    As String
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 5, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 5, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1116,7 +1116,7 @@ Private Function Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSe
         Test_05_mMsg_Dsply_Service_WidthDeterminedByMonoSpacedMessageSection = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_label_pos:=wsTest.TestLabelPos _
+                 , dsply_label_spec:=vbNullString _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_modeless:=bModeLess _
@@ -1165,7 +1165,7 @@ Private Function Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons() As V
     
     BoP ErrSrc(PROC)
     
-    SetupMsgTitleInstasnceAndNo 6, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 6, Readable(PROC)
     
     ' Initializations for this test
     MsgForm.VisualizeForTest = wsTest.VisualizeForTest
@@ -1196,7 +1196,7 @@ Private Function Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons() As V
         Test_06_mMsg_Dsply_Service_WidthDeterminedByReplyButtons = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_label_pos:=wsTest.TestLabelPos _
+                 , dsply_label_spec:=vbNullString _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_width_max:=TestMsgWidthMax _
@@ -1238,7 +1238,7 @@ Private Function Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgW
 
     BoP ErrSrc(PROC)
     
-    SetupMsgTitleInstasnceAndNo 7, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 7, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1268,7 +1268,7 @@ Private Function Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgW
     Test_07_mMsg_Dsply_Service_MonoSpacedSectionWidthExceedsMaxMsgWidth = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_label_pos:=wsTest.TestLabelPos _
+             , dsply_label_spec:=vbNullString _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_min:=TestMsgWidthMin _
@@ -1306,7 +1306,7 @@ Private Function Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHe
     
     BoP ErrSrc(PROC)
     
-    SetupMsgTitleInstasnceAndNo 8, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 8, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1336,7 +1336,7 @@ Private Function Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHe
     Test_08_mMsg_Dsply_Service_MonoSpacedMessageSectionExceedsMaxHeight = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_label_pos:=wsTest.TestLabelPos _
+             , dsply_label_spec:=vbNullString _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_min:=TestMsgWidthMin _
@@ -1376,7 +1376,7 @@ Private Function Test_09_mMsg_Dsply_Service_ButtonsOnly() As Variant
     Dim bMonospaced As Boolean: bMonospaced = True ' initial test value
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 9, Readable(PROC) & ": No message, just buttons (finish with " & BTTN_PASSED & " or " & BTTN_FAILED & ")"
+    SetupMsgTitleInstanceAndNo 9, Readable(PROC) & ": No message, just buttons (finish with " & BTTN_PASSED & " or " & BTTN_FAILED & ")"
     
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
     '~~ for this test  from the Test Worksheet
@@ -1408,7 +1408,7 @@ Private Function Test_09_mMsg_Dsply_Service_ButtonsOnly() As Variant
         Test_09_mMsg_Dsply_Service_ButtonsOnly = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_label_pos:=wsTest.TestLabelPos _
+                 , dsply_label_spec:=vbNullString _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_modeless:=bModeLess _
@@ -1456,7 +1456,7 @@ Private Function Test_10_mMsg_Dsply_Service_ButtonsMatrix() As Variant
         
     BoP ErrSrc(PROC)
     MsgTitle = "Just to demonstrate what's theoretically possible: Buttons only! Finish with " & BTTN_PASSED & " (default) or " & BTTN_FAILED
-    SetupMsgTitleInstasnceAndNo 10, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 10, Readable(PROC)
     
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
     '~~ for this test  from the Test Worksheet
@@ -1486,7 +1486,7 @@ Private Function Test_10_mMsg_Dsply_Service_ButtonsMatrix() As Variant
         Test_10_mMsg_Dsply_Service_ButtonsMatrix = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_label_pos:=wsTest.TestLabelPos _
+                 , dsply_label_spec:=vbNullString _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_button_reply_with_index:=False _
@@ -1533,7 +1533,7 @@ Private Function Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical() As Variant
     
     BoP ErrSrc(PROC)
     
-    SetupMsgTitleInstasnceAndNo 11, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 11, Readable(PROC)
     
     With wsTest
         TestMsgWidthMin = .MsgWidthMin:   lChangeMinWidthPt = .MsgWidthIncrDecr
@@ -1576,7 +1576,7 @@ Private Function Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical() As Variant
         Test_11_mMsg_Dsply_Service_ButtonScrollBarVertical = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_label_pos:=wsTest.TestLabelPos _
+                 , dsply_label_spec:=vbNullString _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_width_min:=TestMsgWidthMin _
@@ -1620,7 +1620,7 @@ Private Function Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal() As Varia
     
     BoP ErrSrc(PROC)
     
-    SetupMsgTitleInstasnceAndNo 12, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 12, Readable(PROC)
     
     TestMsgWidthMax = INIT_WIDTH
     With wsTest
@@ -1659,7 +1659,7 @@ Private Function Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal() As Varia
         Test_12_mMsg_Dsply_Service_ButtonScrollBarHorizontal = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_label_pos:=wsTest.TestLabelPos _
+                 , dsply_label_spec:=vbNullString _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_width_min:=TestMsgWidthMin _
@@ -1704,7 +1704,7 @@ Private Function Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars(
     Dim TestMsgHeightMax    As Long
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 13, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 13, Readable(PROC)
     
     '~~ Obtain initial test values and their corresponding change (increment/decrement) value
     '~~ for this test  from the Test Worksheet
@@ -1731,7 +1731,7 @@ Private Function Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars(
         Test_13_mMsg_Dsply_Service_ButtonsMatrix_With_Both_Scroll_Bars = _
         mMsg.Dsply(dsply_title:=MsgTitle _
                  , dsply_msg:=Message _
-                 , dsply_label_pos:=wsTest.TestLabelPos _
+                 , dsply_label_spec:=vbNullString _
                  , dsply_buttons:=MsgButtons _
                  , dsply_buttons_app_run:=AppRunArgs _
                  , dsply_button_reply_with_index:=False _
@@ -1774,7 +1774,7 @@ Private Function Test_16_mMsg_Dsply_Service_ButtonByDictionary()
     Dim dct         As New Collection
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 16, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 16, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1803,7 +1803,7 @@ Private Function Test_16_mMsg_Dsply_Service_ButtonByDictionary()
     Test_16_mMsg_Dsply_Service_ButtonByDictionary = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_label_pos:=wsTest.TestLabelPos _
+             , dsply_label_spec:=vbNullString _
              , dsply_buttons:=mMsg.Buttons(TestButtons, vbLf, dct) _
              , dsply_width_min:=TestMsgWidthMin _
              , dsply_width_max:=TestMsgWidthMax _
@@ -1834,7 +1834,7 @@ Private Function Test_17_mMsg_Box_Service_MessageAsString() As Variant
     Dim bModeLess   As Boolean:         bModeLess = wsTest.TestOptionModelessMessageDisplay
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 17, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 17, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1886,7 +1886,7 @@ Private Function Test_20_mMsg_Dsply_Service_ButtonByValue()
     Dim bModeLess   As Boolean:         bModeLess = wsTest.TestOptionModelessMessageDisplay
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 20, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 20, Readable(PROC)
         
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1907,7 +1907,7 @@ Private Function Test_20_mMsg_Dsply_Service_ButtonByValue()
     Test_20_mMsg_Dsply_Service_ButtonByValue = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_label_pos:=wsTest.TestLabelPos _
+             , dsply_label_spec:=vbNullString _
              , dsply_buttons:=mMsg.Buttons(TestButtons, vbLf, vbOKOnly) _
              , dsply_width_min:=TestMsgWidthMin _
              , dsply_width_max:=TestMsgWidthMax _
@@ -1938,7 +1938,7 @@ Private Function Test_21_mMsg_Dsply_Service_ButtonByString()
     Dim bModeLess   As Boolean:         bModeLess = wsTest.TestOptionModelessMessageDisplay
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 21, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 21, Readable(PROC)
         
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -1959,7 +1959,7 @@ Private Function Test_21_mMsg_Dsply_Service_ButtonByString()
     Test_21_mMsg_Dsply_Service_ButtonByString = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_label_pos:=wsTest.TestLabelPos _
+             , dsply_label_spec:=vbNullString _
              , dsply_buttons:="Yes," & vbLf & ",No" _
              , dsply_width_min:=TestMsgWidthMin _
              , dsply_width_max:=TestMsgWidthMax _
@@ -1990,7 +1990,7 @@ Private Function Test_22_mMsg_Dsply_Service_ButtonByCollection()
     Dim bModeLess   As Boolean:         bModeLess = wsTest.TestOptionModelessMessageDisplay
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 22, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 22, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -2014,7 +2014,7 @@ Private Function Test_22_mMsg_Dsply_Service_ButtonByCollection()
     Test_22_mMsg_Dsply_Service_ButtonByCollection = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_label_pos:=wsTest.TestLabelPos _
+             , dsply_label_spec:=vbNullString _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_min:=TestMsgWidthMin _
@@ -2049,7 +2049,7 @@ Private Function Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly()
     Dim i           As Long
 
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 23, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 23, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -2077,7 +2077,7 @@ Private Function Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly()
     Test_23_mMsg_Dsply_Service_MonoSpacedSectionOnly = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_label_pos:=wsTest.TestLabelPos _
+             , dsply_label_spec:=vbNullString _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_min:=TestMsgWidthMin _
@@ -2117,7 +2117,7 @@ Private Function Test_24_mMsg_All_Sections()
     Dim i           As Long
 
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 24, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 24, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -2144,7 +2144,7 @@ Private Function Test_24_mMsg_All_Sections()
     Test_24_mMsg_All_Sections = _
     mMsg.Dsply(dsply_title:=MsgTitle _
              , dsply_msg:=Message _
-             , dsply_label_pos:=wsTest.TestLabelPos _
+             , dsply_label_spec:=vbNullString _
              , dsply_buttons:=MsgButtons _
              , dsply_buttons_app_run:=AppRunArgs _
              , dsply_width_min:=TestMsgWidthMin _
@@ -2188,7 +2188,7 @@ Private Function Test_30_mMsg_MonitorHeader_mMsg_Monitor_mMsg_MonitorFooter_Serv
     Dim lWait       As Long
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 30, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 30, Readable(PROC)
     
     TestMsgWidthMin = wsTest.MsgWidthMin
     TestMsgWidthMax = wsTest.MsgWidthMax
@@ -2290,7 +2290,7 @@ Private Function Test_90_mMsg_Dsply_Service_AllInOne() As Variant
     Dim Msg         As TypeMsg
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 9, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 9, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -2346,7 +2346,7 @@ Private Function Test_90_mMsg_Dsply_Service_AllInOne() As Variant
     
     Select Case mMsg.Dsply(dsply_title:=MsgTitle _
                          , dsply_msg:=Msg _
-                         , dsply_label_pos:=wsTest.TestLabelPos _
+                         , dsply_label_spec:=vbNullString _
                          , dsply_buttons:=MsgButtons _
                          , dsply_buttons_app_run:=AppRunArgs _
                          , dsply_width_min:=TestMsgWidthMin _
@@ -2382,7 +2382,7 @@ Private Function Test_91_mMsg_Dsply_Service_MinimumMessage() As Variant
     Dim bModeLess   As Boolean:         bModeLess = wsTest.TestOptionModelessMessageDisplay
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 9, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 9, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -2410,7 +2410,7 @@ Private Function Test_91_mMsg_Dsply_Service_MinimumMessage() As Variant
                                                                                               
     Select Case mMsg.Dsply(dsply_title:=MsgTitle _
                          , dsply_msg:=Message _
-                         , dsply_label_pos:=wsTest.TestLabelPos _
+                         , dsply_label_spec:=vbNullString _
                          , dsply_buttons:=mMsg.Buttons() _
                          , dsply_width_min:=TestMsgWidthMin _
                          , dsply_width_max:=TestMsgWidthMax _
@@ -2444,7 +2444,7 @@ Private Function Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL() As Variant
     Dim bModeLess   As Boolean:         bModeLess = wsTest.TestOptionModelessMessageDisplay
     
     BoP ErrSrc(PROC)
-    SetupMsgTitleInstasnceAndNo 9, Readable(PROC)
+    SetupMsgTitleInstanceAndNo 92, Readable(PROC)
     
     '~~ Obtain initial test values from the Test Worksheet
     With wsTest
@@ -2482,11 +2482,109 @@ Private Function Test_92_mMsg_Dsply_Service_LabelWithUnderlayedURL() As Variant
                                                                                               
     Select Case mMsg.Dsply(dsply_title:=MsgTitle _
                          , dsply_msg:=Message _
-                         , dsply_label_pos:=wsTest.TestLabelPos _
+                         , dsply_label_spec:=vbNullString _
                          , dsply_buttons:=mMsg.Buttons(vbOKOnly) _
-                         , dsply_width_min:=TestMsgWidthMin _
-                         , dsply_width_max:=TestMsgWidthMax _
-                         , dsply_height_max:=TestMsgHeightMax _
+                         , dsply_width_min:=40 _
+                         , dsply_width_max:=80 _
+                         , dsply_height_max:=70 _
+                         , dsply_modeless:=bModeLess)
+        Case BTTN_PASSED:       wsTest.TestPassed
+        Case BTTN_FAILED:       wsTest.TestFailed
+        Case BTTN_TERMINATE:    wsTest.TerminateRegressionTest = True
+    End Select
+    If Not bModeLess Then TestForm
+    
+xt: EoP ErrSrc(PROC)
+    Set MsgButtons = Nothing
+    Set AppRunArgs = Nothing
+    Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
+End Function
+
+Private Function Test_93_mMsg_Dsply_Service_LabelTop() As Variant
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_93_mMsg_Dsply_Service_LabelTop"
+    
+    On Error GoTo eh
+    Dim AppRunArgs  As New Dictionary
+    Dim bModeLess   As Boolean
+    
+    BoP ErrSrc(PROC)
+    SetupMsgTitleInstanceAndNo 93, Readable(PROC)
+    bModeLess = wsTest.TestOptionModelessMessageDisplay
+    MsgForm.VisualizeForTest = wsTest.VisualizeForTest
+    
+    With Message.Section(1)
+        .Label.Text = "Section-1-Label: Above text"
+        .Text.Text = "Section-1-Text: The label of this section's text is above."
+    End With
+    With Message.Section(2)
+        .Label.Text = "Section-2-Label: Above text"
+        .Text.Text = "Section-2-Text: The label of this section's text is above."
+    End With
+
+    Select Case mMsg.Dsply(dsply_title:=MsgTitle _
+                         , dsply_msg:=Message _
+                         , dsply_label_spec:=vbNullString _
+                         , dsply_buttons:=mMsg.Buttons(vbOKOnly) _
+                         , dsply_width_min:=35 _
+                         , dsply_width_max:=70 _
+                         , dsply_height_max:=70 _
+                         , dsply_modeless:=bModeLess)
+        Case BTTN_PASSED:       wsTest.TestPassed
+        Case BTTN_FAILED:       wsTest.TestFailed
+        Case BTTN_TERMINATE:    wsTest.TerminateRegressionTest = True
+    End Select
+    If Not bModeLess Then TestForm
+    
+xt: EoP ErrSrc(PROC)
+    Set MsgButtons = Nothing
+    Set AppRunArgs = Nothing
+    Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
+End Function
+
+Private Function Test_94_mMsg_Dsply_Service_LabelLeftAlignedRight() As Variant
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_94_mMsg_Dsply_Service_LabelLeftAlignedRight"
+    
+    On Error GoTo eh
+    Dim AppRunArgs  As New Dictionary
+    Dim bModeLess   As Boolean
+    
+    BoP ErrSrc(PROC)
+    SetupMsgTitleInstanceAndNo 94, Readable(PROC)
+    bModeLess = wsTest.TestOptionModelessMessageDisplay
+    MsgForm.VisualizeForTest = wsTest.VisualizeForTest
+    
+    With Message.Section(1)
+        .Label.Text = "Section-1-Label: Above text"
+        .Text.Text = "Section-1-Text: The label of this section's text is above."
+    End With
+    With Message.Section(2)
+        .Label.Text = "Section-2-Label: Above text"
+        .Text.Text = "Section-2-Text: The label of this section's text is above."
+    End With
+
+    Select Case mMsg.Dsply(dsply_title:=MsgTitle _
+                         , dsply_msg:=Message _
+                         , dsply_label_spec:="R35" _
+                         , dsply_buttons:=mMsg.Buttons(vbOKOnly) _
+                         , dsply_width_min:=35 _
+                         , dsply_width_max:=70 _
+                         , dsply_height_max:=70 _
                          , dsply_modeless:=bModeLess)
         Case BTTN_PASSED:       wsTest.TestPassed
         Case BTTN_FAILED:       wsTest.TestFailed

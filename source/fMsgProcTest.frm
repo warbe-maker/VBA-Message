@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} fMsgProcTest 
    Caption         =   "Test-Msg-Form"
-   ClientHeight    =   5432
-   ClientLeft      =   119
-   ClientTop       =   462
-   ClientWidth     =   11564
+   ClientHeight    =   5430
+   ClientLeft      =   120
+   ClientTop       =   465
+   ClientWidth     =   11565
    OleObjectBlob   =   "fMsgProcTest.frx":0000
 End
 Attribute VB_Name = "fMsgProcTest"
