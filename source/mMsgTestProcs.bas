@@ -6,16 +6,6 @@ Option Explicit
 '          Test of procedures - rather than fMsg/mMsg services/functions.
 '
 ' ------------------------------------------------------------------------------
-Public Sub ModeLessPassed(ByVal m_title As String)
-    wsTest.TestPassed
-    mMsg.MsgInstance m_title, True
-End Sub
-
-Public Sub ModeLessFailed(ByVal m_title As String)
-    wsTest.TestFailed
-    mMsg.MsgInstance m_title, True
-End Sub
-
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mMsgTestServices." & s:  End Property
 
 Private Function AdjustToVgrid(ByVal atvg_si As Single, _
@@ -302,7 +292,7 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
     On Error GoTo eh
     Dim NewCommandButton1   As MSForms.CommandButton
     Dim NewCommandButton2   As MSForms.CommandButton
-    Dim x                   As Long
+    Dim X                   As Long
     Dim cmp                 As VBComponent
     Dim LeftPos             As Single
     
@@ -354,7 +344,7 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
          
     '~~ Add code on the form for the CommandButtons
     With cmp.CodeModule
-        x = .CountOfLines
+        X = .CountOfLines
         .InsertLines .CountOfLines + 1, "Option Explict"
         .InsertLines .CountOfLines + 1, vbNullString
         .InsertLines .CountOfLines + 1, "Sub CommandButton1_Click()"
