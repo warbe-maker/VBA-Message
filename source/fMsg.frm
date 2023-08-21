@@ -71,7 +71,7 @@ Private Const VSPACE_AREAS                  As Single = 12              ' Vertic
 Private Const VSPACE_BOTTOM                 As Single = 30              ' Space occupied by the title bar
 Private Const VSPACE_BTTN_ROWS              As Single = 5               ' Vertical space between button rows
 Private Const VSPACE_LABEL                  As Single = 0               ' Vertical space between the section-label and the following section-text
-Private Const VSPACE_SECTIONS               As Single = 7               ' Vertical space between displayed message sections
+Private Const VSPACE_SECTIONS               As Single = 5               ' Vertical space between displayed message sections
 Private Const VSPACE_TEXTBOXES              As Single = 18              ' Vertical bottom marging for all textboxes
 Private Const VSPACE_TOP                    As Single = 2               ' Top position for the first displayed control
 Private Const VISLZE_BCKCLR_AREA            As Long = &HC0E0FF          ' -------------
@@ -207,7 +207,7 @@ Private lblMsect                As MSForms.Label    ' Set with MsectItems for a 
 Private lLabelAllPos            As enLabelPos         ' "global" Label position
 Private lMonitorStepsDisplayed  As Long
 Private lMsectsDisplayed        As Long             ' The number of displayed message sections
-Private lMaxNoOfMsgSects   As Long             ' Set with CollectDesignControls (number of message sections designed)
+Private lMaxNoOfMsgSects        As Long             ' Set with CollectDesignControls (number of message sections designed)
 Private lSetupRowButtons        As Long             ' number of buttons setup in a row
 Private lSetupRows              As Long             ' number of setup button rows
 Private lStepsDisplayed         As Long
@@ -215,7 +215,10 @@ Private MsgSectLbl              As TypeMsgLabel     ' Label section of the TypeM
 Private MsgSectTxt              As TypeMsgText      ' Text section of the TypeMsg UDT
 Private siHmarginFrames         As Single           ' Test property, value defaults to 0
 Private siLabelAllWidth         As Single           ' "global" Label width spec
-Private siLytMareaWidth      As Single
+Private siLytMaxMareaWidth      As Single
+Private siLytMaxMsectWidth      As Single
+Private siLytMaxMsectTbxWidth   As Single
+Private siLytMareaWidth         As Single
 Private siLytMarginFramesV      As Single           ' Test property, value defaults to 0
 Private siLytMsectFrmLeft       As Single
 Private siLytMsectFrmTop        As Single           ' A (subsequent) message section fram's top position
@@ -328,28 +331,8 @@ Private Property Get LabelAllPos() As enLabelPos:                         LabelA
 Private Property Let LabelAllPos(ByVal en As enLabelPos):                 lLabelAllPos = en:                                          End Property
 
 Public Property Let LabelAllSpec(ByVal l_spec As String)
-    Const PROC = "LabelAllSpec-Let"
-    
-    On Error GoTo eh
-    Dim s As String
-    
-    Select Case True
-        Case l_spec = vbNullString:     LabelAllPos = enLabelAboveSectionText:  GoTo xt
-        Case InStr(l_spec, "L") <> 0:   LabelAllPos = enLposLeftAlignedLeft:    s = "L"
-        Case InStr(l_spec, "C") <> 0:   LabelAllPos = enLposLeftAlignedCenter:  s = "C"
-        Case InStr(l_spec, "R") <> 0:   LabelAllPos = enLposLeftAlignedRight:   s = "R"
-        Case Else:                      Err.Raise AppErr(1), ErrSrc(PROC), "The label position specification's is neither a vbNullString (the default = top pos) nor L, R, or C!"
-    End Select
-    
-    On Error Resume Next
-    LabelAllWidth = CInt(Replace(UCase(l_spec), s, vbNullString))
-    If Err.Number <> 0 _
-    Then Err.Raise AppErr(2), ErrSrc(PROC), "The common label position spec '" & l_spec & "'  does not include an integer value specifying the left positioned label's width!"
-    On Error GoTo eh
-    
-xt: Exit Property
-    
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+    LabelAllPos = mMsg.LabelPos(l_spec)
+    LabelAllWidth = mMsg.LabelWidth(l_spec)
 End Property
 
 Private Property Get LabelAllWidth() As Single:                         LabelAllWidth = siLabelAllWidth:                            End Property
@@ -371,6 +354,14 @@ Private Property Let LytMareaWidth(ByVal si As Single):                 siLytMar
 Private Property Get LytMarginFramesV() As Single:                      LytMarginFramesV = siLytMarginFramesV:                      End Property
 
 Private Property Let LytMarginFramesV(ByVal si As Single):              siLytMarginFramesV = AdjustToVgrid(si):                     End Property
+
+Private Property Get LytMaxMareaWidth() As Single:                      LytMaxMareaWidth = siLytMaxMareaWidth:                      End Property
+
+Private Property Let LytMaxMareaWidth(ByVal si As Single):              siLytMaxMareaWidth = si:                                    End Property
+
+Private Property Get LytMaxMsectTbxWidth() As Single:                   LytMaxMsectTbxWidth = siLytMaxMsectTbxWidth:                End Property
+
+Private Property Let LytMaxMsectTbxWidth(ByVal si As Single):           siLytMaxMsectTbxWidth = si:                                 End Property
 
 Private Property Get LytMsectFrmLeft() As Single:                       LytMsectFrmLeft = siLytMsectFrmLeft:                        End Property
 
@@ -405,7 +396,7 @@ Private Property Let LytMsectTbxWidth(ByVal si As Single):              siLytMse
 
 Private Property Get MaxRowsHeight() As Single:                         MaxRowsHeight = siMaxButtonHeight + (LytMarginFramesV * 2): End Property
 
-Private Property Get MaxWidthMsgArea() As Single:                       MaxWidthMsgArea = Me.InsideWidth:                           End Property
+'Private Property Get MaxWidthMsgArea() As Single:                       MaxWidthMsgArea = Me.InsideWidth:                           End Property
 
 Public Property Let ModeLess(ByVal b As Boolean):                       bModeLess = b:                                              End Property
 
@@ -553,15 +544,15 @@ Public Property Get MsgWidthMin() As Single:            MsgWidthMin = siMsgWidth
 
 Public Property Let MsgWidthMin(ByVal si As Single):    siMsgWidthMin = si:                                             End Property
 
-Private Property Let NewHeight(Optional ByRef nh_frame_form As Object, _
-                               Optional ByVal nh_for_visible_only As Boolean = True, _
-                               Optional ByVal nh_y_action As fmScrollAction = fmScrollActionBegin, _
-                               Optional ByVal nh_threshold_height_diff As Single = 5, _
-                                        ByVal nh_height As Single)
+Private Property Let NewHeight(Optional ByRef n_frame_form As Object, _
+                               Optional ByVal n_for_visible_only As Boolean = True, _
+                               Optional ByVal n_y_action As fmScrollAction = fmScrollActionBegin, _
+                               Optional ByVal n_threshold_height_diff As Single = 5, _
+                                        ByVal n_height As Single)
 ' ------------------------------------------------------------------------------
 ' Mimics a height change event. Applies a vertical scroll-bar when the content
-' height of the frame or form (nh_frame_form) is greater than the height of
-' the frame or form by considering a threshold (nh_threshold_height_diff) in
+' height of the frame or form (n_frame_form) is greater than the height of
+' the frame or form by considering a threshold (n_threshold_height_diff) in
 ' order to avoid a usesless scroll-bar for a redicolous height difference. In
 ' case the new height is less the the frame's height a vertical scrollbar is
 ' removed.
@@ -569,18 +560,18 @@ Private Property Let NewHeight(Optional ByRef nh_frame_form As Object, _
     Const PROC = "NewHeight"
     
     On Error GoTo eh
-    Dim siContentHeight As Single:  siContentHeight = ContentHeight(nh_frame_form, nh_for_visible_only)
+    Dim siContentHeight As Single:  siContentHeight = ContentHeight(n_frame_form, n_for_visible_only)
     
-    If nh_frame_form Is Nothing Then Err.Raise AppErr(1), ErrSrc(PROC), "The required argument 'nh_frame_form' is Nothing!"
-    If Not IsFrameOrForm(nh_frame_form) _
+    If n_frame_form Is Nothing Then Err.Raise AppErr(1), ErrSrc(PROC), "The required argument 'n_frame_form' is Nothing!"
+    If Not IsFrameOrForm(n_frame_form) _
     Then Err.Raise AppErr(1), ErrSrc(PROC), "The provided argument is neither a Frame nor a Form!"
         
-    nh_frame_form.Height = nh_height
+    n_frame_form.Height = n_height
     
-    If siContentHeight - nh_frame_form.Height > nh_threshold_height_diff Then
-        ScrollVscrollApply sva_frame_form:=nh_frame_form, sva_content_height:=siContentHeight, sva_y_action:=nh_y_action
-    ElseIf ScrollVscrollApplied(nh_frame_form) Then
-        ScrollVscrollRemove nh_frame_form
+    If siContentHeight - n_frame_form.Height > n_threshold_height_diff Then
+        ScrollVscrollApply sva_frame_form:=n_frame_form, sva_content_height:=siContentHeight, sva_y_action:=n_y_action
+    ElseIf ScrollVscrollApplied(n_frame_form) Then
+        ScrollVscrollRemove n_frame_form
     End If
     
 xt: Exit Property
@@ -844,11 +835,15 @@ Private Sub AdjustPos()
             '~~ Position Message Section
             Debug.Print "Sect: " & i & " Top=" & LytMsectFrmTop
             
-            MsectLblAdjust i
-            MsectTbxFrmAdjust i
+            If MsectLblIsDisplayed(i) Then MsectLblAdjust i
+            If MsectTbxFrmIsDisplayed(i) Then MsectTbxFrmAdjust i
             MsectFrmAdjust i
-            frmMsect.Height = ContentHeight(frmMsect)
-            frmMarea.Height = ContentHeight(frmMarea)
+            If Not ScrollVscrollApplied(frmMsect) Then
+                frmMsect.Height = ContentHeight(frmMsect)
+            End If
+            If Not ScrollVscrollApplied(frmMarea) Then
+                frmMarea.Height = ContentHeight(frmMarea)
+            End If
             If lNo = lDisplayed Then
                 frmMarea.Top = LytMareaTop
                 If frmBarea.Visible Then
@@ -860,8 +855,11 @@ Private Sub AdjustPos()
     Next i
     
     '~~ Top position Message Area
-    If frmBarea.Visible Then
+    If BttnsAreaIsDisplayed(frmBarea) Then
         Me.Height = frmBarea.Top + frmBarea.Height + LytAreasBottomSpace
+    Else
+        Me.Width = frmMarea.Left + frmMarea.Width + 5
+        Me.Height = frmMarea.Top + frmMarea.Height + LytAreasBottomSpace
     End If
     
 xt: Exit Sub
@@ -1004,12 +1002,25 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
+Private Function BttnsAreaExists(ByRef b_frm As MSForms.Frame) As Boolean
+    If Not frmBarea Is Nothing Then
+        Set b_frm = frmBarea
+        BttnsAreaExists = True
+    End If
+End Function
+
+Private Function BttnsAreaIsDisplayed(ByRef b_frm As MSForms.Frame) As Boolean
+    If BttnsAreaExists(b_frm) Then
+        BttnsAreaIsDisplayed = b_frm.Visible
+    End If
+End Function
+
 Private Function BttnsArea() As MSForms.Frame
 ' ------------------------------------------------------------------------------
 ' Returns the Buttons area Frame, created if yet not existing.
 ' ------------------------------------------------------------------------------
 
-    If frmBarea Is Nothing Then
+    If Not BttnsAreaExists(frmBarea) Then
         Set frmBarea = AddControl(ac_ctl:=Frame, ac_visible:=True, ac_name:="frBttnsArea")
         With frmBarea
             .Top = 0
@@ -1260,7 +1271,7 @@ Private Sub CollectDesignControls()
     Dim lBttn       As Long
     Dim cmb         As MSForms.CommandButton
     Dim sKey        As String
-    Dim PntsWidth   As Single:  PntsWidth = mMsg.ValueAsPt(Me.MsgWidthMin - mMsg.ValueAsPercentage(Me.Width - Me.InsideWidth, "W"), "W")
+    Dim PntsWidth   As Single:  PntsWidth = mMsg.ValueAsPt(Me.MsgWidthMin - mMsg.ValueAsPercentage(Me.Width - Me.InsideWidth, mMsg.enDsplyDimensionWidth), mMsg.enDsplyDimensionWidth)
     
     Collect col_into:=NewDict(dctAreas) _
           , col_cntrl_type:="Frame" _
@@ -1613,10 +1624,6 @@ End Sub
 
 Private Sub Initialize()
     Const PROC                          As String = "Initialize"
-    Const LYT_DFLT_MAX_MSG_HEIGHT_PCNTG As Long = 80                ' Default minimum message window height
-    Const LYT_DFLT_MIN_MSG_HEIGHT_PCNTG As Long = 20                ' Default minimum message window height
-    Const LYT_DFLT_MAX_MSG_WIDTH_PCNTG  As Long = 90                ' Default maximum message window width
-    Const LYT_DFLT_MIN_MSG_WIDTH_PCNTG  As Long = 20                ' Default maximum message window width
     
     On Error GoTo eh
     
@@ -1631,10 +1638,10 @@ Private Sub Initialize()
     bFormEvents = False
     SetupDone = False
     siHmarginFrames = 0     ' Ensures proper command buttons framing, may be used for test purpose
-    MsgHeightMax = LYT_DFLT_MAX_MSG_HEIGHT_PCNTG
-    MsgHeightMin = LYT_DFLT_MIN_MSG_HEIGHT_PCNTG
-    MsgWidthMax = LYT_DFLT_MAX_MSG_WIDTH_PCNTG
-    MsgWidthMin = LYT_DFLT_MIN_MSG_WIDTH_PCNTG
+    MsgHeightMax = mMsg.MSG_LIMIT_HEIGHT_MAX_PERCENTAGE
+    MsgHeightMin = mMsg.MSG_LIMIT_HEIGHT_MIN_PERCENTAGE
+    MsgWidthMax = mMsg.MSG_LIMIT_WIDTH_MAX_PERCENTAGE
+    MsgWidthMin = mMsg.MSG_LIMIT_WIDTH_MIN_PERCENTAGE
     LytMarginFramesV = 0    ' Ensures proper command buttons framing and vertical positioning of controls
     MsgButtonDefault = 1
 
@@ -1711,8 +1718,29 @@ Private Sub laMsgSection8Label_Click():     OpenClickedLabelItem 8: End Sub
 
 Private Sub laMsgSection8Label_MouseMove(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single):        HandCursorForLink 8:    End Sub
 
+Private Function LytMaxMsectTbxFrmWidth(ByVal m_area_frm As MSForms.Frame, _
+                                        ByVal m_sect_frm As MSForms.Frame) As Single
+' ------------------------------------------------------------------------------
+' The maximum usable message text width depends on the maximum message section
+' width which is reduced by a possible label width (when positioned left it will
+' not be 0) and reduced by the width of a vertical scrollbar if one is applied.
+' ------------------------------------------------------------------------------
+    LytMaxMsectTbxFrmWidth = LytMaxMsectWidth(m_area_frm) - LabelAllWidth - ScrollVscrollWidth(m_sect_frm)
+End Function
+
+Private Function LytMaxMsectWidth(ByVal m_area_frm As MSForms.Frame) As Single
+' ------------------------------------------------------------------------------
+' Returns the maximum usable message section width based on the max message area
+' (m_area_frm) which is reduced by the width of a vertical scrollbar if one is
+' applied.
+' ------------------------------------------------------------------------------
+    LytMaxMsectWidth = LytMaxMareaWidth - ScrollVscrollWidth(m_area_frm)
+End Function
+
 Private Sub LytSpecs()
 
+    LytMaxMareaWidth = Me.MsgWidthMax - (Me.Width - Me.InsideWidth)
+    
     If MareaExists(frmMarea) Then
         With frmMarea
             .Top = 0
@@ -1722,7 +1750,11 @@ Private Sub LytSpecs()
             LytMsectFrmWidth = .Width
         End With
     End If
-    If LabelAllPos = enLabelAboveSectionText Then LytMsectTbxFrmLeft = 0 Else LytMsectTbxFrmLeft = LabelAllWidth
+    If LabelAllPos = enLabelAboveSectionText Then
+        LytMsectTbxFrmLeft = 0
+    Else
+        LytMsectTbxFrmLeft = LabelAllWidth
+    End If
     LytMsectTbxFrmWidth = LytMsectFrmWidth - LytMsectTbxFrmLeft
     LytMsectTbxWidth = LytMsectTbxFrmWidth
     
@@ -1771,15 +1803,15 @@ Private Sub MareaAdjust()
                 '~~ - The width of the message window is expanded by the specified label width
                 '~~   (an error is displayed when this expands the width beyond the max message width)
                 '~~ - The new width of the message section frames is set
-                If Me.Width + LabelAllWidth > Me.MsgWidthMax _
-                Then Err.Raise AppErr(1), ErrSrc(PROC), "The label position is specified " & LabelAllPosString & " This means " & _
-                                                        "that the final setup message window width is expanded by the specified " & _
-                                                        "width of '" & LabelAllWidth & "'pt). This expansion however exceeds the " & _
-                                                        "maximum message window with of '" & MsgWidthMax & "' pt of the display " & _
-                                                        "width! Note that the specified or default max window width is a percentage " & _
-                                                        "with is converted into pt in accordance with the display's properties " & _
-                                                        "(" & mMsg.DpiX & "x" & mMsg.DpiY & " dpi)."
-                
+'                If Me.Width + LabelAllWidth > Me.MsgWidthMax _
+'                Then Err.Raise AppErr(1), ErrSrc(PROC), "The label position is specified " & LabelAllPosString & " This means " & _
+'                                                        "that the final setup message window width is expanded by the specified " & _
+'                                                        "width of '" & LabelAllWidth & "'pt). This expansion however exceeds the " & _
+'                                                        "maximum message window with of '" & MsgWidthMax & "' pt of the display " & _
+'                                                        "width! Note that the specified or default max window width is a percentage " & _
+'                                                        "with is converted into pt in accordance with the display's properties " & _
+'                                                        "(" & mMsg.DpiX & "x" & mMsg.DpiY & " dpi)."
+'
                 Me.Width = Me.Width + LabelAllWidth
                 .Width = ContentWidth(frmMarea) ' LytMareaWidth
                 LytMsectFrmWidth = .Width
@@ -2190,8 +2222,9 @@ Private Sub MsectFrmAdjust(ByVal m_sect As Long)
 ' ------------------------------------------------------------------------------
     With frmMsect
         .Left = LytMsectFrmLeft
-        .Width = LytMsectFrmWidth
-        .Height = ContentHeight(frmMsect)
+        .Top = LytMsectFrmTop
+        If Not ScrollHscrollApplied(frmMsect) Then .Width = LytMsectFrmWidth + ScrollVscrollWidth(frmMsect)
+        If Not ScrollVscrollApplied(frmMsect) Then .Height = ContentHeight(frmMsect)
         LytMsectFrmTop = AdjustToVgrid(.Top + .Height + VSPACE_SECTIONS)
     End With
 
@@ -2215,19 +2248,6 @@ Private Function MsectFrmIsDisplayed(ByVal m_sect As Long, _
         MsectFrmIsDisplayed = m_frm.Visible
     End If
                                      
-End Function
-
-Private Function MsectFrmMaxWidth(ByVal m_area_frm As MSForms.Frame) As Single
-' ------------------------------------------------------------------------------
-' Returns the maximum usable message section width based on the max message area
-' (m_area_frm) considering the frame's vertical scrollbar - in case.
-' Note: A vertical scrollbar reduces the available space by the required space
-'       for the vertical scrollbar.
-' ------------------------------------------------------------------------------
-    MsectFrmMaxWidth = MaxWidthMsgArea
-    Select Case m_area_frm.ScrollBars
-        Case fmScrollBarsVertical, fmScrollBarsBoth:    MsectFrmMaxWidth = MsectFrmMaxWidth - SCROLL_V_WIDTH
-    End Select
 End Function
 
 Private Function MsectLbl(ByVal m_sect As Long, _
@@ -2286,7 +2306,8 @@ Private Sub MsectLblAdjust(ByVal m_sect As Long)
             .Top = 0
             .Left = 0
             If LabelAllPos = enLabelAboveSectionText _
-            Or MsectLblWithoutText(m_sect) Then
+            Or MsectLblHasNoCorrespondingText(m_sect) Then
+                MsectLblAutoSize lbl, frmMarea.Width - .Left
                 .Width = frmMarea.Width - .Left
                 LytMsectTbxFrmTop = AdjustToVgrid(.Top + .Height)
                 .Left = 8
@@ -2297,7 +2318,7 @@ Private Sub MsectLblAdjust(ByVal m_sect As Long)
                     Case enLposLeftAlignedCenter:   .TextAlign = fmTextAlignCenter
                     Case Else:                      .TextAlign = fmTextAlignLeft
                 End Select
-                MsectLblAutoSize lbl, LabelAllWidth, siHeight
+                MsectLblAutoSize lbl, LabelAllWidth + 12
                 Select Case LabelAllPos
                     Case enLposLeftAlignedRight:    .TextAlign = fmTextAlignRight
                     Case enLposLeftAlignedCenter:   .TextAlign = fmTextAlignCenter
@@ -2305,11 +2326,11 @@ Private Sub MsectLblAdjust(ByVal m_sect As Long)
                 End Select
                 LytMsectTbxFrmTop = .Top
                 .Top = .Top + 2 ' to compensate the text-box' vertical position
-                LytMsectFrmTop = .Top + ContentHeight(frmMsect) + 2
-                TimedDoEvents ErrSrc(PROC) ' !!! without, the label might not be ajusted correctly !!!
+'                LytMsectFrmTop = .Top + ContentHeight(frmMsect) + 2
             End If
+'            LytMsectFrmTop = .Top + ContentHeight(frmMsect) + 2
         End With
-            
+        TimedDoEvents PROC
     End If
 
 xt: Exit Sub
@@ -2322,7 +2343,10 @@ End Sub
 
 Private Sub MsectLblAutoSize(ByRef a_lbl As MSForms.Label, _
                              ByVal a_width As Single, _
-                             ByRef a_height As Single)
+                    Optional ByRef a_height As Single)
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
     Const TMP_TBX = "tbxTemp"
     Dim tbx As MSForms.TextBox
     Dim sTempTbx    As String:
@@ -2333,6 +2357,7 @@ Private Sub MsectLblAutoSize(ByRef a_lbl As MSForms.Label, _
                            , Name:=TMP_TBX _
                            , Visible:=True)
     With tbx
+        .MultiLine = True
         .Font.Bold = a_lbl.Font.Bold
         .ForeColor = a_lbl.ForeColor
         .Font = a_lbl.Font
@@ -2340,9 +2365,9 @@ Private Sub MsectLblAutoSize(ByRef a_lbl As MSForms.Label, _
         .Top = frmMarea.Top + frmMarea.Height + 4 ' for test only
         .Height = 4
     End With
-    MsectTbxAutoSize tbx, a_lbl.Caption, LabelAllWidth + 12
+    MsectTbxAutoSize tbx, a_lbl.Caption, a_width - 10
     a_height = tbx.Height - 6
-    
+    BttnsArea.Top = tbx.Top + tbx.Height
     With a_lbl
         .WordWrap = True
         .Width = LabelAllWidth
@@ -2362,6 +2387,10 @@ Private Function MsectLblExists(ByVal m_sect As Long, _
                                 
 End Function
 
+Private Function MsectLblHasNoCorrespondingText(ByVal m_sect As Long) As Boolean
+    MsectLblHasNoCorrespondingText = Text(enSectText, m_sect).Text = vbNullString
+End Function
+
 Private Function MsectLblIsDisplayed(ByVal m_sect As Long, _
                             Optional ByRef m_lbl As MSForms.Label, _
                             Optional ByRef m_frm As MSForms.Frame) As Boolean
@@ -2374,10 +2403,6 @@ Private Function MsectLblIsDisplayed(ByVal m_sect As Long, _
         End If
     End If
 
-End Function
-
-Private Function MsectLblWithoutText(ByVal m_sect As Long) As Boolean
-    MsectLblWithoutText = Text(enSectText, m_sect).Text = vbNullString
 End Function
 
 Private Function MsectTbx(ByVal m_sect As Long) As MSForms.TextBox
@@ -2446,7 +2471,7 @@ Private Sub MsectTbxAutoSize(ByRef as_tbx As MSForms.TextBox, _
             '~~ (applied for proportially spaced text where the width determines the height)
             .WordWrap = True
             .AutoSize = False
-            .Width = as_width_limit - 2 ' the readability space is added later
+            .Width = as_width_limit ' the readability space is added later
             
             If Not as_append Then
                 .Value = as_text
@@ -2474,7 +2499,7 @@ Private Sub MsectTbxAutoSize(ByRef as_tbx As MSForms.TextBox, _
                 End If
             End If
         End If
-        .Width = .Width + 12 ' readability space
+        .Width = .Width + 10 ' readability space
         .Height = AdjustToVgrid(.Height, 0)
     End With
         
@@ -2549,8 +2574,10 @@ Private Sub MsectTbxFrmAdjust(ByVal m_sect As Long)
     
     If MsectTbxFrmIsDisplayed(m_sect, frmMsect, frmMsectTbx, tbxMsect) Then
         With frmMsectTbx
-            .Top = LytMsectTbxFrmTop
-            If MsectTbxWithoutLabel(m_sect) Then
+            If Not MsectLblIsDisplayed(m_sect) _
+            Then .Top = 0 _
+            Else .Top = LytMsectTbxFrmTop
+            If MsectTbxHasNoCorrepondingLabel(m_sect) Then
                 .Left = 0
                 .Width = LytMsectFrmWidth - 3
             Else
@@ -2597,22 +2624,8 @@ Private Function MsectTbxFrmIsDisplayed(ByVal m_sect As Long, _
 
 End Function
 
-Private Function MsectTbxFrmMaxWidth(ByVal m_area_frm As MSForms.Frame, _
-                                     ByVal m_sect_frm As MSForms.Frame) As Single
-' ------------------------------------------------------------------------------
-' The maximum usable message text width depends on the maximum message section
-' width and whether or not the section (m_sect_frm) has a vertical scrollbar
-' which reduces the available space by its required width.
-' ------------------------------------------------------------------------------
-    MsectTbxFrmMaxWidth = MsectFrmMaxWidth(m_area_frm) - LabelAllWidth
-    Select Case m_sect_frm.ScrollBars
-        Case fmScrollBarsVertical, fmScrollBarsBoth:    MsectTbxFrmMaxWidth = MsectTbxFrmMaxWidth - SCROLL_V_WIDTH
-    End Select
-
-End Function
-
-Private Function MsectTbxWithoutLabel(ByVal m_sect As Long) As Boolean
-    MsectTbxWithoutLabel = MsgLabel(m_sect).Text = vbNullString
+Private Function MsectTbxHasNoCorrepondingLabel(ByVal m_sect As Long) As Boolean
+    MsectTbxHasNoCorrepondingLabel = MsgLabel(m_sect).Text = vbNullString
 End Function
 
 Private Function NewDict(ByRef dct As Dictionary) As Dictionary
@@ -2682,8 +2695,8 @@ Public Sub PositionOnScreen(Optional ByVal pos_top_left As Variant = 3)
     With Me
         If ((.Left + .Width) > (VirtualScreenLeftPts + VirtualScreenWidthPts)) Then .Left = ((VirtualScreenLeftPts + VirtualScreenWidthPts) - .Width)
         If ((.Top + .Height) > (VirtualScreenTopPts + VirtualScreenHeightPts)) Then .Top = ((VirtualScreenTopPts + VirtualScreenHeightPts) - .Height)
-        If (.Left < VirtualScreenLeftPts) Then .Left = VirtualScreenLeftPts
-        If (.Top < VirtualScreenTopPts) Then .Top = VirtualScreenTopPts
+        If (.Left < VirtualScreenLeftPts) Then .Left = VirtualScreenLeftPts Else .Left = pos_left
+        If (.Top < VirtualScreenTopPts) Then .Top = VirtualScreenTopPts Else .Top = pos_top
     End With
     
 xt: Exit Sub
@@ -2973,9 +2986,9 @@ Private Sub ScrollVscrollWhereApplicable()
             .Height = MsgHeightMax                  ' Reduce the height to the max height specified
             
             If PrcntgHeightMareaFrm >= 0.6 Then
-                '~~ Either the message area as a whole or the dominating message section - if ther is any -
-                '~~ will be height reduced and applied with a vertical scroll bar
-                ScrollVscrollMsgSectionOrArea TotalExceedingHeight
+                '~~ The message area occupies 60% or more of the total message's height and
+                '~~ thus is the dominating section to be reduced and applied with a vertical scroll-bar
+                NewHeight(frmMarea) = frmMarea.Height - TotalExceedingHeight
             ElseIf PrcntgHeightBareaFrm >= 0.6 Then
                 '~~ Only the buttons area will be reduced and applied with a vertical scrollbar.
                 NewHeight(frmBarea) = frmBarea.Height - TotalExceedingHeight
@@ -3049,14 +3062,18 @@ Public Sub Setup()
     '~~ the vertical scrollbar visible
     AdjustPos
     
-    If MareaIsDisplayed(frmMarea) Then
-        Me.Width = Max(ContentWidth(BttnsArea.Parent), ContentWidth()) + ScrollVscrollWidth(frmMarea) + (Me.Width - Me.InsideWidth)
-        FrameCenterHorizontal center_frame:=frmBarea, left_margin:=10
-        Me.Height = Max(ContentHeight(BttnsArea.Parent), ContentHeight(frmMarea.Parent)) + 35
-    Else
-        Me.Width = ContentWidth(BttnsArea.Parent) + ScrollVscrollWidth(frmBarea) + (Me.Width - Me.InsideWidth)
-        Me.Height = ContentHeight(BttnsArea.Parent) + 35
-    End If
+    Select Case True
+        Case MareaIsDisplayed(frmMarea) And BttnsAreaIsDisplayed(frmBarea)
+            Me.Width = Max(ContentWidth(BttnsArea.Parent), ContentWidth()) + ScrollVscrollWidth(frmMarea) + (Me.Width - Me.InsideWidth)
+            FrameCenterHorizontal center_frame:=frmBarea, left_margin:=10
+            Me.Height = Max(ContentHeight(BttnsArea.Parent), ContentHeight(frmMarea.Parent)) + 35
+        Case Not MareaIsDisplayed(frmMarea) And BttnsAreaIsDisplayed(frmBarea)
+            Me.Width = ContentWidth(BttnsArea.Parent) + ScrollVscrollWidth(frmBarea) + (Me.Width - Me.InsideWidth)
+            Me.Height = ContentHeight(BttnsArea.Parent) + 35
+        Case MareaIsDisplayed(frmMarea) And Not BttnsAreaIsDisplayed(frmBarea)
+            Me.Width = ContentWidth(frmMarea.Parent) + ScrollVscrollWidth(frmMarea) + (Me.Width - Me.InsideWidth)
+            Me.Height = ContentHeight(frmMarea.Parent) + 35
+    End Select
     
     PositionOnScreen "10;10"
     bSetUpDone = True ' To indicate for the Activate event that the setup had already be done beforehand
@@ -3189,8 +3206,8 @@ Const PROC = "Setup03MonoSpacedSection"
   
     With tbxMsect
         With .Font
-            If MsgSectTxt.FontName <> vbNullString Then .Name = MsgSectTxt.FontName Else .Name = DFLT_LBL_MONOSPACED_FONT_NAME
-            If MsgSectTxt.FontSize <> 0 Then .Size = MsgSectTxt.FontSize Else .Size = DFLT_LBL_MONOSPACED_FONT_SIZE
+            If MsgSectTxt.FontName <> vbNullString Then .Name = MsgSectTxt.FontName Else .Name = DFLT_TXT_MONOSPACED_FONT_NAME
+            If MsgSectTxt.FontSize <> 0 Then .Size = MsgSectTxt.FontSize Else .Size = DFLT_TXT_MONOSPACED_FONT_SIZE
             If .Bold <> MsgSectTxt.FontBold Then .Bold = MsgSectTxt.FontBold
             If .Italic <> MsgSectTxt.FontItalic Then .Italic = MsgSectTxt.FontItalic
             If .Underline <> MsgSectTxt.FontUnderline Then .Underline = MsgSectTxt.FontUnderline
@@ -3199,19 +3216,20 @@ Const PROC = "Setup03MonoSpacedSection"
     End With
     
     MsectTbxAutoSize as_tbx:=tbxMsect _
-                  , as_text:=MsgSectTxt.Text _
-                  , as_width_limit:=0 _
-                  , as_append:=s_append _
-                  , as_append_margin:=s_append_margin
+                   , as_text:=MsgSectTxt.Text _
+                   , as_width_limit:=0 _
+                   , as_append:=s_append _
+                   , as_append_margin:=s_append_margin
     
     With tbxMsect
+'        .Width = .Width + 15
         .SelStart = 0
         .Left = siHmarginFrames
         frmMsectTbx.Left = siHmarginFrames
         frmMsectTbx.Height = .Top + .Height
         frmMsectTbx.Width = .Width
     End With ' tbxMsect
-    NewWidth(frmMsectTbx) = Min(MsectTbxFrmMaxWidth(frmMarea, frmMsect), tbxMsect.Width)
+    NewWidth(frmMsectTbx) = Min(LytMaxMsectTbxFrmWidth(Marea, frmMsect), tbxMsect.Width)
     
     frmMsect.Width = frmMsectTbx.Width + LabelAllWidth
     LytMsectFrmWidth = Max(LytMsectFrmWidth, frmMsect.Width)
@@ -3531,17 +3549,25 @@ Private Sub SetupMsgSect(ByVal m_sect As Long)
     End If
     
     If MsgSectTxt.Text <> vbNullString Then
-        Set frmMsect = MsectFrm(m_sect)
-        Set frmMsectTbx = MsectTbxFrm(m_sect, True)
-        Set tbxMsect = MsectTbx(m_sect)
-        If MsgSectTxt.MonoSpaced Then
-            Setup03MonoSpacedSection m_sect  ' returns the maximum width required for monospaced section
+        If MsgSectTxt.MonoSpaced Then ' And Not MsectTbxFrmIsDisplayed(m_sect)
+            If Not MsectTbxFrmIsDisplayed(m_sect) Then
+                Set frmMsect = MsectFrm(m_sect)
+                Set frmMsectTbx = MsectTbxFrm(m_sect, True)
+                Set tbxMsect = MsectTbx(m_sect)
+                Setup03MonoSpacedSection m_sect  ' returns the maximum width required for monospaced section
+            End If
         Else ' proportional spaced
-            Setup12PropSpacedSection m_sect
+            If Not MsectTbxFrmIsDisplayed(m_sect) Then
+                Set frmMsect = MsectFrm(m_sect)
+                Set frmMsectTbx = MsectTbxFrm(m_sect, True)
+                Set tbxMsect = MsectTbx(m_sect)
+                Setup12PropSpacedSection m_sect
+            End If
         End If
         tbxMsect.SelStart = 0
     End If
-      
+    DoEvents
+    
 xt: Exit Sub
 
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
@@ -3729,7 +3755,7 @@ Private Sub SizeAndPosition2Bttns3Frame()
         End With
     End If
     If BttnsArea.Height <> Max(Me.InsideHeight, ContentHeight(BttnsFrm)) Then
-        NewHeight(BttnsArea) = Max(Me.InsideHeight, ContentHeight(BttnsFrm))
+        NewHeight(BttnsArea) = Min(Max(Me.InsideHeight, ContentHeight(BttnsFrm)), MsgHeightMax)
     End If
 xt: Exit Sub
     

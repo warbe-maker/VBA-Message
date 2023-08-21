@@ -10,44 +10,29 @@ Attribute VB_Exposed = True
 Option Explicit
 
 Private bRegressionTest As Boolean
-Private bTerminated As Boolean
+Private bTerminated     As Boolean
 
-Private Property Get ColMsgHeightIncrDecr() As Range:               Set ColMsgHeightIncrDecr = Me.Range("colMsgHeightIncDecr"):                                 End Property
+Public Property Get FailedText() As String:                         Value(Me.Range("colTestPassedFailed")) = "Failed":              End Property
 
-Private Property Get ColMsgHeightMaxSpecAsPoSS() As Range:          Set ColMsgHeightMaxSpecAsPoSS = Me.Range("colMsgHeightMaxSpecAsPoSS"):                      End Property
+Public Property Get LabelPos() As enLabelPos:                       LabelPos = mMsg.LabelPos(MsgLabelPosSpec):                      End Property
 
-Private Property Get ColMsgLabelPosSpec() As Range:                 Set ColMsgLabelPosSpec = Me.Range("colMsgLabelPosSpec"):                                    End Property
+Public Property Get LabelWidth() As Long:                           LabelWidth = mMsg.LabelWidth(MsgLabelPosSpec):                  End Property
 
-Private Property Get ColMsgWidthIncrDecr() As Range:                Set ColMsgWidthIncrDecr = Me.Range("colMsgWidthIncDecr"):                                   End Property
+Public Property Get MsgHeightMax() As Long:                         MsgHeightMax = Value(Me.Range("colMsgHeightMax")):              End Property
 
-Private Property Get ColMsgWidthMax() As Range:                     Set ColMsgWidthMax = Me.Range("colMsgWidthMax"):                                            End Property
+Public Property Let MsgHeightMax(ByVal l As Long):                  Value(Me.Range("colMsgHeightMax")) = l:                         End Property
 
-Private Property Get ColMsgHeightMax() As Range:                    Set ColMsgHeightMax = Me.Range("colMsgHeightMax"):                                            End Property
+Public Property Get MsgLabelPosSpec() As String:                    MsgLabelPosSpec = Value(Me.Range("colMsgLabelPosSpec")):        End Property
 
-Private Property Get ColMsgWidthMin() As Range:                     Set ColMsgWidthMin = Me.Range("colMsgWidthMin"):                                            End Property
+Public Property Let MsgLabelPosSpec(ByVal s As String):             Value(Me.Range("colMsgLabelPosSpec")) = s:                      End Property
 
-Private Property Get FailedText() As String
-    Intersect(Range("rowTest" & mTest.Number), Range("colTestPassedFailed")).Value = "Failed"
-    FailedText = Intersect(RowTest(mTest.Number).EntireRow, Range("colTestPassedFailedNote").EntireColumn).Value
-End Property
+Public Property Get MsgWidthMax() As Long:                          MsgWidthMax = Value(Me.Range("colMsgWidthMax")):                End Property
 
-Public Property Get MsgHeightIncrDecr() As Long:                    MsgHeightIncrDecr = Intersect(RowTest(mTest.Number), ColMsgHeightIncrDecr).Value:           End Property
+Public Property Let MsgWidthMax(ByVal l As Long):                   Value(Me.Range("colMsgWidthMax")) = l:                          End Property
 
-Public Property Get MsgHeightMax() As Long:                         MsgHeightMax = TestValue(ColMsgHeightMax).Value:                                            End Property
+Public Property Get MsgWidthMin() As Long:                          MsgWidthMin = Value(Me.Range("colMsgWidthMin")):                End Property
 
-Public Property Get MsgLabelPosSpec() As String:                    MsgLabelPosSpec = TestValue(ColMsgLabelPosSpec).Value:                                      End Property
-
-Public Property Let MsgLabelPosSpec(ByVal s As String):             TestValue(ColMsgLabelPosSpec).Value = s:                                                    End Property
-
-Public Property Get MsgWidthIncrDecr() As Long:                     MsgWidthIncrDecr = Intersect(RowTest(mTest.Number), ColMsgWidthIncrDecr).Value:             End Property
-
-Public Property Get MsgWidthMax() As Single:                        MsgWidthMax = Intersect(RowTest(mTest.Number), ColMsgWidthMax).Value:                       End Property
-
-Public Property Get MsgWidthMin() As Single
-    On Error Resume Next
-    MsgWidthMin = Intersect(RowTest(mTest.Number).EntireRow, Me.Range("colMsgWidthMin").EntireColumn).Value
-    If Err.Number <> 0 Then Stop
-End Property
+Public Property Let MsgWidthMin(ByVal l As Long):                   Value(Me.Range("colMsgWidthMin")) = l:                          End Property
 
 Public Property Get NextTestNumber() As Long
 ' -------------------------------------------------------------------------
@@ -70,17 +55,17 @@ Public Property Get NextTestNumber() As Long
     
 End Property
 
-Public Property Get RegressionTest() As Boolean:                    RegressionTest = bRegressionTest:                                                           End Property
+Public Property Get RegressionTest() As Boolean:                    RegressionTest = bRegressionTest:                               End Property
 
-Public Property Let RegressionTest(ByVal b As Boolean):             bRegressionTest = b:                                                                        End Property
+Public Property Let RegressionTest(ByVal b As Boolean):             bRegressionTest = b:                                            End Property
 
 Public Property Get RegressionTests() As Range
     Set RegressionTests = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colRegression").EntireColumn)
 End Property
 
-Private Property Get RowTest(Optional ByVal Test As Long) As Range: Set RowTest = Me.Range("rowTest" & mTest.Number):                                      End Property
+Private Property Get RowTest(Optional ByVal Test As Long) As Range: Set RowTest = Me.Range("rowTest" & mTest.Number).EntireRow:     End Property
 
-Public Property Get Terminated() As Boolean:           Terminated = bTerminated:                                         End Property
+Public Property Get Terminated() As Boolean:                        Terminated = bTerminated:                                       End Property
 
 Public Property Let Terminated(ByVal b As Boolean)
     bTerminated = b
@@ -89,8 +74,8 @@ End Property
 
 Public Property Get TestDescription()
     With Me
-        Intersect(.Range("rowTest" & mTest.Number), .Range("colTestDescription")).Select
-        TestDescription = Intersect(.Range("rowTest" & mTest.Number), .Range("colTestDescription")).Value
+        Intersect(.Range("rowTest" & mTest.Number).EntireRow, .Range("colTestDescription").EntireColumn).Select
+        TestDescription = Value(Me.Range("colTestDescription"))
     End With
 End Property
 
@@ -100,10 +85,6 @@ Public Property Get TestLabelPos() As enLabelPos
         Case Me.Shapes("optLabelPosLeftAlignedLeft").OLEFormat.Object.Value = 1:    TestLabelPos = enLposLeftAlignedLeft
         Case Me.Shapes("optLabelPosLeftAlignedRight").OLEFormat.Object.Value = 1:   TestLabelPos = enLposLeftAlignedRight
     End Select
-End Property
-
-Public Property Get LabelPosSpec(Optional ByVal l_test_no As Long)
-    LabelPosSpec = vbNullString
 End Property
 
 Private Property Get TestNumbers() As Range
@@ -129,11 +110,16 @@ xt: Exit Property
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Property
 
-Private Property Let TestResultNote(ByVal s As String)
-    Intersect(Range("rowTest" & mTest.Number), Range("colTestPassedFailedNote")).Value = s
+Private Property Let TestResultNote(ByVal s As String):             Value(Me.Range("colTestPassedFailedNote")) = s:                             End Property
+
+Private Property Get Value(Optional ByVal r As Range) As Variant
+    Value = Intersect(RowTest(mTest.Number).EntireRow, r.EntireColumn).Value
 End Property
 
-Private Property Get TestValue(ByVal r As Range):       Set TestValue = Intersect(RowTest(mTest.Number), r.EntireColumn): End Property
+Private Property Let Value(Optional ByVal r As Range, _
+                                    ByVal v As Variant)
+    Intersect(RowTest(mTest.Number).EntireRow, r.EntireColumn).Value = v
+End Property
 
 Public Property Get VisualizeForTest() As Boolean
 ' ------------------------------------------------------------------------------
@@ -223,7 +209,7 @@ Private Function ErrSrc(ByVal s As String) As String
 End Function
 
 Public Sub Failed()
-    Intersect(Range("rowTest" & mTest.Number), Range("colTestPassedFailed")).Value = "Failed"
+    Value(Me.Range("colTestPassedFailed")) = "Failed"
     With Intersect(RowTest(mTest.Number).EntireRow, Range("colTestPassedFailedNote").EntireColumn)
         .Value = _
         VBA.InputBox(Prompt:="Enter the failed text" _
@@ -240,7 +226,7 @@ Public Sub Failed()
 End Sub
 
 Public Sub Passed()
-    Intersect(Range("rowTest" & mTest.Number), Range("colTestPassedFailed")).Value = "Passed"
+    Value(Me.Range("colTestPassedFailed")) = "Passed"
     With Intersect(RowTest(mTest.Number).EntireRow, Range("colTestPassedFailedNote").EntireColumn)
         .ClearContents
         Application.EnableEvents = False
