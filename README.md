@@ -18,7 +18,7 @@
 &nbsp;&nbsp;&nbsp;[The Monitor service](#the-monitor-service)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Usage of the _Monitor_ service](#usage-of-the-monitor-service)<br>
 &nbsp;&nbsp;&nbsp;[The Buttons service](#the-buttons-service)<br>
-&nbsp;&nbsp;&nbsp;[The _ButtonAppRun_ service](#the-buttonsapprun-service)<br>
+&nbsp;&nbsp;&nbsp;[The _ButtonAppRun_ service](#the-buttonapprun-service)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Usage of the _ButtonAppRun_ service](#usage-of-the-buttonsapprun-service)<br>
 &nbsp;&nbsp;&nbsp;[The MsgInstance service](#the-msginstance-service)<br>
 [Miscellaneous aspects](#miscellaneous-aspects)<br>
@@ -87,7 +87,7 @@ The _Box_ service has these named arguments:
 
 #### _Box_ service usage example
 The below example uses the [_Buttons_](#the-buttons-service) service to specify the displayed buttons and their order. 
-```
+```vb
 Public Sub Demo_Box_Service()
     Const PROC      As String = "Demo_Box_service"
     Const BTTN_1    As String = "Button-1 caption"
@@ -142,8 +142,10 @@ The _Dsply_ service has these named arguments:
 |-----------------------------|-------------------------|
 | `dsply_title`             | Required. String expression displayed in the title bar of the dialog box. If you omit title, the application name is placed in the title bar.|
 | `dsply_msg`               | Required. [UDT _TypeMsg_ ](#syntax-of-the-typemsg-udt) expression providing 4 message sections, each with a label and the message text, displayed as the message in the dialog box. The maximum length of each of the four possible message text strings is only limited by the system's limit for string expressions which is about 1GB!. When one of the 4 message text strings consists of more than one line, they can be separated by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line.|
-| `dsply_buttons`           | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, or a Dictionary, with each item specifying a displayed command button's caption or a button row break (vbLf, vbCr, or vbCrLf). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row.|
-| `dsply_buttons_app_run`  | Dictionary expression, provides information for buttons when displayed ***mode-less** which `Application.Run` service to be performed when clicked. See [The _ButtonAppRun_ service](#the-buttonapprun-service) || `dsply_buttons_app_run`  | |
+| `dsply_label_spec`        | String expression, specifies the position, alignment and width of a label with a corresponding section text, defaults to a vbNullString when omitted = the label is displayed above its corresponding section text. Examples for positioning the label at the left of the corresponding section text:<br>`R60` = Pos left, aligned right, width 60 pt Specifies<br>`C70` = Pos left, aligned centered, width 70 pt.<br>The specification concerns all labels with a corresponding section text. A label without a corresponding section text uses the full message form's width, as does a section text without a corresponding label.|
+| `dsply_buttons`           | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, a Dictionary or a mixture of all, with each item specifying a displayed command button's caption or a button row break (`vbLf`, `vbCr`, or `vbCrLf`). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row.|
+| `dsply_buttons_app_run`  | Dictionary expression, provides information for buttons when displayed ***mode-less** which `Application.Run` service to be performed when clicked. See [The _ButtonAppRun_ service](#the-buttonapprun-service) |
+| `dsply_buttons_app_run`  | |
 | `dsply_button_default`   | Optional, _Long_ expression, defaults to 1, specifies the index of the button which is the default button. |
 | `dsply_reply_with_index` | Optional, _Boolean_ expression, defaults to False. When True the index if the pressed button is returned rather than its caption. |
 | `dsply_modeless`          | Optional, _Boolean_ expression, defaults to False. When True the message is displayed modeless.  |
@@ -153,7 +155,8 @@ The _Dsply_ service has these named arguments:
 | `dsply_button_width_min` | Optional,  _Single_ expression, defaults to 70 pt. Specifies the minimum width of the reply buttons, i.e. even when the displayed string is just Ok, Yes, etc. which would result in a button with much less width. |
 | `dsply_pos`              | Variant expression, specifying the position of the message on screen, defaults to 3.<br>- enManual (0)         = No initial setting specified<br>- enCenterOwner (1)    = Center on the item to which the UserForm belongs<br>- enCenterScreen (2)   = Center on the whole screen<br>- enWindowsDefault (3) = Position in upper-left corner of screen (default)<br>- a range object specifying top and left<br>- a string in the form "\<top>;\<left>" (mind the semicolon separator!) |
 
-#### Syntax of the Type _TypeMsgLabel_
+#### Syntax of the UDT specifying 8 sections
+    
 ```vb
 Public Type TypeMsgLabel
         FontBold        As Boolean
@@ -166,9 +169,6 @@ Public Type TypeMsgLabel
         Text            As String
         OpenWhenClicked As String   ' this extra option is the purpose of this sepcific Type
 End Type
-```
-#### Syntax of the Type _TypeMsgText_
-```vb
 Public Type TypeMsgText
         FontBold        As Boolean
         FontColor       As XlRgbColor
@@ -179,11 +179,13 @@ Public Type TypeMsgText
         MonoSpaced      As Boolean  ' FontName defaults to "Courier New"
         Text            As String
 End Type
+Public Type TypeMsgSect:    Label As TypeMsgLabel:  Text As TypeMsgText:    End Type
+Public Type TypeMsg:        Section(1 To 8) As TypeMsgSect:                 End Type '!!! 8 = Public Property NoOfMsgSects !!!
 ```
 
 #### _Dsply_ service usage example
 The below code demonstrates most of the available features and properties.
-```
+```vb
 Public Sub Demo_Dsply_1()
     Const WIDTH_MAX     As Long = 35
     Const MAX_HEIGHT    As Long = 50
@@ -257,7 +259,7 @@ Provides the display of a well designed error message by supporting a debugging 
 Note: All other information about the error is obtained from the `err` object.
 
 #### Usage example
-```VB
+```vb
 Public Sub Test_ErrMsg_Service()
     Const PROC = "Test_ErrMsg_Service"
     
@@ -363,12 +365,19 @@ Provides buttons as Collection. Example:<br>
 Dim cll As Collection
 Set cll = mMsg.Buttons("A", "B", vbOkOnly)
 ```
-The service may be used directly as buttons argument. Example:
+The service is as flexible as possible and also may be used directly as buttons argument. Example:
 ```vb
+    Dim cll As Collection
+    Dim sButton As String: sButton = "Caption\," & vbLf & "multilined"
+    Set cll = mMsg.Buttons("A", "B", vbOkOnly)
+
     mMsg.Box Prompt:="Message text" _
-           , Buttons:=mMsg.Buttons("True", "False", vbYesNoCancel) _
+           , Buttons:=mMsg.Buttons(cll, "True", "False", vbYesNoCancel, sButton) _
            , Title:="Title"
 ```
+Will display:  
+![](images/ButtonsExample.png)
+>When a Buttons caption text contains a , (comma) the comma needs to be escaped with a \ in order not to have it mismatched with a comma which delimits caption strings)
 
 ### The _ButtonAppRun_ service
 The service returns a Dictionary with `Application.Run` information for the button identified by its caption string, added with the button's caption as the key and all other provided arguments as Collection as item.
@@ -380,11 +389,11 @@ The service has the following named arguments
 
 | Part                  | Description             |
 |-----------------------|-------------------------|
-| `bar_dct`             | Dictionary expression, obligatory, returned with the information added |
-| `bar_button`          | String expression, obligatory, specifies the button's caption for which the `Application.Run` information is provided |
-| `bar_wb`              | Workbook expression, obligatory, specifies the ***open*** Workbook which provides the service called by `Application.Run` |
-| `bar_service_name`    | String expression, obligatory, specifies the ***Public*** service to be called in the form <module>.<procedure> |
-| `bar_arguments`       | ParamArray, optional, any ***positional*** arguments passed to the service |
+| `b_dct`          | Dictionary expression, obligatory, returned with the information added. |
+| `b_button`       | String expression, obligatory, specifies the button's caption for which the `Application.Run` information is provided. |
+| `b_wb`           | Workbook expression, obligatory, specifies the ***open*** Workbook which provides the service (the `Public Sub`) called by `Application.Run`. |
+| `b_service_name` | String expression, obligatory, specifies the ***Public*** service to be called in the form <module>.<procedure>. |
+| `b_arguments`    | ParamArray, optional, any ***positional*** arguments passed to the service. |
 
 ### Usage of the __ButtonAppRun_ service
 ```vb
@@ -404,12 +413,12 @@ The service has the following named arguments
 Note: With the _Dsply_ service the Dictionary is provided via the dsply_buttons_app_run argument.
 
 ### The _MsgInstance_ service
-All services create/use an **instance** of the _fMsg_ UserForm with the title as the id/key.<br>
-Syntax: `MsgInstance(title, unload)`<br>
+When a UserForm is used multiple times in parallel (displayed modeless) it is required to use class instances of it. The service creates - or optionally unloads - an instance of a UserForm identified by its Title and saves the instance into a Dictionary with the Title as the key and the instance as the item.  
+Syntax: `mMsg.MsgInstance(title, unload)`  
 `unload` defaults to False. When True an already existing instance is unloaded.
-The instance object is kept in a Dictionary with the title as the key and the instance object as the item. When no item with the given title exists the instance is created, stored in the Dictionary and returned. When an item exists in the Dictionary which is no longer loaded it is removed from the Dictionary.
+ When no item with the given title exists the instance is created, stored in the Dictionary and returned. When an item exists in the Dictionary which is no longer loaded (shown or hidden) it is removed from the Dictionary.
 
-Example:<br>`Set msg = mMsg.MsgInstance("This title")`<br> returns an already existing or new instance of the _fMsg_ UserForm (fMsg) object.
+Example: `Set msg = mMsg.MsgInstance("This title")` returns an already existing or new instance of the _fMsg_ UserForm (fMsg) object.
 
 ## Miscellaneous aspects
 ### Min/Max Message Width/Height
@@ -421,7 +430,7 @@ A value less than 100 is interpreted as percentage of the screen size, a value e
 
 ### Unambiguous procedure name
 The _ErrSrc_ function provides the procedure-name prefixed by the module-name.
-```VB
+```vb
 Private Function ErrSrc(ByVal proc_name As String) As String
     ErrSrc = "<the name of the module goes here>." & proc_name
 End Function

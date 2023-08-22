@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} fMsgProcTest 
    Caption         =   "Test-Msg-Form"
-   ClientHeight    =   5432
-   ClientLeft      =   119
-   ClientTop       =   462
-   ClientWidth     =   11564
+   ClientHeight    =   5430
+   ClientLeft      =   120
+   ClientTop       =   465
+   ClientWidth     =   11565
    OleObjectBlob   =   "fMsgProcTest.frx":0000
 End
 Attribute VB_Name = "fMsgProcTest"
@@ -294,7 +294,7 @@ xt: Exit Sub
 End Sub
 
 Private Sub cbSetupTitle_Click()
-    Setup1_Title setup_title:=Me.Caption _
+    Setup01Title setup_title:=Me.Caption _
                , setup_width_min:=20
 End Sub
 
@@ -584,7 +584,7 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Public Sub Setup1_Title(ByVal setup_title As String, _
+Public Sub Setup01Title(ByVal setup_title As String, _
                         ByVal setup_width_min As Single)
 ' ------------------------------------------------------------------------------
 ' Setup the message form for the provided title (setup_title) optimized with the
@@ -596,7 +596,7 @@ Public Sub Setup1_Title(ByVal setup_title As String, _
 ' very long title. So the correction needs to be a function (percentage) of the
 ' lenght.
 ' ------------------------------------------------------------------------------
-    Const PROC = "Setup1_Title"
+    Const PROC = "Setup01Title"
     
     On Error GoTo eh
     Dim Correction  As Single

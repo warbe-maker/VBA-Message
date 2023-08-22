@@ -6,16 +6,6 @@ Option Explicit
 '          Test of procedures - rather than fMsg/mMsg services/functions.
 '
 ' ------------------------------------------------------------------------------
-Public Sub ModeLessPassed(ByVal m_title As String)
-    wsTest.TestPassed
-    mMsg.MsgInstance m_title, True
-End Sub
-
-Public Sub ModeLessFailed(ByVal m_title As String)
-    wsTest.TestFailed
-    mMsg.MsgInstance m_title, True
-End Sub
-
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mMsgTestServices." & s:  End Property
 
 Private Function AdjustToVgrid(ByVal atvg_si As Single, _
@@ -55,7 +45,7 @@ Private Function BttnsNo(ByVal v As Variant) As Long
     End Select
 End Function
 
-Private Function Buttons(ParamArray bttns() As Variant) As Collection
+Private Function Buttons(ParamArray Bttns() As Variant) As Collection
 ' --------------------------------------------------------------------------
 ' Returns a collection if the items (bttns) provided. If an item is a
 ' Collection its items are included. When the number of buttons in a row
@@ -84,38 +74,38 @@ Private Function Buttons(ParamArray bttns() As Variant) As Collection
         lRows = 0
         SubItemsDone = 0
     End If
-    If UBound(bttns) = -1 Then GoTo xt
-    If UBound(bttns) = 0 Then
+    If UBound(Bttns) = -1 Then GoTo xt
+    If UBound(Bttns) = 0 Then
         '~~ Only one item
-        Select Case TypeName(bttns(0))
+        Select Case TypeName(Bttns(0))
             Case "Collection"
-                Set cll = bttns(0)
+                Set cll = Bttns(0)
                 For i = cll.Count To 1 Step -1
                     StckPush StackItems, cll(i)
                 Next i
             Case Else
-                If bttns(0) = vbNullString Then Exit Function
-                Select Case bttns(0)
+                If Bttns(0) = vbNullString Then Exit Function
+                Select Case Bttns(0)
                     Case vbLf, vbCr, vbCrLf
-                        cllResult.Add bttns(0)
+                        cllResult.Add Bttns(0)
                         lBttnsInRow = 0
                         lRows = lRows + 1
                     Case Else
-                        If lBttnsInRow + BttnsNo(bttns(0)) >= 7 Then
+                        If lBttnsInRow + BttnsNo(Bttns(0)) >= 7 Then
                             If lRows < 7 Then
                                 cllResult.Add vbLf
                                 lRows = lRows + 1
                                 lBttnsInRow = 1
                             End If
                         End If
-                        cllResult.Add bttns(0)
-                        lBttnsInRow = lBttnsInRow + BttnsNo(bttns(0))
+                        cllResult.Add Bttns(0)
+                        lBttnsInRow = lBttnsInRow + BttnsNo(Bttns(0))
                 End Select
         End Select
     Else
         '~~ More than one item in ParamArray
-        For i = UBound(bttns) To 0 Step -1
-            StckPush StackItems, bttns(i)
+        For i = UBound(Bttns) To 0 Step -1
+            StckPush StackItems, Bttns(i)
         Next i
     End If
     
@@ -302,7 +292,7 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
     On Error GoTo eh
     Dim NewCommandButton1   As MSForms.CommandButton
     Dim NewCommandButton2   As MSForms.CommandButton
-    Dim x                   As Long
+    Dim X                   As Long
     Dim cmp                 As VBComponent
     Dim LeftPos             As Single
     
@@ -354,7 +344,7 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
          
     '~~ Add code on the form for the CommandButtons
     With cmp.CodeModule
-        x = .CountOfLines
+        X = .CountOfLines
         .InsertLines .CountOfLines + 1, "Option Explict"
         .InsertLines .CountOfLines + 1, vbNullString
         .InsertLines .CountOfLines + 1, "Sub CommandButton1_Click()"
@@ -533,37 +523,37 @@ Private Function TestInstance(ByVal fi_key As String, _
     Const PROC = "TestInstance"
     
     On Error GoTo eh
-    Static Instances As Dictionary    ' Collection of (possibly still)  active form instances
+    Static MsgInstances As Dictionary    ' Collection of (possibly still)  active form instances
     
-    If Instances Is Nothing Then Set Instances = New Dictionary
+    If MsgInstances Is Nothing Then Set MsgInstances = New Dictionary
     
     If fi_unload Then
-        If Instances.Exists(fi_key) Then
+        If MsgInstances.Exists(fi_key) Then
             On Error Resume Next
-            Unload Instances(fi_key) ' The instance may be already unloaded
-            Instances.Remove fi_key
+            Unload MsgInstances(fi_key) ' The instance may be already unloaded
+            MsgInstances.Remove fi_key
         End If
         Exit Function
     End If
     
-    If Not Instances.Exists(fi_key) Then
+    If Not MsgInstances.Exists(fi_key) Then
         '~~ There is no evidence of an already existing instance
         Set TestInstance = New fMsgProcTest
-        Instances.Add fi_key, TestInstance
+        MsgInstances.Add fi_key, TestInstance
     Else
         '~~ An instance identified by fi_key exists in the Dictionary.
         '~~ It may however have already been unloaded.
         On Error Resume Next
-        Set TestInstance = Instances(fi_key)
+        Set TestInstance = MsgInstances(fi_key)
         Select Case Err.Number
             Case 0
             Case 13
-                If Instances.Exists(fi_key) Then
+                If MsgInstances.Exists(fi_key) Then
                     '~~ The apparently no longer existing instance is removed from the Dictionarys
-                    Instances.Remove fi_key
+                    MsgInstances.Remove fi_key
                 End If
                 Set TestInstance = New fMsgProcTest
-                Instances.Add fi_key, TestInstance
+                MsgInstances.Add fi_key, TestInstance
             Case Else
                 '~~ Unknown error!
                 Err.Raise 1 + vbObjectError, ErrSrc(PROC), "Unknown/unrecognized error!"
@@ -630,9 +620,8 @@ again:
             .AutoSizeTextBox as_tbx:=.tbx _
                            , as_width_limit:=TestWidthLimit _
                            , as_height_min:=TestHeightMin _
-                           , as_text:="For this " & i & ". test the width is limited to " & TestWidthLimit & ". " & _
-                                      "The height is determined at first by the height resulting from the AutoSize " & _
-                                      "and second by the provided minimum height which for this test is " & TestHeightMin & "." _
+                           , as_text:="For this test the width is limited to " & Prcnt(wsTest.MsgWidthMax, mMsg.enDsplyDimensionWidth) & ". " & _
+                                      "The height is determined at first by the height resulting from the AutoSize." _
                            , as_width_max:=TestWidthMax _
                            , as_height_max:=TestHeightMax _
                            , as_append:=TestAppend _
@@ -815,9 +804,8 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
-Private Function RepeatStrng( _
-                       ByVal rs_s As String, _
-                       ByVal rs_n As Long) As String
+Private Function RepeatStrng(ByVal rs_s As String, _
+                             ByVal rs_n As Long) As String
 ' ----------------------------------------------------------------------------
 ' Returns the string (s) concatenated (n) times. VBA.String in not appropriate
 ' because it does not support leading and trailing spaces.
