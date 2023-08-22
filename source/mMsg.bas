@@ -26,7 +26,7 @@ Option Explicit
 Public Const MSG_LIMIT_WIDTH_MIN_PERCENTAGE     As Long = 15
 Public Const MSG_LIMIT_WIDTH_MAX_PERCENTAGE     As Long = 95
 Public Const MSG_LIMIT_HEIGHT_MIN_PERCENTAGE    As Long = 20
-Public Const MSG_LIMIT_HEIGHT_MAX_PERCENTAGE    As Long = 95
+Public Const MSG_LIMIT_HEIGHT_MAX_PERCENTAGE    As Long = 80
 
 ' Extension of the VBA.MsgBox constants for the Debugging option of the ErrMsg service
 ' to display additional debugging buttons
@@ -69,7 +69,7 @@ Public Type TypeMsgText
 End Type
 
 Public Type TypeMsgSect:    Label As TypeMsgLabel:  Text As TypeMsgText:    End Type
-Public Type TypeMsg:        Section(1 To 8) As TypeMsgSect:                 End Type '!!! 9 = Public Property NoOfMsgSects !!!
+Public Type TypeMsg:        Section(1 To 8) As TypeMsgSect:                 End Type '!!! 8 = Public Property NoOfMsgSects !!!
 
 Public Enum enStartupPosition     ' ---------------------------
     enManual = 0                  ' Used to position the
@@ -314,24 +314,24 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Sub BttnAppRun(ByRef bar_dct As Dictionary, _
-                      ByVal bar_button As String, _
-                      ByVal bar_wb As Workbook, _
-                      ByVal bar_service_name As String, _
-                      ParamArray bar_arguments() As Variant)
+Public Sub BttnAppRun(ByRef b_dct As Dictionary, _
+                      ByVal b_button As String, _
+                      ByVal b_wb As Workbook, _
+                      ByVal b_service_name As String, _
+                 ParamArray b_arguments() As Variant)
 ' --------------------------------------------------------------------------
-' Returns a Dictionary (bar_dct) with Application.Run information for the
-' button identified by its caption string (bar_button) added with the
-' button's caption as the key and all other arguments (bar_wb,
-' bar_service_name, bar_arguments) as Collection as item.
+' Returns a Dictionary (b_dct) with Application.Run information for the
+' button identified by its caption string (b_button) added with the
+' button's caption as the key and all other arguments (b_wb,
+' b_service_name, b_arguments) as Collection as item.
 '
-' Notes:
+' Attention!
 ' - Application.Run supports only positional arguments. When only some of
 '   the optional arguments are used only those after the last one may be
 '   omitted but not those in between. An error is raised when empty
 '   arguments are dedected.
 ' - When Run information is provided for a button already existing in the
-'   Dictionary (bar_dct) it is replaced.
+'   Dictionary (b_dct) it is replaced.
 ' - When the message form is displayed "Modal", which is the default, any
 '   provided Application.Run information is ignored.
 ' --------------------------------------------------------------------------
@@ -341,15 +341,15 @@ Public Sub BttnAppRun(ByRef bar_dct As Dictionary, _
     Dim v   As Variant
     Dim cll As New Collection
     
-    If bar_dct Is Nothing Then Set bar_dct = New Dictionary
+    If b_dct Is Nothing Then Set b_dct = New Dictionary
     
-    cll.Add bar_wb
-    cll.Add bar_service_name
-    For Each v In bar_arguments
+    cll.Add b_wb
+    cll.Add b_service_name
+    For Each v In b_arguments
         If TypeName(v) = "Error" Then
             Err.Raise Number:=AppErr(1) _
                     , source:=ErrSrc(PROC) _
-                    , Description:="The ParamArray argument (bar_arguments) contains empty elements but empty elements " & _
+                    , Description:="The ParamArray argument (b_arguments) contains empty elements but empty elements " & _
                                    "are not supported/possible!" & "||" & _
                                    "Application.Run supports only positional but not named arguments. When only some of " & _
                                    "the optional arguments of the called service are used only those after the last one " & _
@@ -358,8 +358,8 @@ Public Sub BttnAppRun(ByRef bar_dct As Dictionary, _
             cll.Add v
         End If
     Next v
-    If bar_dct.Exists(bar_button) Then bar_dct.Remove bar_button
-    bar_dct.Add bar_button, cll
+    If b_dct.Exists(b_button) Then b_dct.Remove b_button
+    b_dct.Add b_button, cll
     Set cll = Nothing
     
 xt: Exit Sub
@@ -550,8 +550,12 @@ Public Function Buttons(ParamArray Bttns() As Variant) As Collection
                 Case Else
                     '~~ The string may still be a comma or semicolon delimited string of items
                     sDelimiter = vbNullString
-                    If InStr(Bttns(0), ",") <> 0 Then sDelimiter = ","
-                    If InStr(Bttns(0), ";") <> 0 Then sDelimiter = ";"
+                    If InStr(Bttns(0), ",") <> 0 And InStr(Bttns(0), "\,") = 0 Then
+                        '~~ Comma delimited string with the comma not escaped
+                        sDelimiter = ","
+                    ElseIf InStr(Bttns(0), ";") <> 0 Then
+                        sDelimiter = ";"
+                    End If
                     If sDelimiter <> vbNullString Then
                         '~~ The comma or semicolon delimited items are pushed on the stack in reverse order
                         For i = UBound(Split(Bttns(0), sDelimiter)) To 0 Step -1

@@ -909,6 +909,7 @@ Private Sub ApplicationRunViaButton(ByVal ar_button As String)
     Dim sService    As String
     Dim Msg         As TypeMsg
     Dim i           As Long
+    Dim j           As Long
     Dim sKey        As String
     Dim sButton     As String
     
@@ -940,20 +941,20 @@ Private Sub ApplicationRunViaButton(ByVal ar_button As String)
         End If
     Next i
         
-    With Msg.Section(1).Text
-        .Text = "This button is useless when the form is displayed modeless," & vbLf & _
-                "unless it is provided by the caller with an action to perform " & vbLf & _
-                "- which is not the case!"
-        .FontColor = rgbRed
-        .FontBold = True
-        .MonoSpaced = True
-    End With
-    With Msg.Section(2)
-        With .Label
-            .Text = "What this means:"
+    With Msg
+        j = j + 1
+        With .Section(j).Text
+            .Text = "Although the message is displayed modeless, this button has not been provided with Application.Run arguments *) which means that the button is useless (has no function)."
+            .FontColor = rgbRed
+            .FontBold = True
+        End With
+        j = j + 1
+        With .Section(j).Label
+            .Text = "*) In a modeless displayed form there should be no buttons other than those which had been provided " & _
+                    "with 'Application.Run' arguments which specify which makro to execute when clicked (click this for help)."
+            .OpenWhenClicked = "https://github.com/warbe-maker/VBA-Message#the-buttonapprun-service"
             .FontColor = rgbBlue
         End With
-        .Text.Text = "In a modeless displayed form there should be no buttons other than those an 'Application.Run' service had been specified to be performed when clicked."
     End With
     
     mMsg.Dsply dsply_title:="No 'Application.Run' information provided for this button!" _
@@ -2325,10 +2326,8 @@ Private Sub MsectLblAdjust(ByVal m_sect As Long)
                     Case Else:                      .TextAlign = fmTextAlignLeft
                 End Select
                 LytMsectTbxFrmTop = .Top
-                .Top = .Top + 2 ' to compensate the text-box' vertical position
-'                LytMsectFrmTop = .Top + ContentHeight(frmMsect) + 2
+                .Top = .Top ' to compensate the text-box' vertical position
             End If
-'            LytMsectFrmTop = .Top + ContentHeight(frmMsect) + 2
         End With
         TimedDoEvents PROC
     End If
@@ -2366,7 +2365,7 @@ Private Sub MsectLblAutoSize(ByRef a_lbl As MSForms.Label, _
         .Height = 4
     End With
     MsectTbxAutoSize tbx, a_lbl.Caption, a_width - 10
-    a_height = tbx.Height - 6
+    a_height = tbx.Height - 4
     BttnsArea.Top = tbx.Top + tbx.Height
     With a_lbl
         .WordWrap = True
@@ -3078,7 +3077,7 @@ Public Sub Setup()
     PositionOnScreen "10;10"
     bSetUpDone = True ' To indicate for the Activate event that the setup had already be done beforehand
     
-    VisualizeSetupStep "Setup finalized"
+    TimedDoEvents PROC
 
 xt: Exit Sub
 
@@ -3095,9 +3094,7 @@ Private Sub Setup00WidthDeterminingItems()
     '~~ Setup of any monospaced message sections, the second element which potentially effects the final message width.
     '~~ In case the section width exceeds the maximum width specified a horizontal scrollbar is applied.
     Setup02MonoSpacedSections
-    
-    If iSectionsMonoSpaced > 0 Then VisualizeSetupStep "Step2 Message Section(s) Monospaced"
-    
+        
     '~~ Setup the reply buttons. This is the third element which may effect the final message's width.
     '~~ In case the widest buttons row exceeds the maximum width specified for the message
     '~~ a horizontal scrollbar is applied.
@@ -3107,7 +3104,6 @@ Private Sub Setup00WidthDeterminingItems()
         SizeAndPosition2Bttns2Rows
         SizeAndPosition2Bttns3Frame
         SizeAndPosition2Bttns4Area
-        VisualizeSetupStep "Step3 Buttons"
     End If
 
 End Sub
@@ -3331,7 +3327,7 @@ Private Sub Setup05Button(ByVal sb_row As Long, _
     With cmb
         .AutoSize = True
         .WordWrap = False ' the longest line determines the sb_index's width
-        .Caption = sb_caption
+        .Caption = Replace(sb_caption, "\,", ",") ' an escaped , is considered
         .AutoSize = False
         .Height = .Height + 1 ' safety margin to ensure proper multilin caption display
         siMaxButtonHeight = Max(siMaxButtonHeight, .Height)
@@ -3873,19 +3869,5 @@ Private Sub VisualizeCtl(ByVal vc_ctl As MSForms.Control, _
         End If
     End With
     
-End Sub
-
-Private Sub VisualizeSetupStep(ByVal vss_status As String)
-' -------------------------------------------------------------------------------
-' Display the Message form with visualized controls at the top left.
-' -------------------------------------------------------------------------------
-    With Me
-        If .VisualizeForTest Then
-            .Top = 10
-            .Left = 10
-            Application.StatusBar = "Setup step visualization for debug and test: " & vss_status
-'            Stop
-        End If
-    End With
 End Sub
 

@@ -63,7 +63,9 @@ Public Property Get RegressionTests() As Range
     Set RegressionTests = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colRegression").EntireColumn)
 End Property
 
-Private Property Get RowTest(Optional ByVal Test As Long) As Range: Set RowTest = Me.Range("rowTest" & mTest.Number).EntireRow:     End Property
+Private Property Get RowTest(Optional ByVal Test As Long) As Range
+    Set RowTest = Me.Range("rowTest" & Format(mTest.Number, "00")).EntireRow
+End Property
 
 Public Property Get Terminated() As Boolean:                        Terminated = bTerminated:                                       End Property
 
@@ -74,8 +76,8 @@ End Property
 
 Public Property Get TestDescription()
     With Me
-        Intersect(.Range("rowTest" & mTest.Number).EntireRow, .Range("colTestDescription").EntireColumn).Select
-        TestDescription = Value(Me.Range("colTestDescription"))
+        Intersect(.Range("rowTest" & Format(mTest.Number, "00")).EntireRow, .Range("colTestDescription").EntireColumn).Select
+        TestDescription = Value(.Range("colTestDescription"))
     End With
 End Property
 

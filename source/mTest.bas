@@ -113,12 +113,19 @@ Public Function Bttns() As Collection
 End Function
                     
 Public Function BttnsAppRunArgs() As Dictionary
+' ------------------------------------------------------------------------------
+' Returns a Dictionary with reasonable App.Run arguments for any button
+' displayed along wuth a test procedure.
+' ------------------------------------------------------------------------------
     Const PROC = "BttnsAppRunArgs"
     
     On Error GoTo eh
     Dim dct As New Dictionary
     
     mMsg.BttnAppRun dct, BTTN_OK_ONLY, ThisWorkbook, "mTest.Terminated"
+    mMsg.BttnAppRun dct, "Yes", ThisWorkbook, "mTest.Terminated"
+    mMsg.BttnAppRun dct, "No", ThisWorkbook, "mTest.Terminated"
+    mMsg.BttnAppRun dct, "Cancel", ThisWorkbook, "mTest.Terminated"
     mMsg.BttnAppRun dct, BTTN_PASSED, ThisWorkbook, "mTest.Passed"
     mMsg.BttnAppRun dct, BTTN_FAILED, ThisWorkbook, "mTest.Failed"
     mMsg.BttnAppRun dct, BTTN_TRMNTE, ThisWorkbook, "mTest.Terminated"
@@ -447,10 +454,13 @@ Public Sub Evaluate()
     ufm.VisualizeForTest = False
     With Msg
         i = i + 1
-        With .Section(i).Text
-            .Text = sCurrentTitle
-            .FontBold = True
-            .MonoSpaced = True
+        With .Section(i)
+            .Label.Text = "Test Title:"
+            .Label.FontColor = rgbBlue
+            With .Text
+                .Text = sCurrentTitle
+                .FontBold = True
+            End With
         End With
         i = i + 1
         With .Section(i)
@@ -495,11 +505,27 @@ Public Sub Evaluate()
         With .Section(i).Text
             .Text = "Modify any (width/height/label pos) arguments of the current test proc and finally evaluate the result with Passed or Failed."
         End With
+    
+        i = i + 1
+        With .Section(i)
+            .Label.Text = "Attention!"
+            .Label.FontColor = rgbRed
+            .Label.FontBold = True
+        End With
+        i = i + 1
+        With .Section(i).Text
+            .Text = "Buttons displayed with the test procedure must not be pressed! Since the message is displayed modeless, " & _
+                    "in order to allow an extra ""Evaluate"" dialog for the tests and the final Passed/Failed evaluation, " & _
+                    "any pressed button may result in an error being displayed because the button might have not been provided " & _
+                    "with App.Run arguments. The only exception is the test of the mMsg.ErrMsg service which has a corresponding " & _
+                    """About"" paragraph for explanation."
+            .FontBold = True
+        End With
     End With
     
     mMsg.Dsply dsply_title:=EVALUATION_TITLE _
              , dsply_msg:=Msg _
-             , dsply_label_spec:="R100" _
+             , dsply_label_spec:="R60" _
              , dsply_buttons:=mTest.Bttns _
              , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
              , dsply_modeless:=True _
@@ -509,6 +535,25 @@ xt: Exit Sub
 
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
+
+Public Function BttnsOnly() As Collection
+' ------------------------------------------------------------------------------
+' Returns a 7 x 7 buttons only matrix.
+' ------------------------------------------------------------------------------
+    Dim cll As New Collection
+    Dim i   As Long
+    Dim j   As Long
+    
+    For i = 1 To 7
+        For j = 1 To 7
+            cll.Add "B " & i & "-" & j
+        Next j
+        cll.Add vbLf
+    Next i
+    Set BttnsOnly = cll
+    Set cll = Nothing
+    
+End Function
 
 Public Function Passed() As Variant
 ' ------------------------------------------------------------------------------
@@ -702,34 +747,33 @@ End Sub
 Public Function TestProc(ByVal n_test_number As Long) As Variant
         
     Select Case n_test_number
-        Case 1:     TestProc = mMsgTestServices.Test_01_mMsg_Box_Buttons_Only_Test_Plus_Reamaining_To_49
-        Case 2:     TestProc = mMsgTestServices.Test_02_mMsg_ErrMsg_Service
-        Case 3:     TestProc = mMsgTestServices.Test_03_mMsg_Dsply_WidthDeterminedByMinimumWidth
-        Case 4:     TestProc = mMsgTestServices.Test_04_mMsg_Dsply_Width_Determined_By_This_eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeextra_long_Title
-        Case 5:     TestProc = mMsgTestServices.Test_05_mMsg_Dsply_WidthDeterminedByMonoSpacedMessageSection
-        Case 6:     TestProc = mMsgTestServices.Test_06_mMsg_Dsply_WidthDeterminedByReplyButtons
-        Case 7:     TestProc = mMsgTestServices.Test_07_mMsg_Dsply_MonoSpacedSectionWidthExceedsMaxMsgWidth
-        Case 8:     TestProc = mMsgTestServices.Test_08_mMsg_Dsply_MonoSpacedMessageSectionExceedsMaxHeight
-        Case 9:     TestProc = mMsgTestServices.Test_09_mMsg_Dsply_ButtonsOnly
-        Case 10:    TestProc = mMsgTestServices.Test_10_mMsg_Dsply_ButtonsMatrix
-        Case 11:    TestProc = mMsgTestServices.Test_11_mMsg_Dsply_ButtonScrollBarVertical
-        Case 12:    TestProc = mMsgTestServices.Test_12_mMsg_Dsply_ButtonScrollBarHorizontal
-        Case 13:    TestProc = mMsgTestServices.Test_13_mMsg_Dsply_ButtonsMatrix_With_Both_Scroll_Bars
-        Case 16:    TestProc = mMsgTestServices.Test_16_mMsg_Dsply_ButtonByDictionary
-        Case 17:    TestProc = mMsgTestServices.Test_17_mMsg_Box_MessageAsString
-        Case 20:    TestProc = mMsgTestServices.Test_20_mMsg_Dsply_ButtonByValue
-        Case 21:    TestProc = mMsgTestServices.Test_21_mMsg_Dsply_ButtonByString
-        Case 22:    TestProc = mMsgTestServices.Test_22_mMsg_Dsply_ButtonByCollection
-        Case 23:    TestProc = mMsgTestServices.Test_23_mMsg_Dsply_Single_MonoSpaced_Section_Without_Label
-        Case 24:    TestProc = mMsgTestServices.Test_24_mMsg_Dsply_Sections_Without_Label_Or_Label_Only
-        Case 30:    TestProc = mMsgTestServices.Test_30_mMsg_Monitor_Services
-        Case 40:    TestProc = mMsgTestServices.Test_40_mMsg_Dsply_LabelPos_Left_R30
+        Case 1:     TestProc = mMsgTestServices.Test_11_mMsg_Box_Buttons_Only
+        Case 2:     TestProc = mMsgTestServices.Test_12_mMsg_ErrMsg_AppErr_5
+        Case 3:     TestProc = mMsgTestServices.Test_13_mMsg_Dsply_WidthDeterminedByMinimumWidth
+        Case 4:     TestProc = mMsgTestServices.Test_14_mMsg_Dsply_Width_Determined_By_This_eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeextra_long_Title
+        Case 5:     TestProc = mMsgTestServices.Test_15_mMsg_Dsply_WidthDeterminedByMonoSpacedMessageSection
+        Case 6:     TestProc = mMsgTestServices.Test_16_mMsg_Dsply_WidthDeterminedByReplyButtons
+        Case 7:     TestProc = mMsgTestServices.Test_17_mMsg_Dsply_MonoSpacedSectionWidthExceedsMaxMsgWidth
+        Case 8:     TestProc = mMsgTestServices.Test_18_mMsg_Dsply_MonoSpacedMessageSectionExceedsMaxHeight
+        Case 9:     TestProc = mMsgTestServices.Test_19_mMsg_Dsply_ButtonsOnly
+        Case 10:    TestProc = mMsgTestServices.Test_20_mMsg_Dsply_ButtonsMatrix
+        Case 11:    TestProc = mMsgTestServices.Test_21_mMsg_Dsply_ButtonScrollBarVertical
+        Case 13:    TestProc = mMsgTestServices.Test_23_mMsg_Dsply_Buttons_Only
+        Case 16:    TestProc = mMsgTestServices.Test_26_mMsg_Dsply_ButtonByDictionary
+        Case 17:    TestProc = mMsgTestServices.Test_27_mMsg_Box_MessageAsString
+        Case 20:    TestProc = mMsgTestServices.Test_30_mMsg_Dsply_ButtonByValue
+        Case 21:    TestProc = mMsgTestServices.Test_31_mMsg_Dsply_ButtonByString
+        Case 22:    TestProc = mMsgTestServices.Test_32_mMsg_Dsply_ButtonByCollection
+        Case 23:    TestProc = mMsgTestServices.Test_33_mMsg_Dsply_Single_MonoSpaced_Section_Without_Label
+        Case 24:    TestProc = mMsgTestServices.Test_34_mMsg_Dsply_Sections_Without_Label_Or_Label_Only
+        Case 30:    TestProc = mMsgTestServices.Test_40_mMsg_Monitor_Services
+        Case 40:    TestProc = mMsgTestServices.Test_50_mMsg_Dsply_LabelPos_Left_R30
         Case 90:    TestProc = mMsgTestServices.Test_90_mMsg_Dsply_AllInOne
         Case 91:    TestProc = mMsgTestServices.Test_91_mMsg_Dsply_MinimumMessage
         Case 92:    TestProc = mMsgTestServices.Test_92_mMsg_Dsply_LabelWithUnderlayedURL
         Case 0:     mMsg.MsgInstance(Title(mTest.Current)).Hide
                     If mErH.Regression Then
-                        EoP "mMsgTestServices.Test_00_Regression"
+                        EoP "mMsgTestServices.Test_10_Regression"
                         wsTest.RegressionTest = False
                         mErH.Regression = False
                     End If
@@ -761,28 +805,31 @@ Private Function IsUcase(ByVal s As String) As Boolean
               (i = 165)
 End Function
 
-Public Function Title(ByVal s As String) As String
+Public Function Title(ByVal t_s As String) As String
 ' ------------------------------------------------------------------------------
-' Convert a string (s) into a readable message title by:
+' Convert a string (t_s) into a readable message title by:
 ' - replacing all underscores with a whitespace
 ' - characters immediately following an underscore to a lowercase letter.
 ' ------------------------------------------------------------------------------
-    Dim i       As Long
-    Dim sResult As String
+    Dim i As Long
+    Dim s As String
     
-    s = Replace(s, "_", " ")
-    s = Replace(s, "  ", " ")
-    For i = 1 To Len(s)
-        If IsUcase(Mid(s, i, 1)) Then
-            sResult = sResult & " " & Mid(s, i, 1)
+    t_s = Replace(Replace(t_s, "_", " "), "  ", " ")
+    For i = 1 To Len(t_s)
+        If IsUcase(Mid(t_s, i, 1)) Then
+            s = s & " " & Mid(t_s, i, 1)
         Else
-            sResult = sResult & Mid(s, i, 1)
+            s = s & Mid(t_s, i, 1)
         End If
     Next i
-    sResult = Replace(sResult, "m Msg ", "(mMsg.", 1, 1)
-    sResult = Replace(sResult, " m Msg ", ", mMsg.")
-    sResult = Right(sResult, Len(sResult) - 1)
-    Title = Replace(sResult, " Service", " Service)")
+    s = Replace(s, "m Msg ", "(mMsg.", 1, 1)
+    s = Replace(s, " m Msg ", ", mMsg.")
+    s = Right(s, Len(s) - 1)
+    s = Replace(s, "mMsg. Box", "mMsg.Box Service):")
+    s = Replace(s, "mMsg. Dsply", "mMsg.Dsply Service):")
+    s = Replace(s, "mMsg. Err Msg", "mMsg.ErrMsg Service):")
+    
+    Title = s
     
 End Function
 
