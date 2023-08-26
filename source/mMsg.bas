@@ -4,6 +4,7 @@ Option Explicit
 ' Standard Module mMsg: Message display services using the fMsg form.
 ' =====================
 ' Public services:
+' ----------------
 ' Box         In analogy to the MsgBox, provides a simple message but with all
 '             the fexibility for the display of up to 49 reply buttons.
 ' Buttons     Supports the specification of the buttons displayed in a matrix
@@ -18,9 +19,9 @@ Option Explicit
 '
 ' Uses:       fMsg
 '
-' Requires:     Reference to "Microsoft Scripting Runtime"
+' Requires:   Reference to "Microsoft Scripting Runtime"
 '
-' W. Rauschenberger, Berlin June 2023
+' W. Rauschenberger, Berlin Aug 2023
 ' See: https://github.com/warbe-maker/VBA-Message
 ' ------------------------------------------------------------------------------
 Public Const MSG_LIMIT_WIDTH_MIN_PERCENTAGE     As Long = 15

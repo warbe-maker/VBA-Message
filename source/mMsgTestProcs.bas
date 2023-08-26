@@ -620,7 +620,7 @@ again:
             .AutoSizeTextBox as_tbx:=.tbx _
                            , as_width_limit:=TestWidthLimit _
                            , as_height_min:=TestHeightMin _
-                           , as_text:="For this test the width is limited to " & Prcnt(wsTest.MsgWidthMax, mMsg.enDsplyDimensionWidth) & ". " & _
+                           , as_text:="For this test the width is limited to " & mMsg.ValueAsPercentage(wsTest.MsgWidthMax, mMsg.enDsplyDimensionWidth) & ". " & _
                                       "The height is determined at first by the height resulting from the AutoSize." _
                            , as_width_max:=TestWidthMax _
                            , as_height_max:=TestHeightMax _

@@ -373,10 +373,7 @@ Private Property Let LytMsectFrmTop(ByVal si As Single):                siLytMse
 
 Private Property Get LytMsectFrmWidth() As Single:                      LytMsectFrmWidth = siLytMsectFrmWidth:                      End Property
 
-Private Property Let LytMsectFrmWidth(ByVal si As Single)
-    siLytMsectFrmWidth = si
-'    Debug.Print "LytMsectFrmWidth = " & si
-End Property
+Private Property Let LytMsectFrmWidth(ByVal si As Single):              siLytMsectFrmWidth = si:                                    End Property
 
 Private Property Get LytMsectTbxFrmLeft() As Single:                    LytMsectTbxFrmLeft = siLytMsectTbxFrmLeft:                  End Property
 
@@ -833,8 +830,6 @@ Private Sub AdjustPos()
             
             If i = 9 Then Stop
             '~~ Position Message Section
-            Debug.Print "Sect: " & i & " Top=" & LytMsectFrmTop
-            
             If MsectLblIsDisplayed(i) Then MsectLblAdjust i
             If MsectTbxFrmIsDisplayed(i) Then MsectTbxFrmAdjust i
             MsectFrmAdjust i
