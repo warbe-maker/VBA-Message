@@ -1,29 +1,34 @@
-Attribute VB_Name = "mTest"
+Attribute VB_Name = "mMsgTest"
 Option Explicit
 ' ------------------------------------------------------------------------------
-' Standard Module mTest: Test servicing procedures.
+' Standard Module mMsgTest: Test servicing procedures.
 ' ======================
 ' ------------------------------------------------------------------------------
-Public Const BTTN_OK_ONLY       As String = "Ok"
-Public Const BTTN_PASSED        As String = "Test" & vbLf & "Passed"
-Public Const BTTN_FAILED        As String = "Test" & vbLf & "Failed"
-Public Const BTTN_TRMNTE        As String = "Terminate" & vbLf & "(this/subsequent)" & vbLf & "Tests"
+Public Const TEST_URL           As String = "https://github.com/warbe-maker/Common-VBA-Message-Service"
 Public Const MODE_LESS          As Boolean = True
 Public Const MSG_DIM_INCR_DECR  As Long = 10 ' %
 Public Const LBL_WDTH_INCR_DECR As Long = 5  ' pt
 Public udtMessage               As udtMsg
 Public ufmMsg                   As fMsg
-Public sMsgTitle                As String
+Public TestProcName                As String
 
 Private Const EVALUATION_TITLE  As String = "Modification of the test-procedure's arguments and result evaluation"
 
 Private vNumber                 As Variant
-Private sCurrentProc            As String
+Private sCurrentProcId          As String
 Private sCurrentTitle           As String
+Private sCurrentDescription     As String
 Private sPrevious               As String
 Private sUnderEvaluation        As String
 Private siEvaluateTop           As Single
 Private siEvaluateLeft          As Single
+
+Public Property Get BttnOkOnly() As String:                 BttnOkOnly = "Ok":                                                          End Property
+Public Property Get BttnFailed() As String:                 BttnFailed = "Test" & vbLf & "Failed":                                      End Property
+Public Property Get BttnTerminate() As String:              BttnTerminate = "Terminate" & vbLf & "(this/subsequent)" & vbLf & "Tests":  End Property
+Public Property Get BttnRepeat() As String:                 BttnRepeat = "Repeat" & vbLf & "Test":                                      End Property
+
+Public Property Get BttnPassed() As String:                 BttnPassed = "Test" & vbLf & "Passed":                                      End Property
 
 Public Property Get BttnLblPosLeftAlgnCnter() As String:    BttnLblPosLeftAlgnCnter = "Set Label Pos" & vbLf & "Left aligned center":   End Property
 
@@ -49,13 +54,18 @@ Public Property Get BttnMsgWdthMinDecr() As String:         BttnMsgWdthMinDecr =
 
 Public Property Get BttnMsgWdthMinIncr() As String:         BttnMsgWdthMinIncr = "Width Min" & vbLf & "+ " & MSG_DIM_INCR_DECR & "%":   End Property
 
-Public Property Get Current() As String:                    Current = sCurrentProc:                                                     End Property
+Public Property Get CurrentProcId() As String:              CurrentProcId = sCurrentProcId:                                             End Property
 
-Public Property Let Current(ByVal s As String):             sCurrentProc = s:                                                           End Property
+Public Property Let CurrentProcId(ByVal s As String):       sCurrentProcId = s:                                                         End Property
 
 Public Property Get CurrentTitle() As String:               CurrentTitle = sCurrentTitle:                                               End Property
 
 Public Property Let CurrentTitle(ByVal s As String):        sCurrentTitle = s:                                                          End Property
+
+Public Property Get CurrentDescription() As String:         CurrentDescription = sCurrentDescription:                                   End Property
+
+Public Property Let CurrentDescription(ByVal s As String):  sCurrentDescription = s:                                                    End Property
+
 
 Private Property Get LabelPosSpec(Optional ByRef l_pos As enLabelPos, _
                                   Optional ByRef l_lbl_width As Single, _
@@ -80,46 +90,170 @@ Private Property Let LabelPosSpec(Optional ByRef l_pos As enLabelPos, _
     wsTest.MsgLabelPosSpec = l_spec
 End Property
 
-Public Property Get Number() As Variant:                    Number = vNumber:                                                           End Property
-
-Public Property Let Number(ByVal v As Variant):             vNumber = v:                                                                End Property
-
 Public Property Get Previous() As String:                   Previous = sPrevious:                                                       End Property
 
 Public Property Let Previous(ByVal s As String):            sPrevious = s:                                                              End Property
 
+Public Property Get ProcId() As Variant:                    ProcId = vNumber:                                                           End Property
+
+Public Property Let ProcId(ByVal v As Variant):             vNumber = v:                                                                End Property
+
 Public Property Get UnderEvaluation() As String:            UnderEvaluation = sUnderEvaluation:                                         End Property
 
 Public Property Let UnderEvaluation(ByVal s As String):     sUnderEvaluation = s:                                                       End Property
+
+Public Function BttnFailedAction() As Variant
+' ------------------------------------------------------------------------------
+' This "service" may be called from a "Failed" button when the message has been
+' displayed modeless.
+' Note: Because the next test procedure displays the message modeless the
+'       execution of it returns and the previous test message instance is
+'       unloaded.
+' ------------------------------------------------------------------------------
+    wsTest.Failed
+    
+    Previous = CurrentProcId
+    '~~ Unload current test proc
+    Unload mMsg.MsgInstance(mMsgTest.CurrentProcId)
+    UnloadEvaluate
+    
+    '~~ Envoke next test proc
+    BttnFailedAction = mMsgTest.TestProc(wsTest.NextTestNumber)
+    
+End Function
+
+Public Function BttnPassedAction() As Variant
+' ------------------------------------------------------------------------------
+' This "service" may be called from a "Passed" button when the message has been
+' displayed modeless.
+' ------------------------------------------------------------------------------
+    wsTest.Passed
+    mMsgTest.Previous = mMsgTest.CurrentProcId
+    
+    '~~ Unload current test proc
+    Unload mMsg.MsgInstance(mMsgTest.CurrentTitle)
+    UnloadEvaluate
+    
+    '~~ Envoke next test proc
+    BttnPassedAction = mMsgTest.TestProc(wsTest.NextTestNumber)
+    
+End Function
+
+Public Sub BttnReExecWithModArgsAction(Optional ByVal r_msg_width_min As Single = 0, _
+                              Optional ByVal r_msg_width_max As Single = 0, _
+                              Optional ByVal r_msg_height_max As Single = 0, _
+                              Optional ByVal r_lbl_pos As enLabelPos = 0, _
+                              Optional ByVal r_lbl_width As Single = 0)
+' ------------------------------------------------------------------------------
+' Modifies a test procerdure's (r_number) messages argument value and
+' re-executes the test procedure identified by its test number. The service may
+' modify any number of arguments, no matter whether they are used by the tested
+' message variant.
+' ------------------------------------------------------------------------------
+    Const PROC = "BttnReExecWithModArgsAction"
+    
+    On Error GoTo eh
+    Dim siWidthMin      As Single
+    Dim siWidthMax      As Single
+    Dim siHeightMax     As Single
+    Dim lLabelPos       As enLabelPos
+    Dim lLabelWidth     As Long
+    Dim sLabelPosSpec   As String
+    
+    '~~ Get current values
+    With wsTest
+        siWidthMin = .FormWidthMin
+        siWidthMax = .FormWidthMax
+        siHeightMax = .FormHeightMax
+        sLabelPosSpec = .MsgLabelPosSpec
+        lLabelWidth = .LabelWidth
+        lLabelPos = .LabelPos
+    End With
+    
+    '~~ Modify the current values
+    siWidthMin = Max(siWidthMin + r_msg_width_min, mMsg.MSG_LIMIT_WIDTH_MIN_PERCENTAGE)         ' limit to min width
+    siWidthMax = Min(siWidthMax + r_msg_width_max, mMsg.MSG_LIMIT_WIDTH_MAX_PERCENTAGE)         ' limit to max width
+    siHeightMax = Min(siHeightMax + r_msg_height_max, mMsg.MSG_LIMIT_HEIGHT_MAX_PERCENTAGE)     ' limit to max height
+    
+    If r_lbl_pos <> 0 Then
+        If lLabelWidth = 0 Then lLabelWidth = 30
+        '~~ Label pos modified
+        Select Case r_lbl_pos
+            Case enLabelAboveSectionText:   sLabelPosSpec = vbNullString
+            Case enLposLeftAlignedCenter:   sLabelPosSpec = "C" & lLabelWidth
+            Case enLposLeftAlignedLeft:     sLabelPosSpec = "L" & lLabelWidth
+            Case enLposLeftAlignedRight:    sLabelPosSpec = "R" & lLabelWidth
+        End Select
+    ElseIf r_lbl_width <> 0 Then
+        '~~ The width is increased or decreased
+        lLabelWidth = lLabelWidth + r_lbl_width
+        If Abs(lLabelWidth) = LBL_WDTH_INCR_DECR Then lLabelWidth = 30
+        Select Case lLabelPos
+            Case enLabelAboveSectionText:   sLabelPosSpec = vbNullString
+            Case enLposLeftAlignedCenter:   sLabelPosSpec = "C" & lLabelWidth
+            Case enLposLeftAlignedLeft:     sLabelPosSpec = "L" & lLabelWidth
+            Case enLposLeftAlignedRight:    sLabelPosSpec = "R" & lLabelWidth
+        End Select
+    End If
+
+    '~~ Return modified values
+    With wsTest
+        .FormWidthMin = siWidthMin
+        .FormWidthMax = siWidthMax
+        .FormHeightMax = siHeightMax
+        .MsgLabelPosSpec = sLabelPosSpec
+    End With
+
+    mMsgTest.TestProc mMsgTest.ProcId
+    
+xt: Exit Sub
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
+
+Public Function BttnRepeatAction() As Variant
+    '~~ Unload current test proc
+    Unload mMsg.MsgInstance(mMsgTest.CurrentTitle)
+    mMsgTest.TestProc mMsgTest.ProcId
+End Function
+
+Public Sub BttnTerminatedAction()
+    
+    mMsg.MsgInstance(mMsgTest.Title(mMsgTest.CurrentProcId)).Hide
+    If mErH.Regression Then
+        EoP mMsgTest.CurrentProcId
+        wsTest.RegressionTest = False
+        mErH.Regression = False
+#If XcTrc_clsTrc = 1 Then
+        Trc.Dsply
+#ElseIf XcTrc_mTrc = 1 Then
+        mTrc.Dsply
+#End If
+    End If
+    Unload mMsg.MsgInstance(mMsgTest.Title(mMsgTest.CurrentProcId))
+    UnloadEvaluate
+    
+End Sub
 
 Public Function Bttns() As Collection
 ' ------------------------------------------------------------------------------
 ' Collection of test buttons displayed
 ' ------------------------------------------------------------------------------
     '~~ Min/Max Width/Height increment/decrement buttons
-    Set Bttns = mMsg.Buttons(mTest.BTTN_PASSED, mTest.BTTN_FAILED, mTest.BTTN_TRMNTE, vbLf, _
-                             mTest.BttnMsgWdthMinIncr, mTest.BttnMsgWdthMinDecr, mTest.BttnMsgWdthMaxIncr, mTest.BttnMsgWdthMaxDecr, vbLf, mTest.BttnMsgHghtMaxIncr, mTest.BttnMsgHghtMaxDecr, vbLf)
+    Set Bttns = mMsg.Buttons(mMsgTest.BttnPassed, mMsgTest.BttnFailed, mMsgTest.BttnTerminate, vbLf, _
+                             mMsgTest.BttnMsgWdthMinIncr, mMsgTest.BttnMsgWdthMinDecr, mMsgTest.BttnMsgWdthMaxIncr, mMsgTest.BttnMsgWdthMaxDecr, vbLf, mMsgTest.BttnMsgHghtMaxIncr, mMsgTest.BttnMsgHghtMaxDecr, vbLf)
     
     If HasLabelWithText Then
         '~~ Label position spec modification buttons
         Select Case wsTest.LabelPos
-            Case enLabelAboveSectionText: Set Bttns = mMsg.Buttons(Bttns, mTest.BttnLblPosLeftAlgnCnter, mTest.BttnLblPosLeftAlgnLeft, mTest.BttnLblPosLeftAlgnRight, vbLf)
-            Case enLposLeftAlignedCenter: Set Bttns = mMsg.Buttons(Bttns, mTest.BttnLblPosTop, mTest.BttnLblPosLeftAlgnLeft, mTest.BttnLblPosLeftAlgnRight, vbLf, mTest.BttnLblWdthIncr, mTest.BttnLblWdthDecr, vbLf)
-            Case enLposLeftAlignedLeft:   Set Bttns = mMsg.Buttons(Bttns, mTest.BttnLblPosTop, mTest.BttnLblPosLeftAlgnCnter, mTest.BttnLblPosLeftAlgnRight, vbLf, mTest.BttnLblWdthIncr, mTest.BttnLblWdthDecr, vbLf)
-            Case enLposLeftAlignedRight:  Set Bttns = mMsg.Buttons(Bttns, mTest.BttnLblPosTop, mTest.BttnLblPosLeftAlgnCnter, mTest.BttnLblPosLeftAlgnLeft, vbLf, mTest.BttnLblWdthIncr, mTest.BttnLblWdthDecr, vbLf)
+            Case enLabelAboveSectionText: Set Bttns = mMsg.Buttons(Bttns, mMsgTest.BttnLblPosLeftAlgnCnter, mMsgTest.BttnLblPosLeftAlgnLeft, mMsgTest.BttnLblPosLeftAlgnRight, vbLf)
+            Case enLposLeftAlignedCenter: Set Bttns = mMsg.Buttons(Bttns, mMsgTest.BttnLblPosTop, mMsgTest.BttnLblPosLeftAlgnLeft, mMsgTest.BttnLblPosLeftAlgnRight, vbLf, mMsgTest.BttnLblWdthIncr, mMsgTest.BttnLblWdthDecr, vbLf)
+            Case enLposLeftAlignedLeft:   Set Bttns = mMsg.Buttons(Bttns, mMsgTest.BttnLblPosTop, mMsgTest.BttnLblPosLeftAlgnCnter, mMsgTest.BttnLblPosLeftAlgnRight, vbLf, mMsgTest.BttnLblWdthIncr, mMsgTest.BttnLblWdthDecr, vbLf)
+            Case enLposLeftAlignedRight:  Set Bttns = mMsg.Buttons(Bttns, mMsgTest.BttnLblPosTop, mMsgTest.BttnLblPosLeftAlgnCnter, mMsgTest.BttnLblPosLeftAlgnLeft, vbLf, mMsgTest.BttnLblWdthIncr, mMsgTest.BttnLblWdthDecr, vbLf)
         End Select
     End If
     Bttns.Remove Bttns.Count
     
-End Function
-                    
-
-Public Function BttnsBasic() As Collection
-' ------------------------------------------------------------------------------
-' Collection of test buttons displayed for a basic test.
-' ------------------------------------------------------------------------------
-    Set BttnsBasic = mMsg.Buttons(mTest.BTTN_PASSED, mTest.BTTN_FAILED, mTest.BTTN_TRMNTE)
-        
 End Function
 
 Public Function BttnsAppRunArgs() As Dictionary
@@ -132,29 +266,30 @@ Public Function BttnsAppRunArgs() As Dictionary
     On Error GoTo eh
     Dim dct As New Dictionary
     
-    mMsg.BttnAppRun dct, BTTN_OK_ONLY, ThisWorkbook, "mTest.Terminated"
-    mMsg.BttnAppRun dct, "Yes", ThisWorkbook, "mTest.Terminated"
-    mMsg.BttnAppRun dct, "No", ThisWorkbook, "mTest.Terminated"
-    mMsg.BttnAppRun dct, "Cancel", ThisWorkbook, "mTest.Terminated"
-    mMsg.BttnAppRun dct, BTTN_PASSED, ThisWorkbook, "mTest.Passed"
-    mMsg.BttnAppRun dct, BTTN_FAILED, ThisWorkbook, "mTest.Failed"
-    mMsg.BttnAppRun dct, BTTN_TRMNTE, ThisWorkbook, "mTest.Terminated"
+    mMsg.BttnAppRun dct, BttnOkOnly, ThisWorkbook, "mMsgTest.BttnTerminatedAction"
+    mMsg.BttnAppRun dct, "Yes", ThisWorkbook, "mMsgTest.BttnTerminatedAction"
+    mMsg.BttnAppRun dct, "No", ThisWorkbook, "mMsgTest.BttnTerminatedAction"
+    mMsg.BttnAppRun dct, "Cancel", ThisWorkbook, "mMsgTest.BttnTerminatedAction"
+    mMsg.BttnAppRun dct, BttnPassed, ThisWorkbook, "mMsgTest.BttnPassedAction"
+    mMsg.BttnAppRun dct, BttnFailed, ThisWorkbook, "mMsgTest.BttnFailedAction"
+    mMsg.BttnAppRun dct, BttnTerminate, ThisWorkbook, "mMsgTest.BttnTerminatedAction"
+    mMsg.BttnAppRun dct, BttnRepeat, ThisWorkbook, "mMsgTest.BttnRepeatAction"
     
-    mMsg.BttnAppRun dct, BttnLblPosTop, ThisWorkbook, "mTest.ReExecWithModArgs", 0, 0, 0, enLabelAboveSectionText
-    mMsg.BttnAppRun dct, BttnLblPosLeftAlgnCnter, ThisWorkbook, "mTest.ReExecWithModArgs", 0, 0, 0, enLposLeftAlignedCenter
-    mMsg.BttnAppRun dct, BttnLblPosLeftAlgnLeft, ThisWorkbook, "mTest.ReExecWithModArgs", 0, 0, 0, enLposLeftAlignedLeft
-    mMsg.BttnAppRun dct, BttnLblPosLeftAlgnRight, ThisWorkbook, "mTest.ReExecWithModArgs", 0, 0, 0, enLposLeftAlignedRight
+    mMsg.BttnAppRun dct, BttnLblPosTop, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", 0, 0, 0, enLabelAboveSectionText
+    mMsg.BttnAppRun dct, BttnLblPosLeftAlgnCnter, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", 0, 0, 0, enLposLeftAlignedCenter
+    mMsg.BttnAppRun dct, BttnLblPosLeftAlgnLeft, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", 0, 0, 0, enLposLeftAlignedLeft
+    mMsg.BttnAppRun dct, BttnLblPosLeftAlgnRight, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", 0, 0, 0, enLposLeftAlignedRight
     
-    mMsg.BttnAppRun dct, BttnLblWdthDecr, ThisWorkbook, "mTest.ReExecWithModArgs", 0, 0, 0, 0, -LBL_WDTH_INCR_DECR
-    mMsg.BttnAppRun dct, BttnLblWdthIncr, ThisWorkbook, "mTest.ReExecWithModArgs", 0, 0, 0, 0, LBL_WDTH_INCR_DECR
+    mMsg.BttnAppRun dct, BttnLblWdthDecr, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", 0, 0, 0, 0, -LBL_WDTH_INCR_DECR
+    mMsg.BttnAppRun dct, BttnLblWdthIncr, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", 0, 0, 0, 0, LBL_WDTH_INCR_DECR
     
-    mMsg.BttnAppRun dct, BttnMsgWdthMaxDecr, ThisWorkbook, "mTest.ReExecWithModArgs", 0, -MSG_DIM_INCR_DECR
-    mMsg.BttnAppRun dct, BttnMsgWdthMaxIncr, ThisWorkbook, "mTest.ReExecWithModArgs", 0, MSG_DIM_INCR_DECR
-    mMsg.BttnAppRun dct, BttnMsgWdthMinDecr, ThisWorkbook, "mTest.ReExecWithModArgs", -MSG_DIM_INCR_DECR
-    mMsg.BttnAppRun dct, BttnMsgWdthMinIncr, ThisWorkbook, "mTest.ReExecWithModArgs", MSG_DIM_INCR_DECR
+    mMsg.BttnAppRun dct, BttnMsgWdthMaxDecr, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", 0, -MSG_DIM_INCR_DECR
+    mMsg.BttnAppRun dct, BttnMsgWdthMaxIncr, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", 0, MSG_DIM_INCR_DECR
+    mMsg.BttnAppRun dct, BttnMsgWdthMinDecr, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", -MSG_DIM_INCR_DECR
+    mMsg.BttnAppRun dct, BttnMsgWdthMinIncr, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", MSG_DIM_INCR_DECR
     
-    mMsg.BttnAppRun dct, BttnMsgHghtMaxDecr, ThisWorkbook, "mTest.ReExecWithModArgs", 0, 0, -MSG_DIM_INCR_DECR
-    mMsg.BttnAppRun dct, BttnMsgHghtMaxIncr, ThisWorkbook, "mTest.ReExecWithModArgs", 0, 0, MSG_DIM_INCR_DECR
+    mMsg.BttnAppRun dct, BttnMsgHghtMaxDecr, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", 0, 0, -MSG_DIM_INCR_DECR
+    mMsg.BttnAppRun dct, BttnMsgHghtMaxIncr, ThisWorkbook, "mMsgTest.BttnReExecWithModArgsAction", 0, 0, MSG_DIM_INCR_DECR
     
     Set BttnsAppRunArgs = dct
     Set dct = Nothing
@@ -164,9 +299,32 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Public Function NextSect(ByRef n_sect As Long) As Long
-    n_sect = n_sect + 1
-    NextSect = n_sect
+                    
+
+Public Function BttnsBasic() As Collection
+' ------------------------------------------------------------------------------
+' Collection of test buttons displayed for a basic test.
+' ------------------------------------------------------------------------------
+    Set BttnsBasic = mMsg.Buttons(mMsgTest.BttnPassed, mMsgTest.BttnFailed, vbLf, mMsgTest.BttnRepeat, mMsgTest.BttnTerminate)
+End Function
+
+Public Function BttnsOnly() As Collection
+' ------------------------------------------------------------------------------
+' Returns a 7 x 7 buttons only matrix.
+' ------------------------------------------------------------------------------
+    Dim cll As New Collection
+    Dim i   As Long
+    Dim j   As Long
+    
+    For i = 1 To 7
+        For j = 1 To 7
+            cll.Add "B " & i & "-" & j
+        Next j
+        cll.Add vbLf
+    Next i
+    Set BttnsOnly = cll
+    Set cll = Nothing
+    
 End Function
 
 Private Sub EoP(ByVal e_proc As String, Optional ByVal e_inf As String = vbNullString)
@@ -342,105 +500,10 @@ xt: Exit Function
 End Function
 
 Private Function ErrSrc(ByVal sProc As String) As String
-    ErrSrc = "mTest." & sProc
+    ErrSrc = "mMsgTest." & sProc
 End Function
 
-Public Function Failed() As Variant
-' ------------------------------------------------------------------------------
-' This "service" may be called from a "Failed" button when the message has been
-' displayed modeless.
-' Note: Because the next test procedure displays the message modeless the
-'       execution of it returns and the previous test message instance is
-'       unloaded.
-' ------------------------------------------------------------------------------
-    wsTest.Failed
-    
-    Previous = Current
-    '~~ Unload current test proc
-    Unload mMsg.MsgInstance(mTest.Current)
-    UnloadEvaluate
-    
-    '~~ Envoke next test proc
-    Failed = mTest.TestProc(wsTest.NextTestNumber)
-    
-End Function
-
-Private Function HasLabelWithText() As Boolean
-' ------------------------------------------------------------------------------
-' Retuns TRUE when the current udtMessage has at least one section with a Label
-' and a text.
-' ------------------------------------------------------------------------------
-    Dim i As Long
-    
-    With udtMessage
-        For i = 1 To mMsg.NoOfMsgSects
-            With .Section(i)
-                If .Label.Text <> vbNullString And .Text.Text <> vbNullString Then
-                    HasLabelWithText = True
-                    Exit For
-                End If
-            End With
-        Next i
-    End With
-    
-End Function
-
-Public Sub MessageInit(ByRef m_form As fMsg, _
-                       ByVal m_title As String)
-' ------------------------------------------------------------------------------
-' Initializes the all message sections with the defaults throughout this test
-' module which uses a module global declared udtMessage for a consistent layout.
-' ------------------------------------------------------------------------------
-    Dim i As Long
-    
-    mMsg.MsgInstance fi_key:=m_title, fi_unload:=True                    ' Ensures a message starts from scratch
-    Set m_form = mMsg.MsgInstance(m_title)
-    
-    For i = 1 To mMsg.NoOfMsgSects ' obtained when the designed controls are collected
-        With udtMessage.Section(i)
-            .Label.Text = vbNullString
-            .Label.FontColor = rgbBlue
-            .Text.Text = vbNullString
-            .Text.MonoSpaced = False
-            .Text.FontItalic = False
-            .Text.FontUnderline = False
-            .Text.FontColor = rgbBlack
-        End With
-    Next i
-
-End Sub
-
-Private Sub UnloadEvaluate()
-' --------------------------------------------------------------------------------
-'
-' --------------------------------------------------------------------------------
-    Const PROC = "UnloadEvaluate"
-    
-    On Error GoTo eh
-    Dim ufm As fMsg
-    
-    If mMsg.MsgInstances.Exists(EVALUATION_TITLE) Then
-        On Error Resume Next
-        Set ufm = mMsg.MsgInstances(EVALUATION_TITLE)
-        If Err.Number <> 0 Then
-            mMsg.MsgInstances.Remove EVALUATION_TITLE
-        End If
-        With ufm
-            siEvaluateTop = .Top
-            siEvaluateLeft = .Left
-        End With
-        Unload ufm
-    Else
-        siEvaluateTop = 20
-        siEvaluateLeft = 200
-    End If
-
-xt: Exit Sub
-
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
-End Sub
-
-Public Sub Evaluate()
+Public Sub Evaluate(Optional ByVal e_selftest As Boolean = False)
 ' --------------------------------------------------------------------------------
 ' Displays a modeless dialog to modify the current test-procedure's arguments and
 ' finally evaluate the result as Passed or Failed.
@@ -459,6 +522,9 @@ Public Sub Evaluate()
     Dim siTop   As Single
     
     UnloadEvaluate
+    If e_selftest Then
+        mMsgTest.InitializeTest "02-0", PROC
+    End If
     Set ufm = mMsg.MsgInstance(PROC)
     Set ufmTest = mMsg.MsgInstance(CurrentTitle)
     With ufmTest
@@ -468,61 +534,48 @@ Public Sub Evaluate()
     
     ufm.VisualizeForTest = False
     With Msg
-        i = i + 1
-        With .Section(i)
+        With .Section(NextSect(i))
             .Label.Text = "Test Title:"
             .Label.FontColor = rgbBlue
-            With .Text
-                .Text = sCurrentTitle
-                .FontBold = True
-            End With
+            .Text.Text = sCurrentTitle
         End With
-        i = i + 1
-        With .Section(i)
+        With .Section(NextSect(i))
+            .Label.Text = "Test Description:"
+            .Label.FontColor = rgbBlue
+            .Text.Text = sCurrentDescription
+        End With
+        
+        With .Section(NextSect(i))
             .Label.Text = "Width Min:"
             .Label.FontColor = rgbBlue
-            With .Text
-                .Text = wsTest.FormWidthMin & "% of the dispay's width"
-                .FontBold = True
-            End With
+            .Text.Text = wsTest.FormWidthMin & "% of the dispay's width"
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(NextSect(i))
             .Label.Text = "Width Max:"
             .Label.FontColor = rgbBlue
-            With .Text
-                .Text = wsTest.FormWidthMax & "% of the display's width"
-                .FontBold = True
-            End With
+            .Text.Text = wsTest.FormWidthMax & "% of the display's width"
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(NextSect(i))
             .Label.Text = "Height Max:"
             .Label.FontColor = rgbBlue
-            With .Text
-                .Text = wsTest.FormHeightMax & "% of the display's height"
-                .FontBold = True
-            End With
+            .Text.Text = wsTest.FormHeightMax & "% of the display's height"
         End With
         
         If HasLabelWithText Then
-            i = i + 1
-            With .Section(i)
+            With .Section(NextSect(i))
                 .Label.Text = "Label Pos Spec:"
                 .Label.FontColor = rgbBlue
-                With .Text
-                    .Text = wsTest.MsgLabelPosSpec
-                    .FontBold = True
-                End With
+                .Text.Text = wsTest.MsgLabelPosSpec
             End With
         End If
-        i = i + 1
-        With .Section(i).Text
+        
+        With .Section(NextSect(i)).Text
             .Text = "Modify any (width/height/Label pos) arguments of the current test proc and finally evaluate the result with Passed or Failed."
         End With
     
-        i = i + 1
-        With .Section(i)
+        With .Section(NextSect(i))
             .Label.Text = "Attention!"
             .Label.FontColor = rgbRed
             .Label.FontBold = True
@@ -537,9 +590,12 @@ Public Sub Evaluate()
     
     mMsg.Dsply dsply_title:=EVALUATION_TITLE _
              , dsply_msg:=Msg _
-             , dsply_Label_spec:="R70" _
-             , dsply_buttons:=mTest.Bttns _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
+             , dsply_width_min:=50 _
+             , dsply_width_max:=70 _
+             , dsply_height_max:=85 _
+             , dsply_Label_spec:="R80" _
+             , dsply_buttons:=mMsgTest.Bttns _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
              , dsply_modeless:=True _
              , dsply_pos:=siTop & ";" & siLeft
         
@@ -548,40 +604,93 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Public Function BttnsOnly() As Collection
+Private Function HasLabelWithText() As Boolean
 ' ------------------------------------------------------------------------------
-' Returns a 7 x 7 buttons only matrix.
+' Retuns TRUE when the current udtMessage has at least one section with a Label
+' and a text.
 ' ------------------------------------------------------------------------------
-    Dim cll As New Collection
-    Dim i   As Long
-    Dim j   As Long
+    Dim i As Long
     
-    For i = 1 To 7
-        For j = 1 To 7
-            cll.Add "B " & i & "-" & j
-        Next j
-        cll.Add vbLf
-    Next i
-    Set BttnsOnly = cll
-    Set cll = Nothing
+    With mMsgTest.udtMessage
+        For i = 1 To mMsg.NoOfMsgSects
+            With .Section(i)
+                If .Label.Text <> vbNullString And .Text.Text <> vbNullString Then
+                    HasLabelWithText = True
+                    Exit For
+                End If
+            End With
+        Next i
+    End With
     
 End Function
 
-Public Function Passed() As Variant
+Public Sub InitializeMessage(ByRef m_form As fMsg, _
+                             ByVal m_title As String)
 ' ------------------------------------------------------------------------------
-' This "service" may be called from a "Passed" button when the message has been
-' displayed modeless.
+' Initializes all message sections with defaults used with all tests provided
+' they use the global declared udtMessage.
 ' ------------------------------------------------------------------------------
-    wsTest.Passed
-    mTest.Previous = mTest.Current
+    Dim i As Long
     
-    '~~ Unload current test proc
-    Unload mMsg.MsgInstance(mTest.CurrentTitle)
-    UnloadEvaluate
+    mMsg.MsgInstance fi_key:=m_title, fi_unload:=True                    ' Ensures a message starts from scratch
+    Set m_form = mMsg.MsgInstance(m_title)
     
-    '~~ Envoke next test proc
-    Passed = mTest.TestProc(wsTest.NextTestNumber)
+    For i = 1 To mMsg.NoOfMsgSects ' obtained when the designed controls are collected
+        With mMsgTest.udtMessage.Section(i)
+            With .Label
+                .Text = vbNullString
+                .FontColor = rgbBlue
+                .OnClickAction = mMsgTest.TEST_URL
+            End With
+            With .Text
+                .Text = vbNullString
+                .FontBold = False
+                .FontColor = rgbBlack
+                .OnClickAction = mMsgTest.TEST_URL
+            End With
+        End With
+    Next i
+
+End Sub
+
+Public Sub InitializeTest(ByVal s_number As Variant, _
+                          ByVal s_proc As String)
+' ------------------------------------------------------------------------------
+' Sets up a message form instance based on the test proc's title.
+' ------------------------------------------------------------------------------
     
+    mMsgTest.ProcId = s_number
+    TestProcName = mMsgTest.Title(s_proc)
+    mMsgTest.CurrentProcId = s_proc
+    mMsgTest.CurrentTitle = TestProcName
+    mMsgTest.CurrentDescription = wsTest.TestDescription
+    mMsgTest.InitializeMessage m_form:=ufmMsg, m_title:=TestProcName ' set test-global message specifications
+    ufmMsg.VisualizeForTest = wsTest.VisualizeForTest
+    wsTest.SelectDescription
+    
+End Sub
+
+Private Function IsUcase(ByVal s As String) As Boolean
+
+    Dim i   As Integer: i = Asc(s)
+    
+    IsUcase = (i >= 65 And i <= 90) Or _
+              (i >= 192 And i <= 214) Or _
+              (i >= 216 And i <= 223) Or _
+              (i = 128) Or _
+              (i = 138) Or _
+              (i = 140) Or _
+              (i = 142) Or _
+              (i = 154) Or _
+              (i = 156) Or _
+              (i >= 158 And i <= 159) Or _
+              (i = 163) Or _
+              (i = 165)
+End Function
+
+Public Function NextSect(ByRef n_sect As Long) As Long
+    n_sect = n_sect + 1
+    NextSect = n_sect
 End Function
 
 Public Function PrcPnt(ByVal pp_value As Single, _
@@ -596,78 +705,6 @@ Public Function PrcPnt(ByVal pp_value As Single, _
     End Select
     
 End Function
-
-Public Sub ReExecWithModArgs(Optional ByVal r_msg_width_min As Single = 0, _
-                             Optional ByVal r_msg_width_max As Single = 0, _
-                             Optional ByVal r_msg_height_max As Single = 0, _
-                             Optional ByVal r_lbl_pos As enLabelPos = 0, _
-                             Optional ByVal r_lbl_width As Single = 0)
-' ------------------------------------------------------------------------------
-' Modifies a test procerdure's (r_number) messages argument value and
-' re-executes the test procedure identified by its test number. The service may
-' modify any number of arguments, no matter whether they are used by the tested
-' message variant.
-' ------------------------------------------------------------------------------
-    Const PROC = "ReExecWithModArgs"
-    
-    On Error GoTo eh
-    Dim siWidthMin      As Single
-    Dim siWidthMax      As Single
-    Dim siHeightMax     As Single
-    Dim lLabelPos       As enLabelPos
-    Dim lLabelWidth     As Long
-    Dim sLabelPosSpec   As String
-    
-    '~~ Get current values
-    With wsTest
-        siWidthMin = .FormWidthMin
-        siWidthMax = .FormWidthMax
-        siHeightMax = .FormHeightMax
-        sLabelPosSpec = .MsgLabelPosSpec
-        lLabelWidth = .LabelWidth
-        lLabelPos = .LabelPos
-    End With
-    
-    '~~ Modify the current values
-    siWidthMin = Max(siWidthMin + r_msg_width_min, mMsg.MSG_LIMIT_WIDTH_MIN_PERCENTAGE)         ' limit to min width
-    siWidthMax = Min(siWidthMax + r_msg_width_max, mMsg.MSG_LIMIT_WIDTH_MAX_PERCENTAGE)         ' limit to max width
-    siHeightMax = Min(siHeightMax + r_msg_height_max, mMsg.MSG_LIMIT_HEIGHT_MAX_PERCENTAGE)     ' limit to max height
-    
-    If r_lbl_pos <> 0 Then
-        If lLabelWidth = 0 Then lLabelWidth = 30
-        '~~ Label pos modified
-        Select Case r_lbl_pos
-            Case enLabelAboveSectionText:   sLabelPosSpec = vbNullString
-            Case enLposLeftAlignedCenter:   sLabelPosSpec = "C" & lLabelWidth
-            Case enLposLeftAlignedLeft:     sLabelPosSpec = "L" & lLabelWidth
-            Case enLposLeftAlignedRight:    sLabelPosSpec = "R" & lLabelWidth
-        End Select
-    ElseIf r_lbl_width <> 0 Then
-        '~~ The width is increased or decreased
-        lLabelWidth = lLabelWidth + r_lbl_width
-        If Abs(lLabelWidth) = LBL_WDTH_INCR_DECR Then lLabelWidth = 30
-        Select Case lLabelPos
-            Case enLabelAboveSectionText:   sLabelPosSpec = vbNullString
-            Case enLposLeftAlignedCenter:   sLabelPosSpec = "C" & lLabelWidth
-            Case enLposLeftAlignedLeft:     sLabelPosSpec = "L" & lLabelWidth
-            Case enLposLeftAlignedRight:    sLabelPosSpec = "R" & lLabelWidth
-        End Select
-    End If
-
-    '~~ Return modified values
-    With wsTest
-        .FormWidthMin = siWidthMin
-        .FormWidthMax = siWidthMax
-        .FormHeightMax = siHeightMax
-        .MsgLabelPosSpec = sLabelPosSpec
-    End With
-
-    mTest.TestProc mTest.Number
-    
-xt: Exit Sub
-
-eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
-End Sub
 
 Public Function Repeat(repeat_string As String, repeat_n_times As Long)
     Dim s As String
@@ -723,45 +760,15 @@ Public Function RepeatString(ByVal rep_n_times As Long, _
     
 End Function
 
-Public Sub SetupMsgTitleInstanceAndNo(ByVal s_number As Variant, _
-                                      ByVal s_proc As String)
-' ------------------------------------------------------------------------------
-' Sets up a message form instance based on the test proc's title.
-' ------------------------------------------------------------------------------
-    
-    mTest.Number = s_number
-    sMsgTitle = mTest.Title(s_proc)
-    mTest.Current = s_proc
-    mTest.CurrentTitle = sMsgTitle
-    mTest.MessageInit m_form:=ufmMsg, m_title:=sMsgTitle ' set test-global message specifications
-    ufmMsg.VisualizeForTest = wsTest.VisualizeForTest
-    
-End Sub
-
-Public Sub Terminated()
-    
-    mMsg.MsgInstance(mTest.Title(mTest.Current)).Hide
-    If mErH.Regression Then
-        EoP mTest.Current
-        wsTest.RegressionTest = False
-        mErH.Regression = False
-#If XcTrc_clsTrc = 1 Then
-        Trc.Dsply
-#ElseIf XcTrc_mTrc = 1 Then
-        mTrc.Dsply
-#End If
-    End If
-    Unload mMsg.MsgInstance(mTest.Title(mTest.Current))
-    UnloadEvaluate
-    
-End Sub
-
 Public Function TestProc(ByVal n_test_number As Variant) As Variant
         
     Select Case n_test_number
         Case "02-1":    TestProc = mMsgTestProcs.Test_Basic_02_1_Single_Section_PropSpaced
         Case "02-2":    TestProc = mMsgTestProcs.Test_Basic_02_2_Single_Section_MonoSpaced_With_Label
         Case "02-3":    TestProc = mMsgTestProcs.Test_Basic_02_3_Single_Section_MonoSpaced_No_Label
+        Case "02-4":    TestProc = mMsgTestProcs.Test_Basic_02_4_Single_Section_MonoSpaced_With_VH_Scroll
+        Case "02-5":    TestProc = mMsgTestProcs.Test_Basic_02_5_Single_Section_Label_Only
+        Case "00":      TestProc = mMsgTestServices.Test_00_Evaluate
         Case 11:        TestProc = mMsgTestServices.Test_11_mMsg_Box_Buttons_Only
         Case 12:        TestProc = mMsgTestServices.Test_12_mMsg_ErrMsg_AppErr_5
         Case 13:        TestProc = mMsgTestServices.Test_13_mMsg_Dsply_WidthDeterminedByMinimumWidth
@@ -785,9 +792,8 @@ Public Function TestProc(ByVal n_test_number As Variant) As Variant
         Case 50:        TestProc = mMsgTestServices.Test_50_mMsg_Dsply_LabelPos_Left_R30
         Case 90:        TestProc = mMsgTestServices.Test_90_mMsg_Dsply_AllInOne
         Case 91:        TestProc = mMsgTestServices.Test_91_mMsg_Dsply_MinimumMessage
-        Case 92:        TestProc = mMsgTestServices.Test_92_mMsg_Dsply_LabelWithUnderlayedURL
         Case 0
-            mMsg.MsgInstance(Title(mTest.Current)).Hide
+            mMsg.MsgInstance(Title(mMsgTest.CurrentProcId)).Hide
             If mErH.Regression Then
                 EoP "mMsgTestServices.Test_10_Regression"
                 wsTest.RegressionTest = False
@@ -798,27 +804,9 @@ Public Function TestProc(ByVal n_test_number As Variant) As Variant
 #ElseIf XcTrc_mTrc = 1 Then
             mTrc.Dsply
 #End If
-            Unload mMsg.MsgInstance(Title(Current))
+            Unload mMsg.MsgInstance(Title(CurrentProcId))
     End Select
     
-End Function
-
-Private Function IsUcase(ByVal s As String) As Boolean
-
-    Dim i   As Integer: i = Asc(s)
-    
-    IsUcase = (i >= 65 And i <= 90) Or _
-              (i >= 192 And i <= 214) Or _
-              (i >= 216 And i <= 223) Or _
-              (i = 128) Or _
-              (i = 138) Or _
-              (i = 140) Or _
-              (i = 142) Or _
-              (i = 154) Or _
-              (i = 156) Or _
-              (i >= 158 And i <= 159) Or _
-              (i = 163) Or _
-              (i = 165)
 End Function
 
 Public Function Title(ByVal t_s As String) As String
@@ -848,4 +836,34 @@ Public Function Title(ByVal t_s As String) As String
     Title = s
     
 End Function
+
+Private Sub UnloadEvaluate()
+' --------------------------------------------------------------------------------
+'
+' --------------------------------------------------------------------------------
+    Const PROC = "UnloadEvaluate"
+    
+    On Error GoTo eh
+    Dim ufm As fMsg
+    
+    If mMsg.MsgInstances.Exists(EVALUATION_TITLE) Then
+        On Error Resume Next
+        Set ufm = mMsg.MsgInstances(EVALUATION_TITLE)
+        If Err.Number <> 0 Then
+            mMsg.MsgInstances.Remove EVALUATION_TITLE
+        End If
+        With ufm
+            siEvaluateTop = .Top
+            siEvaluateLeft = .Left
+        End With
+        Unload ufm
+    Else
+        siEvaluateTop = 20
+        siEvaluateLeft = 200
+    End If
+
+xt: Exit Sub
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Sub
 

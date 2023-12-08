@@ -12,46 +12,60 @@ Option Explicit
 Private bRegressionTest As Boolean
 Private bTerminated     As Boolean
 
-Public Property Get FailedText() As String:                         Value(Me.Range("colTestPassedFailed")) = "Failed":              End Property
+Public Property Get Value(Optional ByVal v_col As String) As Variant
+    Value = Intersect(RowTest(mMsgTest.ProcId).EntireRow, Range(v_col).EntireColumn).Value
+End Property
+Public Property Let Value(Optional ByVal v_col As String, _
+                                   ByVal v_value As Variant)
+    Intersect(RowTest(mMsgTest.ProcId).EntireRow, Range(v_col).EntireColumn).Value = v_value
+End Property
 
-Public Property Get LabelPos() As enLabelPos:                       LabelPos = mMsg.LabelPos(MsgLabelPosSpec):                      End Property
+Public Property Get FailedText() As String
+    FailedText = Intersect(RowTest(mMsgTest.ProcId).EntireRow, Range("colTestPassedFailedNote").EntireColumn).Value
+End Property
 
-Public Property Get LabelWidth() As Long:                           LabelWidth = mMsg.LabelWidth(MsgLabelPosSpec):                  End Property
+Public Property Get FormHeightMax() As Long
+    FormHeightMax = Intersect(RowTest(mMsgTest.ProcId).EntireRow, Range("colMsgMaxHeight").EntireColumn).Value
+End Property
 
-Public Property Get MsgHeightMax() As Long:                         MsgHeightMax = Value(Me.Range("colMsgHeightMax")):              End Property
+Public Property Let FormHeightMax(ByVal l As Long)
+    Intersect(RowTest(mMsgTest.ProcId).EntireRow, Range("colMsgMaxHeight").EntireColumn).Value = l
+End Property
 
-Public Property Let MsgHeightMax(ByVal l As Long):                  Value(Me.Range("colMsgHeightMax")) = l:                         End Property
+Public Property Get FormWidthMax() As Long:             FormWidthMax = Value("colMsgMaxWidth"):                     End Property
 
-Public Property Get MsgLabelPosSpec() As String:                    MsgLabelPosSpec = Value(Me.Range("colMsgLabelPosSpec")):        End Property
+Public Property Let FormWidthMax(ByVal l As Long):      Value("colMsgMaxWidth") = l:                                End Property
 
-Public Property Let MsgLabelPosSpec(ByVal s As String):             Value(Me.Range("colMsgLabelPosSpec")) = s:                      End Property
+Public Property Get FormWidthMin() As Long:             FormWidthMin = Value("colMsgMinWidth"):                     End Property
 
-Public Property Get MsgWidthMax() As Long:                          MsgWidthMax = Value(Me.Range("colMsgWidthMax")):                End Property
+Public Property Let FormWidthMin(ByVal l As Long):      Value("colMsgMinWidth") = l:                                End Property
 
-Public Property Let MsgWidthMax(ByVal l As Long):                   Value(Me.Range("colMsgWidthMax")) = l:                          End Property
+Public Property Get LabelPos() As enLabelPos:           LabelPos = mMsg.LabelPos(MsgLabelPosSpec):                  End Property
 
-Public Property Get MsgWidthMin() As Long:                          MsgWidthMin = Value(Me.Range("colMsgWidthMin")):                End Property
+Public Property Get LabelWidth() As Long:               LabelWidth = mMsg.LabelWidth(MsgLabelPosSpec):              End Property
 
-Public Property Let MsgWidthMin(ByVal l As Long):                   Value(Me.Range("colMsgWidthMin")) = l:                          End Property
+Public Property Get MsgLabelPosSpec() As String:        MsgLabelPosSpec = Value("colMsgLabelPosSpec"):              End Property
+
+Public Property Let MsgLabelPosSpec(ByVal s As String): Value("colMsgLabelPosSpec") = s:                            End Property
 
 Public Property Get NextTestNumber() As Long
 ' -------------------------------------------------------------------------
 ' Returns the number of the next consequtive test indicated for regression
 ' ("R"). Returns 0 if there's no next test.
 ' -------------------------------------------------------------------------
-    Dim Rng     As Range
+    Dim rng     As Range
     Dim iRow    As Long
     
     NextTestNumber = 0
-    For Each Rng In TestNumbers
-        If Rng.Value = vbNullString Then Exit Property  ' End of test reached
-        If Rng.Value > mTest.Number Then                ' This is the current/last test
-            If Rng.OFFSET(iRow, 2).Value = "R" Then
-                NextTestNumber = Rng.Value
+    For Each rng In TestProcIds
+        If rng.Value = vbNullString Then Exit Property  ' End of test reached
+        If rng.Value > mMsgTest.ProcId Then                ' This is the current/last test
+            If rng.OFFSET(iRow, 2).Value = "R" Then
+                NextTestNumber = rng.Value
                 Exit Property
             End If
         End If
-    Next Rng
+    Next rng
     
 End Property
 
@@ -63,10 +77,6 @@ Public Property Get RegressionTests() As Range
     Set RegressionTests = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colRegression").EntireColumn)
 End Property
 
-Private Property Get RowTest(Optional ByVal Test As Long) As Range
-    Set RowTest = Me.Range("rowTest" & Format(mTest.Number, "00")).EntireRow
-End Property
-
 Public Property Get Terminated() As Boolean:                        Terminated = bTerminated:                                       End Property
 
 Public Property Let Terminated(ByVal b As Boolean)
@@ -74,12 +84,9 @@ Public Property Let Terminated(ByVal b As Boolean)
     If bTerminated Then bRegressionTest = False
 End Property
 
-Public Property Get TestDescription()
-    With Me
-        Intersect(.Range("rowTest" & Format(mTest.Number, "00")).EntireRow, .Range("colTestDescription").EntireColumn).Select
-        TestDescription = Value(.Range("colTestDescription"))
-    End With
-End Property
+Public Property Get TestDescription() As String:        TestDescription = Value("colTestDescription"):  End Property
+
+Public Property Let TestDescription(ByVal s As String): Value("colTestDescription") = s:                End Property
 
 Public Property Get TestLabelPos() As enLabelPos
     Select Case True
@@ -89,8 +96,8 @@ Public Property Get TestLabelPos() As enLabelPos
     End Select
 End Property
 
-Private Property Get TestNumbers() As Range
-    Set TestNumbers = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colTestNo").EntireColumn)
+Private Property Get TestProcIds() As Range
+    Set TestProcIds = Intersect(Me.Range("rngTests").EntireRow, Me.Range("colTestProcId").EntireColumn)
 End Property
 
 Public Property Get TestOptionModelessMessageDisplay() As Boolean
@@ -113,15 +120,6 @@ eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Property
 
 Private Property Let TestResultNote(ByVal s As String):             Value(Me.Range("colTestPassedFailedNote")) = s:                             End Property
-
-Private Property Get Value(Optional ByVal r As Range) As Variant
-    Value = Intersect(RowTest(mTest.Number).EntireRow, r.EntireColumn).Value
-End Property
-
-Private Property Let Value(Optional ByVal r As Range, _
-                                    ByVal v As Variant)
-    Intersect(RowTest(mTest.Number).EntireRow, r.EntireColumn).Value = v
-End Property
 
 Public Property Get VisualizeForTest() As Boolean
 ' ------------------------------------------------------------------------------
@@ -211,8 +209,8 @@ Private Function ErrSrc(ByVal s As String) As String
 End Function
 
 Public Sub Failed()
-    Value(Me.Range("colTestPassedFailed")) = "Failed"
-    With Intersect(RowTest(mTest.Number).EntireRow, Range("colTestPassedFailedNote").EntireColumn)
+    Value("colTestPassedFailed") = "Failed"
+    With Intersect(RowTest(mMsgTest.ProcId).EntireRow, Range("colTestPassedFailedNote").EntireColumn)
         .Value = _
         VBA.InputBox(Prompt:="Enter the failed text" _
                    , Title:="Test failed" _
@@ -227,23 +225,51 @@ Public Sub Failed()
     End With
 End Sub
 
-Public Sub Passed()
-    Value(Me.Range("colTestPassedFailed")) = "Passed"
-    With Intersect(RowTest(mTest.Number).EntireRow, Range("colTestPassedFailedNote").EntireColumn)
-        .ClearContents
-        Application.EnableEvents = False
-        .Select
-        Application.EnableEvents = True
-    End With
+Public Sub SelectDescription()
+    Application.EnableEvents = False
+    Intersect(RowTest(mMsgTest.ProcId).EntireRow, Me.Range("colTestDescription").EntireColumn).Select
+    Application.EnableEvents = True
 End Sub
 
+Public Sub Passed()
+    Value("colTestPassedFailed") = "Passed"
+    Value("colTestPassedFailedNote") = vbNullString
+End Sub
+
+Public Function RowTest(ByVal r_test_proc_id As String) As Range
+' ------------------------------------------------------------------------------
+' Returns the entire row indicated by the test number. When the row cannot be
+' identified by its name it will be identified computed.
+' ------------------------------------------------------------------------------
+    Const PROC = "RowTest"
+    
+    On Error GoTo eh
+    Dim rng As Range
+    
+    With Me
+        For Each rng In Intersect(.Range("colTestProcId").EntireColumn, .UsedRange.EntireColumn).Cells
+            With rng
+                If .Value = r_test_proc_id Then
+                    Set RowTest = .EntireRow
+                    Exit Function
+                End If
+            End With
+        Next rng
+    End With
+    Err.Raise AppErr(1), ErrSrc(PROC), "There is no test row with the name '" & _
+                                       r_test_proc_id & "' in column 'colTestProcId'!"
+xt: Exit Function
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Function
+
 Private Sub Worksheet_Activate()
-    Dim Rng As Range
+    Dim rng As Range
     Application.ScreenUpdating = False
-    Set Rng = Selection
+    Set rng = Selection
     wsTest.Range("rngZoom").Select
     ActiveWindow.Zoom = True
-    Rng.Select
+    rng.Select
     Application.EnableEvents = True
 End Sub
 
