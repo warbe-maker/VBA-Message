@@ -312,6 +312,7 @@ Public Function Test_00_Evaluate()
             .Label.Text = "Test Title:"
             .Label.FontColor = rgbBlue
             .Text.Text = mMsgTest.TestProcName
+            .Text.MonoSpaced = False
         End With
         With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Test Description:"

@@ -638,6 +638,8 @@ Private Sub DsplyDPItoPT(Optional ByVal x_dpi As Single, _
     
     Dim hDC            As Variant
     Dim RetVal         As Long
+    Dim PixelsPerInchX As Long
+    Dim PixelsPerInchY As Long
  
     On Error Resume Next
     hDC = GetDC(0)
