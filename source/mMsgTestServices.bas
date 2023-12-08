@@ -42,23 +42,7 @@ Private Const DFLT_SECT_TEXT_PROP   As String = ">Lorem ipsum dolor sit amet, co
                                                 "esse cillum dolore eu fugiat nulla pariatur. Excepteur sint " & _
                                                 "occaecat cupidatat non proident, sunt in culpa qui officia " & _
                                                 "deserunt mollit anim id est laborum.<"
-Private Const DFLT_SECT_TEXT_MONO   As String = ">Lorem ipsum dolor sit amet, consectetur adipiscing elit, " & vbLf & _
-                                                "sed do eiusmod tempor incididunt ut labore et dolore magna " & vbLf & _
-                                                "aliqua." & vbLf & _
-                                                "Ut enim ad minim veniam, quis nostrud exercitation " & _
-                                                "ullamco laboris nisi ut aliquip ex ea commodo consequat." & vbLf & _
-                                                "Duis aute irure dolor in reprehenderit in voluptate velit " & _
-                                                "esse cillum dolore eu fugiat nulla pariatur." & vbLf & _
-                                                "Excepteur sint occaecat cupidatat non proident, sunt in culpa " & _
-                                                "qui officia deserunt mollit anim id est laborum.<"
-Private vButton4                As Variant
-Private vButton5                As Variant
 Private vButton6                As Variant
-Private sReadableTestProc       As String
-
-Private Property Get DefaultSectionTextMono() As String
-    DefaultSectionTextMono = Replace(DFLT_SECT_TEXT_PROP, ". ", "." & vbLf)
-End Property
 
 Private Property Get DefaultSectionTextProp() As String: DefaultSectionTextProp = DFLT_SECT_TEXT_PROP:  End Property
 
@@ -270,9 +254,6 @@ Public Function Test_10_Regression() As Variant
     Const PROC = "Test_10_Regression"
     
     On Error GoTo eh
-    Dim rng     As Range
-    Dim sTest   As String
-    Dim sMakro  As String
         
     ' Test initializations
     ThisWorkbook.Save
@@ -571,7 +552,6 @@ Public Function Test_12_mMsg_ErrMsg_AppErr_5() As Variant
 ' For the last testing variant the mErH component is installed!
 ' ------------------------------------------------------------------------------
     Const PROC = "Test_12_mMsg_ErrMsg_AppErr_5"
-    Const EXPECTED_TITLE = "Application Error  5 in: 'mMsgTestServices.Test_12_mMsg_ErrMsg_AppErr_5'"
     
     On Error GoTo eh
     
@@ -952,9 +932,6 @@ Public Function Test_20_mMsg_Dsply_ButtonsMatrix() As Variant
     On Error GoTo eh
     Dim bMonospaced         As Boolean: bMonospaced = True ' initial test value
     Dim i, j                As Long
-    Dim lChangeHeightPcntg  As Long
-    Dim lChangeWidthPcntg   As Long
-    Dim lChangeMinWidthPt   As Long
     Dim cll                 As New Collection
     
     mBasic.BoP ErrSrc(PROC)
@@ -1042,7 +1019,6 @@ Public Function Test_23_mMsg_Dsply_Buttons_Only() As Variant
     Const PROC = "Test_23_mMsg_Dsply_Buttons_Only"
     
     On Error GoTo eh
-    Dim i, j                As Long
     Dim bMonospaced         As Boolean:         bMonospaced = True ' initial test value
     
     mBasic.BoP ErrSrc(PROC)
@@ -1653,44 +1629,3 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
         Case Else:      GoTo xt
     End Select
 End Function
-
-Private Sub UnusedPublicItems()
-' ----------------------------------------------------------------
-' Please note:
-' - Providing the Workbook argument saves the Workbook selection
-'   dialog
-' - Providing the specification of the excluded VBComponents saves
-'   the selection dialog. If explicitly none are to be excluded
-'   a vbNullString need to be provided
-' - Providing excluded lines - those which are a kind of standard
-'   and for sure will not contain any call/use of a public item -
-'   may improve the overall performance
-' - The service displays the result by means of ShellRun. In case
-'   no application is linked with the file extention .txt a dialog
-'   to determain which application to use for the open will be
-'   displayed.
-'
-' W. Rauschenberger, Berlin Apr 2023
-' ----------------------------------------------------------------
-    Const COMPS_EXCLUDED As String = vbNullString ' Example: "mBasic,mDct,mErH,mObject,mTrc"
-    Const LINES_EXCLUDED As String = "Select Case*ErrMsg(ErrSrc(PROC))" & vbCrLf & _
-                                        "Case vbResume:*Stop:*Resume" & vbCrLf & _
-                                        "Case Else:*GoTo xt"
-    Const UNUSED_SERVICE As String = "VBPunusedPublic.xlsb!mUnused.Unused" ' must not be altered
-    
-    
-    '~~ Check if the servicing Workbook is open and terminate of not.
-    Dim wbk As Workbook
-    On Error Resume Next
-    Set wbk = Application.Workbooks("VBPunusedPublic.xlsb")
-    If Err.Number <> 0 Then
-        MsgBox Title:="The Workbook VBPunusedPublic.xlsb is not open!", Prompt:="The Workbook needs to be opened before this procedure is re-executed." & vbLf & vbLf & _
-                      "The Workbook may be downloaded from the link provided in the 'Immediate Window'. Use the download button on the displayed webpage."
-        Debug.Print "https://github.com/warbe-maker/Common-Excel-VBP-Unused-Public-Items-Service/blob/main/VBPunusedPublic.xlsb?raw=true"
-        Exit Sub
-    End If
-    
-    Application.Run UNUSED_SERVICE, , COMPS_EXCLUDED, LINES_EXCLUDED
-
-End Sub
-

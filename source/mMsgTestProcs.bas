@@ -306,9 +306,9 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
     Const PROC = "FormNew"
     
     On Error GoTo eh
-    Dim NewCommandButton1   As MSForms.CommandButton
-    Dim NewCommandButton2   As MSForms.CommandButton
-    Dim X                   As Long
+    Dim NewCommandButton1   As MsForms.CommandButton
+    Dim NewCommandButton2   As MsForms.CommandButton
+    Dim x                   As Long
     Dim cmp                 As VBComponent
     Dim LeftPos             As Single
     
@@ -360,7 +360,7 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
          
     '~~ Add code on the form for the CommandButtons
     With cmp.CodeModule
-        X = .CountOfLines
+        x = .CountOfLines
         .InsertLines .CountOfLines + 1, "Option Explict"
         .InsertLines .CountOfLines + 1, vbNullString
         .InsertLines .CountOfLines + 1, "Sub CommandButton1_Click()"
@@ -652,9 +652,9 @@ again:
             With .tbxTestAndResult
                 .MultiLine = True
                 .WordWrap = False
-                With .font
+                With .Font
                     .Name = "Courier New"
-                    .SIZE = 8
+                    .Size = 8
                 End With
                 .Top = 5
                 .AutoSize = True
@@ -737,9 +737,9 @@ again:
             With .tbxTestAndResult
                 .MultiLine = True
                 .WordWrap = False
-                With .font
+                With .Font
                     .Name = "Courier New"
-                    .SIZE = 8
+                    .Size = 8
                 End With
                 .Top = 5
                 .AutoSize = True
@@ -976,7 +976,6 @@ Public Function Test_Basic_02_4_Single_Section_MonoSpaced_With_VH_Scroll()
 ' is replaced by one for the message area.
 ' ------------------------------------------------------------------------------
     Const PROC = "Test_Basic_02_4_Single_Section_MonoSpaced_With_VH_Scroll"
-    Const LINES = 60
     
     On Error GoTo eh
     

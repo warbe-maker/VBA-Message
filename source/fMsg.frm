@@ -49,10 +49,6 @@ Option Explicit
 ' W. Rauschenberger Berlin, Oct 2023
 ' --------------------------------------------------------------------------
 Private Const DFLT_BTTN_MIN_WIDTH           As Single = 70              ' Default minimum reply button width
-Private Const DFLT_LBL_MONOSPACED_FONT_NAME As String = "Courier New"   ' Default monospaced Font name
-Private Const DFLT_LBL_MONOSPACED_FONT_SIZE As Single = 9               ' Default monospaced Font size
-Private Const DFLT_LBL_PROPSPACED_FONT_NAME As String = "Calibri"       ' Default proportional spaced Font name
-Private Const DFLT_LBL_PROPSPACED_FONT_SIZE As Single = 9               ' Default proportional spaced Font size
 Private Const DFLT_TXT_MONOSPACED_FONT_NAME As String = "Courier New"   ' Default monospaced Font name
 Private Const DFLT_TXT_MONOSPACED_FONT_SIZE As Single = 10              ' Default monospaced Font size
 Private Const DFLT_TXT_PROPSPACED_FONT_NAME As String = "Tahoma"        ' Default proportional spaced Font name
@@ -66,7 +62,6 @@ Private Const VISUALIZE_CLR_MON_STEPS_FRM   As Long = &HFFFFC0          '       
 Private Const VISUALIZE_CLR_MSEC_FRM        As Long = &HFFFFC0          '              of controls
 Private Const VISUALIZE_CLR_MSEC_LBL        As Long = rgbLightYellow    ' light yellow during
 Private Const VISUALIZE_CLR_MSEC_TEXT_FRM   As Long = rgbLightGreen     ' light green  test (only!)
-Private Const VISUALIZE_CLR_BTTNS_FRM       As Long = &H80C0FF          ' light green  test (only!)
 Private Const VISUALIZE_CLR_BTTNS_ROW_FRM   As Long = &HC0FFFF          ' light yellow test (only!)
 Private Const TEMP_TBX_NAME                 As String = "tbxTemp"
 Private Const SCROLL_VER_THRESHOLD          As Single = 5
@@ -142,7 +137,6 @@ Private AppliedBttns                        As Dictionary       ' Dictionary of 
 Private AppliedBttnsRetVal                  As Dictionary       ' Dictionary of the applied buttons' reply value (key=CommandButton)
 Private bButtonsSetup                       As Boolean
 Private bFormEvents                         As Boolean
-Private bIndicateFrameCaptions              As Boolean
 Private bModeLess                           As Boolean
 Private bMonitorInitialized                 As Boolean
 Private bReplyWithIndex                     As Boolean
@@ -178,11 +172,8 @@ Private dctVisualizedForTest                As New Dictionary
 Private frmBarea                            As MsForms.Frame    ' The buttons area frame
 Private frmBttnsFrm                         As MsForms.Frame    ' Set with CollectDesignControls
 Private frmMarea                            As MsForms.Frame    ' The message area frame
-Private frmMsect                            As MsForms.Frame    ' A message section's fram
-Private frmMsectText                        As MsForms.Frame    ' A message section's TextBox frame
 Private frmSteps                            As MsForms.Frame
 Private lBackColor                          As Long
-Private lblMsectText                        As MsForms.Label    ' Set with MsectItems for a certain section
 Private lLabelAllPos                        As enLabelPos       ' "global" Label position
 Private lMaxNoOfMsgSects                    As Long             ' Set with CollectDesignControls (number of message sections designed)
 Private lMonitorStepsDisplayed              As Long
@@ -557,40 +548,6 @@ Private Property Let MsectTextFrmWidth(Optional ByVal w_sect As Long, _
     
 End Property
 
-Private Property Let MsectTextFrmWidthOnlyText(ByVal si As Single)
-' ------------------------------------------------------------------------------
-' A section's text frame width - in this case the width of the text with a left
-' positioned label - may expand only with the setup of a monospaced section.
-' In case it does, related widths are adjusted correspondingly.
-' ------------------------------------------------------------------------------
-    Dim siWidth As Single
-    If WidthExpanded(si, siMsectTextFrmWidthOnlyTextMin, siMsectTextFrmWidthOnlyTextMax, siMsectTextFrmWidthOnlyText, siWidth) Then
-        siMsectTextFrmWidthOnlyText = siWidth
-        '~~ A new expanded width, which may only have been caused by a monospaced section setup -
-        '~~ will expand all subsequent frames
-        siMsectFrmWidth = siMsectTextFrmWidthOnlyText + MsectFrmMarginLeft + MsectFrmMarginRight
-        siAreasFrmWidth = siMsectFrmWidth + AreasFrmMarginLeft + AreasFrmMarginRight
-        FormWidthInside = siAreasFrmWidth + FormMarginLeft + FormMarginRight
-    End If
-    
-End Property
-
-Private Property Let MsectTextFrmWidthWithLposLbl(ByVal m_si As Single)
-' ------------------------------------------------------------------------------
-' A section's text frame width - in this case the width of the text with a left
-' positioned label - may expand only with the setup of a monospaced section.
-' In case it does, related widths are adjusted correspondingly.
-' ------------------------------------------------------------------------------
-    Dim si As Single
-    If WidthExpanded(m_si, siMsectTextFrmWidthWithLposLblMin, siMsectTextFrmWidthWithLposLblMax, siMsectTextFrmWidthWithLposLbl, si) Then
-        siMsectTextFrmWidthWithLposLbl = si
-        siMsectFrmWidth = si + siMsectLabelWidthAll + MsectLabelTextMargin + MsectFrmMarginLeft + MsectFrmMarginRight
-        siMsectTextFrmWidthOnlyText = siMsectFrmWidth - MsectFrmMarginLeft - MsectFrmMarginRight
-        siAreasFrmWidth = siMsectFrmWidth + AreasFrmMarginLeft + AreasFrmMarginRight
-        FormWidthInside = siAreasFrmWidth + FormMarginLeft + FormMarginRight
-    End If
-End Property
-
 Private Property Get MsectTextMarginRight() As Single:              MsectTextMarginRight = 4:                                               End Property
 
 Private Property Get MSFormsCtlType(ByVal msf_enum As MSFormControls) As String
@@ -894,41 +851,6 @@ Private Function AddCursor(CursorType As CursorTypes)
     End If
 End Function
 
-Private Sub AdjustedParentsWidthAndHeight(ByVal ctrl As MsForms.Control)
-' ------------------------------------------------------------------------------
-' Adjust the width and height of all parent frames starting with the parent of
-' the provided control (ctrl) by considering the control's width and height and
-' a possibly already applied vertical and/or horizontal scroll-bar.
-' ------------------------------------------------------------------------------
-    Dim FrmParent   As Variant
-    
-    On Error Resume Next
-    Set FrmParent = ctrl.Parent
-    If Err.Number <> 0 Then
-        On Error GoTo eh
-        GoTo xt
-    End If
-    
-    Do
-        If IsForm(FrmParent) Then
-            If Not ScrollVerApplied(FrmParent) Then
-                FrmParent.Width = ContentWidth(FrmParent) + 5
-                FrmParent.Height = ctrl.Top + ContentHeight(FrmParent) + 30
-            End If
-        ElseIf IsFrameOrForm(FrmParent) Then
-            If Not ScrollVerApplied(FrmParent) Then
-                FrmParent.Width = ContentWidth(FrmParent)
-                FrmParent.Height = ContentHeight(FrmParent)
-            End If
-        End If
-        If IsForm(FrmParent) Then Exit Do
-        Set FrmParent = FrmParent.Parent
-    Loop
-                
-xt: Exit Sub
-eh:
-End Sub
-
 Private Function AdjustToVgrid(ByVal atvg_si As Single, _
                       Optional ByVal atvg_threshold As Single = 1.5, _
                       Optional ByVal atvg_grid As Single = 4) As Single
@@ -1130,8 +1052,7 @@ End Sub
 
 Private Sub AutoSizeApplyTextProperties(ByVal a_sect As Long, _
                                         ByRef a_lbl As MsForms.Label, _
-                                        ByRef a_text As String, _
-                                        ByVal a_monospaced As Boolean)
+                                        ByRef a_text As String)
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
@@ -1192,8 +1113,7 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Sub AutoSizeLabelViaTextBox(ByVal a_sect As Long, _
-                                    ByRef a_lbl As MsForms.Label, _
+Private Sub AutoSizeLabelViaTextBox(ByRef a_lbl As MsForms.Label, _
                                     ByVal a_text As String, _
                                     ByVal a_width_limit As Single, _
                            Optional ByVal a_align As Long = fmTextAlignLeft)
@@ -1347,12 +1267,6 @@ xt: Exit Function
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
 
-Private Sub BareaFrmAdjust()
-    BttnsFrmAdjust
-    BareaFrm.Width = ContentWidth(BareaFrm)
-    BareaFrm.Height = ContentHeight(BareaFrm)
-End Sub
-
 Private Sub BareaFrmCenter()
     Dim si As Single
     
@@ -1416,11 +1330,6 @@ xt: Exit Function
     
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Function
-
-Private Sub BttnsFrmAdjust()
-    BttnsFrm.Width = ContentWidth(BttnsFrm)
-    BttnsFrm.Height = ContentHeight(BttnsFrm)
-End Sub
 
 Private Function BttnsFrmExists(ByRef b_frm As MsForms.Frame) As Boolean
     If Not frmBttnsFrm Is Nothing Then
@@ -1945,7 +1854,7 @@ Private Function ErrSrc(ByVal sProc As String) As String
     ErrSrc = "fMsg." & sProc
 End Function
 
-Private Sub FinalizeHeights(ByRef f_finalized As Boolean)
+Private Sub FinalizeHeights()
 ' ------------------------------------------------------------------------------
 ' 1. Finalize heights and top positions.
 ' 2. When the resulting height exceeds the default or specified height,
@@ -1956,25 +1865,17 @@ Private Sub FinalizeHeights(ByRef f_finalized As Boolean)
     Const PROC = "FinalizeHeights"
     
     On Error GoTo eh
-    Dim v   As Variant
-    Dim si  As Single
     
-    FinalizeHeightsAndTopPositions f_finalized
-    If Not f_finalized Then
-        '~~ When the message form's height exceeds the specified maximum height
-        With Me
-            If .InsideHeight > FormHeightInsideMax - SCROLL_VER_THRESHOLD Then
-                '~~ Provide a vertical scroll-bar for the dominating frame (message section text frame,
-                '~~ message area, buttons area or message area and buttons area proportionally
-                ScrollVerForHeightExceedingFrames exceeding_height:=.InsideHeight - FormHeightInsideMax _
-                                                , s_finalized:=f_finalized
-                If Not f_finalized Then
-'                    FinalizeHeightsAndTopPositions f_finalized
-                End If
-            End If
-        End With ' height exceeds specified maximum
-    End If
-    FinalizeHeightsAndTopPositions f_finalized
+    FinalizeHeightsAndTopPositions
+    '~~ When the message form's height exceeds the specified maximum height
+    With Me
+        If .InsideHeight > FormHeightInsideMax - SCROLL_VER_THRESHOLD Then
+            '~~ Provide a vertical scroll-bar for the dominating frame (message section text frame,
+            '~~ message area, buttons area or message area and buttons area proportionally
+            ScrollVerForHeightExceedingFrames exceeding_height:=.InsideHeight - FormHeightInsideMax
+        End If
+    End With ' height exceeds specified maximum
+    FinalizeHeightsAndTopPositions
     FormHeightAdjust
     
 xt: Exit Sub
@@ -1982,7 +1883,7 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Sub FinalizeHeightsAndTopPositions(ByRef f_finalized As Boolean)
+Private Sub FinalizeHeightsAndTopPositions()
 ' ------------------------------------------------------------------------------
 ' Reduce the height of the message area - or a message section if one is
 ' dominating - and or the height of the buttons area in order to have the
@@ -1998,12 +1899,7 @@ Private Sub FinalizeHeightsAndTopPositions(ByRef f_finalized As Boolean)
     
     On Error GoTo eh
     Dim v           As Variant
-    Dim frmSect     As MsForms.Frame
-    Dim frmText     As MsForms.Frame
     Dim frmMarea    As MsForms.Frame
-    Dim frmBarea    As MsForms.Frame
-    Dim lblText     As MsForms.Label
-    Dim lblLabel    As MsForms.Label
     Dim si          As Single
     Dim siTopNext   As Single:          siTopNext = FormMarginTop
     
@@ -2041,7 +1937,6 @@ End Sub
 Private Sub FinalizeWidthFrame(ByVal f_frm As MsForms.Frame, _
                                ByVal f_margin_left As Single, _
                                ByVal f_margin_right As Single, _
-                               ByRef f_finalized As Boolean, _
                                ByVal f_max_width As Single, _
                       Optional ByVal f_x_action As fmScrollAction = fmScrollActionNoChange)
 ' ------------------------------------------------------------------------------
@@ -2054,7 +1949,6 @@ Private Sub FinalizeWidthFrame(ByVal f_frm As MsForms.Frame, _
     Const PROC = "FinalizeWidthFrame"
     
     On Error GoTo eh
-    Dim si                  As Single
     Dim siWidthContent      As Single ' the frame's content width not considering any left/right margin
     Dim siWidthContMax      As Single ' the maximum content which fits into the frame without a horizontal scroll-bar
     Dim bAppliedOrChanged   As Boolean
@@ -2062,7 +1956,6 @@ Private Sub FinalizeWidthFrame(ByVal f_frm As MsForms.Frame, _
     siWidthContMax = f_max_width - f_margin_left - f_margin_right
     siWidthContent = ContentWidth(f_frm)
     With f_frm
-        Debug.Print .Name
         If siWidthContent > siWidthContMax + SCROLL_HOR_THRESHOLD Then
             '~~ In cas a horizontal scroll-bar is already applied
             '~~ only the scroll-width is adjusted to the content width
@@ -2071,9 +1964,6 @@ Private Sub FinalizeWidthFrame(ByVal f_frm As MsForms.Frame, _
                          , s_content_width:=siWidthContent + f_margin_left + f_margin_right _
                          , s_x_action:=f_x_action _
                          , s_applied_or_changed:=bAppliedOrChanged
-            If bAppliedOrChanged Then
-                f_finalized = False
-            End If
         End If
     End With
 
@@ -2082,24 +1972,7 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Sub FinalizeWidthLabel(ByVal f_lbl As MsForms.Label, _
-                               ByVal f_width As Single, _
-                               ByVal f_margin_left As Single, _
-                               ByVal f_margin_right As Single, _
-                               ByVal f_finalized As Boolean)
-    With f_lbl
-        .Left = f_margin_left
-        If .Width < f_width - 5 Then
-            .TextAlign = fmTextAlignLeft
-            .Font.Size = .Font.Size
-            DoEvents
-        End If
-    End With
-    DoEvents
-
-End Sub
-
-Private Sub FinalizeWidths(ByRef f_finalized As Boolean)
+Private Sub FinalizeWidths()
 ' ------------------------------------------------------------------------------
 ' Adjusts all visible frame control's width considering their content width and
 ' providing a horizontal scroll-bar for those which exceed the maximum width.
@@ -2107,11 +1980,8 @@ Private Sub FinalizeWidths(ByRef f_finalized As Boolean)
     Const PROC = "FinalizeWidths"
     
     On Error GoTo eh
-    Dim frmBarea    As MsForms.Frame
     Dim frmMarea    As MsForms.Frame
-    Dim frmSect     As MsForms.Frame
     Dim frmText     As MsForms.Frame
-    Dim lblText     As MsForms.Label
     Dim si          As Single
     Dim v           As Variant
     
@@ -2125,7 +1995,6 @@ Private Sub FinalizeWidths(ByRef f_finalized As Boolean)
                 FinalizeWidthFrame f_frm:=frmText _
                                  , f_margin_left:=MsectTextFrmMarginLeft _
                                  , f_margin_right:=MsectTextFrmMarginRight _
-                                 , f_finalized:=f_finalized _
                                  , f_max_width:=MsectTextFrmWidthMax(v)
             End If
         Next v
@@ -2135,7 +2004,6 @@ Private Sub FinalizeWidths(ByRef f_finalized As Boolean)
         FinalizeWidthFrame f_frm:=BareaFrm _
                          , f_margin_left:=AreasFrmMarginLeft _
                          , f_margin_right:=AreasFrmMarginRight _
-                         , f_finalized:=f_finalized _
                          , f_x_action:=fmScrollActionBegin _
                          , f_max_width:=siAreasFrmWidthMax
         
@@ -2159,10 +2027,6 @@ Private Function FormBottomSpace() As Single:           FormBottomSpace = 32:   
 Private Sub FormHeightAdjust()
     Me.Height = FormMarginTop + ContentHeight(Me) + FormMarginBottom + (Me.Height - Me.InsideHeight)
 End Sub
-
-Private Function FormWidthFinal() As Single
-    FormWidthFinal = ContentWidth(Me) + FormWidthDiffOutIn + FormMarginLeft + FormMarginRight
-End Function
 
 Private Function FormWidthInsideMonospaced(ByVal m_sect As Long, _
                                            ByVal m_si As Single) As Single
@@ -2373,13 +2237,6 @@ Private Function IsCursorType(CursorType As CursorTypes) As Boolean
     IsCursorType = (Cursor.hCursor = CursorHandle)
 End Function
 
-Private Function IsForm(ByVal v As Object) As Boolean
-    Dim o As Object
-    On Error Resume Next
-    Set o = v.Parent
-    IsForm = Err.Number <> 0
-End Function
-
 Private Function IsFrameOrForm(ByVal v As Object) As Boolean
     IsFrameOrForm = TypeOf v Is MsForms.UserForm Or TypeOf v Is MsForms.Frame
 End Function
@@ -2495,18 +2352,6 @@ Private Function MareaFrmExists(ByRef m_frm As MsForms.Frame) As Boolean
     If Not frmMarea Is Nothing Then
         Set m_frm = frmMarea
         MareaFrmExists = True
-    End If
-End Function
-
-Private Function MareaFrmIsActive(Optional ByRef m_frm As MsForms.Frame) As Boolean
-' ------------------------------------------------------------------------------
-'
-' ------------------------------------------------------------------------------
-    If MareaFrmExists(m_frm) Then
-        If m_frm.Visible Then
-            Set m_frm = frmMarea
-            MareaFrmIsActive = True
-        End If
     End If
 End Function
 
@@ -3031,17 +2876,6 @@ Private Function MsectFrmTop(ByVal m_sect As Long) As Single
     
 End Function
 
-Private Function MsectFrmWidthFinal() As Single
-    Dim v   As Variant
-    Dim si  As Single
-    
-    For Each v In MsectsActive
-        si = Max(si, MsectFrm(v).Width)
-    Next v
-    MsectFrmWidthFinal = si + 4
-    
-End Function
-
 Private Function MsectFrmWidthLabel(ByVal m_sect As Long) As Single
     
     If MsectTxtWithLftPosLbl(m_sect) _
@@ -3344,17 +3178,6 @@ Private Function MsectTextFrmExists(ByVal m_sect As Long, _
                                 
 End Function
 
-Private Function MsectTextFrmHeight(ByVal m_sect As Long)
-    Dim frm As MsForms.Frame
-    
-    Set frm = MsectTextFrm(m_sect)
-    If Not ScrollVerApplied(frm) Then
-        MsectTextFrmHeight = ContentHeight(frm) + ScrollHorHeight(frm)
-    Else
-        MsectTextFrmHeight = frm.Height
-    End If
-End Function
-
 Private Function MsectTextFrmIsActive(ByVal m_sect As Long, _
                              Optional ByRef m_sect_frm As MsForms.Frame, _
                              Optional ByRef m_text_frm As MsForms.Frame) As Boolean
@@ -3438,14 +3261,6 @@ Private Function MsectTextLblExists(ByVal m_sect As Long, _
     End If
                                 
 End Function
-
-'Private Function MsectTextMonospaced(ByVal m_sect) As String:   MsectTextMonospaced = Msg.Section(m_sect).Text.MonoSpaced:   End Function
-
-Private Function MsectTextSetupDone(ByVal m_sect As Long) As Boolean
-    MsectTextSetupDone = dctSectTextSetup.Exists(m_sect)
-End Function
-
-'Private Function MsectTextText(ByVal m_sect) As String:         MsectTextText = MsgText(enSectText, m_sect).Text:               End Function
 
 Private Function MsectTextWidthLimit(ByVal m_sect As Long) As Single
 ' ------------------------------------------------------------------------------
@@ -3588,14 +3403,6 @@ xt: Exit Sub
 
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
-
-Private Function PrcntgHeightBareaFrm() As Single
-    PrcntgHeightBareaFrm = Round(BareaFrm.Height / (MareaFrm.Height + BareaFrm.Height), 2)
-End Function
-
-Private Function PrcntgHeightMareaFrm() As Single
-    PrcntgHeightMareaFrm = Round(MareaFrm.Height / (MareaFrm.Height + BareaFrm.Height), 2)
-End Function
 
 Private Function Qdequeue(ByRef qu As Collection) As Variant
     Const PROC = "DeQueue"
@@ -3778,8 +3585,7 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Sub ScrollVerForHeightExceedingFrames(ByVal exceeding_height As Single, _
-                                              ByRef s_finalized As Boolean)
+Private Sub ScrollVerForHeightExceedingFrames(ByVal exceeding_height As Single)
 ' ------------------------------------------------------------------------------
 ' Either because the message area occupies 60% or more of the total height or
 ' because both, the message area and the buttons area us about the same height,
@@ -3791,7 +3597,6 @@ Private Sub ScrollVerForHeightExceedingFrames(ByVal exceeding_height As Single, 
     On Error GoTo eh
     Dim bScrollApplied      As Boolean
     Dim frm                 As MsForms.Frame
-    Dim i                   As Long
     Dim siExceedingHeight   As Single
     Dim siPercentageBarea   As Single
     Dim siPercentageMarea   As Single
@@ -3804,7 +3609,6 @@ Private Sub ScrollVerForHeightExceedingFrames(ByVal exceeding_height As Single, 
             If Not ScrollVerApplied(frm) Then
                 NewHeight n_height:=frm.Height - siExceedingHeight _
                         , n_frame:=frm
-                s_finalized = False
                 bScrollApplied = True
             End If
             GoTo xt
@@ -3819,7 +3623,6 @@ Private Sub ScrollVerForHeightExceedingFrames(ByVal exceeding_height As Single, 
             If Not ScrollVerApplied(frm) Then
                 NewHeight n_height:=frm.Height - exceeding_height _
                         , n_frame:=frm
-                s_finalized = False
                 bScrollApplied = True
             End If
             GoTo xt
@@ -3827,18 +3630,15 @@ Private Sub ScrollVerForHeightExceedingFrames(ByVal exceeding_height As Single, 
             '~~ Neither a message section, the messsage area as a whole, nor the buttons area has
             '~~ a dominating height. Thus the message area and the buttons area's height is
             '~~ reduced proportionally and both get a vertical scroll-bar
-            s_finalized = False
             siPercentageMarea = frmMarea.Height / (Me.InsideHeight / 100)
             siPercentageBarea = frmBarea.Height / (Me.InsideHeight / 100)
             If Not ScrollVerApplied(frmMarea) Then
                 NewHeight n_height:=ContentHeight(frmMarea) - (exceeding_height * (siPercentageMarea / 100)) _
                         , n_frame:=frmMarea
-                s_finalized = False
             End If
             If Not ScrollVerApplied(frmBarea) Then
                 NewHeight n_height:=ContentHeight(frmBarea) - (exceeding_height * (siPercentageBarea / 100)) _
                         , n_frame:=frmBarea
-                s_finalized = False
             End If
         End If
     End If
@@ -4017,17 +3817,14 @@ Const PROC = "Setup04MonoSpacedSection"
     Dim sText   As String
     Dim lbl     As MsForms.Label:   Set lbl = MsectTextLbl(s_sect)
     
-    AutoSizeApplyTextProperties s_sect, lbl, sText, a_monospaced:=True
+    AutoSizeApplyTextProperties s_sect, lbl, sText
     
     tbxTemp.Left = 0
-    AutoSizeLabelViaTextBox a_sect:=s_sect _
-                          , a_lbl:=lbl _
+    AutoSizeLabelViaTextBox a_lbl:=lbl _
                           , a_text:=sText _
                           , a_width_limit:=0
                           
     FormWidthInside(s_sect) = FormWidthInsideMonospaced(s_sect, lbl.Width)
-    WidthsDebug s_sect, " " & PROC & " after setup monospaced section " & s_sect & " "
-                  
     dctSectTextSetup.Add s_sect, vbNullString
     TempTbx lbl, t_remove:=True
     
@@ -4048,7 +3845,6 @@ Private Sub Setup05Buttons()
     Dim frmBarea    As MsForms.Frame
     Dim frmBttnRow  As MsForms.Frame
     Dim frmBttns    As MsForms.Frame
-    Dim siWidth     As Single
     Dim v           As Variant
     
     If cllMsgBttns.Count = 0 Then GoTo xt
@@ -4181,7 +3977,6 @@ Private Sub Setup05ButtonsSizeAndPosition2ButtonRows()
     Dim v               As Variant
     Dim lButtons        As Long
     Dim siHeight        As Single
-    Dim WidthBttnsFrm   As Single
     Dim dct             As Dictionary:      Set dct = AppliedBttnRows
     
     '~~ Adjust button row's width and height
@@ -4359,7 +4154,6 @@ Private Sub Setup11PropSpacedSections()
     
     On Error GoTo eh
     Dim v   As Variant
-    Dim frm As MsForms.Frame
     
     For Each v In MsectsActive
         With Msg.Section(v).Text
@@ -4386,14 +4180,12 @@ Private Sub Setup12PropSpacedSection(ByVal s_sect As Long)
     Dim sText   As String:          sText = Msg.Section(s_sect).Text.Text
     Dim frmText As MsForms.Frame:   Set frmText = MsectTextFrm(s_sect)
     
-    AutoSizeApplyTextProperties s_sect, lblText, sText, a_monospaced:=False
+    AutoSizeApplyTextProperties s_sect, lblText, sText
     tbxTemp.Left = 0
-    AutoSizeLabelViaTextBox a_sect:=s_sect _
-                          , a_lbl:=lblText _
+    AutoSizeLabelViaTextBox a_lbl:=lblText _
                           , a_text:=sText _
                           , a_width_limit:=MsectTextWidthLimit(s_sect)
                 
-    WidthsDebug s_sect, " setup prop-speced section done "
     dctSectTextSetup.Add s_sect, vbNullString
     TempTbx lblText, t_remove:=True
     
@@ -4432,8 +4224,6 @@ Private Sub Setup14Label(ByVal s_sect As Long)
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC = "Setup14Label"
-    
     Dim lbl     As MsForms.Label
     Dim sText   As String
     
@@ -4443,7 +4233,7 @@ Private Sub Setup14Label(ByVal s_sect As Long)
                                    , a_lbl:=lbl _
                                    , a_text:=sText
         tbxTemp.Left = MsectFrmMarginLeft
-        AutoSizeLabelViaTextBox s_sect, lbl, sText, MsectFrmWidthLabelLimit(s_sect)
+        AutoSizeLabelViaTextBox lbl, sText, MsectFrmWidthLabelLimit(s_sect)
         dctSectLabelSetup.Add s_sect, vbNullString
         With lbl
             .Left = MsectFrmMarginLeft
@@ -4457,7 +4247,6 @@ Private Sub Setup14Label(ByVal s_sect As Long)
         End With
         DoEvents
     End If
-    WidthsDebug s_sect, " " & PROC & " done for section " & s_sect & " "
     
 End Sub
 
@@ -4468,12 +4257,10 @@ Private Sub Setup20Finalize()
     Const PROC = "Setup20Finalize"
     
     On Error GoTo eh
-    Dim bDoneHeights    As Boolean
-    Dim bDoneWidths     As Boolean
     
-    FinalizeWidths bDoneWidths
-    FinalizeHeights bDoneHeights
-    FinalizeWidths bDoneWidths
+    FinalizeWidths
+    FinalizeHeights
+    FinalizeWidths
         
 xt: Exit Sub
     
@@ -4697,15 +4484,10 @@ Function WidthExpanded(ByVal w_this As Single, _
     w_new = Max(w_new, w_min) ' possible expands
     If w_new > w_now Then
         WidthExpanded = True
-        Debug.Print "Width expanded from " & w_now & " to " & w_new
-        If w_new = w_max Then
-            Debug.Print " ... and has reached its max of " & w_max
-        End If
     End If
 End Function
 
-Public Sub WidthsDebug(Optional ByVal m_sect As Long = 0, _
-                  Optional ByVal m_phase As String = vbNullString)
+Public Sub WidthsDebug(Optional ByVal m_phase As String = vbNullString)
 ' ------------------------------------------------------------------------------
 ' For test and debugging only!
 ' ------------------------------------------------------------------------------

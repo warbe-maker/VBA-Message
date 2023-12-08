@@ -68,8 +68,7 @@ Public Property Let CurrentDescription(ByVal s As String):  sCurrentDescription 
 
 
 Private Property Get LabelPosSpec(Optional ByRef l_pos As enLabelPos, _
-                                  Optional ByRef l_lbl_width As Single, _
-                                  Optional ByVal l_test_no As Long) As String
+                                  Optional ByRef l_lbl_width As Single) As String
     Dim s As String
     s = wsTest.MsgLabelPosSpec
     LabelPosSpec = s
@@ -85,7 +84,6 @@ End Property
 
 Private Property Let LabelPosSpec(Optional ByRef l_pos As enLabelPos, _
                                   Optional ByRef l_lbl_width As Single, _
-                                  Optional ByVal l_test_no As Long, _
                                            ByVal l_spec As String)
     wsTest.MsgLabelPosSpec = l_spec
 End Property
@@ -511,9 +509,6 @@ Public Sub Evaluate(Optional ByVal e_selftest As Boolean = False)
     Const PROC = "Evaluate"
     
     On Error GoTo eh
-    Static s    As String
-    Dim cll     As Collection
-    Dim dct     As New Dictionary
     Dim ufm     As fMsg
     Dim Msg     As mMsg.udtMsg
     Dim i       As Long
