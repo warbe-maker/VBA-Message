@@ -17,15 +17,15 @@ Option Explicit
 Const SCROLL_V_WIDTH            As Single = 18              ' Additional horizontal space required for a frame with a vertical scrollbar
 Const SCROLL_H_HEIGHT           As Single = 18              ' Additional vertical space required for a frame with a horizontal scroll barr
 
-Private TextMonitorHeader       As TypeMsgText
-Private TextMonitorFooter       As TypeMsgText
-Private TextMonitorStep         As TypeMsgText
+Private TextMonitorHeader       As udtMsgText
+Private TextMonitorFooter       As udtMsgText
+Private TextMonitorStep         As udtMsgText
 Private dctSectText             As New Dictionary
 
 Public Property Get Text(Optional ByVal txt_kind_of_text As KindOfText, _
-                         Optional ByVal txt_section As Long = 1) As TypeMsgText
+                         Optional ByVal txt_section As Long = 1) As udtMsgText
 ' ------------------------------------------------------------------------------
-' Returns the text (txt_kind_of_text) as section-text or -label, monitor-header,
+' Returns the text (txt_kind_of_text) as section-text or -Label, monitor-header,
 ' -footer, or -step.
 ' ------------------------------------------------------------------------------
     Dim vArry() As Variant
@@ -54,14 +54,14 @@ End Property
 
 Public Property Let Text(Optional ByVal txt_kind_of_text As KindOfText, _
                          Optional ByVal txt_section As Long = 1, _
-                                  ByRef txt_text As TypeMsgText)
+                                  ByRef txt_text As udtMsgText)
 ' ------------------------------------------------------------------------------
-' Provide the text (txt_text) as section (txt_section) text, section label,
+' Provide the text (txt_text) as section (txt_section) text, section Label,
 ' monitor header, footer, or step (txt_kind_of_text).
 ' ------------------------------------------------------------------------------
     Dim vArry(0 To 7)   As Variant
     
-'    Dim t As TypeMsgText
+'    Dim t As udtMsgText
 '    t.FontBold = txt_text.FontBold
 '    t.FontColor = txt_text.FontColor
 '    t.FontItalic = txt_text.FontItalic
@@ -604,12 +604,12 @@ Public Sub Setup01Title(ByVal setup_title As String, _
     
     With Me
         .Width = setup_width_min
-        '~~ The extra title label is only used to adjust the form width and remains hidden
+        '~~ The extra title Label is only used to adjust the form width and remains hidden
         With .laMsgTitle
-            With .Font
+            With .font
                 .Bold = False
-                .Name = Me.Font.Name
-                .Size = 8    ' Value which comes to a length close to the length required
+                .Name = Me.font.Name
+                .SIZE = 8    ' Value which comes to a length close to the length required
             End With
             .Visible = True
             .Caption = vbNullString

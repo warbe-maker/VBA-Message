@@ -1,11 +1,27 @@
 Attribute VB_Name = "mMsgTestProcs"
 Option Explicit
-
 ' ------------------------------------------------------------------------------
-' Standard Module mProcTest
-'          Test of procedures - rather than fMsg/mMsg services/functions.
+' Standard Module mMsgTestProcs: Test of basic procedures.
+' ==============================
 '
 ' ------------------------------------------------------------------------------
+Private Const DFLT_SECT_TEXT_PROP   As String = ">Lorem ipsum dolor sit amet, consectetur adipiscing elit, " & _
+                                                "sed do eiusmod tempor incididunt ut labore et dolore magna " & _
+                                                "aliqua. Ut enim ad minim veniam, quis nostrud exercitation " & _
+                                                "ullamco laboris nisi ut aliquip ex ea commodo consequat. " & _
+                                                "Duis aute irure dolor in reprehenderit in voluptate velit " & _
+                                                "esse cillum dolore eu fugiat nulla pariatur. Excepteur sint " & _
+                                                "occaecat cupidatat non proident, sunt in culpa qui officia " & _
+                                                "deserunt mollit anim id est laborum.<"
+Private Const DFLT_SECT_TEXT_MONO   As String = ">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed " & _
+                                                "do eiusmod tempor incididunt ut labore et dolore magna aliqua." & vbLf & _
+                                                "Ut enim ad minim veniam, quis nostrud exercitation " & _
+                                                "ullamco laboris nisi ut aliquip ex ea commodo consequat." & vbLf & _
+                                                "Duis aute irure dolor in reprehenderit in voluptate velit " & _
+                                                "esse cillum dolore eu fugiat nulla pariatur." & vbLf & _
+                                                "Excepteur sint occaecat cupidatat non proident, sunt in culpa " & _
+                                                "qui officia deserunt mollit anim id est laborum.<"
+
 Private Property Get ErrSrc(Optional ByVal s As String) As String:  ErrSrc = "mMsgTestServices." & s:  End Property
 
 Private Function AdjustToVgrid(ByVal atvg_si As Single, _
@@ -18,7 +34,7 @@ Private Function AdjustToVgrid(ByVal atvg_si As Single, _
 ' The function is used to vertically align form controls with the grid in order
 ' result vertically aligns a control in a userform to a grid value which ensures
 ' to have any text within the control correctly displayed in accordance with its
-' font size. A certain threshold prevents an optically irritating large space to
+' Font size. A certain threshold prevents an optically irritating large space to
 ' a control abovel. Examples:
 '  7.5 < si >= 0   results to 6
 ' 13.5 < si >= 7.5 results in 12
@@ -451,6 +467,16 @@ Private Function QisEmpty(ByVal qu As Collection) As Boolean
     Else QisEmpty = True
 End Function
 
+Private Function RepeatStrng(ByVal rs_s As String, _
+                             ByVal rs_n As Long) As String
+' ----------------------------------------------------------------------------
+' Returns the string (s) concatenated (n) times. VBA.String in not appropriate
+' because it does not support leading and trailing spaces.
+' ----------------------------------------------------------------------------
+    Dim i   As Long
+    For i = 1 To rs_n: RepeatStrng = RepeatStrng & rs_s:  Next i
+End Function
+
 Private Function StckIsEmpty(ByVal stck As Collection) As Boolean
 ' ----------------------------------------------------------------------------
 ' Common Stack Empty check service. Returns True when either there is no stack
@@ -569,17 +595,13 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Sub Test_Regression()
-    Test_AdjustToVgrid
-End Sub
-
-Private Sub Test_AdjustToVgrid()
+Public Sub Test_Basic_01_1_AdjustToVgrid()
     Debug.Assert AdjustToVgrid(7.4) = 6
     Debug.Assert AdjustToVgrid(7.5) = 12
 End Sub
 
-Private Sub Test_AutoSizeTextBox_Width_Limited()
-    Const PROC = "Test_AutoSizeTextBox_Width_Limited"
+Public Sub Test_Basic_01_2_AutoSizeTextBox_Width_Limited()
+    Const PROC = "Test_Basic_01_2_AutoSizeTextBox_Width_Limited"
     
     Dim i                   As Long
     Dim iFrom               As Long
@@ -620,7 +642,7 @@ again:
             .AutoSizeTextBox as_tbx:=.tbx _
                            , as_width_limit:=TestWidthLimit _
                            , as_height_min:=TestHeightMin _
-                           , as_text:="For this test the width is limited to " & mMsg.ValueAsPercentage(wsTest.MsgWidthMax, mMsg.enDsplyDimensionWidth) & ". " & _
+                           , as_text:="For this test the width is limited to " & mMsg.ValueAsPercentage(wsTest.FormWidthMax, mMsg.enDsplyDimensionWidth) & ". " & _
                                       "The height is determined at first by the height resulting from the AutoSize." _
                            , as_width_max:=TestWidthMax _
                            , as_height_max:=TestHeightMax _
@@ -630,9 +652,9 @@ again:
             With .tbxTestAndResult
                 .MultiLine = True
                 .WordWrap = False
-                With .Font
+                With .font
                     .Name = "Courier New"
-                    .Size = 8
+                    .SIZE = 8
                 End With
                 .Top = 5
                 .AutoSize = True
@@ -674,8 +696,8 @@ again:
 
 End Sub
 
-Private Sub Test_AutoSizeTextBox_Width_Unlimited()
-    Const PROC = "Test_AutoSizeTextBox_Width_Unlimited"
+Public Sub Test_Basic_01_3_AutoSizeTextBox_Width_Unlimited()
+    Const PROC = "Test_Basic_01_3_AutoSizeTextBox_Width_Unlimited"
     
     Dim i               As Long
     Dim iFrom           As Long
@@ -715,9 +737,9 @@ again:
             With .tbxTestAndResult
                 .MultiLine = True
                 .WordWrap = False
-                With .Font
+                With .font
                     .Name = "Courier New"
-                    .Size = 8
+                    .SIZE = 8
                 End With
                 .Top = 5
                 .AutoSize = True
@@ -757,15 +779,15 @@ again:
 
 End Sub
 
-Private Sub Test_Pass_TypeMsgText()
+Public Sub Test_Basic_01_4_Pass_udtMsgText()
 ' ------------------------------------------------------------------------------
-' Test of passing on any 'kind of' TypeMsgText to a UserForm and retrieving it
-' again as a TypeMsgText.
+' Test of passing on any 'kind of' udtMsgText to a UserForm and retrieving it
+' again as a udtMsgText.
 ' ------------------------------------------------------------------------------
-    Const PROC = "Test_Pass_TypeMsgText"
+    Const PROC = "Test_Basic_01_4_Pass_udtMsgText"
     
     On Error GoTo eh
-    Dim t As TypeMsgText
+    Dim t As udtMsgText
     Dim f As fMsgProcTest
     Dim k As KindOfText
     Dim i As Long
@@ -804,14 +826,239 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
-Private Function RepeatStrng(ByVal rs_s As String, _
-                             ByVal rs_n As Long) As String
-' ----------------------------------------------------------------------------
-' Returns the string (s) concatenated (n) times. VBA.String in not appropriate
-' because it does not support leading and trailing spaces.
-' ----------------------------------------------------------------------------
-    Dim i   As Long
-    For i = 1 To rs_n: RepeatStrng = RepeatStrng & rs_s:  Next i
+Public Function Test_Basic_02_1_Single_Section_PropSpaced() As Variant
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_Basic_02_1_Single_Section_PropSpaced"
+        
+    On Error GoTo eh
+    
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest "02-1", PROC
+    With mMsgTest.udtMessage.Section(1)
+        .Label.Text = "Any Label:"
+        .Label.FontColor = rgbBlue
+        .Text.Text = DFLT_SECT_TEXT_PROP
+    End With
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_buttons:=mMsgTest.BttnsBasic _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
+           
+xt: mBasic.EoP ErrSrc(PROC)
+    Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
 End Function
 
+Public Function Test_Basic_02_2_Single_Section_MonoSpaced_With_Label() As Variant
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_Basic_02_2_Single_Section_MonoSpaced_With_Label"
+        
+    On Error GoTo eh
+    
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest "02-2", PROC
+    With mMsgTest.udtMessage.Section(1)
+        .Label.Text = "Path:"
+        .Label.FontColor = rgbBlue
+        .Text.Text = "mMsgTestServices.Test_12_mMsg_ErrMsg_AppErr_5: Application Error 5" ' DFLT_SECT_TEXT_MONO
+        .Text.MonoSpaced = True
+        .Text.FontSize = 9
+    End With
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_buttons:=mMsgTest.BttnsBasic _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
+           
+xt: mBasic.EoP ErrSrc(PROC)
+    Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
+End Function
+
+Public Function Test_Basic_02_3_Single_Section_MonoSpaced_No_Label() As Variant
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_Basic_02_3_Single_Section_MonoSpaced_No_Label"
+        
+    On Error GoTo eh
+    
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest "02-3", PROC
+
+    With mMsgTest.udtMessage.Section(1).Text
+        .MonoSpaced = True
+        .FontSize = 9
+        .Text = "Open a folder      : C:\TEMP\              " & vbLf & _
+                "Call the eMail app : mailto:xxxxx@gmail.com" & vbLf & _
+                "Open a url/link    : http://......         " & vbLf & _
+                "Open a file        : C:\TEMP\TestThis          (opens a dialog for the selection of the app)" & vbLf & _
+                "Open an application: x:\my\workbooks\this.xlsb (opens Excel)"
+    End With
+
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_buttons:=mMsgTest.BttnsBasic _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
+           
+xt: mBasic.EoP ErrSrc(PROC)
+    Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
+End Function
+
+Public Function Test_Basic_02_5_Single_Section_Label_Only() As Variant
+' ------------------------------------------------------------------------------
+'
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_Basic_02_5_Single_Section_Label_Only"
+        
+    On Error GoTo eh
+    
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest "02-5", PROC
+
+    With mMsgTest.udtMessage.Section(1)
+        .Label.Text = "Label-only section (no section text specified). The Label spans the full message " & _
+                                "width and may even be multi-lined. Any Label position specs are ignored."
+    End With
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_buttons:=mMsgTest.BttnsBasic _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
+           
+xt: mBasic.EoP ErrSrc(PROC)
+    Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
+End Function
+
+Public Function Test_Basic_02_4_Single_Section_MonoSpaced_With_VH_Scroll()
+' ------------------------------------------------------------------------------
+' With the vertical scroll bar applied the horizontal scroll-bar of the section
+' is replaced by one for the message area.
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_Basic_02_4_Single_Section_MonoSpaced_With_VH_Scroll"
+    Const LINES = 60
+    
+    On Error GoTo eh
+    
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest "02-4", PROC
+            
+    With mMsgTest.udtMessage.Section(1).Text
+        .Text = "Text only section! " & DFLT_SECT_TEXT_MONO
+        .MonoSpaced = True
+    End With
+      
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_buttons:=mMsgTest.BttnsBasic _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
+             
+xt: mBasic.EoP ErrSrc(PROC)
+    Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
+End Function
+
+Public Function Test_Basic_02_6_Single_Section_MonoSpaced_With_Label_And_VH_Scroll()
+' ------------------------------------------------------------------------------
+' With the vertical scroll bar applied the horizontal scroll-bar of the section
+' is replaced by one for the message area.
+' ------------------------------------------------------------------------------
+    Const PROC = "Test_Basic_02_6_Single_Section_MonoSpaced_With_Label_And_VH_Scroll"
+    
+    On Error GoTo eh
+    
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest "02-6", PROC
+            
+    With mMsgTest.udtMessage.Section(1)
+        .Label.Text = "Test-Label:"
+        .Label.FontColor = rgbGreen
+
+        .Text.Text = DFLT_SECT_TEXT_MONO & vbLf & _
+                     DFLT_SECT_TEXT_MONO & vbLf & _
+                     DFLT_SECT_TEXT_MONO & vbLf & _
+                     DFLT_SECT_TEXT_MONO
+        .Text.MonoSpaced = True
+    End With
+      
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_buttons:=mMsgTest.BttnsBasic _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
+             
+xt: mBasic.EoP ErrSrc(PROC)
+    Exit Function
+
+eh: Select Case ErrMsg(ErrSrc(PROC))
+        Case vbResume:  Stop: Resume
+        Case Else:      GoTo xt
+    End Select
+End Function
+
+Public Sub Test_Regression()
+
+'    mMsgTestProcs.Test_Basic_01_1_AdjustToVgrid
+'    mMsgTestProcs.Test_Basic_01_2_AutoSizeTextBox_Width_Limited
+'    mMsgTestProcs.Test_Basic_01_3_AutoSizeTextBox_Width_Unlimited
+'    mMsgTestProcs.Test_Basic_01_4_Pass_udtMsgText
+    mMsgTestProcs.Test_Basic_02_1_Single_Section_PropSpaced
+    mMsgTestProcs.Test_Basic_02_2_Single_Section_MonoSpaced_With_Label
+    mMsgTestProcs.Test_Basic_02_3_Single_Section_MonoSpaced_No_Label
+    mMsgTestProcs.Test_Basic_02_4_Single_Section_MonoSpaced_With_VH_Scroll
+    mMsgTestProcs.Test_Basic_02_5_Single_Section_Label_Only
+End Sub
 

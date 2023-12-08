@@ -9,8 +9,6 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[_Box_ service usage example](#box-service-usager-example)<br>
 &nbsp;&nbsp;&nbsp;[The Dsply service](#the-dsply-service)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax](#syntax-1)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax of the Type _TypeMsgLabel_](#syntax-of-the-type-typemsglabel)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax of the Type _TypeMsgText_](#syntax-of-the-type-typemsgtext)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[_Dsply_ service usage example](#dsply-service-usage-example)<br>
 &nbsp;&nbsp;&nbsp;[The ErrMsg service](#the-errmsg-service)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Syntax](#syntax-2)<br>
@@ -51,7 +49,7 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 | vbApplicationModal or vbSystemModal, no vbModeless option | The message can be displayed both ways which _modal_ (the default) or _modeless_. _modal_ equals to vbApplicationModal, there is (yet) no vbSystemModal option.|
 | Specifying the default button | The default button may be specified as index or as the displayed caption. However, it cannot be specified as vbOk, vbYes, vbNo, etc. |
 | Display of an alert image (?, !, etc.) | (yet) not implemented |
-| not available           | An optional "Label" above a message section allows the specification of anything to open: URL, mailto, folder, file, or an application like Excel.|
+| not available           | A message is structured into sections of which each can have a Label and a Text whereby the Label may be positioned to the left of the Text or above (the default). Both, the Label and the Text may have an _OnClickAction_ which allows the specification of anything to open: URL, mailto, folder, file, or an application like Excel.|
 
 ## Installation
 1. Download [fMsg.frm][1], [fMsg.frx][2], and [mMsg.bas][3] .
@@ -141,8 +139,8 @@ The _Dsply_ service has these named arguments:
 | Part                        | Description             |
 |-----------------------------|-------------------------|
 | `dsply_title`             | Required. String expression displayed in the title bar of the dialog box. If you omit title, the application name is placed in the title bar.|
-| `dsply_msg`               | Required. [UDT _TypeMsg_ ](#syntax-of-the-typemsg-udt) expression providing 4 message sections, each with a label and the message text, displayed as the message in the dialog box. The maximum length of each of the four possible message text strings is only limited by the system's limit for string expressions which is about 1GB!. When one of the 4 message text strings consists of more than one line, they can be separated by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line.|
-| `dsply_label_spec`        | String expression, specifies the position, alignment and width of a label with a corresponding section text, defaults to a vbNullString when omitted = the label is displayed above its corresponding section text. Examples for positioning the label at the left of the corresponding section text:<br>`R60` = Pos left, aligned right, width 60 pt Specifies<br>`C70` = Pos left, aligned centered, width 70 pt.<br>The specification concerns all labels with a corresponding section text. A label without a corresponding section text uses the full message form's width, as does a section text without a corresponding label.|
+| `dsply_msg`               | Required. [UDT _udtMsg_ ](#syntax-of-the-udt-specifying-8-sections) expression providing 4 message sections, each with a label and the message text, displayed as the message in the dialog box. The maximum length of each of the four possible message text strings is only limited by the system's limit for string expressions which is about 1GB!. When one of the 4 message text strings consists of more than one line, they can be separated by using a carriage return character (Chr(13)), a linefeed character (Chr(10)), or carriage return - linefeed character combination (Chr(13) & Chr(10)) between each line.|
+| `dsply_label_spec`        | String expression, defaults to `vbNullString` (which means that the Label is positioned above the specified text), any string other than a vbNullString specifies the position, alignment and width of a label with a corresponding section text, defaults to a vbNullString when omitted = the label is displayed above its corresponding section text:<br>`"R60"` = Pos left, aligned right, width 60 pt Specifies<br>`C70` = Pos left, aligned centered, width 70 pt.<br>The specification concerns all labels with a corresponding section text. A label without a corresponding section text uses the full message form's width, as does a section text without a corresponding label.|
 | `dsply_buttons`           | Optional. Variant expression. Defaults to vbOkOnly. May be provided as a comma delimited String, a Collection, a Dictionary or a mixture of all, with each item specifying a displayed command button's caption or a button row break (`vbLf`, `vbCr`, or `vbCrLf`). Any of the items may be a string or a classic VBA.MsgBox values (see [The VBA.MsgBox buttons argument settings][4]. Items exceeding 49 captions are ignored, when no row breaks are specified max 7 buttons are displayed in a row.|
 | `dsply_buttons_app_run`  | Dictionary expression, provides information for buttons when displayed ***mode-less** which `Application.Run` service to be performed when clicked. See [The _ButtonAppRun_ service](#the-buttonapprun-service) |
 | `dsply_buttons_app_run`  | |
@@ -158,7 +156,14 @@ The _Dsply_ service has these named arguments:
 #### Syntax of the UDT specifying 8 sections
     
 ```vb
-Public Type TypeMsgLabel
+Public Type udtMsg
+    Section(1 To 8) As udtMsgSect
+End Type 
+Public Type udtMsgSect
+    Label As udtMsgLabel
+    Text As udtMsgText
+End Type
+Public Type udtMsgLabel
         FontBold        As Boolean
         FontColor       As XlRgbColor
         FontItalic      As Boolean
@@ -167,9 +172,10 @@ Public Type TypeMsgLabel
         FontUnderline   As Boolean
         MonoSpaced      As Boolean  ' FontName defaults to "Courier New"
         Text            As String
-        OpenWhenClicked As String   ' this extra option is the purpose of this sepcific Type
+        OnClickAction   As String 
 End Type
-Public Type TypeMsgText
+
+Public Type udtMsgText
         FontBold        As Boolean
         FontColor       As XlRgbColor
         FontItalic      As Boolean
@@ -178,9 +184,8 @@ Public Type TypeMsgText
         FontUnderline   As Boolean
         MonoSpaced      As Boolean  ' FontName defaults to "Courier New"
         Text            As String
+        OnClickAction   As String
 End Type
-Public Type TypeMsgSect:    Label As TypeMsgLabel:  Text As TypeMsgText:    End Type
-Public Type TypeMsg:        Section(1 To 8) As TypeMsgSect:                 End Type '!!! 8 = Public Property NoOfMsgSects !!!
 ```
 
 #### _Dsply_ service usage example
@@ -193,7 +198,7 @@ Public Sub Demo_Dsply_1()
     Dim sTitle          As String
     Dim cllBttns        As New Collection
     Dim i, j            As Long
-    Dim Message         As TypeMsg
+    Dim Message         As udtMsg
    
     sTitle = "Usage demo: Full featured multiple choice message"
     With Message.Section(1)
@@ -287,7 +292,7 @@ The _Monitor_, _MonitorHeader_,  and _MonitorFooter_ service has the following n
 | Part                  | Description             |
 |-----------------------|-------------------------|
 | `mon_title`           | _String_ expression, displayed as title in the message window handle bar. When the service is called with different titles each of them open its dedicated monitor window. |
-| `mon_text`            | Type `TypeMsgText` expression (see [Syntax of the Type _TypeMsgText_ UDT](#syntax-of-the-type-typemsgtext)), displayed as the process header, step, or footer. |
+| `mon_text`            | Type `udtMsgText` expression (see [Syntax of the Type _udtMsgText_ UDT](#syntax-of-the-udt-specifying-8-sections)), displayed as the process header, step, or footer. |
 | `mon_steps_visible`   | _Long_ expression, optional, defaults to 10, specifies the number of steps to be displayed. When more steps are provided the displayed steps are scrolled.|
 | `mon_width_min`       | _Long_ expression, optional, defaults to 30% of the screen's width. |
 | `mon_width_max`       | _Long_ expression, optional, defaults to 80% of the screen's width. When the length of a line (when specified mono-spaced!) exceeds the maximum width, a horizontal scroll-bar is displayed.|
@@ -297,7 +302,7 @@ The _Monitor_, _MonitorHeader_,  and _MonitorFooter_ service has the following n
 #### Usage of the _Monitor_ service
 Thanks to the defaults for all optional arguments the service requires only the following four code lines:
 ```vb   
-        Dim Step    As TypeMsgText
+        Dim Step    As udtMsgText
         Dim Process As String:      Process = "The title for the process"
         ' .... begin of a process or loop
         Step.Text = "the process step text"
@@ -317,9 +322,9 @@ Public Sub Demo_Monitor()
     Const WIDTH_MAX As Long = 30
     Dim i           As Long
     Dim Title       As String
-    Dim Header      As TypeMsgText
-    Dim Step        As TypeMsgText
-    Dim Footer      As TypeMsgText
+    Dim Header      As udtMsgText
+    Dim Step        As udtMsgText
+    Dim Footer      As udtMsgText
        
     Title = "Process monitoring demo (displaying the last 10 steps)"
     With Header
@@ -335,7 +340,7 @@ Public Sub Demo_Monitor()
     Footer.Text = "Process in progress! Please wait."
     
     '~~ With the very first service call the monitoring message window is initialized
-    '~~ For this demo the max window with is liited to 30% of the screen width in order to demonstrate a horizontal scroll-bar
+    '~~ For this demo the max window with is limited to 30% of the screen width in order to demonstrate a horizontal scroll-bar
     mMsg.MonitorHeader mon_title:=Title _
                      , mon_text:=Header _
                      , mon_width_max:=WIDTH_MAX _
@@ -380,15 +385,16 @@ Will display:
 >When a Buttons caption text contains a , (comma) the comma needs to be escaped with a \ in order not to have it mismatched with a comma which delimits caption strings)
 
 ### The _ButtonAppRun_ service
-The service returns a Dictionary with `Application.Run` information for the button identified by its caption string, added with the button's caption as the key and all other provided arguments as Collection as item.
-- `Application.Run` only supports positional arguments. When only some of the optional arguments are used only those after the last one may be omitted but not those in between. The function raises an error when empty arguments are provided.
-- When Run information is provided for a button already existing in the Dictionary the information (the entry) it is replaced.
-- When the message form is displayed "Modal", which is the default, any provided Application.Run information is ignored.
+The service is to be used to specify  `Application.Run` actions performed when a button is pressed - provided the message is displayed mode-less. The service returns a Dictionary with `Application.Run` information for the button <u>identified by its caption string</u>, added with the button's caption as the key and all other arguments as a `Collection`.
+- VBA's `Application.Run` supports only positional arguments. I.e. that when only some of the optional arguments are used only those after the last one may be omitted but not any in between. The function raises an error when empty arguments are provided.
+- When the 'Run` information is provided for a button already existing in the Dictionary the information (the entry) it overwritten/replaced.
+- When the message form is displayed "Modal" (which is the default), any provided `Application.Run`  information is ignored.
+- The _ButtonAppRun_ service may centralize all `Run` specifications for those Command-Buttons in a VB-Project with a unique 'Caption`.
 
-The service has the following named arguments
+The service has the following named arguments:
 
-| Part                  | Description             |
-|-----------------------|-------------------------|
+| Part             | Description             |
+|------------------|-------------------------|
 | `b_dct`          | Dictionary expression, obligatory, returned with the information added. |
 | `b_button`       | String expression, obligatory, specifies the button's caption for which the `Application.Run` information is provided. |
 | `b_wb`           | Workbook expression, obligatory, specifies the ***open*** Workbook which provides the service (the `Public Sub`) called by `Application.Run`. |
@@ -413,7 +419,7 @@ The service has the following named arguments
 Note: With the _Dsply_ service the Dictionary is provided via the dsply_buttons_app_run argument.
 
 ### The _MsgInstance_ service
-When a UserForm is used multiple times in parallel (displayed modeless) it is required to use class instances of it. The service creates - or optionally unloads - an instance of a UserForm identified by its Title and saves the instance into a Dictionary with the Title as the key and the instance as the item.  
+When a UserForm is used multiple times in parallel (displayed mode-less) it is required to use class instances of it. The service creates - or optionally unloads - an instance of a UserForm identified by its Title and saves the instance into a Dictionary with the Title as the key and the instance as the item.  
 Syntax: `mMsg.MsgInstance(title, unload)`  
 `unload` defaults to False. When True an already existing instance is unloaded.
  When no item with the given title exists the instance is created, stored in the Dictionary and returned. When an item exists in the Dictionary which is no longer loaded (shown or hidden) it is removed from the Dictionary.
@@ -437,16 +443,15 @@ End Function
 ```
 
 ### Multiple Message Form instances
-Each service uses its own instance of the _fMsg_ UserForm. When a message service is displayed mode-less any individual _Title_ displays its own message until the message window is closed by the user - or the application is closed. While modeless is optional for the _Box_ and _Dsply_ service it is the standard for the _Monitor_ service. See the below demo<br>
+Each service uses its own instance of the _fMsg_ UserForm. When a message service is displayed mode-less any individual _Title_ displays its own message until the message window is closed by the user - or the application is closed. While mode-less is optional for the _Box_ and _Dsply_ service it is the standard for the _Monitor_ service. See the below demo<br>
 ![](images/DemoMsgMonitorInstances.gif)
 
 # Contribution
 Any contribution is welcome, last but not least concerning the wording in the documentation which may be sub-optimal since I am not a native English man.
 
-The Excel Workbook [Msg.xlsm](#Msg.xlsm) is for development and test of the _fMsg_ and the _mMsg_ modules. Any code changes or amendments to the implementation require a - pretty elaborated - regression test supported by a dedicated Worksheet in the Workbook.
+The Excel Workbook [Msg.xlsm](#Msg.xlsm) is for development and test of the _fMsg_ and the _mMsg_ modules. Any code changes or amendments to the implementation require a complete regression test which is very well supported by a dedicated Worksheet.
 
-Please note: The Workbook uses my "automated update of common components". This will have no effect when the [Excel-VB-Project-Component-Management-Services][5] is not installed.
-
+Please note: The Workbook uses my "automated update of common components" - which will have no effect as long as the [Excel-VB-Project-Component-Management-Services][5] is not installed.
 
 
 [1]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/master/source/fMsg.frm

@@ -31,7 +31,7 @@ Option Compare Text
     Private Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal ms As Long)
 #End If
 
-#If XcTrc_clsTrc = 1 Then
+#If XcTrc_clsTrc Then
     Private Trc                 As New clsTrc
 #End If
 Private Const DFLT_SECT_TEXT_PROP   As String = ">Lorem ipsum dolor sit amet, consectetur adipiscing elit, " & _
@@ -72,39 +72,6 @@ Private Function AppErr(ByVal app_err_no As Long) As Long
 ' ------------------------------------------------------------------------------
     If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
 End Function
-
-Private Sub BoP(ByVal b_proc As String, ParamArray b_arguments() As Variant)
-' ------------------------------------------------------------------------------
-' Common 'Begin of Procedure' interface for the 'Common VBA Error Services' and
-' the 'Common VBA Execution Trace Service' (only in case the first one is not
-' installed/activated). The services, when installed, are activated by the
-' | Cond. Comp. Arg.        | Installed component |
-' |-------------------------|---------------------|
-' | XcTrc_mTrc = 1          | mTrc                |
-' | XcTrc_clsTrc = 1        | clsTrc              |
-' | ErHComp = 1             | mErH                |
-' I.e. both components are independant from each other!
-' Note: This procedure is obligatory for any VB-Component using either the
-'       the 'Common VBA Error Services' and/or the 'Common VBA Execution Trace
-'       Service'.
-' ------------------------------------------------------------------------------
-    Dim s As String
-    Debug.Print "BoP: " & b_proc
-    If UBound(b_arguments) >= 0 Then s = Join(b_arguments, ",")
-
-#If ErHComp = 1 Then
-    '~~ The error handling also hands over to the mTrc/clsTrc component when
-    '~~ either of the two is installed.
-    mErH.BoP b_proc, s
-#ElseIf XcTrc_clsTrc = 1 Then
-    '~~ mErH is not installed but the mTrc is
-    Trc.BoP b_proc, s
-#ElseIf XcTrc_mTrc = 1 Then
-    '~~ mErH neither mTrc is installed but clsTrc is
-    mTrc.BoP b_proc, s
-#End If
-
-End Sub
 
 Public Sub cmdTest11_Click():   mMsgTestServices.Test_11_mMsg_Box_Buttons_Only:                                 End Sub
 
@@ -147,37 +114,6 @@ Public Sub cmdTest50_Click():   mMsgTestServices.Test_50_mMsg_Dsply_LabelPos_Lef
 Public Sub cmdTest90_Click():   mMsgTestServices.Test_90_mMsg_Dsply_AllInOne:                                   End Sub
 
 Public Sub cmdTest91_Click():   mMsgTestServices.Test_91_mMsg_Dsply_MinimumMessage:                             End Sub
-
-Public Sub cmdTest92_Click():   mMsgTestServices.Test_92_mMsg_Dsply_LabelWithUnderlayedURL:                     End Sub
-
-Private Sub EoP(ByVal e_proc As String, Optional ByVal e_inf As String = vbNullString)
-' ------------------------------------------------------------------------------
-' Common 'End of Procedure' interface for the 'Common VBA Error Services' and
-' the 'Common VBA Execution Trace Service' (only in case the first one is not
-' installed/activated).
-' Note 1: The services, when installed, are activated by the
-'         | Cond. Comp. Arg.        | Installed component |
-'         |-------------------------|---------------------|
-'         | XcTrc_mTrc = 1          | mTrc                |
-'         | XcTrc_clsTrc = 1        | clsTrc              |
-'         | ErHComp = 1             | mErH                |
-'         I.e. both components are independant from each other!
-' Note 2: This procedure is obligatory for any VB-Component using either the
-'         the 'Common VBA Error Services' and/or the 'Common VBA Execution
-'         Trace Service'.
-' ------------------------------------------------------------------------------
-    Debug.Print "EoP: " & e_proc
-#If ErHComp = 1 Then
-    '~~ The error handling also hands over to the mTrc component when 'ExecTrace = 1'
-    '~~ so the Else is only for the case the mTrc is installed but the merH is not.
-    mErH.EoP e_proc
-#ElseIf XcTrc_clsTrc = 1 Then
-    Trc.EoP e_proc, e_inf
-#ElseIf XcTrc_mTrc = 1 Then
-    mTrc.EoP e_proc, e_inf
-#End If
-
-End Sub
 
 Private Function ErrMsg(ByVal err_source As String, _
                Optional ByVal err_no As Long = 0, _
@@ -334,7 +270,7 @@ Public Function Test_10_Regression() As Variant
     Const PROC = "Test_10_Regression"
     
     On Error GoTo eh
-    Dim Rng     As Range
+    Dim rng     As Range
     Dim sTest   As String
     Dim sMakro  As String
         
@@ -347,9 +283,9 @@ Public Function Test_10_Regression() As Variant
     mTrc.Title = "Regression test module mMsg"
     mTrc.NewFile
     
-    BoP ErrSrc(PROC)
-    mTest.Current = vbNullString
-    Test_10_Regression = mTest.TestProc(wsTest.NextTestNumber)
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.CurrentProcId = vbNullString
+    Test_10_Regression = mMsgTest.TestProc(wsTest.NextTestNumber)
 
 xt: Exit Function
 
@@ -359,33 +295,103 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
+Public Function Test_00_Evaluate()
+' --------------------------------------------------------------------------------
+' Displays a modeless dialog to modify the current test-procedure's arguments and
+' finally evaluate the result as Passed or Failed.
+' --------------------------------------------------------------------------------
+    Const PROC = "Test_00_Evaluate"
+    
+    On Error GoTo eh
+    Dim i As Long
+    
+    mMsgTest.InitializeTest "00", PROC
+    
+    With mMsgTest.udtMessage
+        With .Section(mMsgTest.NextSect(i))
+            .Label.Text = "Test Title:"
+            .Label.FontColor = rgbBlue
+            .Text.Text = mMsgTest.TestProcName
+        End With
+        With .Section(mMsgTest.NextSect(i))
+            .Label.Text = "Test Description:"
+            .Label.FontColor = rgbBlue
+            .Text.Text = mMsgTest.CurrentDescription
+        End With
+        With .Section(mMsgTest.NextSect(i))
+            .Label.Text = "Width Min:"
+            .Label.FontColor = rgbBlue
+            .Text.Text = wsTest.FormWidthMin & "% of the dispay's width"
+        End With
+        With .Section(mMsgTest.NextSect(i))
+            .Label.Text = "Width Max:"
+            .Label.FontColor = rgbBlue
+            .Text.Text = wsTest.FormWidthMax & "% of the display's width"
+        End With
+        With .Section(mMsgTest.NextSect(i))
+            .Label.Text = "Height Max:"
+            .Label.FontColor = rgbBlue
+            .Text.Text = wsTest.FormHeightMax & "% of the display's height"
+        End With
+        
+        With .Section(mMsgTest.NextSect(i)).Text
+            .Text = "Modify any (width/height/Label pos) arguments of the current test proc and finally evaluate the result with Passed or Failed."
+        End With
+    
+        With .Section(mMsgTest.NextSect(i))
+            .Label.Text = "Attention!"
+            .Label.FontColor = rgbRed
+            .Label.FontBold = True
+            .Text.Text = "Buttons displayed with the test procedure must not be pressed! Since the message is displayed modeless, " & _
+                         "in order to allow an extra ""Evaluate"" dialog for the tests and the final Passed/Failed evaluation, " & _
+                         "any pressed button may result in an error being displayed because the button might have not been provided " & _
+                         "with App.Run arguments. The only exception is the test of the mMsg.ErrMsg service which has a corresponding " & _
+                         """About"" paragraph for explanation."
+        End With
+    End With
+    
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_width_min:=50 _
+             , dsply_width_max:=70 _
+             , dsply_height_max:=85 _
+             , dsply_Label_spec:="R80" _
+             , dsply_buttons:=mMsgTest.Bttns _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_modeless:=True
+        
+xt: Exit Function
+
+eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
+End Function
+
 Public Function Test_11_mMsg_Box_Buttons_Only() As Variant
 ' ------------------------------------------------------------------------------
 ' The Buttons service "in action": Display a matrix of 7 x 7 buttons
 ' ------------------------------------------------------------------------------
     Const PROC = "Test_11_mMsg_Box_Buttons_Only"
         
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 11, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 11, PROC
         
     
     mMsg.Box Prompt:=vbNullString _
-           , Buttons:=mTest.BttnsOnly _
-           , Title:=sMsgTitle _
-           , box_modeless:=mTest.MODE_LESS _
-           , box_width_min:=wsTest.MsgWidthMin _
-           , box_width_max:=wsTest.MsgWidthMax _
-           , box_height_max:=wsTest.MsgHeightMax
+           , Buttons:=mMsgTest.BttnsOnly _
+           , Title:=TestProcName _
+           , box_modeless:=mMsgTest.MODE_LESS _
+           , box_width_min:=wsTest.FormWidthMin _
+           , box_width_max:=wsTest.FormWidthMax _
+           , box_height_max:=wsTest.FormHeightMax
 
     
-xt: mTest.Evaluate
-    EoP ErrSrc(PROC)
+xt: mMsgTest.Evaluate
+    mBasic.EoP ErrSrc(PROC)
     
 End Function
 
 Private Sub Test_11_mMsg_Buttons_Service()
     Const PROC = "Test_11_mMsg_Buttons_Service"
-    BoP ErrSrc(PROC)
+    mBasic.BoP ErrSrc(PROC)
     mMsgTestServices.Test_11_mMsg_Buttons_Service_01_Empty
     mMsgTestServices.Test_11_mMsg_Buttons_Service_02_Single_String
     mMsgTestServices.Test_11_mMsg_Buttons_Service_03_Single_Numeric_Item
@@ -396,62 +402,62 @@ Private Sub Test_11_mMsg_Buttons_Service()
     mMsgTestServices.Test_11_mMsg_Buttons_Service_08_Semicolon_Delimited_String_Collection
     mMsgTestServices.Test_11_mMsg_Buttons_Service_09_Comma_Delimited_String_Dictionary
     mMsgTestServices.Test_11_mMsg_Box_Buttons_Only
-    EoP ErrSrc(PROC)
+    mBasic.EoP ErrSrc(PROC)
 End Sub
 
 Private Sub Test_11_mMsg_Buttons_Service_01_Empty()
     Const PROC = "Test_11_mMsg_Buttons_Service_01_Empty"
     Dim cll As Collection
     
-    BoP ErrSrc(PROC)
+    mBasic.BoP ErrSrc(PROC)
     Set cll = mMsg.Buttons()
     Debug.Assert cll.Count = 0
     Set cll = Nothing
-    EoP ErrSrc(PROC)
+    mBasic.EoP ErrSrc(PROC)
 End Sub
 
 Private Sub Test_11_mMsg_Buttons_Service_02_Single_String()
     Const PROC = "Test_11_mMsg_Buttons_Service_02_Single_String"
     Dim cll As Collection
     
-    BoP ErrSrc(PROC)
+    mBasic.BoP ErrSrc(PROC)
     Set cll = mMsg.Buttons("aaa")
     Debug.Assert cll.Count = 1
     Debug.Assert cll(1) = "aaa"
     Set cll = Nothing
-    EoP ErrSrc(PROC)
+    mBasic.EoP ErrSrc(PROC)
 End Sub
 
 Public Function Test_11_mMsg_Buttons_Service_03_Single_Numeric_Item() As Variant
     Const PROC = "Test_11_mMsg_Buttons_Service_03_Single_Numeric_Item"
     Dim cll As Collection
     
-    BoP ErrSrc(PROC)
+    mBasic.BoP ErrSrc(PROC)
     Set cll = mMsg.Buttons(vbResumeOk)
     Debug.Assert cll.Count = 1
     Debug.Assert cll(1) = vbResumeOk
     Set cll = Nothing
-    EoP ErrSrc(PROC)
+    mBasic.EoP ErrSrc(PROC)
 End Function
 
 Private Sub Test_11_mMsg_Buttons_Service_04_String_String()
     Const PROC = "Test_11_mMsg_Buttons_Service_04_String_String"
     Dim cll As Collection
     
-    BoP ErrSrc(PROC)
+    mBasic.BoP ErrSrc(PROC)
     Set cll = mMsg.Buttons("aaa", "bbb")
     Debug.Assert cll.Count = 2
     Debug.Assert cll(1) = "aaa"
     Debug.Assert cll(2) = "bbb"
     Set cll = Nothing
-    EoP ErrSrc(PROC)
+    mBasic.EoP ErrSrc(PROC)
 End Sub
 
 Private Sub Test_11_mMsg_Buttons_Service_05_Collection_String_String()
     Const PROC = "Test_11_mMsg_Buttons_Service_05_Collection_String_String"
     Dim cll As New Collection
     
-    BoP ErrSrc(PROC)
+    mBasic.BoP ErrSrc(PROC)
     cll.Add "aaa"
     cll.Add "bbb"
     
@@ -463,14 +469,14 @@ Private Sub Test_11_mMsg_Buttons_Service_05_Collection_String_String()
     Debug.Assert cll(4) = "bbb"
     
     Set cll = Nothing
-    EoP ErrSrc(PROC)
+    mBasic.EoP ErrSrc(PROC)
 End Sub
 
 Private Sub Test_11_mMsg_Buttons_Service_06_String_Collection_String()
     Const PROC = "Test_11_mMsg_Buttons_Service_06_String_Collection_String"
     Dim cll  As New Collection
     
-    BoP ErrSrc(PROC)
+    mBasic.BoP ErrSrc(PROC)
     cll.Add "aaa"
     cll.Add "bbb"
     
@@ -482,14 +488,14 @@ Private Sub Test_11_mMsg_Buttons_Service_06_String_Collection_String()
     Debug.Assert cll(4) = "bbb"
     
     Set cll = Nothing
-    EoP ErrSrc(PROC)
+    mBasic.EoP ErrSrc(PROC)
 End Sub
 
 Private Sub Test_11_mMsg_Buttons_Service_07_String_String_Collection()
     Const PROC = "Test_11_mMsg_Buttons_Service_07_String_String_Collection"
     Dim cll  As New Collection
     
-    BoP ErrSrc(PROC)
+    mBasic.BoP ErrSrc(PROC)
     cll.Add "ccc"
     cll.Add "ddd"
     
@@ -501,14 +507,14 @@ Private Sub Test_11_mMsg_Buttons_Service_07_String_String_Collection()
     Debug.Assert cll(4) = "ddd"
     
     Set cll = Nothing
-    EoP ErrSrc(PROC)
+    mBasic.EoP ErrSrc(PROC)
 End Sub
 
 Private Sub Test_11_mMsg_Buttons_Service_08_Semicolon_Delimited_String_Collection()
     Const PROC = "Test_11_mMsg_Buttons_Service_08_Semicolon_Delimited_String_Collection"
     Dim cll   As New Collection
     
-    BoP ErrSrc(PROC)
+    mBasic.BoP ErrSrc(PROC)
     cll.Add "ccc"
     cll.Add "ddd"
     
@@ -520,7 +526,7 @@ Private Sub Test_11_mMsg_Buttons_Service_08_Semicolon_Delimited_String_Collectio
     Debug.Assert cll(4) = "ddd"
     
     Set cll = Nothing
-    EoP ErrSrc(PROC)
+    mBasic.EoP ErrSrc(PROC)
 End Sub
 
 Private Sub Test_11_mMsg_Buttons_Service_09_Comma_Delimited_String_Dictionary()
@@ -528,7 +534,7 @@ Private Sub Test_11_mMsg_Buttons_Service_09_Comma_Delimited_String_Dictionary()
     Dim dct As New Dictionary
     Dim cll As Collection
     
-    BoP ErrSrc(PROC)
+    mBasic.BoP ErrSrc(PROC)
     dct.Add "ccc", "ccc"
     dct.Add "ddd", "ddd"
     
@@ -541,7 +547,7 @@ Private Sub Test_11_mMsg_Buttons_Service_09_Comma_Delimited_String_Dictionary()
     
     Set cll = Nothing
     Set dct = Nothing
-    EoP ErrSrc(PROC)
+    mBasic.EoP ErrSrc(PROC)
 End Sub
 
 Public Function Test_12_mMsg_ErrMsg_AppErr_5() As Variant
@@ -568,19 +574,19 @@ Public Function Test_12_mMsg_ErrMsg_AppErr_5() As Variant
     
     On Error GoTo eh
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 12, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 12, PROC
     
     mErH.Asserted AppErr(5) ' skips the display of the error message when mErH.Regression = True
     
     Err.Raise Number:=AppErr(5) _
             , source:=ErrSrc(PROC) _
             , Description:="This is a test error description!||This is part of the error description, " & _
-                           "concatenated by a double vertical bar and therefore displayed as an additional 'About the error' section " & _
-                           "- one of the specific features of the mMsg.ErrMsg service."
+                           "concatenated by a double vertical bar and therefore displayed as an additional 'About' section " & _
+                           "(one of the specific features of the mMsg.ErrMsg service)."
         
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -598,51 +604,49 @@ Public Function Test_13_mMsg_Dsply_WidthDeterminedByMinimumWidth() As Variant
     On Error GoTo eh
     Dim i As Long
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 13, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 13, PROC
             
-    With udtMessage
-        i = i + 1
-        With .Section(i)
+    With mMsgTest.udtMessage
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Attention:"
             .Label.FontColor = rgbRed
             .Text.Text = "The Ok button ultimately teminates this test without having been evaluated! " & _
                          "The evaluation should include changing arguments like min/max width/height and " & _
-                         "- when appropriate - also the label positioning and width."
+                         "- when appropriate - also the Label positioning and width."
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Description:"
             .Text.Text = wsTest.TestDescription
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Expected test result:"
-            .Text.Text = "The width of all message sections is adjusted either to the specified minimum form width (" & mTest.PrcPnt(wsTest.MsgWidthMin, mMsg.enDsplyDimensionWidth) & ") or " _
+            .Text.Text = "The width of all message sections is adjusted either to the specified minimum form width (" & mMsgTest.PrcPnt(wsTest.FormWidthMin, mMsg.enDsplyDimensionWidth) & ") or " _
                        & "to the width determined by the reply buttons."
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Please also note:"
             .Text.Text = "1. The message form height is adjusted to the required height up to the specified " & _
-                         "maximum heigth which for this test is " & mTest.PrcPnt(wsTest.MsgHeightMax, mMsg.enDsplyDimensionHeight) & "." & vbLf & _
-                         "2. The minimum width limit for this test is " & mTest.PrcPnt(wsTest.MsgWidthMin, mMsg.enDsplyDimensionWidth) & " and the maximum width limit for this test is " & mTest.PrcPnt(wsTest.MsgWidthMax, mMsg.enDsplyDimensionWidth) & "."
-            .Text.FontColor = rgbRed
+                         "maximum heigth which for this test is " & mMsgTest.PrcPnt(wsTest.FormHeightMax, mMsg.enDsplyDimensionHeight) & "." & vbLf & _
+                         "2. The minimum width limit for this test is " & mMsgTest.PrcPnt(wsTest.FormWidthMin, mMsg.enDsplyDimensionWidth) & " and the maximum width limit for this test is " & mMsgTest.PrcPnt(wsTest.FormWidthMax, mMsg.enDsplyDimensionWidth) & "."
         End With
     End With
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_modeless:=mTest.MODE_LESS _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
 
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -660,42 +664,41 @@ Public Function Test_14_mMsg_Dsply_Width_Determined_By_This_eeeeeeeeeeeeeeeeeeee
     On Error GoTo eh
     Dim i As Long
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 14, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 14, PROC
    
-   With udtMessage
-        i = i + 1
-        With .Section(i)
+   With mMsgTest.udtMessage
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Attention:"
             .Label.FontColor = rgbRed
             .Text.Text = "The Ok button ultimately teminates this test without having been evaluated! " & _
                          "The evaluation should include changing arguments like min/max width/height and " & _
-                         "- when appropriate - also the label positioning and width."
+                         "- when appropriate - also the Label positioning and width."
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Description:"
             .Text.Text = wsTest.TestDescription
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Expected test result:"
-            .Text.Text = "Because all sections use a proportional font message's width is adjusted exclusively to the title's lenght."
+            .Text.Text = "Because all sections use a proportional Font message's width is adjusted exclusively to the title's lenght."
         End With
     End With
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
              
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -713,53 +716,52 @@ Public Function Test_15_mMsg_Dsply_WidthDeterminedByMonoSpacedMessageSection() A
     On Error GoTo eh
     Dim i As Long
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 15, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 15, PROC
             
-    AssertWidthAndHeight wsTest.MsgWidthMin _
-                       , wsTest.MsgWidthMax _
-                       , wsTest.MsgHeightMax
+    AssertWidthAndHeight wsTest.FormWidthMin _
+                       , wsTest.FormWidthMax _
+                       , wsTest.FormHeightMax
     
-    With udtMessage
-        i = i + 1
-        With .Section(i)
+    With mMsgTest.udtMessage
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Description:"
             .Text.Text = "The length of the longest monospaced message section line determines the width of the message form - " & _
-                         "provided it does not exceed the specified maximum form width which for this test is " & mTest.PrcPnt(wsTest.MsgWidthMax, mMsg.enDsplyDimensionWidth) & "% " & _
-                         "of the display's width. The maximum form width may be incremented/decremented by " & mTest.PrcPnt(10, mMsg.enDsplyDimensionWidth) & " in order to test the result."
+                         "provided it does not exceed the specified maximum form width which for this test is " & mMsgTest.PrcPnt(wsTest.FormWidthMax, mMsg.enDsplyDimensionWidth) & "% " & _
+                         "of the display's width. The maximum form width may be incremented/decremented by " & mMsgTest.PrcPnt(10, mMsg.enDsplyDimensionWidth) & " in order to test the result."
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Expected test result:"
             .Text.Text = "Initally, the message form width is adjusted to the longest line in the " & _
                          "monospaced message section and all other message sections are adjusted " & _
                          "to this (enlarged) width." & vbLf & _
-                         "When the maximum form width is reduced by " & mTest.PrcPnt(10, mMsg.enDsplyDimensionWidth) & " the monospaced message section is displayed with a horizontal scrollbar."
+                         "When the maximum form width is reduced by " & mMsgTest.PrcPnt(10, mMsg.enDsplyDimensionWidth) & " the monospaced message section is displayed with a horizontal scrollbar."
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Please note the following:"
             .Text.Text = "- In contrast to the message sections above, this section uses the ""monospaced"" option which ensures" & vbLf & _
                          "  the message text is not ""word wrapped""." & vbLf & _
                          "- The message form height is adjusted to the need up to the specified maximum heigth" & vbLf & _
-                         "  based on the screen height which for this test is " & mTest.PrcPnt(wsTest.MsgHeightMax, mMsg.enDsplyDimensionHeight) & "."
+                         "  based on the screen height which for this test is " & mMsgTest.PrcPnt(wsTest.FormHeightMax, mMsg.enDsplyDimensionHeight) & "."
             .Text.MonoSpaced = True
             .Text.FontUnderline = False
         End With
     End With
                         
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_modeless:=mTest.MODE_LESS _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
 
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -778,35 +780,37 @@ Public Function Test_16_mMsg_Dsply_WidthDeterminedByReplyButtons() As Variant
     Dim OneBttnMore         As String
     Dim OneBttnLess         As String
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 16, PROC
-    With udtMessage.Section(1)
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 16, PROC
+    With mMsgTest.udtMessage.Section(1)
         .Label.Text = "Description:"
         .Text.Text = wsTest.TestDescription
     End With
-    With udtMessage.Section(2)
+    With mMsgTest.udtMessage.Section(2)
         .Label.Text = "Expected test result:"
         .Text.Text = "The message form width is adjusted to the space required by the number of reply buttons and all message sections are adjusted to this (enlarged) width."
     End With
-    With udtMessage.Section(3)
+    With mMsgTest.udtMessage.Section(3)
         .Label.Text = "Please also note:"
         .Text.Text = "The message form height is adjusted to the required height limited only by the specified maximum heigth " & _
-                     "which is a percentage of the screen height (for this test = " & mTest.PrcPnt(wsTest.MsgHeightMax, mMsg.enDsplyDimensionHeight) & "."
+                     "which is a percentage of the screen height (for this test = " & mMsgTest.PrcPnt(wsTest.FormHeightMax, mMsg.enDsplyDimensionHeight) & "."
     End With
     OneBttnMore = "Repeat with one button more"
     OneBttnLess = "Repeat with one button less"
     vButton6 = "The one more buttonn"
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=mMsg.Buttons("Yes", "No", "Cancel", "Ok") _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
 
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -823,35 +827,35 @@ Public Function Test_17_mMsg_Dsply_MonoSpacedSectionWidthExceedsMaxMsgWidth() As
     
     On Error GoTo eh
 
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 17, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 17, PROC
     
-    With udtMessage.Section(1)
-        .Label.Text = "Description:"
-        .Text.Text = "The width used by the 3rd ""monospaced"" message section exceeds the maximum message width which for this test is " & mTest.PrcPnt(wsTest.MsgWidthMax, mMsg.enDsplyDimensionWidth) & "."
+    With mMsgTest.udtMessage.Section(1)
+        .Label.Text = "About this test:"
+        .Text.Text = "The 3rd section's Text is ""monospaced"" and exceeds the maximum message width which for this test is " & mMsgTest.PrcPnt(wsTest.FormWidthMax, mMsg.enDsplyDimensionWidth) & "."
     End With
-    With udtMessage.Section(2)
-        .Label.Text = "Expected test result:"
-        .Text.Text = "The monospaced message section comes with a horizontal scrollbar."
+    With mMsgTest.udtMessage.Section(2)
+        .Label.Text = "Expected result:"
+        .Text.Text = "The monospaced message section is displayed with a horizontal scrollbar."
     End With
-    With udtMessage.Section(3)
+    With mMsgTest.udtMessage.Section(3)
         .Label.Text = "Please note the following:"
-        .Text.Text = "This (single line!) monspaced message section exceeds the specified maximum message width which for this test is " & mTest.PrcPnt(wsTest.MsgWidthMax, mMsg.enDsplyDimensionWidth) & "."
+        .Text.Text = "This (single line!) monspaced message section exceeds the specified maximum message width which for this test is " & mMsgTest.PrcPnt(wsTest.FormWidthMax, mMsg.enDsplyDimensionWidth) & "."
         .Text.MonoSpaced = True
     End With
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
 
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -868,37 +872,37 @@ Public Function Test_18_mMsg_Dsply_MonoSpacedMessageSectionExceedsMaxHeight() As
     
     On Error GoTo eh
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 18, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 18, PROC
        
-    With udtMessage.Section(1)
+    With mMsgTest.udtMessage.Section(1)
         .Label.Text = "Description:"
         .Text.Text = "The overall message window height exceeds the for this test specified maximum of " & _
-                     PrcPnt(wsTest.MsgHeightMax, mMsg.enDsplyDimensionHeight) & " of the screen height. Because the monospaced section " & _
+                     PrcPnt(wsTest.FormHeightMax, mMsg.enDsplyDimensionHeight) & " of the screen height. Because the monospaced section " & _
                      "is the dominating one regarding its height it is displayed with a horizontal scroll-bar."
     End With
-    With udtMessage.Section(3)
+    With mMsgTest.udtMessage.Section(3)
         .Label.Text = "Please note the following:"
         .Text.Text = "The monospaced message's height is reduced to fit the maximum form height and a vertical scrollbar is added."
     End With
-    With udtMessage.Section(2)
+    With mMsgTest.udtMessage.Section(2)
         .Label.Text = "Expected test result:"
         .Text.Text = RepeatString(25, "This monospaced message comes with a vertical scrollbar." & vbLf, True)
         .Text.MonoSpaced = True
     End With
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
 
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -914,22 +918,22 @@ Public Function Test_19_mMsg_Dsply_ButtonsOnly() As Variant
     Const PROC = "Test_19_mMsg_Dsply_ButtonsOnly"
     
     On Error GoTo eh
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 19, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 19, PROC
         
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
-             , dsply_buttons:=mTest.BttnsOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_modeless:=mTest.MODE_LESS _
-             , dsply_button_default:=BTTN_PASSED _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
+             , dsply_buttons:=mMsgTest.BttnsOnly _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_button_default:=BttnPassed _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
              
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -952,31 +956,30 @@ Public Function Test_20_mMsg_Dsply_ButtonsMatrix() As Variant
     Dim lChangeMinWidthPt   As Long
     Dim cll                 As New Collection
     
-    BoP ErrSrc(PROC)
-    sMsgTitle = "Just to demonstrate what's theoretically possible: Buttons only! Finish with " & BTTN_PASSED & " (default) or " & BTTN_FAILED
-    mTest.SetupMsgTitleInstanceAndNo 20, PROC
+    mBasic.BoP ErrSrc(PROC)
+    TestProcName = "Just to demonstrate what's theoretically possible: Buttons only! Finish with " & BttnPassed & " (default) or " & BttnFailed
+    mMsgTest.InitializeTest 20, PROC
     
     '~~ Assemble the matrix of buttons as collection for  the argument buttons
-    For i = 2 To 7 ' rows
+    For i = 4 To 7 ' rows
         For j = 1 To 7 ' row buttons
             cll.Add "Button" & vbLf & i & "-" & j
         Next j
     Next i
                          
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
-             , dsply_buttons:=mMsg.Buttons(mTest.Bttns, cll) _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
+             , dsply_buttons:=mMsg.Buttons(mMsgTest.Bttns, vbLf, cll) _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
              , dsply_button_reply_with_index:=False _
-             , dsply_button_default:=BTTN_PASSED _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_button_default:=BttnPassed _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
 
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -994,37 +997,35 @@ Public Function Test_21_mMsg_Dsply_ButtonScrollBarVertical() As Variant
     On Error GoTo eh
     Dim i   As Long
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 21, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 21, PROC
     
-    With udtMessage
-        i = i + 1
-        With .Section(i)
+    With mMsgTest.udtMessage
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Description:"
             .Text.Text = "The vertical order of the displayed buttons make the buttons section to the dominating section. " & _
                          "This means that, in case the max message height is exceeded, this sections height is reduced to " & _
                          "fit the max message height and the section is provided with a vertical scroll-bar."
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Expected result:"
             .Text.Text = "When the max height is reduced (may already be the case) the buttons section is displayed with " & _
                          "a vertical scrollbar. When the max height is increased, the vertical scroll-bar vanishes."
         End With
     End With
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
-             , dsply_buttons:=mMsg.Buttons("Yes", vbLf, "No", vbLf, "Cancel", vbLf, "Ok") _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
+             , dsply_buttons:=mMsg.Buttons(mMsgTest.BttnTerminate, vbLf, mMsgTest.BttnPassed, vbLf, mMsgTest.BttnFailed, vbLf, mMsgTest.BttnRepeat) _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
     
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1043,23 +1044,23 @@ Public Function Test_23_mMsg_Dsply_Buttons_Only() As Variant
     Dim i, j                As Long
     Dim bMonospaced         As Boolean:         bMonospaced = True ' initial test value
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 23, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 23, PROC
                          
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
              , dsply_button_reply_with_index:=False _
-             , dsply_button_default:=BTTN_PASSED _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_button_default:=BttnPassed _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
                  
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1077,17 +1078,17 @@ Public Function Test_26_mMsg_Dsply_ButtonByDictionary()
     On Error GoTo xt
     Dim dct                 As New Collection
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 26, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 26, PROC
     
-    With udtMessage.Section(1)
+    With mMsgTest.udtMessage.Section(1)
         .Label.Text = "Description:"
         .Text.Text = "The ""buttons"" argument is a collection of the test specific buttons " & _
                      "(Passed, Failed) and the two extra Yes, No buttons provided as Dictionary!" & vbLf & vbLf & _
                      "The test proves that the mMsg.Buttons service is able to combine any kind of arguments " & _
                      "provided via the ParamArray."
     End With
-    With udtMessage.Section(2)
+    With mMsgTest.udtMessage.Section(2)
         .Label.Text = "Expected result:"
         .Text.Text = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
     End With
@@ -1095,18 +1096,18 @@ Public Function Test_26_mMsg_Dsply_ButtonByDictionary()
     dct.Add vbLf
     dct.Add "No"
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
 
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1123,20 +1124,20 @@ Public Function Test_27_mMsg_Box_MessageAsString() As Variant
         
     On Error GoTo eh
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 27, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 27, PROC
         
-    mMsg.Box Title:=sMsgTitle _
+    mMsg.Box Title:=TestProcName _
            , Prompt:="This is a message provided as a simple string argument!" _
-           , Buttons:=mTest.Bttns _
-           , box_buttons_app_run:=mTest.BttnsAppRunArgs _
-           , box_width_min:=wsTest.MsgWidthMin _
-           , box_width_max:=wsTest.MsgWidthMax _
-           , box_height_max:=wsTest.MsgHeightMax _
-           , box_modeless:=mTest.MODE_LESS
+           , Buttons:=mMsgTest.Bttns _
+           , box_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+           , box_width_min:=wsTest.FormWidthMin _
+           , box_width_max:=wsTest.FormWidthMax _
+           , box_height_max:=wsTest.FormHeightMax _
+           , box_modeless:=mMsgTest.MODE_LESS
            
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1153,30 +1154,30 @@ Public Function Test_30_mMsg_Dsply_ButtonByValue()
     
     On Error GoTo eh
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 30, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 30, PROC
         
-    With udtMessage.Section(1)
+    With mMsgTest.udtMessage.Section(1)
         .Label.Text = "Description:"
         .Text.Text = "The ""buttons"" argument is a collection of the test buttons (Passed, Failed) and an additional button provided as value"
     End With
-    With udtMessage.Section(2)
+    With mMsgTest.udtMessage.Section(2)
         .Label.Text = "Expected result:"
         .Text.Text = "The ""Ok"" button is displayed in the second row."
     End With
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
     
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1193,30 +1194,30 @@ Public Function Test_31_mMsg_Dsply_ButtonByString()
     
     On Error GoTo eh
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 31, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 31, PROC
     
-    With udtMessage.Section(1)
+    With mMsgTest.udtMessage.Section(1)
         .Label.Text = "Description:"
         .Text.Text = "The ""buttons"" argument is provided as string expression."
     End With
-    With udtMessage.Section(2)
+    With mMsgTest.udtMessage.Section(2)
         .Label.Text = "Expected result:"
         .Text.Text = "The buttons ""Yes"" an ""No"" are displayed centered in two rows"
     End With
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
              
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1233,30 +1234,30 @@ Public Function Test_32_mMsg_Dsply_ButtonByCollection()
     
     On Error GoTo eh
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 32, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 32, PROC
     
-    With udtMessage.Section(1)
+    With mMsgTest.udtMessage.Section(1)
         .Label.Text = "Description:"
         .Text.Text = "The ""buttons"" argument is provided as string expression."
     End With
-    With udtMessage.Section(2)
+    With mMsgTest.udtMessage.Section(2)
         .Label.Text = "Expected result:"
         .Text.Text = "The buttons are centered in n rows"
     End With
       
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
     
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1276,32 +1277,32 @@ Public Function Test_33_mMsg_Dsply_Single_MonoSpaced_Section_Without_Label()
     Dim Msg                 As String
     Dim i                   As Long
     Dim sLbreak             As String
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 33, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 33, PROC
             
     i = 1
     For i = 1 To LINES
-        Msg = Msg & sLbreak & Format(i, "00: ") & Format(Now(), "YY-MM-DD hh:mm:ss") & " Line " & Format(i, "00") & " of " & Format(LINES, "00") & " the single mono-spaced message section without label."
+        Msg = Msg & sLbreak & Format(i, "00: ") & Format(Now(), "YY-MM-DD hh:mm:ss") & " Line " & Format(i, "00") & " of " & Format(LINES, "00") & " the single mono-spaced message section without Label."
         sLbreak = vbLf
     Next i
     
-    With udtMessage.Section(1).Text
+    With mMsgTest.udtMessage.Section(1).Text
         .Text = Msg
         .MonoSpaced = True
     End With
       
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
              
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1319,64 +1320,67 @@ Public Function Test_34_mMsg_Dsply_Sections_Without_Label_Or_Label_Only()
     On Error GoTo eh
     Dim i As Long
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 34, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 34, PROC
     
-    With udtMessage
-        i = i + 1
-        With .Section(i)
+    With mMsgTest.udtMessage
+        With .Section(mMsgTest.NextSect(i))
+            .Label.Text = "About this test:"
+            .Label.FontBold = True
+
+            .Text.Text = "This test combines sections with" & vbLf & _
+                         "- a Label left positioned and aligned right with Text" & vbLf & _
+                         "- Labels without a corresponding Text (spanning the full width)" & vbLf & _
+                         "- Texts without a Label (spanning the full width) whereby " & vbLf & _
+                         "whereby all Labels and all Texts have an underlayed URL displayed when clicked."
+        End With
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Attention:"
             .Label.FontColor = rgbRed
             .Text.Text = "The Ok button ultimately teminates this test without having been evaluated! " & _
                          "The evaluation should include changing arguments like min/max width/height and " & _
-                         "- when appropriate - also the label positioning and width."
+                         "- when appropriate - also the Label positioning and width."
         End With
-        i = i + 1
-        With .Section(i)
-            .Label.Text = "Multiline label without text (spans full message width), " & _
-                          "Multiline label without text (spans full message width), " & _
-                          "Multiline label without text (spans full message width)."
+        
+        With .Section(mMsgTest.NextSect(i))
+            .Label.Text = "This is a multiline Label without a corresponding text which thus spans the full message width."
             .Label.FontColor = rgbGreen
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Label with text:"
             .Label.FontColor = rgbGreen
             .Text.Text = "Section text"
         End With
-        i = i + 1
-        With .Section(i)
-            .Label.Text = "Multiline label without text (spans full message width), " & _
-                          "Multiline label without text (spans full message width)."
+        
+        With .Section(mMsgTest.NextSect(i))
+            .Label.Text = "This is a multiline Label without a corresponding text which thus spans the full message width."
             .Label.FontColor = rgbGreen
         End With
-        i = i + 1
-        With .Section(i)
-            .Text.Text = "Section text without label (spans full message width), " & _
-                         "Section text without label (spans full message width), " & _
-                         "Section text without label (spans full message width)."
+        
+        With .Section(mMsgTest.NextSect(i))
+            .Text.Text = "This is a section Text without a corresponding Label which thus spans the full message width."
         End With
-        i = i + 1
-        With .Section(i)
-            .Label.Text = "Multiline label without text (spans full message width), " & _
-                          "Multiline label without text (spans full message width), " & _
-                          "Multiline label without text (spans full message width)."
+        
+        With .Section(mMsgTest.NextSect(i))
+            .Label.Text = "This is a multiline Label without a corresponding text which thus spans the full message width."
             .Label.FontColor = rgbGreen
         End With
     End With
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
     
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1393,14 +1397,14 @@ Public Function Test_40_mMsg_Monitor_Services() As Variant
     
     On Error GoTo eh
     Dim i                   As Long
-    Dim Header              As TypeMsgText
-    Dim Step                As TypeMsgText
-    Dim Footer              As TypeMsgText
+    Dim Header              As udtMsgText
+    Dim Step                As udtMsgText
+    Dim Footer              As udtMsgText
     Dim iLoops              As Long
     Dim lWait               As Long
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 40, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 40, PROC
     
     With Header
         .Text = "Step Status (steps 1 to 10)"
@@ -1417,8 +1421,8 @@ Public Function Test_40_mMsg_Monitor_Services() As Variant
     lWait = 300
        
     '~~ Because this is the very first service call the size of the monitoring window is initialized
-    mMsg.MonitorHeader mon_title:=sMsgTitle, mon_text:=Header, mon_width_max:=50
-    mMsg.MonitorFooter sMsgTitle, Footer
+    mMsg.MonitorHeader mon_title:=TestProcName, mon_text:=Header, mon_width_max:=50
+    mMsg.MonitorFooter TestProcName, Footer
     
     For i = 1 To iLoops
         '~~ The Header may be changed at any point in time
@@ -1428,15 +1432,15 @@ Public Function Test_40_mMsg_Monitor_Services() As Variant
                 .MonoSpaced = True
                 .FontColor = rgbDarkBlue
             End With
-            mMsg.MonitorHeader sMsgTitle, Header
+            mMsg.MonitorHeader TestProcName, Header
         End If
         
         With Step
             .Text = Format(i, "00") & ". Follow-Up line after " & Format(lWait, "0000") & " Milliseconds."
-            .Text = mTest.Repeat(.Text & " ", Int(i / 5) + 1) & vbLf & "    Second line just for test " & mTest.Repeat(".", i)
+            .Text = mMsgTest.Repeat(.Text & " ", Int(i / 5) + 1) & vbLf & "    Second line just for test " & mMsgTest.Repeat(".", i)
             .MonoSpaced = True
         End With
-        mMsg.Monitor mon_title:=sMsgTitle _
+        mMsg.Monitor mon_title:=TestProcName _
                    , mon_text:=Step
                    
         '~~ Simmulation of a process
@@ -1449,12 +1453,12 @@ Public Function Test_40_mMsg_Monitor_Services() As Variant
         .FontBold = True
         .FontColor = rgbRed
     End With
-    mMsg.MonitorFooter sMsgTitle, Footer
+    mMsg.MonitorFooter TestProcName, Footer
     
-    mTest.Evaluate
+    mMsgTest.Evaluate
         
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1465,56 +1469,52 @@ End Function
 
 Public Function Test_50_mMsg_Dsply_LabelPos_Left_R30()
 ' ------------------------------------------------------------------------------
-' Test procedure for label pos left, width 30, various sections with and without
-' label and/or text.
+' Test procedure for Label pos left, width 30, various sections with and without
+' Label and/or text.
 ' ------------------------------------------------------------------------------
     Const PROC = "Test_50_mMsg_Dsply_LabelPos_Left_R30"
     
     On Error GoTo eh
     Dim i As Long
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 50, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 50, PROC
     
-    With udtMessage
-        i = i + 1
-        With .Section(i)
+    With mMsgTest.udtMessage
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Label-" & i
             .Text.Text = DefaultSectionTextProp
             .Text.MonoSpaced = False
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Label-" & i
             .Text.Text = DefaultSectionTextProp
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = vbNullString
-            .Text.Text = "A section/paragraph without a corresponding label uses the full available message width *)"
+            .Text.Text = "A section/paragraph without a corresponding Label uses the full available message width *)"
         End With
-        i = i + 1
-        With .Section(i)
-            With .Label
-                .Text = "*) Link to VBA-Message repo README! (label without text, uses full available message width)"
-                .OpenWhenClicked = "https://github.com/warbe-maker/VBA-Message#readme"
-            End With
+        
+        With .Section(mMsgTest.NextSect(i))
+            .Label.Text = "*) Link to VBA-Message repo README! (Label without text, uses full available message width)"
             .Text.Text = vbNullString
         End With
     End With
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=30 _
-             , dsply_width_max:=50 _
-             , dsply_height_max:=70 _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
     
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1530,21 +1530,20 @@ Public Function Test_90_mMsg_Dsply_AllInOne() As Variant
     Dim i       As Long
     Dim sBttn   As String: sBttn = "Any caption\," & vbLf & "any number" & vbLf & "of lines"
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 90, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 90, PROC
     
-    With udtMessage
-        i = i + 1
-        With .Section(i)
+    With mMsgTest.udtMessage
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Summary of the mMsg.Dsply service features:" & vbLf
             .Label.FontColor = rgbBlue
             .Text.MonoSpaced = True
             .Text.FontSize = 9
             .Text.Text = "- Up to 8 message sections/paragraphs" & vbLf & _
-                         "- An optional label allows qualifying each section/paragraph" & vbLf & _
+                         "- An optional Label allows qualifying each section/paragraph" & vbLf & _
                          "- Labels may be positioned above their corresponding section/paragraph text (the default)" & vbLf & _
                          "  or at the left" & vbLf & _
-                         "- Monospaced font option for each section/paragraph (as used with this one)" & vbLf & _
+                         "- Monospaced Font option for each section/paragraph (as used with this one)" & vbLf & _
                          "- (Almost) unlimited message size" & vbLf & _
                          "- Unlimited message width and height due to scroll-bars used in case" & vbLf & _
                          "- 7 x 7 reply buttons with any caption text" & vbLf & _
@@ -1553,28 +1552,28 @@ Public Function Test_90_mMsg_Dsply_AllInOne() As Variant
                          "- Label only and text only sections/paragraphs" & vbLf & _
                          "- Labels with an ""open when clicked"" option (for url links for example)."
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Unlimited message width demo:"
             .Label.FontColor = rgbBlue
             .Text.MonoSpaced = True
             .Text.Text = "Because this section's text is mono-spaced (which by definition is not word-wrapped) the message width is determined by:" & vbLf _
-                       & "a) the for this demo specified maximum width of " & mTest.PrcPnt(wsTest.MsgHeightMax, mMsg.enDsplyDimensionHeight) & vbLf _
+                       & "a) the for this demo specified maximum width of " & mMsgTest.PrcPnt(wsTest.FormHeightMax, mMsg.enDsplyDimensionHeight) & vbLf _
                        & "   (defaults to " & MSG_LIMIT_WIDTH_MAX_PERCENTAGE & "% when not specified)" & vbLf _
                        & "b) the longest line of this section" & vbLf _
                        & "Because the text exeeds the specified maximum message width, a horizontal scroll-bar is displayed." & vbLf _
                        & "Due to this feature there is no message size limit other than the sytem's limit which for a string is about 1GB !!!!"
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Unlimited message height:"
             .Label.FontColor = rgbBlue
             .Text.Text = "As with the message width, the message height is unlimited. When the maximum height (explicitly specified or the default) " _
                        & "is exceeded a vertical scroll-bar is displayed. Due to this feature there is no message size limit other than the sytem's " _
                        & "limit which for a string is about 1GB !!!!"
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Button flexibility:"
             .Label.FontColor = rgbBlue
             .Text.Text = "This demo displays only some of the 7 x 7 = 49 possible reply buttons which may have any caption text " _
@@ -1582,18 +1581,18 @@ Public Function Test_90_mMsg_Dsply_AllInOne() As Variant
         End With
     End With
     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=mMsg.Buttons("Yes", "No", "Cancel", "Ok", vbLf, sBttn) _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
     
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
@@ -1611,109 +1610,41 @@ Public Function Test_91_mMsg_Dsply_MinimumMessage() As Variant
     On Error GoTo eh
     Dim i As Long
     
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 91, PROC
+    mBasic.BoP ErrSrc(PROC)
+    mMsgTest.InitializeTest 91, PROC
         
-    With udtMessage
-        i = i + 1
-        With .Section(i)
+    With mMsgTest.udtMessage
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Description:"
             .Text.Text = wsTest.TestDescription
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Expected test result:"
-            .Text.Text = "The width of all message sections is adjusted either to the specified minimum form width (" & mTest.PrcPnt(wsTest.MsgWidthMin, mMsg.enDsplyDimensionWidth) & ") or " _
+            .Text.Text = "The width of all message sections is adjusted either to the specified minimum form width (" & mMsgTest.PrcPnt(wsTest.FormWidthMin, mMsg.enDsplyDimensionWidth) & ") or " _
                        & "to the width determined by the reply buttons."
         End With
-        i = i + 1
-        With .Section(i)
+        
+        With .Section(mMsgTest.NextSect(i))
             .Label.Text = "Please also note:"
             .Text.Text = "The message form height is adjusted to the required height up to the specified " & _
-                         "maximum heigth which is " & mTest.PrcPnt(wsTest.MsgHeightMax, mMsg.enDsplyDimensionHeight) & " and not exceeded."
+                         "maximum heigth which is " & mMsgTest.PrcPnt(wsTest.FormHeightMax, mMsg.enDsplyDimensionHeight) & " and not exceeded."
             .Text.FontColor = rgbRed
         End With
     End With
                                                                                                   
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
+    mMsg.Dsply dsply_title:=TestProcName _
+             , dsply_msg:=mMsgTest.udtMessage _
+             , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_buttons:=vbOKOnly _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=wsTest.MsgWidthMin _
-             , dsply_width_max:=wsTest.MsgWidthMax _
-             , dsply_height_max:=wsTest.MsgHeightMax _
-             , dsply_modeless:=mTest.MODE_LESS
+             , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
+             , dsply_width_min:=wsTest.FormWidthMin _
+             , dsply_width_max:=wsTest.FormWidthMax _
+             , dsply_height_max:=wsTest.FormHeightMax _
+             , dsply_modeless:=mMsgTest.MODE_LESS
                          
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
-    Exit Function
-
-eh: Select Case ErrMsg(ErrSrc(PROC))
-        Case vbResume:  Stop: Resume
-        Case Else:      GoTo xt
-    End Select
-End Function
-
-Public Function Test_92_mMsg_Dsply_LabelWithUnderlayedURL() As Variant
-' ------------------------------------------------------------------------------
-'
-' ------------------------------------------------------------------------------
-    Const PROC = "Test_92_mMsg_Dsply_LabelWithUnderlayedURL"
-    
-    On Error GoTo eh
-    Dim i As Long
-    Dim cll As Collection
-    Dim sButton As String: sButton = "Caption\," & vbLf & "multilined"
-    Set cll = mMsg.Buttons("A", "B", vbOKOnly)
-    
-    BoP ErrSrc(PROC)
-    mTest.SetupMsgTitleInstanceAndNo 92, PROC
-        
-    With udtMessage
-        i = i + 1
-        With .Section(i)
-            .Label.Text = "Public github repo Common-VBA-Message-Service"
-            .Label.OpenWhenClicked = "https://github.com/warbe-maker/Common-VBA-Message-Service"
-            .Text.Text = "The corresponding label is underlayed with a url *)."
-        End With
-        i = i + 1
-        With .Section(i)
-            .Label.Text = "About this feature of the 'Common-VBA-Message-Service':"
-            .Text.Text = "The Common-VBA-Message-Service makes use of the 'Click' and the 'MouseMove' event " & _
-                         "of the Label control to allow not only to open a URL but also to open a file or " & _
-                         "start an application (open a Workbook, Word document, etc). Examples:"
-        End With
-        i = i + 1
-        With .Section(i).Text
-            .MonoSpaced = True
-            .FontSize = 9
-            .Text = "Open a folder:       C:\TEMP\                 " & vbLf & _
-                    "Call the eMail app:  mailto:xxxxx@tutanota.com" & vbLf & _
-                    "Open a url/link:     http://......            " & vbLf & _
-                    "Open a file:         C:\TEMP\TestThis           (opens a dialog for the selection of the app" & vbLf & _
-                    "Open an application: x:\my\workbooks\this.xlsb  (opens Excel)"
-        End With
-        i = i + 1
-        With .Section(i).Label
-            .Text = "*) Common-VBA-Message-Service'"
-            .OpenWhenClicked = "https://github.com/warbe-maker/Common-VBA-Message-Service"
-            .FontSize = 8
-        End With
-    End With
-                                                                                                     
-    mMsg.Dsply dsply_title:=sMsgTitle _
-             , dsply_msg:=udtMessage _
-             , dsply_label_spec:=wsTest.MsgLabelPosSpec _
-             , dsply_buttons:=mMsg.Buttons(cll, "True", "False", vbYesNoCancel, sButton) _
-             , dsply_buttons_app_run:=mTest.BttnsAppRunArgs _
-             , dsply_width_min:=40 _
-             , dsply_width_max:=80 _
-             , dsply_height_max:=70 _
-             , dsply_modeless:=mTest.MODE_LESS
-    
-xt: EoP ErrSrc(PROC)
-    mTest.Evaluate
+xt: mBasic.EoP ErrSrc(PROC)
+    mMsgTest.Evaluate
     Exit Function
 
 eh: Select Case ErrMsg(ErrSrc(PROC))
