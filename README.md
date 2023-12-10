@@ -1,5 +1,4 @@
-# Common VBA Message Service (a MsgBox Alternative)
-
+### Common VBA Message Service (a MsgBox Alternative)
 [Summary](#summary)<br>
 [Why an alternative MsgBox?](#why-an-alternative-msgbox)<br>
 [Installation](#installation)<br>
@@ -32,7 +31,7 @@ A flexible and powerful alternative to the `VBA.MsgBox`, providing four specific
 - ***[ErrMsg](#the-errmsg-service)***: a service dedicated to the display of a well designed error message including a debugging option
 - ***[Monitor](#the-monitor-service)***: a service to display the progress of any number of ongoing processes progress.
 
-Below is an at-a-glance demonstration of the services capability. For those looking for a "fastpath" the code is available for download in the [MsgUsageDemo.xlsm][6] Workbook (mind the fact that the VB-Project needs to be signed or the Macro Security has to be changed. The code displays :<br>
+Below is an at-a-glance demonstration of the component's capabilities, i.e. the variety of possible messages including the monitoring of process steps and sub-process steps. For those looking for a "fastpath" the code is available for download in the [MsgUsageDemo.xlsm][6] Workbook (mind the fact that the VB-Project needs to be signed or the Macro Security has to be changed.  
 ![](images/Demo-Msg-Services.gif)
 
 ## Why an alternative MsgBox?
@@ -40,16 +39,16 @@ The alternative implementation addresses many of the MsgBox's deficiencies - wit
 
 |MsgBox|This "Common&nbsp;VBA&nbsp;Message&nbsp;Service"|
 |------|-----------|
-| The message width and height is limited and cannot be altered | The&nbsp;maximum&nbsp;width and&nbsp;height&nbsp;is&nbsp;specified as&nbsp;a percentage of the screen&nbsp;size&nbsp; which&nbsp;defaults&nbsp;to: 85%&nbsp;width and  85%&nbsp;height. A message which exceeds the limits is displayed with a horizontal and/or vertical scroll-bar.|
-| When a message exceeds its size limit ("approximately 1024 characters, depending on the width of the characters used") it is truncated | In practice there's no size limit but the systems limit for a `String` type which is about 1GB (and the _Dsply_ service displays up to 4 strings!|
-| The message is displayed with a proportional font | A message (section) string may optionally be displayed mono-spaced |
-| Composing a fair designed message is time consuming and it is difficult to come up with a satisfying result | Up&nbsp;to&nbsp;3&nbsp; _Message&nbsp;Sections_ each with an optional _Message Text Label_ and a _Mono-spaced_ option allow an appealing design without any extra  effort |
+| The message width and height is limited and cannot be altered | The maximum width and height is specified as a percentage of the screen size (both default 85% of the screen size. When a maximum is exceeded a vertical and/or a horizontal scroll-bars are displayed.|
+| A message which exceeds the size limit (approximately 1024 characters, depending on the width of the characters used) is truncated | There is no other size limit for a message but the systems limit for a `String` type which is about 1GB (and the _Dsply_ service displays up to 4 strings! Because a message has up to 8 sections even that limit is irrelevant.|
+| The message is displayed with a proportional font | A message (label and/or section) may be displayed proportional- or mono-spaced whereby the first is the default. |
+| Composing a fair designed message is time consuming and it is difficult to come up with a satisfying result | Up&nbsp;to&nbsp;8&nbsp; _Message&nbsp;Sections_ each with an optional _Label_, which may be placed above (default) or at the left of the section's _Text_ together with a _Mono-spaced_ option allow an appealing design with little extra effort. |
 | The maximum reply _Buttons_ is 3 and the displayed captions are not language specific | All services provide 7 x 7 (49) reply _Buttons_ (7 rows by 7 buttons) in any order. When the message is displayed mode-less displayed buttons may be provided with `Application.Run` information performed when the button is clicked.   |
 | The caption of the reply _Buttons_ is specified by a [value](<https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function#settings>) which results in 1 to 3 reply _Buttons_ with corresponding untranslated! native English captions | The caption of the reply _Buttons_ may be specified by the [VB MsgBox values](<https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function#settings>) **and** additionally by any multi-line text. |
-| vbApplicationModal or vbSystemModal, no vbModeless option | The message can be displayed both ways which _modal_ (the default) or _modeless_. _modal_ equals to vbApplicationModal, there is (yet) no vbSystemModal option.|
+| vbApplicationModal or vbSystemModal, no vbModeless option | The message can be displayed both ways which _modal_ (the default) or _mode-less_. _modal_ equals to vbApplicationModal, there is (yet) no vbSystemModal option.|
 | Specifying the default button | The default button may be specified as index or as the displayed caption. However, it cannot be specified as vbOk, vbYes, vbNo, etc. |
 | Display of an alert image (?, !, etc.) | (yet) not implemented |
-| not available           | A message is structured into sections of which each can have a Label and a Text whereby the Label may be positioned to the left of the Text or above (the default). Both, the Label and the Text may have an _OnClickAction_ which allows the specification of anything to open: URL, mailto, folder, file, or an application like Excel.|
+| not available           | A message is structured into sections of which each can have a _Label_ and a _Text_ whereby the Label may be positioned to the left of the Text or above (the default). Both, the Label and the Text may have an _OnClickAction_ which allows the specification of anything to open: URL, mailto, folder, file, or an application like Excel.|
 
 ## Installation
 1. Download [fMsg.frm][1], [fMsg.frx][2], and [mMsg.bas][3] .
@@ -146,7 +145,7 @@ The _Dsply_ service has these named arguments:
 | `dsply_buttons_app_run`  | |
 | `dsply_button_default`   | Optional, _Long_ expression, defaults to 1, specifies the index of the button which is the default button. |
 | `dsply_reply_with_index` | Optional, _Boolean_ expression, defaults to False. When True the index if the pressed button is returned rather than its caption. |
-| `dsply_modeless`          | Optional, _Boolean_ expression, defaults to False. When True the message is displayed modeless.  |
+| `dsply_modeless`          | Optional, _Boolean_ expression, defaults to False. When True the message is displayed mode-less.  |
 | `dsply_width_min`        | Optional, _Single_ expression, defaults to 300 which interpreted as pt.                   |
 | `dsply_width_max`        | Optional, _Single_ expression, Defaults to 80 which interpreted as % of the screen's width. |
 | `dsply_height_max`       | Optional, _Single_ expression, defaults to 75 which is interpreted as % of the screen's height.|
@@ -401,12 +400,12 @@ The service has the following named arguments:
 | `b_service_name` | String expression, obligatory, specifies the ***Public*** service to be called in the form <module>.<procedure>. |
 | `b_arguments`    | ParamArray, optional, any ***positional*** arguments passed to the service. |
 
-### Usage of the __ButtonAppRun_ service
+### Usage of the _ButtonAppRun_ service
 ```vb
     Dim dctButtonsAppRun As New Dictionary
     
-    '~~ Note: Provided 'Application.Run' information only becomes effective
-    '~~ when the form is displayed modeless!
+    '~~ Note: Any provided 'Application.Run' information becomes effective
+    '~~ only when the form is displayed mode-less!
     mMsg.ButtonAppRun dctButtonsAppRun, "Passed", ThisWorkbook, "mMsgTestServices.Passed"
     mMsg.ButtonAppRun dctButtonsAppRun, "Failed", ThisWorkbook, "mMsgTestServices.Failed"
     
@@ -414,25 +413,20 @@ The service has the following named arguments:
            , Buttons:=MsgButtons _
            , Title:=MsgTitle _
            , box_modeless:=True _
-           , box_buttons_app_run:=dctButtonsAppRun
+           , box_buttons_app_run:=dctButtonsAppRun ' *)
 ```
-Note: With the _Dsply_ service the Dictionary is provided via the dsply_buttons_app_run argument.
+*) With the _Dsply_ service the Dictionary is provided via the `dsply_buttons_app_run` argument.
 
 ### The _MsgInstance_ service
-When a UserForm is used multiple times in parallel (displayed mode-less) it is required to use class instances of it. The service creates - or optionally unloads - an instance of a UserForm identified by its Title and saves the instance into a Dictionary with the Title as the key and the instance as the item.  
-Syntax: `mMsg.MsgInstance(title, unload)`  
-`unload` defaults to False. When True an already existing instance is unloaded.
- When no item with the given title exists the instance is created, stored in the Dictionary and returned. When an item exists in the Dictionary which is no longer loaded (shown or hidden) it is removed from the Dictionary.
-
-Example: `Set msg = mMsg.MsgInstance("This title")` returns an already existing or new instance of the _fMsg_ UserForm (fMsg) object.
+Since the UserForm (fMsg) may be displayed multiple times in parallel when displayed mode-less  all services use an instances of the UserForm identified by its Title (Caption). The services create - or optionally unload - an instance of a UserForm identified by its Title and saves the instance into a Dictionary with the Title as the key and the instance as the item. This service property matters when it comes to process-step-monitoring where it is important to understand that each Process-Title is a separate, mode-less displayed window (i.e. process) in which steps are displayed.
 
 ## Miscellaneous aspects
 ### Min/Max Message Width/Height
-A value less than 100 is interpreted as percentage of the screen size, a value equal or greater 100 is interpreted as pt - and re-calculated as percentage to evaluate the specifiable range. The specifiable width ranges from 25 to 98 or a value in pt which corresponds to them. I.e. a width less than 25% is set to 25%, a width greater than 98% is set to 98%.
+Both may be specified as pt or percentage. A value less than 100 is interpreted as percentage of the screen size, a value equal or greater 100 is interpreted as pt - and re-calculated as percentage to evaluate the specifiable range. The specifiable width ranges from 25 to 98 or a value in pt which corresponds to them. I.e. a width less than 25% is set to 25%, a width greater than 98% is set to 98%. For pt values the %-equivalent is the limit.
 
 ### Proportional- versus Mono-spaced
 - ***Mono-spaced***: Because the text is ++not++  "wrapped" the width of the _Message Form_ is determined by the longest text line (up to the _Maximum Form Width_ specified). When the maximum width is exceeded a vertical scroll bar is applied.<br>Note: The title and the broadest _Button Row_ may still determine an even broader final _Message Form_.
-- ***Proportional-spaced (default)***: Because the text is "wrapped" the width of a proportional-spaced text adjusts to the width of the form determined by the Title, Mono-spaced sections and the doisplayed Buttons.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the specified minimum message width and the width required for the broadest _Buttons Row_.
+- ***Proportional-spaced (default)***: Because the text is "wrapped" the width of a proportional-spaced text adjusts to the width of the form determined by the Title, Mono-spaced sections and the displayed Buttons.<br>Note: When a message is displayed exclusively proportional-spaced the _Message Form_ width is determined by the length of the title, the specified minimum message width and the width required for the broadest _Buttons Row_.
 
 ### Unambiguous procedure name
 The _ErrSrc_ function provides the procedure-name prefixed by the module-name.
