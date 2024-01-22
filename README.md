@@ -257,7 +257,7 @@ which displays:
 ![](images/Demo-Dsply-service.png)
 
 ### The _ErrMsg_ service
-Provides the display of a well designed error message by supporting a debugging option enabled with _Conditional Compile Argument_  `Debugging = 1` which displays an extra ***Resume Error Line*** button.
+Provides the display of a well designed error message by supporting a debugging option which displays an extra ***Resume Error Line*** button.
 #### Syntax
 `mMsg.ErrMsg(proc-name)`
 Note: All other information about the error is obtained from the `err` object.

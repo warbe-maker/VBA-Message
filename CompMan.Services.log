@@ -6229,3 +6229,25 @@
 23-12-08-15:45:41  Standard-Module mTrc .............: Unchanged Common Component used
 23-12-08-15:45:41  Workbook        wbMsg ............: Unchanged VBComponent ignored
 23-12-08-15:45:41  Worksheet       wsTest ...........: Unchanged VBComponent ignored
+24-01-15-18:51:22 ======================================================================================================================================================================
+24-01-15-18:51:22                                                    Update Outdated Common Components (by CompMan.xlsb) for Msg.xlsb                                                   
+24-01-15-18:51:22 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+24-01-15-18:51:22  Standard-Module mBasic ...........: Component is up-to-date! Revision-Number has been set to to 2023-12-08-12-19-08 (UTC) (the raw's in the Common Components Folder)
+24-01-15-18:51:22                                      Used Common Component is up-to-date
+24-01-15-18:51:22  Standard-Module mDct .............: Component is up-to-date! Revision-Number has been set to to 2023-12-08-12-19-08 (UTC) (the raw's in the Common Components Folder)
+24-01-15-18:51:22                                      Used Common Component is up-to-date
+24-01-15-18:51:22  Standard-Module mMsg .............: Component is up-to-date! Revision-Number has been set to to 2023-12-08-13-52-06 (UTC) (the raw's in the Common Components Folder)
+24-01-15-18:51:22                                      Used Common Component is up-to-date
+24-01-15-18:51:22  Standard-Module mObject ..........: Component is up-to-date! Revision-Number has been set to to 2023-10-10-07-22-01 (UTC) (the raw's in the Common Components Folder)
+24-01-15-18:51:22                                      Used Common Component is up-to-date
+24-01-15-18:51:23  Standard-Module mTrc .............: Component is up-to-date! Revision-Number has been set to to 2023-06-23.002 (the raw's in the Common Components Folder)
+24-01-15-18:51:23                                      Used Common Component is up-to-date
+24-01-15-18:53:07 ========================================================================
+24-01-15-18:53:07         Export Changed Components (by CompMan.xlsb) for Msg.xlsb        
+24-01-15-18:53:07 ------------------------------------------------------------------------
+24-01-15-18:53:07  Standard-Module mObject .: Modified Common Component: e x p o r t e d !
+24-01-15-18:53:07                             Modified Common Component: Last modification info changed from 2023-10-10-07-22-01 (UTC) to 2024-01-15-17-53-07 (UTC)
+24-01-15-18:53:07                             Modified Common Component: Pending Release registered
+24-01-15-18:53:08  UserForm        fMsg ....: Modified Common Component: e x p o r t e d !
+24-01-15-18:53:08                             Modified Common Component: Last modification info changed from 2023-12-10-18-05-44 (UTC) to 2024-01-15-17-53-08 (UTC)
+24-01-15-18:53:08                             Modified Common Component: Pending Release registered
