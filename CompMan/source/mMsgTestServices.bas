@@ -186,7 +186,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
     If err_line = 0 Then ErrLine = Erl
-    If err_source = vbNullString Then err_source = Err.source
+    If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
     
@@ -260,7 +260,7 @@ Public Function Test_10_Regression() As Variant
     Unload fMsg
     wsTest.RegressionTest = True
     mErH.Regression = True
-    mTrc.FileName = "RegressionTest.ExecTrace.log"
+    mTrc.FileBaseName = "RegressionTest.ExecTrace"
     mTrc.Title = "Regression test module mMsg"
     mTrc.NewFile
     
@@ -561,7 +561,7 @@ Public Function Test_12_mMsg_ErrMsg_AppErr_5() As Variant
     mErH.Asserted AppErr(5) ' skips the display of the error message when mErH.Regression = True
     
     Err.Raise Number:=AppErr(5) _
-            , source:=ErrSrc(PROC) _
+            , Source:=ErrSrc(PROC) _
             , Description:="This is a test error description!||This is part of the error description, " & _
                            "concatenated by a double vertical bar and therefore displayed as an additional 'About' section " & _
                            "(one of the specific features of the mMsg.ErrMsg service)."

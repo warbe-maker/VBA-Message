@@ -112,7 +112,7 @@ Public Function BttnFailedAction() As Variant
     
     Previous = CurrentProcId
     '~~ Unload current test proc
-    Unload mMsg.MsgInstance(mMsgTest.CurrentProcId)
+    Unload mMsg.Instance(mMsgTest.CurrentProcId)
     UnloadEvaluate
     
     '~~ Envoke next test proc
@@ -129,7 +129,7 @@ Public Function BttnPassedAction() As Variant
     mMsgTest.Previous = mMsgTest.CurrentProcId
     
     '~~ Unload current test proc
-    Unload mMsg.MsgInstance(mMsgTest.CurrentTitle)
+    Unload mMsg.Instance(mMsgTest.CurrentTitle)
     UnloadEvaluate
     
     '~~ Envoke next test proc
@@ -211,13 +211,13 @@ End Sub
 
 Public Function BttnRepeatAction() As Variant
     '~~ Unload current test proc
-    Unload mMsg.MsgInstance(mMsgTest.CurrentTitle)
+    Unload mMsg.Instance(mMsgTest.CurrentTitle)
     mMsgTest.TestProc mMsgTest.ProcId
 End Function
 
 Public Sub BttnTerminatedAction()
     
-    mMsg.MsgInstance(mMsgTest.Title(mMsgTest.CurrentProcId)).Hide
+    mMsg.Instance(mMsgTest.Title(mMsgTest.CurrentProcId)).Hide
     If mErH.Regression Then
         EoP mMsgTest.CurrentProcId
         wsTest.RegressionTest = False
@@ -228,7 +228,7 @@ Public Sub BttnTerminatedAction()
         mTrc.Dsply
 #End If
     End If
-    Unload mMsg.MsgInstance(mMsgTest.Title(mMsgTest.CurrentProcId))
+    Unload mMsg.Instance(mMsgTest.Title(mMsgTest.CurrentProcId))
     UnloadEvaluate
     
 End Sub
@@ -441,7 +441,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
     If err_line = 0 Then ErrLine = Erl
-    If err_source = vbNullString Then err_source = Err.source
+    If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
     
@@ -520,8 +520,8 @@ Public Sub Evaluate(Optional ByVal e_selftest As Boolean = False)
     If e_selftest Then
         mMsgTest.InitializeTest "02-0", PROC
     End If
-    Set ufm = mMsg.MsgInstance(PROC)
-    Set ufmTest = mMsg.MsgInstance(CurrentTitle)
+    Set ufm = mMsg.Instance(PROC)
+    Set ufmTest = mMsg.Instance(CurrentTitle)
     With ufmTest
         siTop = .Top
         siLeft = .Left + .Width + 5
@@ -627,8 +627,8 @@ Public Sub InitializeMessage(ByRef m_form As fMsg, _
 ' ------------------------------------------------------------------------------
     Dim i As Long
     
-    mMsg.MsgInstance fi_key:=m_title, fi_unload:=True                    ' Ensures a message starts from scratch
-    Set m_form = mMsg.MsgInstance(m_title)
+    mMsg.Instance i_title:=m_title, i_unload:=True                    ' Ensures a message starts from scratch
+    Set m_form = mMsg.Instance(m_title)
     
     For i = 1 To mMsg.NoOfMsgSects ' obtained when the designed controls are collected
         With mMsgTest.udtMessage.Section(i)
@@ -758,11 +758,11 @@ End Function
 Public Function TestProc(ByVal n_test_number As Variant) As Variant
         
     Select Case n_test_number
-        Case "02-1":    TestProc = mMsgTestProcs.Test_Basic_02_1_Single_Section_PropSpaced
-        Case "02-2":    TestProc = mMsgTestProcs.Test_Basic_02_2_Single_Section_MonoSpaced_With_Label
-        Case "02-3":    TestProc = mMsgTestProcs.Test_Basic_02_3_Single_Section_MonoSpaced_No_Label
-        Case "02-4":    TestProc = mMsgTestProcs.Test_Basic_02_4_Single_Section_MonoSpaced_With_VH_Scroll
-        Case "02-5":    TestProc = mMsgTestProcs.Test_Basic_02_5_Single_Section_Label_Only
+        Case "02-1":    TestProc = mMsgTestProcs.Test_02_1_Single_Section_PropSpaced
+        Case "02-2":    TestProc = mMsgTestProcs.Test_02_2_Single_Section_MonoSpaced_With_Label
+        Case "02-3":    TestProc = mMsgTestProcs.Test_02_3_Single_Section_MonoSpaced_No_Label
+        Case "02-4":    TestProc = mMsgTestProcs.Test_02_4_Single_Section_MonoSpaced_With_VH_Scroll
+        Case "02-5":    TestProc = mMsgTestProcs.Test_02_5_Single_Section_Label_Only
         Case "00":      TestProc = mMsgTestServices.Test_00_Evaluate
         Case 11:        TestProc = mMsgTestServices.Test_11_mMsg_Box_Buttons_Only
         Case 12:        TestProc = mMsgTestServices.Test_12_mMsg_ErrMsg_AppErr_5
@@ -788,7 +788,7 @@ Public Function TestProc(ByVal n_test_number As Variant) As Variant
         Case 90:        TestProc = mMsgTestServices.Test_90_mMsg_Dsply_AllInOne
         Case 91:        TestProc = mMsgTestServices.Test_91_mMsg_Dsply_MinimumMessage
         Case 0
-            mMsg.MsgInstance(Title(mMsgTest.CurrentProcId)).Hide
+            mMsg.Instance(Title(mMsgTest.CurrentProcId)).Hide
             If mErH.Regression Then
                 EoP "mMsgTestServices.Test_10_Regression"
                 wsTest.RegressionTest = False
@@ -799,7 +799,7 @@ Public Function TestProc(ByVal n_test_number As Variant) As Variant
 #ElseIf XcTrc_mTrc = 1 Then
             mTrc.Dsply
 #End If
-            Unload mMsg.MsgInstance(Title(CurrentProcId))
+            Unload mMsg.Instance(Title(CurrentProcId))
     End Select
     
 End Function
@@ -841,11 +841,11 @@ Private Sub UnloadEvaluate()
     On Error GoTo eh
     Dim ufm As fMsg
     
-    If mMsg.MsgInstances.Exists(EVALUATION_TITLE) Then
+    If mMsg.Instances.Exists(EVALUATION_TITLE) Then
         On Error Resume Next
-        Set ufm = mMsg.MsgInstances(EVALUATION_TITLE)
+        Set ufm = mMsg.Instances(EVALUATION_TITLE)
         If Err.Number <> 0 Then
-            mMsg.MsgInstances.Remove EVALUATION_TITLE
+            mMsg.Instances.Remove EVALUATION_TITLE
         End If
         With ufm
             siEvaluateTop = .Top

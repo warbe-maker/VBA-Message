@@ -241,7 +241,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
     If err_line = 0 Then ErrLine = Erl
-    If err_source = vbNullString Then err_source = Err.source
+    If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
     
@@ -306,8 +306,8 @@ Private Function FormNew(ByVal uf_wb As Workbook, _
     Const PROC = "FormNew"
     
     On Error GoTo eh
-    Dim NewCommandButton1   As MsForms.CommandButton
-    Dim NewCommandButton2   As MsForms.CommandButton
+    Dim NewCommandButton1   As MSForms.CommandButton
+    Dim NewCommandButton2   As MSForms.CommandButton
     Dim x                   As Long
     Dim cmp                 As VBComponent
     Dim LeftPos             As Single
@@ -531,16 +531,16 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
-Private Function TestInstance(ByVal fi_key As String, _
-                     Optional ByVal fi_unload As Boolean = False) As fMsgProcTest
+Private Function TestInstance(ByVal t_key As String, _
+                     Optional ByVal t_unload As Boolean = False) As fMsgProcTest
 ' -------------------------------------------------------------------------
 ' Returns an instance of the UserForm fMsgProcTest which is definitely
-' identified by anything uniqe for the instance (fi_key). This may be what
+' identified by anything uniqe for the instance (t_key). This may be what
 ' becomes the title (property Caption) or even an object such like a
 ' Worksheet (if the instance is Worksheet specific). An already existing or
-' new created instance is maintained in a static Dictionary with fi_key as
-' the key and returned to the caller. When fi_unload is true only a possibly
-' already existing Userform identified by fi_key is unloaded.
+' new created instance is maintained in a static Dictionary with t_key as
+' the key and returned to the caller. When t_unload is true only a possibly
+' already existing Userform identified by t_key is unloaded.
 '
 ' Requires: Reference to the "Microsoft Scripting Runtime".
 ' Usage   : The fMsgProcTest has to be replaced by the name of the desired
@@ -549,37 +549,37 @@ Private Function TestInstance(ByVal fi_key As String, _
     Const PROC = "TestInstance"
     
     On Error GoTo eh
-    Static MsgInstances As Dictionary    ' Collection of (possibly still)  active form instances
+    Static Instances As Dictionary    ' Collection of (possibly still)  active form instances
     
-    If MsgInstances Is Nothing Then Set MsgInstances = New Dictionary
+    If Instances Is Nothing Then Set Instances = New Dictionary
     
-    If fi_unload Then
-        If MsgInstances.Exists(fi_key) Then
+    If t_unload Then
+        If Instances.Exists(t_key) Then
             On Error Resume Next
-            Unload MsgInstances(fi_key) ' The instance may be already unloaded
-            MsgInstances.Remove fi_key
+            Unload Instances(t_key) ' The instance may be already unloaded
+            Instances.Remove t_key
         End If
         Exit Function
     End If
     
-    If Not MsgInstances.Exists(fi_key) Then
+    If Not Instances.Exists(t_key) Then
         '~~ There is no evidence of an already existing instance
         Set TestInstance = New fMsgProcTest
-        MsgInstances.Add fi_key, TestInstance
+        Instances.Add t_key, TestInstance
     Else
-        '~~ An instance identified by fi_key exists in the Dictionary.
+        '~~ An instance identified by t_key exists in the Dictionary.
         '~~ It may however have already been unloaded.
         On Error Resume Next
-        Set TestInstance = MsgInstances(fi_key)
+        Set TestInstance = Instances(t_key)
         Select Case Err.Number
             Case 0
             Case 13
-                If MsgInstances.Exists(fi_key) Then
+                If Instances.Exists(t_key) Then
                     '~~ The apparently no longer existing instance is removed from the Dictionarys
-                    MsgInstances.Remove fi_key
+                    Instances.Remove t_key
                 End If
                 Set TestInstance = New fMsgProcTest
-                MsgInstances.Add fi_key, TestInstance
+                Instances.Add t_key, TestInstance
             Case Else
                 '~~ Unknown error!
                 Err.Raise 1 + vbObjectError, ErrSrc(PROC), "Unknown/unrecognized error!"
@@ -595,13 +595,32 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Sub Test_Basic_01_1_AdjustToVgrid()
+Public Sub Test_00_1_Guide()
+
+    Dim sTitle As String
+    Dim sMsg As String
+    
+    sTitle = "Guidance title"
+    sMsg = "This is a guidance message. This is a guidance message. This is a guidance message. This is a guidance message. This is a guidance message. This is a guidance message. This is a guidance message. This is a guidance message."
+    With New clsTestAid
+        .TestId = "00-1.1"
+        .Guide sMsg
+        .GuideDone
+        .TestId = "00-1.2"
+        .Guide sMsg
+        .GuideDone
+        .GuideUnload
+    End With
+    
+End Sub
+
+Public Sub Test_01_1_AdjustToVgrid()
     Debug.Assert AdjustToVgrid(7.4) = 6
     Debug.Assert AdjustToVgrid(7.5) = 12
 End Sub
 
-Public Sub Test_Basic_01_2_AutoSizeTextBox_Width_Limited()
-    Const PROC = "Test_Basic_01_2_AutoSizeTextBox_Width_Limited"
+Public Sub Test_01_2_AutoSizeTextBox_Width_Limited()
+    Const PROC = "Test_01_2_AutoSizeTextBox_Width_Limited"
     
     Dim i                   As Long
     Dim iFrom               As Long
@@ -696,8 +715,8 @@ again:
 
 End Sub
 
-Public Sub Test_Basic_01_3_AutoSizeTextBox_Width_Unlimited()
-    Const PROC = "Test_Basic_01_3_AutoSizeTextBox_Width_Unlimited"
+Public Sub Test_01_3_AutoSizeTextBox_Width_Unlimited()
+    Const PROC = "Test_01_3_AutoSizeTextBox_Width_Unlimited"
     
     Dim i               As Long
     Dim iFrom           As Long
@@ -779,12 +798,12 @@ again:
 
 End Sub
 
-Public Sub Test_Basic_01_4_Pass_udtMsgText()
+Public Sub Test_01_4_Pass_udtMsgText()
 ' ------------------------------------------------------------------------------
 ' Test of passing on any 'kind of' udtMsgText to a UserForm and retrieving it
 ' again as a udtMsgText.
 ' ------------------------------------------------------------------------------
-    Const PROC = "Test_Basic_01_4_Pass_udtMsgText"
+    Const PROC = "Test_01_4_Pass_udtMsgText"
     
     On Error GoTo eh
     Dim t As udtMsgText
@@ -792,8 +811,8 @@ Public Sub Test_Basic_01_4_Pass_udtMsgText()
     Dim k As KindOfText
     Dim i As Long
     
-    Set f = TestInstance(fi_key:="Test-Title", fi_unload:=True)
-    Set f = TestInstance(fi_key:="Test-Title")
+    Set f = TestInstance(t_key:="Test-Title", t_unload:=True)
+    Set f = TestInstance(t_key:="Test-Title")
     
     t.FontBold = True
     With f
@@ -826,24 +845,22 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
-Public Function Test_Basic_02_1_Single_Section_PropSpaced() As Variant
+Public Function Test_02_1_Single_Section_PropSpaced() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC = "Test_Basic_02_1_Single_Section_PropSpaced"
+    Const PROC = "Test_02_1_Single_Section_PropSpaced"
         
     On Error GoTo eh
     
     mBasic.BoP ErrSrc(PROC)
     mMsgTest.InitializeTest "02-1", PROC
     With mMsgTest.udtMessage.Section(1)
-        .Label.Text = "Any Label:"
-        .Label.FontColor = rgbBlue
         .Text.Text = DFLT_SECT_TEXT_PROP
     End With
     mMsg.Dsply dsply_title:=TestProcName _
              , dsply_msg:=mMsgTest.udtMessage _
-             , dsply_buttons:=mMsgTest.BttnsBasic _
+             , dsply_buttons:=vbNullString _
              , dsply_buttons_app_run:=mMsgTest.BttnsAppRunArgs _
              , dsply_Label_spec:=wsTest.MsgLabelPosSpec _
              , dsply_width_min:=wsTest.FormWidthMin _
@@ -860,11 +877,11 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_Basic_02_2_Single_Section_MonoSpaced_With_Label() As Variant
+Public Function Test_02_2_Single_Section_MonoSpaced_With_Label() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC = "Test_Basic_02_2_Single_Section_MonoSpaced_With_Label"
+    Const PROC = "Test_02_2_Single_Section_MonoSpaced_With_Label"
         
     On Error GoTo eh
     
@@ -896,11 +913,11 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_Basic_02_3_Single_Section_MonoSpaced_No_Label() As Variant
+Public Function Test_02_3_Single_Section_MonoSpaced_No_Label() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC = "Test_Basic_02_3_Single_Section_MonoSpaced_No_Label"
+    Const PROC = "Test_02_3_Single_Section_MonoSpaced_No_Label"
         
     On Error GoTo eh
     
@@ -936,11 +953,11 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_Basic_02_5_Single_Section_Label_Only() As Variant
+Public Function Test_02_5_Single_Section_Label_Only() As Variant
 ' ------------------------------------------------------------------------------
 '
 ' ------------------------------------------------------------------------------
-    Const PROC = "Test_Basic_02_5_Single_Section_Label_Only"
+    Const PROC = "Test_02_5_Single_Section_Label_Only"
         
     On Error GoTo eh
     
@@ -970,12 +987,12 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_Basic_02_4_Single_Section_MonoSpaced_With_VH_Scroll()
+Public Function Test_02_4_Single_Section_MonoSpaced_With_VH_Scroll()
 ' ------------------------------------------------------------------------------
 ' With the vertical scroll bar applied the horizontal scroll-bar of the section
 ' is replaced by one for the message area.
 ' ------------------------------------------------------------------------------
-    Const PROC = "Test_Basic_02_4_Single_Section_MonoSpaced_With_VH_Scroll"
+    Const PROC = "Test_02_4_Single_Section_MonoSpaced_With_VH_Scroll"
     
     On Error GoTo eh
     
@@ -1006,12 +1023,12 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Function
 
-Public Function Test_Basic_02_6_Single_Section_MonoSpaced_With_Label_And_VH_Scroll()
+Public Function Test_02_6_Single_Section_MonoSpaced_With_Label_And_VH_Scroll()
 ' ------------------------------------------------------------------------------
 ' With the vertical scroll bar applied the horizontal scroll-bar of the section
 ' is replaced by one for the message area.
 ' ------------------------------------------------------------------------------
-    Const PROC = "Test_Basic_02_6_Single_Section_MonoSpaced_With_Label_And_VH_Scroll"
+    Const PROC = "Test_02_6_Single_Section_MonoSpaced_With_Label_And_VH_Scroll"
     
     On Error GoTo eh
     
@@ -1050,14 +1067,14 @@ End Function
 
 Public Sub Test_Regression()
 
-'    mMsgTestProcs.Test_Basic_01_1_AdjustToVgrid
-'    mMsgTestProcs.Test_Basic_01_2_AutoSizeTextBox_Width_Limited
-'    mMsgTestProcs.Test_Basic_01_3_AutoSizeTextBox_Width_Unlimited
-'    mMsgTestProcs.Test_Basic_01_4_Pass_udtMsgText
-    mMsgTestProcs.Test_Basic_02_1_Single_Section_PropSpaced
-    mMsgTestProcs.Test_Basic_02_2_Single_Section_MonoSpaced_With_Label
-    mMsgTestProcs.Test_Basic_02_3_Single_Section_MonoSpaced_No_Label
-    mMsgTestProcs.Test_Basic_02_4_Single_Section_MonoSpaced_With_VH_Scroll
-    mMsgTestProcs.Test_Basic_02_5_Single_Section_Label_Only
+'    mMsgTestProcs.Test_01_1_AdjustToVgrid
+'    mMsgTestProcs.Test_01_2_AutoSizeTextBox_Width_Limited
+'    mMsgTestProcs.Test_01_3_AutoSizeTextBox_Width_Unlimited
+'    mMsgTestProcs.Test_01_4_Pass_udtMsgText
+    mMsgTestProcs.Test_02_1_Single_Section_PropSpaced
+    mMsgTestProcs.Test_02_2_Single_Section_MonoSpaced_With_Label
+    mMsgTestProcs.Test_02_3_Single_Section_MonoSpaced_No_Label
+    mMsgTestProcs.Test_02_4_Single_Section_MonoSpaced_With_VH_Scroll
+    mMsgTestProcs.Test_02_5_Single_Section_Label_Only
 End Sub
 

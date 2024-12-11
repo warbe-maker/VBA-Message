@@ -87,12 +87,12 @@ Public Property Let Text(Optional ByVal txt_kind_of_text As KindOfText, _
 
 End Property
 
-Private Property Get ContentHeight(ByRef frm As MSForms.Frame) As Single
+Private Property Get ContentHeight(ByRef frm As MsForms.Frame) As Single
 ' ------------------------------------------------------------------------------
 ' Returns the height of the frame's (frm) content by considering only
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
-    Dim ctl As MSForms.Control
+    Dim ctl As MsForms.Control
     
     For Each ctl In frm.Controls
         If ctl.Parent Is frm Then
@@ -108,8 +108,8 @@ Private Property Get FrameContentWidth(Optional ByRef v As Variant) As Single
 ' applied/visible controls.
 ' ------------------------------------------------------------------------------
     
-    Dim ctl     As MSForms.Control
-    Dim frm_ctl As MSForms.Control
+    Dim ctl     As MsForms.Control
+    Dim frm_ctl As MsForms.Control
     
     If TypeName(v) = "Frame" Then Set frm_ctl = v Else Stop
     For Each ctl In frm_ctl.Controls
@@ -120,7 +120,7 @@ Private Property Get FrameContentWidth(Optional ByRef v As Variant) As Single
     
 End Property
 
-Private Property Let FrameHeight(Optional ByRef frm As MSForms.Frame, _
+Private Property Let FrameHeight(Optional ByRef frm As MsForms.Frame, _
                                           ByVal frm_height As Single)
 ' ------------------------------------------------------------------------------
 ' Mimics a frame's height change event. When the height of the frame (frm) is
@@ -154,7 +154,7 @@ Private Property Let FrameHeight(Optional ByRef frm As MSForms.Frame, _
     End If
 End Property
 
-Private Property Let FrameWidth(Optional ByRef frm As MSForms.Frame, _
+Private Property Let FrameWidth(Optional ByRef frm As MsForms.Frame, _
                                          ByVal frm_width As Single)
 ' ------------------------------------------------------------------------------
 ' Mimics a frame's width change event. When the width of the frame (frm) is
@@ -183,15 +183,15 @@ Private Property Let FrameWidth(Optional ByRef frm As MSForms.Frame, _
     
 End Property
 
-Private Property Get ScrollBarHeight(Optional ByVal frm As MSForms.Frame) As Single
+Private Property Get ScrollBarHeight(Optional ByVal frm As MsForms.Frame) As Single
     If frm.ScrollBars = fmScrollBarsBoth Or frm.ScrollBars = fmScrollBarsHorizontal Then ScrollBarHeight = 14
 End Property
 
-Private Property Get ScrollBarWidth(Optional ByVal frm As MSForms.Frame) As Single
+Private Property Get ScrollBarWidth(Optional ByVal frm As MsForms.Frame) As Single
     If frm.ScrollBars = fmScrollBarsBoth Or frm.ScrollBars = fmScrollBarsVertical Then ScrollBarWidth = 12
 End Property
 
-Private Property Get VspaceFrame(Optional frm As MSForms.Frame) As Single
+Private Property Get VspaceFrame(Optional frm As MsForms.Frame) As Single
     If frm.Caption = vbNullString Then VspaceFrame = 4 Else VspaceFrame = 8
 
 End Property
@@ -207,7 +207,7 @@ Private Function AppErr(ByVal app_err_no As Long) As Long
     If app_err_no >= 0 Then AppErr = app_err_no + vbObjectError Else AppErr = Abs(app_err_no - vbObjectError)
 End Function
 
-Public Sub AutoSizeTextBox(ByRef as_tbx As MSForms.TextBox, _
+Public Sub AutoSizeTextBox(ByRef as_tbx As MsForms.TextBox, _
                            ByVal as_text As String, _
                   Optional ByVal as_width_limit As Single = 0, _
                   Optional ByVal as_width_min As Single = 0, _
@@ -385,7 +385,7 @@ Private Function ErrMsg(ByVal err_source As String, _
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
     If err_line = 0 Then ErrLine = Erl
-    If err_source = vbNullString Then err_source = Err.source
+    If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
     
@@ -468,7 +468,7 @@ Private Function QisEmpty(ByVal qu As Collection) As Boolean
     Else QisEmpty = True
 End Function
 
-Private Function ScrollH_Applied(ByRef frm As MSForms.Frame) As Boolean
+Private Function ScrollH_Applied(ByRef frm As MsForms.Frame) As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns True when the frame (frm) has already a horizontal scrollbar applied.
 ' ------------------------------------------------------------------------------
@@ -478,7 +478,7 @@ Private Function ScrollH_Applied(ByRef frm As MSForms.Frame) As Boolean
 End Function
 
 Private Sub ScrollH_Apply( _
-                            ByRef scroll_frame As MSForms.Frame, _
+                            ByRef scroll_frame As MsForms.Frame, _
                             ByVal scrolled_width As Single, _
                    Optional ByVal x_action As fmScrollAction = fmScrollActionBegin)
 ' ------------------------------------------------------------------------------
@@ -527,7 +527,7 @@ xt: Exit Sub
 eh: If ErrMsg(ErrSrc(PROC)) = vbYes Then: Stop: Resume
 End Sub
 
-Private Function ScrollV_Applied(ByRef frm As MSForms.Frame) As Boolean
+Private Function ScrollV_Applied(ByRef frm As MsForms.Frame) As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns True when the frame (frm) has already a vertical scrollbar applied.
 ' ------------------------------------------------------------------------------
@@ -537,7 +537,7 @@ Private Function ScrollV_Applied(ByRef frm As MSForms.Frame) As Boolean
 End Function
 
 Private Sub ScrollV_Apply( _
-                          ByRef scroll_frame As MSForms.Frame, _
+                          ByRef scroll_frame As MsForms.Frame, _
                           ByVal scrolled_height As Single, _
                  Optional ByVal y_action As fmScrollAction = fmScrollActionBegin)
 ' ------------------------------------------------------------------------------
@@ -606,10 +606,10 @@ Public Sub Setup01Title(ByVal setup_title As String, _
         .Width = setup_width_min
         '~~ The extra title Label is only used to adjust the form width and remains hidden
         With .laMsgTitle
-            With .font
+            With .Font
                 .Bold = False
-                .Name = Me.font.Name
-                .SIZE = 8    ' Value which comes to a length close to the length required
+                .Name = Me.Font.Name
+                .Size = 8    ' Value which comes to a length close to the length required
             End With
             .Visible = True
             .Caption = vbNullString

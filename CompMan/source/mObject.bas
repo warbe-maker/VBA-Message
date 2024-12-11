@@ -34,9 +34,9 @@ Option Compare Text
 #Const VBE = 1              ' Requires a Reference to "Microsoft Visual Basis Extensibility ..."
 ' --- Begin of declarations to get all Workbooks of all running Excel instances
 Private Declare PtrSafe Function FindWindowEx Lib "user32" Alias "FindWindowExA" (ByVal hWnd1 As LongPtr, ByVal hWnd2 As LongPtr, ByVal lpsz1 As String, ByVal lpsz2 As String) As LongPtr
-Private Declare PtrSafe Function GetClassName Lib "user32" Alias "GetClassNameA" (ByVal hWnd As LongPtr, ByVal lpClassName As String, ByVal nMaxCount As LongPtr) As LongPtr
+Private Declare PtrSafe Function GetClassName Lib "user32" Alias "GetClassNameA" (ByVal hwnd As LongPtr, ByVal lpClassName As String, ByVal nMaxCount As LongPtr) As LongPtr
 Private Declare PtrSafe Function IIDFromString Lib "ole32" (ByVal lpsz As LongPtr, ByRef lpiid As UUID) As LongPtr
-Private Declare PtrSafe Function AccessibleObjectFromWindow Lib "oleacc" (ByVal hWnd As LongPtr, ByVal dwId As LongPtr, ByRef riid As UUID, ByRef ppvObject As Object) As LongPtr
+Private Declare PtrSafe Function AccessibleObjectFromWindow Lib "oleacc" (ByVal hwnd As LongPtr, ByVal dwId As LongPtr, ByRef riid As UUID, ByRef ppvObject As Object) As LongPtr
 
 Type UUID 'GUID
     Data1 As Long
@@ -617,7 +617,7 @@ Public Function OpenWbs() As Dictionary
                 N = 1
                 ReDim aApps(1 To 1)
                 Set aApps(N) = app
-            ElseIf checkHwnds(aApps, app.hWnd) Then
+            ElseIf checkHwnds(aApps, app.hwnd) Then
                 N = N + 1
                 ReDim Preserve aApps(1 To N)
                 Set aApps(N) = app
@@ -651,10 +651,10 @@ End Function
 
 #If Win64 Then
     Dim hWndDesk As LongPtr
-    Dim hWnd As LongPtr
+    Dim hwnd As LongPtr
 #Else
     Dim hWndDesk As Long
-    Dim hWnd As Long
+    Dim hwnd As Long
 #End If
 ' -----------------------------------------------------------------------------------
 '
@@ -667,19 +667,19 @@ End Function
     hWndDesk = FindWindowEx(hWndMain, 0&, "XLDESK", vbNullString)
 
     If hWndDesk <> 0 Then
-        hWnd = FindWindowEx(hWndDesk, 0, vbNullString, vbNullString)
+        hwnd = FindWindowEx(hWndDesk, 0, vbNullString, vbNullString)
 
-        Do While hWnd <> 0
+        Do While hwnd <> 0
             sText = String$(100, Chr$(0))
-            lRet = CLng(GetClassName(hWnd, sText, 100))
+            lRet = CLng(GetClassName(hwnd, sText, 100))
             If Left$(sText, lRet) = "EXCEL7" Then
                 Call IIDFromString(StrPtr(IID_IDispatch), iid)
-                If AccessibleObjectFromWindow(hWnd, OBJID_NATIVEOM, iid, ob) = 0 Then 'S_OK
+                If AccessibleObjectFromWindow(hwnd, OBJID_NATIVEOM, iid, ob) = 0 Then 'S_OK
                     Set GetExcelObjectFromHwnd = ob.Application
                     GoTo xt
                 End If
             End If
-            hWnd = FindWindowEx(hWndDesk, hWnd, vbNullString, vbNullString)
+            hwnd = FindWindowEx(hWndDesk, hwnd, vbNullString, vbNullString)
         Loop
         
     End If
@@ -688,9 +688,9 @@ xt:
 End Function
 
 #If Win64 Then
-    Private Function checkHwnds(ByRef xlApps() As Application, hWnd As LongPtr) As Boolean
+    Private Function checkHwnds(ByRef xlApps() As Application, hwnd As LongPtr) As Boolean
 #Else
-    Private Function checkHwnds(ByRef xlApps() As Application, hWnd As Long) As Boolean
+    Private Function checkHwnds(ByRef xlApps() As Application, hwnd As Long) As Boolean
 #End If
 ' -----------------------------------------------------------------------------------------
 '
@@ -703,7 +703,7 @@ End Function
     If UBound(xlApps) = 0 Then GoTo xt
 
     For i = LBound(xlApps) To UBound(xlApps)
-        If xlApps(i).hWnd = hWnd Then
+        If xlApps(i).hwnd = hwnd Then
             checkHwnds = False
             GoTo xt
         End If

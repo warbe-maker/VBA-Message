@@ -448,9 +448,9 @@ The Excel Workbook [Msg.xlsm](#Msg.xlsm) is for development and test of the _fMs
 Please note: The Workbook uses my "automated update of common components" - which will have no effect as long as the [Excel-VB-Project-Component-Management-Services][5] is not installed.
 
 
-[1]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/master/source/fMsg.frm
-[2]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/master/source/fMsg.frx
-[3]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/master/source/mMsg.bas
+[1]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/CompMan/master/source/fMsg.frm
+[2]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/master/CompMan/source/fMsg.frx
+[3]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/CompMan/master/source/mMsg.bas
 [4]:https://docs.microsoft.com/de-DE/office/vba/Language/Reference/User-Interface-Help/msgbox-function
 [5]:https://github.com/warbe-maker/Excel-VB-Components-Management-Services
 [6]:https://gitcdn.link/cdn/warbe-maker/Common-VBA-Message-Service/master/MsgUsageDemos/MsgUsageDemos.xlsm

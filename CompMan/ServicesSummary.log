@@ -1,0 +1,64 @@
+24-11-27-17:31:38 -------------------------------------------------- Export Changed Components (by CompMan.xlsb) for Msg.xlsb ---------------------------------------------------
+24-11-27-17:31:38 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+24-11-27-17:31:38                                     Modified Common Component: Release registered pending                                                                      
+24-11-27-17:31:38                                     Serviced Common Component modified: E x p o r t e d !                                                                      
+24-11-27-17:31:38                                     Serviced Common Component modified: Re-registered pending release                                                          
+24-11-27-17:31:39 ExportChangedComponents (by CompMan.xlsb) for Msg.xlsb: 1 of 16 exported (mObject)     See the VBE CompMan menu for 3 Common Components pending release!  (see E:\Sync\Excel VBA\DevAndTest\Msg\CompMan\Services.log for log details)
+24-11-27-17:33:40 =====================================================================================================================================================================================================================================
+24-11-27-17:33:40 ------------------------------------------------------------------------------------- Export Changed Components (by CompMan.xlsb) for Msg.xlsb --------------------------------------------------------------------------------------
+24-11-27-17:33:40 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+24-11-27-17:33:40 ExportChangedComponents (by CompMan.xlsb) for Msg.xlsb: 1 of 16 exported (mObject)     See the VBE CompMan menu for 2 Common Components pending release!  (see E:\Sync\Excel VBA\DevAndTest\Msg\CompMan\Services.log for log details)
+24-11-27-23:16:55 ===================================================================================================
+24-11-27-23:16:55  Standard-Module  mObject..........:  Modified Common Component: Release registered pending        
+24-11-27-23:16:55                   .................:  Serviced Common Component modified (code differs from public and LastModAt > LastmodAt public): Registered pending release 
+24-11-27-23:16:55                   .................:  Serviced Common Component modified: Properties pending set equal serviced                                                  
+24-11-27-23:16:56                   .................:  Serviced Common Component properties housekeeping:                                                                         
+24-11-27-23:16:56                   .................:  Serviced Common Component's Export-File meets public: Properties set equal public                                          
+24-11-27-23:16:57 ===============================================================================================================================================================
+24-11-27-23:16:57 -------------------------------------------------- Export Changed Components (by CompMan.xlsb) for Msg.xlsb ---------------------------------------------------
+24-11-27-23:16:57 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+24-11-27-23:16:57                                     Modified Common Component: Release registered pending                                                                      
+24-11-27-23:16:57                                     Serviced Common Component modified: E x p o r t e d !                                                                      
+24-11-27-23:16:57                                     Serviced Common Component modified: Re-registered pending release                                                          
+24-11-27-23:16:58 ExportChangedComponents (by CompMan.xlsb) for Msg.xlsb: 1 of 16 exported (mObject)     See the VBE CompMan menu for 2 Common Components pending release!  (see E:\Sync\Excel VBA\DevAndTest\Msg\CompMan\Services.log for log details)
+24-11-27-23:18:25 =======================================================================================================================================================================================================================================
+24-11-27-23:18:25 -------------------------------------------------------------------------------------- Export Changed Components (by CompMan.xlsb) for Msg.xlsb ---------------------------------------------------------------------------------------
+24-11-27-23:18:25 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+24-11-27-23:18:25 ExportChangedComponents (by CompMan.xlsb) for Msg.xlsb: 1 of 16 exported (mObject)     See the VBE CompMan menu for 1 Common Component is pending release!  (see E:\Sync\Excel VBA\DevAndTest\Msg\CompMan\Services.log for log details)
+24-11-28-09:32:02 ===================================================================================================
+24-11-28-09:32:02  UserForm         fMsg.............:  Modified Common Component: Release registered pending        
+24-11-28-09:32:02                   .................:  Serviced Common Component modified (code differs from public and LastModAt > LastmodAt public): Registered pending release 
+24-11-28-09:32:02                   .................:  Serviced Common Component modified: Properties pending set equal serviced                                                  
+24-11-28-09:32:02  Standard-Module  mObject..........:  Modified Common Component: Release registered pending                                                                      
+24-11-28-09:32:02                   .................:  Serviced Common Component modified (code differs from public and LastModAt > LastmodAt public): Registered pending release 
+24-11-28-09:32:02                   .................:  Serviced Common Component modified: Properties pending set equal serviced                                                  
+24-11-28-09:32:03  UserForm         fMsg.............:  Serviced Common Component properties housekeeping:                                                                         
+24-11-28-09:32:03                   .................:  Serviced Common Component's Export-File meets public: Properties set equal public                                          
+24-11-28-09:32:03  Standard-Module  mObject..........:  Serviced Common Component properties housekeeping:                                                                         
+24-11-28-09:32:03                   .................:  Serviced Common Component's Export-File meets public: Properties set equal public                                          
+24-11-28-09:32:04 ===============================================================================================================================================================
+24-11-28-09:32:04 -------------------------------------------------- Export Changed Components (by CompMan.xlsb) for Msg.xlsb ---------------------------------------------------
+24-11-28-09:32:04 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+24-11-28-09:32:04                                     Modified Common Component: Release registered pending                                                                      
+24-11-28-09:32:04                                     Serviced Common Component modified: E x p o r t e d !                                                                      
+24-11-28-09:32:04                                     Serviced Common Component modified: Re-registered pending release                                                          
+24-11-28-09:42:13 =================================================================================================
+24-11-28-09:42:13 ------------------- Export Changed Components (by CompMan.xlsb) for Msg.xlsb --------------------
+24-11-28-09:42:13 -------------------------------------------------------------------------------------------------
+24-11-28-09:42:13  Standard-Module  mMsg              Modified Common Component: Release registered pending        
+24-11-28-09:42:13                                     Serviced Common Component modified: E x p o r t e d !        
+24-11-28-09:42:13                                     Serviced Common Component modified: Re-registered pending re 
+24-11-28-09:42:14 ExportChangedComponents (by CompMan.xlsb) for Msg.xlsb: 3 of 16 exported (mMsg, mObject, fMsg)     See the VBE CompMan menu for 1 Common Component is pending release!  (see E:\Sync\Excel VBA\DevAndTest\Msg\CompMan\Services.log for log details)
+24-11-28-09:51:31 ===================================================================================================
+24-11-28-09:51:31  Standard-Module  mObject..........:  Modified Common Component: Release registered pending        
+24-11-28-09:51:31                   .................:  Serviced Common Component modified (code differs from public and LastModAt > LastmodAt public): Registered pending release 
+24-11-28-09:51:31                   .................:  Serviced Common Component modified: Properties pending set equal serviced                                                  
+24-11-28-09:51:32                   .................:  Serviced Common Component properties housekeeping:                                                                         
+24-11-28-09:51:32                   .................:  Serviced Common Component's Export-File meets public: Properties set equal public                                          
+24-11-28-09:51:33 ===============================================================================================================================================================
+24-11-28-09:51:33 -------------------------------------------------- Export Changed Components (by CompMan.xlsb) for Msg.xlsb ---------------------------------------------------
+24-11-28-09:51:33 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+24-11-28-09:51:33                                     Modified Common Component: Release registered pending                                                                      
+24-11-28-09:51:33                                     Serviced Common Component modified: E x p o r t e d !                                                                      
+24-11-28-09:51:33                                     Serviced Common Component modified: Re-registered pending release                                                          
+24-11-28-09:51:33 ExportChangedComponents (by CompMan.xlsb) for Msg.xlsb: 1 of 16 exported (mObject)     See the VBE CompMan menu for 1 Common Component is pending release!  (see E:\Sync\Excel VBA\DevAndTest\Msg\CompMan\Services.log for log details)

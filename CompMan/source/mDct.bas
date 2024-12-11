@@ -2,6 +2,7 @@ Attribute VB_Name = "mDct"
 Option Explicit
 ' ----------------------------------------------------------------------------
 ' Standard Module mDct: Procedures for Dictionaries
+' =====================
 '
 ' Note: 1. Procedures of the mDct module do not use the Common VBA Error Handler.
 '          However, test module uses the mErrHndlr module for test purpose.
@@ -21,7 +22,7 @@ Option Explicit
 '               Note: The reference to "Microsoft Visual Basic Application Extensibility .."
 '               is for the mMsgTest module only!
 '
-' W. Rauschenberger, Berlin Sept 2020
+' W. Rauschenberger, Berlin Jan 2024
 ' ----------------------------------------------------------------------------
 Private bAddedAfter     As Boolean
 Private bAddedBefore    As Boolean
@@ -86,7 +87,6 @@ Public Sub DctAdd(ByRef add_dct As Dictionary, _
     On Error GoTo eh
     Dim bDone           As Boolean
     Dim dctTemp         As Dictionary
-    Dim vItem           As Variant
     Dim vItemExisting   As Variant
     Dim vKeyExisting    As Variant
     Dim vValueExisting  As Variant ' the entry's add_key/add_item value for the comparison with the vValueNew
@@ -272,12 +272,10 @@ Private Sub AddAscByKey(ByRef add_dct As Dictionary, _
     On Error GoTo eh
     Dim bDone           As Boolean
     Dim dctTemp         As Dictionary
-    Dim vItem           As Variant
     Dim vItemExisting   As Variant
     Dim vKeyExisting    As Variant
     Dim vValueExisting  As Variant ' the entry's add_key/add_item value for the comparison with the vValueNew
     Dim vValueNew       As Variant ' the argument add_key's/add_item's value
-    Dim vValueTarget    As Variant ' the add before/after add_key/add_item's value
     Dim bStayWithFirst  As Boolean
     Dim bOrderByItem    As Boolean
     Dim bOrderByKey     As Boolean
@@ -392,34 +390,32 @@ eh: Select Case ErrMsg(ErrSrc(PROC))
     End Select
 End Sub
 
-Public Function ErrMsg(ByVal err_source As String, _
+Private Function ErrMsg(ByVal err_source As String, _
               Optional ByVal err_no As Long = 0, _
               Optional ByVal err_dscrptn As String = vbNullString, _
               Optional ByVal err_line As Long = 0) As Variant
 ' ------------------------------------------------------------------------------
-' Universal error message display service. Obligatory copy Private for any
-' VB-Component using the common error service but not having the mBasic common
-' component installed.
-' Displays: - a debugging option button when the Cond. Comp. Arg. 'Debugging = 1'
-'           - an optional additional "About:" section when the err_dscrptn has
-'             an additional string concatenated by two vertical bars (||)
-'           - the error message by means of the Common VBA Message Service
-'             (fMsg/mMsg) when installed and active (Cond. Comp. Arg.
-'             `MsgComp = 1`)
+' Universal error message display service which displays:
+' - a debugging option button
+' - an "About:" section when the err_dscrptn has an additional string
+'   concatenated by two vertical bars (||)
+' - the error message either by means of the Common VBA Message Service
+'   (fMsg/mMsg) when installed (indicated by Cond. Comp. Arg. `mMsg = 1` or by
+'   means of the VBA.MsgBox in case not.
 '
 ' Uses: AppErr  For programmed application errors (Err.Raise AppErr(n), ....)
 '               to turn them into a negative and in the error message back into
 '               its origin positive number.
 '
-' W. Rauschenberger Berlin, June 2023
+' W. Rauschenberger Berlin, Jan 2024
 ' See: https://github.com/warbe-maker/VBA-Error
 ' ------------------------------------------------------------------------------
-#If ErHComp = 1 Then
+#If mErH = 1 Then
     '~~ When Common VBA Error Services (mErH) is avaiLabel in the VB-Project
     '~~ (which includes the mMsg component) the mErh.ErrMsg service is invoked.
     ErrMsg = mErH.ErrMsg(err_source, err_no, err_dscrptn, err_line): GoTo xt
     GoTo xt
-#ElseIf MsgComp = 1 Then
+#ElseIf mMsg = 1 Then
     '~~ When (only) the Common Message Service (mMsg, fMsg) is available in the
     '~~ VB-Project, mMsg.ErrMsg is invoked for the display of the error message.
     ErrMsg = mMsg.ErrMsg(err_source, err_no, err_dscrptn, err_line): GoTo xt
@@ -441,7 +437,7 @@ Public Function ErrMsg(ByVal err_source As String, _
     '~~ Obtain error information from the Err object for any argument not provided
     If err_no = 0 Then err_no = Err.Number
     If err_line = 0 Then ErrLine = Erl
-    If err_source = vbNullString Then err_source = Err.source
+    If err_source = vbNullString Then err_source = Err.Source
     If err_dscrptn = vbNullString Then err_dscrptn = Err.Description
     If err_dscrptn = vbNullString Then err_dscrptn = "--- No error description available ---"
     
@@ -474,12 +470,8 @@ Public Function ErrMsg(ByVal err_source As String, _
     ErrText = "Error: " & vbLf & ErrDesc & vbLf & vbLf & "Source: " & vbLf & err_source & ErrAtLine
     If ErrAbout <> vbNullString Then ErrText = ErrText & vbLf & vbLf & "About: " & vbLf & ErrAbout
     
-#If Debugging = 1 Then
     ErrBttns = vbYesNo
     ErrText = ErrText & vbLf & vbLf & "Debugging:" & vbLf & "Yes    = Resume Error Line" & vbLf & "No     = Terminate"
-#Else
-    ErrBttns = vbCritical
-#End If
     ErrMsg = MsgBox(Title:=ErrTitle, Prompt:=ErrText, Buttons:=ErrBttns)
 xt:
 End Function
@@ -530,7 +522,6 @@ Public Function DctDiffers(ByVal dd_dct1 As Dictionary, _
     
     On Error GoTo eh
     Dim i       As Long
-    Dim v       As Variant
     
     If dd_ignore_items_empty Then
         '~~ Remove empty items (items with a lenght = 0) from both Dictionaries
@@ -547,8 +538,7 @@ Public Function DctDiffers(ByVal dd_dct1 As Dictionary, _
             For i = 0 To dd_dct1.Count - 1
                 If Differs(v1:=dd_dct1.Items()(i) _
                          , v2:=dd_dct2.Items()(i) _
-                         , ignore_case:=dd_ignore_case _
-                         , ignore_empty:=dd_ignore_items_empty) Then
+                         , ignore_case:=dd_ignore_case) Then
                     DctDiffers = True
                     Exit For
                 End If
@@ -559,8 +549,7 @@ Public Function DctDiffers(ByVal dd_dct1 As Dictionary, _
             For i = 0 To dd_dct1.Count - 1
                 If Differs(v1:=dd_dct1.Keys()(i) _
                          , v2:=dd_dct2.Keys()(i) _
-                         , ignore_case:=dd_ignore_case _
-                         , ignore_empty:=dd_ignore_items_empty) Then
+                         , ignore_case:=dd_ignore_case) Then
                     DctDiffers = True
                     Exit For
                 End If
@@ -571,12 +560,10 @@ Public Function DctDiffers(ByVal dd_dct1 As Dictionary, _
             For i = 0 To dd_dct1.Count - 1
                 DctDiffers = Differs(v1:=dd_dct1.Keys()(i) _
                                    , v2:=dd_dct2.Keys()(i) _
-                                   , ignore_case:=dd_ignore_case _
-                                   , ignore_empty:=dd_ignore_items_empty) _
+                                   , ignore_case:=dd_ignore_case) _
                          And Differs(v1:=dd_dct1.Items()(i) _
                                    , v2:=dd_dct2.Items()(i) _
-                                   , ignore_case:=dd_ignore_case _
-                                   , ignore_empty:=dd_ignore_items_empty)
+                                   , ignore_case:=dd_ignore_case)
                 If DctDiffers Then Exit For
             Next i
     End Select
@@ -606,14 +593,15 @@ End Sub
 
 Private Function Differs(ByVal v1 As Variant, _
                          ByVal v2 As Variant, _
-                Optional ByVal ignore_case As Boolean = False, _
-                Optional ByVal ignore_empty As Boolean = False) As Boolean
+                Optional ByVal ignore_case As Boolean = False) As Boolean
 ' ------------------------------------------------------------------------------
 ' Returns TRUE when v1 is not identical with v2. I.e when they are objects,
 ' TRUE is returned when the object's Name differ. When only one of the two
 ' is a string and the other one is an object the string is compared with the
 ' object's Name property.
 ' ------------------------------------------------------------------------------
+    Const PROC = "Differs"
+    
     On Error Resume Next
     Select Case True
         Case IsObject(v1) And IsObject(v2)
@@ -645,8 +633,8 @@ Private Function Differs(ByVal v1 As Variant, _
             Then Differs = StrComp(v1, v2, vbTextCompare) _
             Else Differs = StrComp(v1, v2, vbBinaryCompare)
             If Differs Then
-                Debug.Print "Ignore Case = " & CStr(ignore_case)
-                Debug.Print "Differs: " & v1 & vbLf & _
+                Debug.Print ErrSrc(PROC) & ": " & "Ignore Case = " & CStr(ignore_case)
+                Debug.Print ErrSrc(PROC) & ": " & "Differs: " & v1 & vbLf & _
                             "         " & v2
             End If
     End Select
@@ -693,7 +681,6 @@ Public Function KeySort(ByRef s_dct As Dictionary) As Dictionary
     Dim vKey    As Variant
     Dim arr()   As Variant
     Dim Temp    As Variant
-    Dim Txt     As String
     Dim i       As Long
     Dim j       As Long
     

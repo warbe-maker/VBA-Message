@@ -621,3 +621,11 @@
 23-12-08 14:54:26 01,5310 01,5310 << End execution trace 
 23-12-08 14:54:26                 Execution trace by 'Common VBA Execution Trace Service (mTrc)' (https://github.com/warbe-maker/VBA-Trace)
 23-12-08 14:54:26                 Impact on the overall performance (caused by the trace itself): 3,6 milliseconds!
+===========================================================================================================================================
+24-11-28 09:31:18 Elapsed Length  Execution trace by 'Common VBA Execution Trace Service (mTrc)' (https://github.com/warbe-maker/VBA-Trace)
+24-11-28 09:31:18 seconds seconds >> Begin execution trace 
+24-11-28 09:31:18 00,0000         |  >> mMsgTestServices.Test_02_2_Single_Section_MonoSpaced_With_Label
+24-11-28 09:31:18 00,1521 00,1521 |  << mMsgTestServices.Test_02_2_Single_Section_MonoSpaced_With_Label
+24-11-28 09:31:18 00,1521 00,1521 << End execution trace 
+24-11-28 09:31:18                 Execution trace by 'Common VBA Execution Trace Service (mTrc)' (https://github.com/warbe-maker/VBA-Trace)
+24-11-28 09:31:18                 Impact on the overall performance (caused by the trace itself): 13,2 milliseconds!
